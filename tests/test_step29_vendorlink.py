@@ -102,6 +102,10 @@ class Qualification(unittest.TestCase):
                     uid_split[ad.uid] = group.split
                     self.assertNotRegex(ad.description, r"vendor\d+")
             self.assertEqual(len(labels[group.uid]), len(group.views)*(len(group.views)-1)//2)
+            # Handwritten product number is private fixture truth, independent of output order.
+            expected = [int(a.records[0].title.split()[1] == b.records[0].title.split()[1])
+                        for i, a in enumerate(group.views) for b in group.views[i+1:]]
+            self.assertEqual(labels[group.uid], expected)
         self.assertGreater(report["rejected"]["shared_exact_text"], 0)
         blind = fixture(split="dev").blind()
         with self.assertRaises(ValueError):
@@ -113,6 +117,42 @@ class Qualification(unittest.TestCase):
         self.assertEqual(len(scores[blind.uid]["scores"]), len(blind.views)*(len(blind.views)-1)//2)
         self.evidence("data", {**report, "blind_regroup_rejected": True, "fit_evaluation_rejected": True,
                                "blind_scoring_uses_no_identity": True})
+
+    def test_blind_alignment_and_ties(self):
+        source = fixture(split="dev")
+        aligned, blind = source.evaluation_order(), source.blind()
+        self.assertEqual(blind, aligned.blind())
+        self.assertTrue(all(v.identity is None for v in blind.views))
+        self.assertTrue(all(len(v.uid) == 64 and ":" not in v.uid for v in blind.views))
+        # Recover labels here only from private fixture membership, not exported IDs.
+        private = {r.uid: v.identity for v in source.views for r in v.records}
+        expected = [int(private[a.records[0].uid] == private[b.records[0].uid])
+                    for i, a in enumerate(blind.views) for b in blind.views[i+1:]]
+        self.assertEqual(expected, aligned.labels())
+        self.assertNotEqual(expected, [int(i//2 == j//2) for i in range(8) for j in range(i+1, 8)])
+        self.assertEqual(source.blind(), d.Group(source.uid, source.domain, source.split, source.views[::-1]).blind())
+        # Relabel identities and old view UIDs: neither may affect public IDs/order.
+        relabeled = d.Group(source.uid, source.domain, source.split, tuple(
+            d.View("changed-"+str(i), v.records, "other-"+v.identity) for i, v in enumerate(source.views)))
+        self.assertEqual(blind, relabeled.blind())
+        ids = [v.uid for v in blind.views]
+        scores = [0.]*len(expected)
+        ap = run.query_ap(scores, expected, ids)
+        reference = []
+        for q, view in enumerate(aligned.views):
+            ranked_ids = sorted(v.uid for v in aligned.views if v.uid != view.uid)
+            partner = next(v.uid for v in aligned.views if v.uid != view.uid and v.identity == view.identity)
+            reference.append(1/(ranked_ids.index(partner)+1))
+        self.assertEqual(ap, reference)
+        # Permuting storage changes neither score/label pairing nor AP by query ID.
+        permutation = [5, 0, 7, 2, 1, 6, 3, 4]
+        other = [aligned.views[i] for i in permutation]
+        other_labels = [int(a.identity == b.identity) for i, a in enumerate(other) for b in other[i+1:]]
+        other_ap = run.query_ap(scores, other_labels, [v.uid for v in other])
+        self.assertEqual(dict(zip(ids, ap)), dict(zip([v.uid for v in other], other_ap)))
+        self.evidence("blind_ties", {"qrels_aligned": True, "identity_and_old_uid_independent": True,
+            "storage_permutation_invariant": True, "all_equal_score_ap": ap,
+            "fixed_tie_rule": "opaque_view_id", "uniform_tie_expectation_not_a_per_instance_target": True})
 
     def test_vendor_representation_and_diagonal_reference(self):
         layers = tuple(torch.arange(24, dtype=torch.float32).reshape(2, 3, 4)/(k+2) for k in range(5))
@@ -168,7 +208,8 @@ class Qualification(unittest.TestCase):
         self.evidence("h_math", errors)
 
     def test_actual_vjp_updates_and_full_restore(self):
-        group, history = fixture(), fixture("B")
+        # 35 records / 595 pairs / 70 channel texts cross BOTH actual block boundaries.
+        group, history = fixture(component_sizes=(2,)*7), fixture("B", component_sizes=(2,)*7)
         model = model_for("H_full", self.root)
         teacher = model.teacher(history)+.6
         initial = copy.deepcopy(model)
@@ -214,6 +255,7 @@ class Qualification(unittest.TestCase):
                 torch.testing.assert_close(restored_optimizer.state_dict()["state"][key][field], value, atol=0, rtol=0)
         self.evidence("actual_update_restore", {"tiny_random_bert": True, "encoder_change": encoder_change,
             "head_change": head_change, "restored_next_update_exact": True, "direct_autograd_agrees": True,
+            "records": 35, "record_pairs": 595, "channel_texts": 70, "head_block": 512, "microbatch": 64,
             "pretrained_weights_loaded": False})
 
     def test_four_actual_trajectories_memory_and_future_access(self):
@@ -267,16 +309,22 @@ class Qualification(unittest.TestCase):
             run.execute(resumed, resume_load, self.root/(method+"_resumed"), order="ABC", seed=7, epochs=1,
                 identity={"scope": "handwritten", "method": method}, resume=job/"stage1.pt")
             self.assertEqual(loaded_after_recovery, ["B", "C"])
+            recovered_job = self.root/(method+"_resumed")
+            completion = json.loads((recovered_job/"completion.json").read_text())
+            self.assertTrue(all((recovered_job/p).is_file() for p in completion["stage_endpoints"]))
+            self.assertEqual(run.file_sha256(job/"stage1.pt"), run.file_sha256(recovered_job/"stage1.pt"))
+            self.assertEqual(completion["inherited_endpoints"][0]["sha256"], run.file_sha256(job/"stage1.pt"))
             for key, value in model.state_dict().items():
                 torch.testing.assert_close(resumed.state_dict()[key], value, atol=0, rtol=0)
             blind = fixture("A", "dev").blind()
             scores = run.evaluate(model, [blind])[blind.uid]["scores"]
-            ap = run.query_ap(scores, fixture("A", "dev").labels(), len(blind.views))
+            ap = run.query_ap(scores, fixture("A", "dev").evaluation_order().labels(), [v.uid for v in blind.views])
             self.assertEqual(len(ap), len(blind.views))
             self.assertTrue(all(0 <= v <= 1 for v in ap))
             evidence[method] = {"loaded_domains": loaded, "updates": result["updates"],
                 "history_members": len(states[-1]["memory"]["entries"]), "blind_pairs": len(scores),
-                "stage_boundary_resume_exact": True, "recovered_stage_loads": loaded_after_recovery}
+                "stage_boundary_resume_exact": True, "recovered_stage_loads": loaded_after_recovery,
+                "all_recovered_endpoints_exist": True, "inherited_endpoint_same_bytes": True}
         self.evidence("actual_four_trajectories", evidence)
 
 

@@ -13,6 +13,7 @@ import json
 import math
 from pathlib import Path
 import random
+import shutil
 import time
 
 import numpy as np
@@ -24,6 +25,14 @@ from step29_vendorlink_methods import Memory, Model, Settings, make_optimizer, u
 
 def write_json(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+
+
+def file_sha256(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024*1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def rng_state():
@@ -95,7 +104,20 @@ def execute(model, load_fit, job, *, order, seed, epochs, identity, check=lambda
         optimizer, cursor = load_state(resume, model, memory, identity)
     if cursor["complete"]:
         raise ValueError("Completed trajectory must not be resumed")
+    inherited = []
     try:
+        # A fresh recovery directory must retain every already learned endpoint.
+        # Copy existing states; never retrain earlier domains to fill this list.
+        if resume is not None:
+            for index in range(1, cursor["stage"]+1):
+                check()
+                source = Path(resume).resolve().parent/f"stage{index}.pt"
+                target = job/source.name
+                digest = file_sha256(source)  # Missing ancestors fail before further training.
+                shutil.copyfile(source, target)
+                if file_sha256(target) != digest:
+                    raise ValueError("Inherited endpoint copy differs")
+                inherited.append({"path": target.name, "source": str(source), "sha256": digest})
         for stage in range(cursor["stage"], 3):
             check()
             groups = load_fit(order[stage])
@@ -156,7 +178,7 @@ def execute(model, load_fit, job, *, order, seed, epochs, identity, check=lambda
             del groups
         write_json(job/"completion.json", {"status": "THREE_STAGES_TRAINED_NOT_EVALUATED",
             "identity": identity, "updates": cursor["updates"], "memory_bytes": len(memory.bytes()),
-            "stage_endpoints": [f"stage{i}.pt" for i in (1, 2, 3)]})
+            "stage_endpoints": [f"stage{i}.pt" for i in (1, 2, 3)], "inherited_endpoints": inherited})
         return cursor
     except BaseException as error:
         write_json(job/"failure.json", {"status": "STOP_NO_AUTOMATIC_RETRY", "error": repr(error), "cursor": cursor})
@@ -173,19 +195,27 @@ def evaluate(model, groups, check=lambda: None):
     return result
 
 
-def query_ap(scores, labels, n):
-    """Deterministic query MAP ingredients, not pairwise AP. Zero positives fail."""
+def query_ap(scores, labels, view_ids):
+    """Per-query AP with fixed opaque-ID ties; independent of input row order.
+
+    Scores and private qrels must share the exported view_ids ordering.
+    """
+    n = len(view_ids)
+    if n < 2 or len(set(view_ids)) != n or not all(isinstance(v, str) and v for v in view_ids):
+        raise ValueError("Distinct opaque view IDs required")
     matrix, truth = np.zeros((n, n)), np.zeros((n, n), dtype=bool)
     indices = np.triu_indices(n, 1)
     if len(scores) != len(indices[0]) or len(labels) != len(scores):
         raise ValueError("Incomplete pair table")
+    if not np.isfinite(scores).all() or not np.isin(labels, [0, 1]).all():
+        raise ValueError("Finite scores and binary aligned qrels required")
     matrix[indices], truth[indices] = scores, labels
     matrix += matrix.T
     truth |= truth.T
     result = []
     for q in range(n):
         candidates = [i for i in range(n) if i != q]
-        ordered = sorted(candidates, key=lambda i: (-matrix[q, i], i))
+        ordered = sorted(candidates, key=lambda i: (-matrix[q, i], view_ids[i]))
         hits = truth[q, ordered]
         if not hits.any():
             raise ValueError("Query has no known positive")

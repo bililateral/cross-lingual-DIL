@@ -1,0 +1,278 @@
+{
+  "review_date": "2026-10-29",
+  "timezone": "Asia/Shanghai",
+  "input": {
+    "name": "vendorlink_implementation_review.zip",
+    "bytes": 48396,
+    "sha256": "5274c7fe508ade3fa0197f3b189ade7d97c0027d897a8e7da35a670b62a7a7e2",
+    "members": 28,
+    "payloads": 27
+  },
+  "status": {
+    "review": "COMPLETED",
+    "implementation": "TARGETED_REPAIR_REQUIRED",
+    "scientific_framework": "ACCEPTABLE_WITH_RESTRICTED_PROXY_CLAIMS",
+    "formal_training_authorized": false,
+    "formal_training_executed": false
+  },
+  "findings": [
+    {
+      "id": "F01",
+      "category": "SCIENTIFIC_BLOCKER",
+      "scope": "正式评分／方法比较，发生同分时",
+      "title": "同分排序与关系标签结构相关",
+      "evidence_status": "CONFIRMED_SOURCE_AND_HANDWRITTEN_NUMERICAL_COUNTEREXAMPLE",
+      "source": [
+        {
+          "path": "scripts/step29_vendorlink_data.py",
+          "lines": [
+            119,
+            120,
+            132,
+            133
+          ]
+        },
+        {
+          "path": "scripts/step29_vendorlink_run.py",
+          "function": "query_ap",
+          "lines": [
+            176,
+            188,
+            193
+          ]
+        }
+      ],
+      "mechanism": "同身份两视图相邻，平分按candidate_index排序。",
+      "evidence": {
+        "views": 8,
+        "positive_pairs": 4,
+        "pairs": 28,
+        "all_scores_equal": true,
+        "current_map": 0.41904761904761906,
+        "current_fraction": "44/105",
+        "uniform_label_independent_tie_expectation": 0.3704081632653061,
+        "expectation_fraction": "363/980"
+      },
+      "impact": "方法／阶段同分率不同时可能获得不同的结构性MAP优势；未发现正式结果污染，因为本轮没有正式结果。",
+      "minimal_fix": "冻结关系无关视图／候选次序或明确的同分期望规则；与F02共同处理；增加不训练的同分／重排对齐微例。",
+      "not_claimed": "并未声称所有正式分数都会同分；固定随机排列的单例不要求恰等于随机破平期望。",
+      "shared_repair_unit": "evaluation_metadata_and_tie_order"
+    },
+    {
+      "id": "F02",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "scope": "盲载荷和qrels隔离承诺",
+      "title": "blind载荷仍可直接解码关系",
+      "evidence_status": "CONFIRMED_SOURCE_AND_HANDWRITTEN_DATA",
+      "source": [
+        {
+          "path": "scripts/step29_vendorlink_data.py",
+          "function": "blind/build_views",
+          "lines": [
+            59,
+            60,
+            117,
+            118,
+            119,
+            120,
+            132,
+            133,
+            137
+          ]
+        },
+        {
+          "path": "scripts/step29_vendorlink_run.py",
+          "function": "evaluate",
+          "lines": [
+            166,
+            173
+          ]
+        },
+        {
+          "path": "tests/test_step29_vendorlink.py",
+          "lines": [
+            99,
+            106,
+            115
+          ]
+        }
+      ],
+      "mechanism": "共同identity哈希前缀保留在view UID，且视图仍按身份成对相邻。",
+      "evidence": {
+        "handwritten_rows": 80,
+        "identity_all_none": true,
+        "all_28_qrels_recovered_from_uid": true,
+        "all_28_qrels_recovered_from_indices": true
+      },
+      "impact": "显式identity为空不足以证明盲真值隔离。",
+      "minimal_fix": "独立不泄露共同身份的view UID，同时固定关系无关组内排列，再生成对齐qrels。",
+      "not_claimed": "当前模型前向只用文本；没有证据证明实际利用UID作弊或梯度证据失效。",
+      "shared_repair_unit": "evaluation_metadata_and_tie_order"
+    },
+    {
+      "id": "F03",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "scope": "旧CPU证据覆盖当前版的可核验来源",
+      "title": "cpu01未改函数证据缺来源桥",
+      "evidence_status": "CONFIRMED_PACKAGE_COVERAGE_GAP",
+      "source": [
+        {
+          "path": "implementation/implementation.zh.txt",
+          "lines": [
+            37,
+            38
+          ]
+        },
+        {
+          "path": "implementation/cpu01/receipt.json",
+          "lines": [
+            15,
+            34
+          ]
+        },
+        {
+          "path": "implementation/cpu04/receipt.json",
+          "lines": [
+            9,
+            34
+          ]
+        }
+      ],
+      "mechanism": "cpu01 methods/run/tests整文件SHA不同，包内缺旧源码或可逆到旧SHA的完整差异。",
+      "impact": "不能仅凭摘要独立证明未改函数的原生证据可直接覆盖当前文件；不影响cpu04当前阶段流程或cpu02当前data源码证据。",
+      "minimal_fix": "补已有旧methods/run/tests或可校验到旧整文件SHA的patch，只核相关函数及实际调用的旧Group/assignment等必要依赖，复用未变证据。",
+      "not_claimed": "不是当前数学错误，也不否定cpu01当时通过；不要求全面重跑历史。"
+    },
+    {
+      "id": "F04",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "scope": "API恢复后的端点评价交接；启用正式resume前",
+      "title": "恢复完成清单引用未生成的首阶段端点",
+      "evidence_status": "CONFIRMED_STATIC_CONTROL_FLOW",
+      "source": [
+        {
+          "path": "scripts/step29_vendorlink_run.py",
+          "function": "execute",
+          "lines": [
+            87,
+            89,
+            94,
+            99,
+            152,
+            154,
+            155,
+            157,
+            159
+          ]
+        },
+        {
+          "path": "tests/test_step29_vendorlink.py",
+          "lines": [
+            267,
+            271
+          ]
+        }
+      ],
+      "mechanism": "从stage1恢复到fresh job只写stage2/3，completion却列新目录的stage1/2/3。",
+      "impact": "完整评价三角无法仅从该清单收集；最终模型恢复一致性不因此无效。",
+      "minimal_fix": "为继承端点记录原路径、身份和hash，或复制原端点并校验；无需重训。",
+      "not_claimed": "CLI当前拒绝正式resume；正常全新轨迹不受这一触发条件影响。"
+    }
+  ],
+  "necessary_followup_prerequisites": [
+    {
+      "id": "N01",
+      "title": "实际市场文件／字段／数据资格",
+      "requirement": "固定获准文件版本、字段、空值和规模、划分参数、组大小及A/B/C映射；当前未做实际准备。"
+    },
+    {
+      "id": "N02",
+      "title": "正式配置与来源",
+      "requirement": "冻结实际BERT/tokenizer/源码身份、Settings与epochs/曝光；保留两既有H参数，不新增HPO或按最终结果选择。"
+    },
+    {
+      "id": "N03",
+      "title": "限定真实英文GPU资格",
+      "requirement": "在另行授权范围内核encoder/head实际更新、评分、保存恢复、Memory字节及资源；正式形状跨块时补一次覆盖512对和encoder微批边界的direct-autograd对照。",
+      "smallest_example": {
+        "component_sizes": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "records": 35,
+        "record_pairs": 595,
+        "channel_texts": 70
+      },
+      "evidence_limit": "已有实际VJP例为20记录/190对/40通道文本，microbatch64，未跨块；未证实代码跨块错误。"
+    },
+    {
+      "id": "N04",
+      "title": "最终评价与交接",
+      "requirement": "关闭F01/F02，预定query权重、tie规则、Q/O/F/N、配对统计及标签开放；若启用恢复关闭F04。"
+    },
+    {
+      "id": "N05",
+      "title": "预算／三路准入／执行许可",
+      "requirement": "具体化累计资格训练评价失败费用和显存预留；尚无正式批次调度器／签发许可。"
+    },
+    {
+      "id": "N06",
+      "title": "不虚计共享节省",
+      "requirement": "36轨迹当前对应108阶段调用；90阶段须先实现并核验H首阶段共享。"
+    }
+  ],
+  "optional_items": [
+    {
+      "id": "O01",
+      "item": "VendorLink+ER",
+      "if_omitted": "可保留本轮整体比较和H内部归因；不支持相同历史记忆权限下优于VendorLink。"
+    },
+    {
+      "id": "O02",
+      "item": "近重复／模板敏感性分析",
+      "if_omitted": "只能报告未排除此类信号的观察账号视图效果，不能声称排除了模板等贡献。"
+    },
+    {
+      "id": "O03",
+      "item": "跨账号真实控制者标签",
+      "if_omitted": "不支持真实马甲识别；本轮受控代理任务仍可成立。"
+    },
+    {
+      "id": "O04",
+      "item": "H首阶段共享",
+      "if_omitted": "科学比较仍成立，按未共享工作量预算，不报90阶段。"
+    },
+    {
+      "id": "O05",
+      "item": "释放旧fit残留引用",
+      "if_omitted": "资源峰值如实计入；1MiB承诺限定为已计量Memory序列化，而非全进程所有旧文本物理驻留。"
+    }
+  ],
+  "out_of_scope_overdesign": [
+    "全部六排列",
+    "全epoch诊断",
+    "全部旧方法基线",
+    "逐层CKA",
+    "额外HPO",
+    "通用实验平台",
+    "重开全部旧项目审查",
+    "为显著性扩种子／预算",
+    "依据最终结果选参数",
+    "本轮下载正式数据／模型或启动GPU"
+  ],
+  "scope_of_independent_execution": {
+    "environment": "isolated reviewer workspace, Python 3.12.14, NumPy 2.3.5, Linux-6.18.55-x86_64-with-glibc2.39",
+    "hash_and_ast_only_plus_microchecks": true,
+    "models_loaded": 0,
+    "training_runs": 0,
+    "test_suite_runs": 0,
+    "formal_data_or_labels_read": 0,
+    "project_server_accesses": 0,
+    "torch_or_transformers_imported": false
+  }
+}

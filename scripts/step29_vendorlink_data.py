@@ -56,8 +56,22 @@ class Group:
             raise ValueError("Blind views do not contain relation labels")
         return [int(a.identity == b.identity) for i, a in enumerate(self.views) for b in self.views[i+1:]]
 
+    def evaluation_order(self) -> Group:
+        """Prepare private qrels in the same opaque, relation-independent order as scoring.
+
+        IDs hash each disjoint record set, never identity or the old view UID.
+        This is idempotent and must run before exporting the aligned qrels.
+        """
+        views = []
+        for view in self.views:
+            key = ["evaluation_view", self.uid, sorted(r.uid for r in view.records)]
+            uid = hashlib.sha256(json.dumps(key, ensure_ascii=False).encode()).hexdigest()
+            views.append(View(uid, view.records, view.identity))
+        return Group(self.uid, self.domain, self.split, tuple(sorted(views, key=lambda v: v.uid)))
+
     def blind(self) -> Group:
-        return Group(self.uid, self.domain, self.split, tuple(View(v.uid, v.records) for v in self.views))
+        group = self.evaluation_order()
+        return Group(group.uid, group.domain, group.split, tuple(View(v.uid, v.records) for v in group.views))
 
     @classmethod
     def from_dict(cls, value: dict) -> Group:
@@ -132,6 +146,8 @@ def build_views(rows: list[dict], *, split_seed: int, train_fraction: float,
             group = Group(f"{market}:{split}:{index}", market, split,
                           tuple(v for _, views in chunk for v in views))
             group.validate(training=split == "fit")
+            if split != "fit":
+                group = group.evaluation_order()
             labels[group.uid] = group.labels()
             # Evaluation inputs carry no identity labels; these remain in the separate qrels output.
             payloads.setdefault(f"{market}:{split}", []).append(asdict(group if split == "fit" else group.blind()))

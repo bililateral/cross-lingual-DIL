@@ -1,0 +1,676 @@
+- region "对话" [ref=e119]:
+  - generic [ref=e120]:
+    - generic [ref=e129]:
+      - generic [ref=e130]:
+        - generic [ref=e131]:
+          - heading "你说：" [level=4] [ref=e132]
+          - generic [ref=e133]:
+            - generic [ref=e136]:
+              - button "vendorlink_implementation_review.zip" [ref=e137] [cursor=pointer]
+              - generic:
+                - generic:
+                  - generic "vendorlink_implementation_review.zip"
+                  - generic: 文件
+            - generic [ref=e139]:
+              - generic [ref=e141]:
+                - generic [ref=e142]:
+                  - generic [ref=e143]: 请用当前选择的 GPT-6／Pro 完成本次独立科研外审。 本轮唯一输入：vendorlink_implementation_review.zip；48,396字节；SHA256 5274c7fe508ade3fa0197f3b189ade7d97c0027d897a8e7da35a670b62a7a7e2；28个成员（27载荷＋MANIFEST）。 用户已要求实现完成后提交网页GPT外审并交代背景；本包只有本轮方案、源码、手写CPU证据和相关说明，无正式数据、标签源文件、模型、Memory或凭据。 请对本次VendorLink受控账号视图持续学习的实现与方案作独立科研外审。 这是一项新的真实文本场景扩展，不能把同会话旧合成五方法、原版S/H或等待编排报告当成本轮结论。请先完整阅读implementation/implementation.zh.txt及implementation/authorization.json，再读源码、测试和CPU原件；proposal.zh.txt是较早静态提议，最新补充优先。不要直接认可执行者的摘要或PASS数量。 背景：主线是纯商品标题/描述输入的训练未见身份账号关联与持续学习抗遗忘。原中文合成45轨迹H相对S最终旧域MAP有优势，但遗忘差区间跨零，原主要共同门false；没有已确认的额外抗遗忘结论。用户要完整H迁移到VendorLink场景，并要求原VendorLink论文方法作独立对照。用户已明确接受观察账号不同商品集合的受控代理实验，不能外推真实跨账号马甲真值。 本轮四臂：VendorLink_SEQ（原方法新顺序适配）、H_SEQ、H_ER、H_full。三个H保持相同当前域方法，分别无历史、0.1监督回放、再加0.5教师分数保持；保留既有H_pos_tuned两参数，不新增HPO。VendorLink与H采用相同英文BERT骨干起点的建议，但任务目标/表示/评分保持各自方法。VendorLink无记忆，对H的整体比较不等于相同记忆权限的比较；H_ER承担内部公平归因。 请重点审查： 1. 代理数据构造、跨市场同名只作保守划分、处理前后精确去重、训练身份隔离及盲评价是否符合问题；未做近重复/潜在控制者隔离意味着什么。拒绝把作者预测别名当真值。 2. 原论文对照是否保留了必要方法。固定作者提交9d0ba5dba665f0e057426cb3b88fae402658d361已直接核查：最后四层等权求和并屏蔽padding，却未把三维token输出聚合成广告向量。用户已批准“有效token掩码平均”作为明确复现假设，请独立判断其合理性与命名边界；不要把它改写成原作者明确提供的方法。官方账号自相似包含对角线；本轮保留。阶段新分类头/新优化器、PyTorch AdamW和输入截断等适配也需说明。 3. H是否确实保持记录对评分、半均值半log-mean-exp、自然/同控重组监督、非加权BCE、正例rank与HardTop5、历史0.1/0.5及旧教师不刷新；三个消融是否仅改变预定历史作用。尤其核对encoder/head真实梯度、分块VJP及实际optimizer更新，不能只看组件名。 4. 三阶段执行是否只读当前域，过去只能取存活Memory；恢复是否继承模型、Adam、RNG、记忆/教师和游标。H的Adam跨域继承，VendorLink新阶段重置；请按代码与cpu04判断，勿引用cpu03为最终修订证据。 5. 资格充分性：cpu01有一次真实数据逻辑失败，cpu02修好；cpu03是上传失败后误重复旧来源的5秒，不能背书当前版；cpu04对当前阶段流程定向通过。20/300秒全部保留。cpu01未改数学/梯度/下一步恢复证据复用。所有商品字符串及模型均为手写/随机微型HF BERT，没有预训练、真实数据、GPU或正式效果。只指出确有必要的增量核验，不要求全面重验历史。 6. 四臂是否足够回答“相对原论文方法的应用效果”和“H超过普通回放的遗忘缓解”；VendorLink+ER是否只属于更强结论需要的后续项，若认为本轮必须加，请具体论证而非泛泛要求更强基线。三循环×三seed×四臂36条仍为未获正式预算的建议；不加全排列、全epoch诊断、全部旧基线、CKA/HPO或通用实验平台。 7. 后续必要范围：实际三市场文件/字段、正式数据资格、真实英文GPU资格、三路显存准入和累计预算仍待合同。单轨迹入口及手写轨迹已实现；没有正式批次调度器和签发的执行许可，不称已可正式开训。请区分本轮已证实实现缺陷与正式运行前的自然前提；首阶段共享尚未实现，不能计入90阶段节省。 请返回完整中文报告，逐项给出源码位置、证据和主张影响，区分SCIENTIFIC_BLOCKER、REPRODUCIBILITY_DEFECT、必要后续前提、可选建议、OUT_OF_SCOPE_OVERDESIGN。对可选项说明删掉后结论边界；不要自动扩预算/数据范围，也不要建议根据最终结果选参数。 仅审查提供的实现与手写证据，不下载正式数据/模型，不重跑训练或访问项目服务器。若能独立静态检查或微型数值核对，请明确实际环境和范围，不能把网页端执行冒充项目Linux原生证据。请核对输入MANIFEST的逐文件大小/SHA，报告准确输入身份，给出可下载的完整报告及必要附件，并明确完成状态。
+                  - generic [aria-hidden] [ref=e146]: …
+                - button "显示更多" [ref=e147] [cursor=pointer]
+              - generic [ref=e153]:
+                - button "复制消息" [ref=e154] [cursor=pointer]
+                - button "共享提示" [ref=e157] [cursor=pointer]
+                - button "编辑消息" [ref=e160] [cursor=pointer]
+        - button "思考了 12m 49s" [ref=e168] [cursor=pointer]
+        - generic [ref=e175]:
+          - heading "ChatGPT 说：" [level=4] [ref=e176]
+          - generic [ref=e179]:
+            - heading "审查结论" [level=2] [ref=e180]
+            - paragraph [ref=e181]:
+              - strong [ref=e182]: 本轮独立外审已完成。方案与四臂可以保留，但当前实现外审应作“需要定向修复与来源补齐”的处置，尚不能直接关闭，也不构成正式开训许可。
+            - paragraph [ref=e183]: H 的核心公式、编码器与记录对头的梯度链、实际优化器更新，以及 cpu04 所对应的阶段流程，没有发现已证实的实质错误。需要处置的是：**评价侧两个相关问题、旧 CPU 证据的来源衔接缺口，以及 API 恢复后的端点清单错误。**其中，评价侧问题已经通过当前源码和独立手写数值例确认。
+            - paragraph [ref=e184]:
+              - strong [ref=e185]: 完整中文报告与核对附件：
+              - link "下载 vendorlink_independent_review_20261029.zip" [ref=e186] [cursor=pointer]:
+                - /url: https://chatgpt.com/library?file_id=libfile_cf5a2d983cf8819184d36dfd3b95040d&account_id=personal
+                - button "下载 vendorlink_independent_review_20261029.zip" [ref=e189]:
+                  - generic [ref=e190]: vendorlink_independent_review_20261029.zip
+            - paragraph [ref=e197]:
+              - text: 下载包为
+              - strong [ref=e198]: 35,412 字节、11 个成员
+              - text: ，SHA256：
+            - generic [ref=e200]:
+              - generic [ref=e201]:
+                - generic [ref=e204]: 纯文本
+                - generic [ref=e205]:
+                  - button "启用自动换行" [ref=e207] [cursor=pointer]
+                  - button "复制代码" [ref=e210] [cursor=pointer]
+              - code [ref=e214]: 4abc45df424dce4585424d599c53f97c41e68306963ce9fd22c8f0431dccd10c
+            - paragraph [ref=e215]: 以下给出主要裁决、依据及最小处置范围；完整报告包含全部源码定位、分类发现、资格边界和附件说明。
+            - heading "一、输入身份与实际审查范围" [level=2] [ref=e216]
+            - generic [ref=e217]:
+              - table [ref=e220]:
+                - rowgroup [ref=e221]:
+                  - row "核对项目 结果" [ref=e222]:
+                    - columnheader "核对项目" [ref=e223]
+                    - columnheader "结果" [ref=e224]
+                - rowgroup [ref=e225]:
+                  - row "输入文件 vendorlink_implementation_review.zip" [ref=e226]:
+                    - cell "输入文件" [ref=e227]
+                    - cell "vendorlink_implementation_review.zip" [ref=e228]
+                  - row "实际大小 48,396 字节" [ref=e229]:
+                    - cell "实际大小" [ref=e230]
+                    - cell "48,396 字节" [ref=e231]:
+                      - strong [ref=e232]: 48,396 字节
+                  - row "实际 SHA256 5274c7fe508ade3fa0197f3b189ade7d97c0027d897a8e7da35a670b62a7a7e2" [ref=e233]:
+                    - cell "实际 SHA256" [ref=e234]
+                    - cell "5274c7fe508ade3fa0197f3b189ade7d97c0027d897a8e7da35a670b62a7a7e2" [ref=e235]:
+                      - strong [ref=e236]: 5274c7fe508ade3fa0197f3b189ade7d97c0027d897a8e7da35a670b62a7a7e2
+                  - row "ZIP 成员 28 个：27 载荷＋MANIFEST" [ref=e237]:
+                    - cell "ZIP 成员" [ref=e238]
+                    - cell "28 个：27 载荷＋MANIFEST" [ref=e239]:
+                      - strong [ref=e240]: 28 个：27 载荷＋MANIFEST
+                  - row "逐文件核对 27 项大小与 SHA256 全部匹配" [ref=e241]:
+                    - cell "逐文件核对" [ref=e242]
+                    - cell "27 项大小与 SHA256 全部匹配" [ref=e243]:
+                      - strong [ref=e244]: 27 项大小与 SHA256 全部匹配
+                  - row "成员检查 集合精确一致，无重复成员或不安全路径" [ref=e245]:
+                    - cell "成员检查" [ref=e246]
+                    - cell "集合精确一致，无重复成员或不安全路径" [ref=e247]
+              - generic:
+                - button "复制表格"
+                - button "展开表格"
+            - paragraph [ref=e248]: "我按要求先完整阅读最新实现说明和授权，再完整阅读源码、测试及 cpu01—cpu04 原件。`proposal.zh.txt` 按早期提议处理，没有用其中旧状态覆盖最新决定，也没有把旧合成实验结论作为本轮结果。"
+            - paragraph [ref=e249]:
+              - text: 本次独立计算发生在
+              - strong [ref=e250]: 网页隔离工作区：Python 3.12.14、NumPy 2.3.5
+              - text: ，仅进行了哈希、AST、手写数据和微型数值核对。**没有加载模型、运行训练或现有测试套件、读取正式数据／标签、访问项目服务器。**这些核对不冒称项目 Linux 原生证据。
+            - heading "二、四项需要处置的发现" [level=2] [ref=e251]
+            - heading "F01 — SCIENTIFIC_BLOCKER：同分排序使用了与标签相关的排列" [level=3] [ref=e252]
+            - paragraph [ref=e253]:
+              - strong [ref=e254]: 影响范围：正式评价有效性；正式评分前应修复。
+            - paragraph [ref=e255]: 数据构造总把同身份的两个视图相邻放置，而 query_ap() 在分数相同时按候选下标排序：
+            - generic [ref=e257]:
+              - generic [ref=e258]:
+                - generic [ref=e261]: Python
+                - generic [ref=e262]:
+                  - button "启用自动换行" [ref=e264] [cursor=pointer]
+                  - button "复制代码" [ref=e267] [cursor=pointer]
+              - code [ref=e271]: "ordered = sorted(candidates, key=lambda i: (-matrix[q, i], i))"
+            - paragraph [ref=e272]: 因此，下标并非与关系标签无关。
+            - paragraph [ref=e273]:
+              - strong [ref=e274]: 源码定位：
+            - list [ref=e275]:
+              - listitem [ref=e276]: scripts/step29_vendorlink_data.py：第 119—120、132—133 行。
+              - listitem [ref=e277]: "scripts/step29_vendorlink_run.py：`query_ap()`，第 176—193 行，特别是第 188 行。"
+            - paragraph [ref=e278]:
+              - text: 我提取当前 query_ap()，用
+              - strong [ref=e279]: 4 身份×2 视图、全部分数相等
+              - text: 的例子实际核对。逐查询 AP 为：
+            - generic [ref=e282]:
+              - math [ref=e284]:
+                - generic [ref=e286]:
+                  - generic [ref=e287]: "1"
+                  - generic [ref=e288]: ","
+                  - generic [ref=e289]: "1"
+                  - generic [ref=e290]: ","
+                  - generic [ref=e291]:
+                    - generic [ref=e292]: "1"
+                    - generic [ref=e293]: "3"
+                  - generic [ref=e294]: ","
+                  - generic [ref=e295]:
+                    - generic [ref=e296]: "1"
+                    - generic [ref=e297]: "3"
+                  - generic [ref=e298]: ","
+                  - generic [ref=e299]:
+                    - generic [ref=e300]: "1"
+                    - generic [ref=e301]: "5"
+                  - generic [ref=e302]: ","
+                  - generic [ref=e303]:
+                    - generic [ref=e304]: "1"
+                    - generic [ref=e305]: "5"
+                  - generic [ref=e306]: ","
+                  - generic [ref=e307]:
+                    - generic [ref=e308]: "1"
+                    - generic [ref=e309]: "7"
+                  - generic [ref=e310]: ","
+                  - generic [ref=e311]:
+                    - generic [ref=e312]: "1"
+                    - generic [ref=e313]: "7"
+              - generic [ref=e315]:
+                - text: 1, 1,
+                - generic [ref=e322]:
+                  - generic [ref=e323]: "3"
+                  - generic [ref=e325]: "1"
+                - text: ","
+                - generic [ref=e334]:
+                  - generic [ref=e335]: "3"
+                  - generic [ref=e337]: "1"
+                - text: ","
+                - generic [ref=e346]:
+                  - generic [ref=e347]: "5"
+                  - generic [ref=e349]: "1"
+                - text: ","
+                - generic [ref=e358]:
+                  - generic [ref=e359]: "5"
+                  - generic [ref=e361]: "1"
+                - text: ","
+                - generic [ref=e370]:
+                  - generic [ref=e371]: "7"
+                  - generic [ref=e373]: "1"
+                - text: ","
+                - generic [ref=e382]:
+                  - generic [ref=e383]: "7"
+                  - generic [ref=e385]: "1"
+            - paragraph [ref=e389]: 于是：
+            - generic [ref=e392]:
+              - math [ref=e394]:
+                - generic [ref=e396]:
+                  - generic [ref=e397]: M
+                  - generic [ref=e398]: A
+                  - generic [ref=e399]:
+                    - generic [ref=e400]: P
+                    - generic [ref=e401]: 当前排列
+                  - generic [ref=e402]: =
+                  - generic [ref=e403]:
+                    - generic [ref=e404]: "44"
+                    - generic [ref=e405]: "105"
+                  - generic [ref=e406]: =
+                  - generic [ref=e407]: "0.41904761904761906"
+              - generic [aria-hidden] [ref=e408]:
+                - generic [ref=e409]:
+                  - text: MA
+                  - generic [ref=e410]:
+                    - text: P
+                    - generic [ref=e411]: 当前排列
+                  - text: =
+                - generic [ref=e421]:
+                  - generic [ref=e426]:
+                    - generic [ref=e427]: "105"
+                    - generic [ref=e429]: "44"
+                  - text: =
+                - generic [ref=e433]: "0.41904761904761906"
+            - paragraph [ref=e434]: 如果同分顺序独立于标签，单正例查询的均匀破平期望为：
+            - generic [ref=e437]:
+              - math [ref=e439]:
+                - generic [ref=e441]:
+                  - generic [ref=e442]: E
+                  - generic [ref=e443]: "["
+                  - generic [ref=e444]: M
+                  - generic [ref=e445]: A
+                  - generic [ref=e446]:
+                    - generic [ref=e447]: P
+                    - generic [ref=e448]: 随机破平
+                  - generic [ref=e449]: "]"
+                  - generic [ref=e450]: =
+                  - generic [ref=e451]:
+                    - generic [ref=e452]:
+                      - generic [ref=e453]: "1"
+                      - generic [ref=e454]: +
+                      - generic [ref=e455]:
+                        - generic [ref=e456]: "1"
+                        - generic [ref=e457]: "2"
+                      - generic [ref=e458]: +
+                      - generic [ref=e459]: ⋯
+                      - generic [ref=e460]: +
+                      - generic [ref=e461]:
+                        - generic [ref=e462]: "1"
+                        - generic [ref=e463]: "7"
+                    - generic [ref=e464]: "7"
+                  - generic [ref=e465]: =
+                  - generic [ref=e466]:
+                    - generic [ref=e467]: "363"
+                    - generic [ref=e468]: "980"
+                  - generic [ref=e469]: =
+                  - generic [ref=e470]: "0.3704081632653061"
+              - generic [aria-hidden] [ref=e471]:
+                - generic [ref=e472]:
+                  - text: E[MA
+                  - generic [ref=e473]:
+                    - text: P
+                    - generic [ref=e474]: 随机破平
+                  - text: "] ="
+                - generic [ref=e484]:
+                  - generic [ref=e489]:
+                    - generic [ref=e490]: "7"
+                    - generic [ref=e492]:
+                      - text: 1 +
+                      - generic [ref=e497]:
+                        - generic [ref=e498]: "2"
+                        - generic [ref=e501]: "1"
+                      - text: + ⋯ +
+                      - generic [ref=e510]:
+                        - generic [ref=e511]: "7"
+                        - generic [ref=e514]: "1"
+                  - text: =
+                - generic [ref=e522]:
+                  - generic [ref=e527]:
+                    - generic [ref=e528]: "980"
+                    - generic [ref=e530]: "363"
+                  - text: =
+                - generic [ref=e534]: "0.3704081632653061"
+            - paragraph [ref=e535]:
+              - text: 当前排列在这个确定例子中带来约
+              - strong [ref=e536]: "0.048639456"
+              - text: 的优势。
+            - paragraph [ref=e537]:
+              - text: 这证明的是
+              - strong [ref=e538]: 同分条件下的协议偏差
+              - text: 。正式同分率尚未测量；但不同方法或阶段的同分比例不同，就可能受到不同程度的影响。
+            - paragraph [ref=e539]: "**最小修复：**在结果开放前固定与关系无关的视图／候选次序或明确的同分处理规则，并核对重排后的 qrels。一个冻结随机次序的单例不必恰好等于上述随机期望；关键是破平规则不能利用关系结构。"
+            - heading "F02 — REPRODUCIBILITY_DEFECT：盲载荷仍可直接解码关系标签" [level=3] [ref=e540]
+            - paragraph [ref=e541]:
+              - strong [ref=e542]: 影响范围：盲输入／qrels 隔离承诺。与 F01 可作为同一个评价修复单元处理。
+            - paragraph [ref=e543]: 当前视图 UID 为：
+            - generic [ref=e545]:
+              - generic [ref=e546]:
+                - generic [ref=e549]: 纯文本
+                - generic [ref=e550]:
+                  - button "启用自动换行" [ref=e552] [cursor=pointer]
+                  - button "复制代码" [ref=e555] [cursor=pointer]
+              - code [ref=e559]: identity_hash:view0 identity_hash:view1
+            - paragraph [ref=e560]: blind() 只清空 identity 字段，保留共同前缀；两个视图还始终相邻排列。
+            - paragraph [ref=e561]:
+              - strong [ref=e562]: 源码定位：
+            - list [ref=e563]:
+              - listitem [ref=e564]: "data.py：`blind()` 第 59—60 行；`build_views()` 第 117—120、132—137 行。"
+              - listitem [ref=e565]: "run.py：`evaluate()` 第 166—173 行。"
+              - listitem [ref=e566]: 测试目前主要检查显式 identity 为空，见 tests/test_step29_vendorlink.py 第 99、106—115 行。
+            - paragraph [ref=e567]:
+              - text: 我用当前数据源码构造了
+              - strong [ref=e568]: 80 条手写商品、4 观察账号、8 视图
+              - text: 的 dev 组：
+            - list [ref=e569]:
+              - listitem [ref=e570]: identity 全部为 None；
+              - listitem [ref=e571]:
+                - text: 仅用 UID 共同前缀，就能精确恢复全部
+                - strong [ref=e572]: 28 个无序对标签
+                - text: ；
+              - listitem [ref=e573]: 仅用相邻索引规则 i // 2 == j // 2，也能精确恢复全部标签。
+            - paragraph [ref=e574]: "**当前模型前向确实只消费标题和描述，没有证据表明它实际使用 UID 作弊。**因此，这项发现针对盲接口的实现承诺，不否定已有梯度与实际更新证据。"
+            - paragraph [ref=e575]: "**最小修复：**同时采用独立、不暴露共同身份的视图 ID，以及固定、与身份关系无关的组内排列，再生成对应 qrels。只换 ID 或只打散顺序，都不足以关闭这个问题。"
+            - heading "F03 — REPRODUCIBILITY_DEFECT：cpu01 到当前版的“未改函数”来源桥未闭合" [level=3] [ref=e576]
+            - paragraph [ref=e577]:
+              - strong [ref=e578]: 影响范围：旧原生证据能否被独立确认适用于当前代码。
+            - paragraph [ref=e579]: "cpu01 的 methods.py、`run.py`、测试文件 SHA 都不同于当前版。包内没有对应旧源码或可以逆向重构到旧 SHA 的完整差异材料。"
+            - paragraph [ref=e580]: 因此，目前可以确认：
+            - list [ref=e581]:
+              - listitem [ref=e582]: cpu01 当时保存了数学、实际更新和下一步恢复通过记录；
+              - listitem [ref=e583]: 当前公式与接线可以静态审查；
+              - listitem [ref=e584]: cpu04 当前阶段流程有直接对应的来源证据。
+            - paragraph [ref=e585]:
+              - text: 但尚不能仅凭“相关函数未改”的摘要，机械确认 cpu01 的相关测试确实覆盖当前这些函数。
+              - strong [ref=e586]: 这不是认定当前数学错误，也不否定 cpu01 当时的通过。
+            - paragraph [ref=e587]:
+              - text: "**最小修复：**补已有旧源码或可验证到旧整文件 SHA 的差异材料，只追数学／恢复函数及实际调用的旧 Group、`assignment` 等必要依赖，然后复用未变证据。"
+              - strong [ref=e588]: 不要求全面重跑历史测试。
+            - paragraph [ref=e589]: 依据为 implementation/implementation.zh.txt 第 37—38 行、cpu01 receipt 的旧来源，以及当前 MANIFEST／cpu04 receipt 的来源。
+            - heading "F04 — REPRODUCIBILITY_DEFECT：恢复完成清单列出新目录中不存在的首阶段端点" [level=3] [ref=e590]
+            - paragraph [ref=e591]:
+              - strong [ref=e592]: 影响范围：API 恢复后的端点评价交接；启用正式恢复前应修复。
+            - paragraph [ref=e593]: 从旧作业的 stage1.pt 恢复到新目录时，执行循环只运行后两阶段，新目录只会写出：
+            - generic [ref=e595]:
+              - generic [ref=e596]:
+                - generic [ref=e599]: 纯文本
+                - generic [ref=e600]:
+                  - button "启用自动换行" [ref=e602] [cursor=pointer]
+                  - button "复制代码" [ref=e605] [cursor=pointer]
+              - code [ref=e609]: stage2.pt stage3.pt
+            - paragraph [ref=e610]: 但 completion.json 始终列出：
+            - generic [ref=e612]:
+              - generic [ref=e613]:
+                - generic [ref=e616]: 纯文本
+                - generic [ref=e617]:
+                  - button "启用自动换行" [ref=e619] [cursor=pointer]
+                  - button "复制代码" [ref=e622] [cursor=pointer]
+              - code [ref=e626]: stage1.pt stage2.pt stage3.pt
+            - paragraph [ref=e627]: 新目录中的 stage1.pt 实际没有生成。源码位置为 run.py 第 87—99、149—159 行；当前恢复测试比较最终模型，没有检查完成清单中每个端点是否存在。
+            - paragraph [ref=e628]: "**最终模型恢复一致性的证据不因此失效。**问题在于按新清单收集评价三角时，无法取得首阶段端点，进而无法仅凭该清单计算获得水平与遗忘。"
+            - paragraph [ref=e629]: "**最小修复：**明确记录继承端点的原路径、身份与 hash，或复制已有端点并校验。无需重训。正式 CLI 当前禁止 resume，因此正常全新轨迹不受这个触发条件影响。"
+            - heading "三、数据与方法的哪些部分可以接受" [level=2] [ref=e630]
+            - heading "1. 受控代理任务成立，但标签边界必须保留" [level=3] [ref=e631]
+            - paragraph [ref=e632]: 当前构造正确区分了：
+            - list [ref=e633]:
+              - listitem [ref=e634]:
+                - strong [ref=e635]: 观察账号身份：
+                - text: "`(market, vendor)`；"
+              - listitem [ref=e636]: "**保守划分键：**跨市场 vendor.casefold()；"
+              - listitem [ref=e637]: "**真实控制者：**当前并未验证。"
+            - paragraph [ref=e638]: 跨市场同名只绑定划分，不产生跨账号同控标签；作者预测别名没有被用作真值。这符合用户已经接受的代理任务。
+            - paragraph [ref=e639]:
+              - text: 处理前后精确去重也已接通。准确表述是：
+              - strong [ref=e640]: 对 NFKC／空白标准化、忽略大小写后的完整标题＋描述做精确去重
+              - text: 。cpu02 的数据源码与当前一致，可以支持 cpu01 漏排复制广告问题的定向修复。它没有证明近重复、模板变体或潜在控制者隔离已经完成。相关实现见 data.py 第 70—120 行。
+            - paragraph [ref=e641]: 还有一个需要明确写入论文的边界：**当前 builder 每身份恰好两个视图，因此每查询恰好一个正例。**在相同查询与聚合权重下，MAP 与 MRR 数值相同。这可以检验当前账号视图检索与遗忘，但不能据此声称验证了多别名、多正例排序能力。
+            - heading "2. VendorLink 的补全假设合理，命名边界应继续保留" [level=3] [ref=e642]
+            - paragraph [ref=e643]: 按照本包提供的固定上游核实记录，当前实现保留了：
+            - list [ref=e644]:
+              - listitem [ref=e645]: 卖家分类交叉熵；
+              - listitem [ref=e646]: BERT pooler 分类头；
+              - listitem [ref=e647]: 最后四层等权相加；
+              - listitem [ref=e648]: 用户批准的有效 token 掩码均值；
+              - listitem [ref=e649]:
+                - text: 原账号集合归一化余弦评分，
+                - strong [ref=e650]: 账号自相似包含广告自身对角线
+                - text: 。
+            - paragraph [ref=e651]: 代码位置为 methods.py 第 48—68、145—159、241—253 行。
+            - paragraph [ref=e652]: 掩码均值是合理的有限补全。对于非零且未进入归一化 epsilon 钳位区间的广告向量，正的 token 数缩放会在 L2 归一化中抵消，因此 masked mean 与 masked sum 的最终余弦评分相同，允许正常浮点舍入差异。这个性质支持该补全，但不能把它改写成作者已经提供的 token 聚合。
+            - paragraph [ref=e653]: 建议继续使用：
+            - blockquote [ref=e654]:
+              - paragraph [ref=e655]:
+                - strong [ref=e656]: VendorLink_SEQ：原方法的顺序适配，含用户批准的有效 token 掩码均值补全。
+            - paragraph [ref=e657]: "阶段重建分类头／优化器、PyTorch AdamW、`do_lower_case=True`、拼接输入最多 512 token 等适配应明确披露。它们不构成论文原表或旧优化器的逐位复现。本轮也没有重新下载并逐行审查上游仓库，原作者实现事实的证据边界已在完整报告中注明。"
+            - heading "3. H 的关键数学与更新接线保持成立" [level=3] [ref=e658]
+            - paragraph [ref=e659]: 当前代码中的核心目标可写为：
+            - generic [ref=e662]:
+              - math [ref=e664]:
+                - generic [ref=e666]:
+                  - generic [ref=e667]: H
+                  - generic [ref=e668]: (
+                  - generic [ref=e669]: K
+                  - generic [ref=e670]: )
+                  - generic [ref=e671]: =
+                  - generic [ref=e672]:
+                    - generic [ref=e673]: "1"
+                    - generic [ref=e674]: "2"
+                  - generic [ref=e675]: mean
+                  - generic: ⁡
+                  - generic [ref=e676]: (
+                  - generic [ref=e677]: K
+                  - generic [ref=e678]: )
+                  - generic [ref=e679]: +
+                  - generic [ref=e680]:
+                    - generic [ref=e681]: "1"
+                    - generic [ref=e682]: "2"
+                  - generic [ref=e683]: log
+                  - generic: ⁡
+                  - generic [ref=e684]: meanexp
+                  - generic: ⁡
+                  - generic [ref=e685]: (
+                  - generic [ref=e686]: K
+                  - generic [ref=e687]: )
+              - generic [aria-hidden] [ref=e688]:
+                - generic [ref=e689]: H(K) =
+                - generic [ref=e690]:
+                  - generic [ref=e695]:
+                    - generic [ref=e696]: "2"
+                    - generic [ref=e698]: "1"
+                  - generic [ref=e702]: mean
+                  - text: (K) +
+                - generic [ref=e703]:
+                  - generic [ref=e708]:
+                    - generic [ref=e709]: "2"
+                    - generic [ref=e711]: "1"
+                  - generic [ref=e715]: log
+                  - generic [ref=e716]: meanexp
+                  - text: (K)
+            - paragraph [ref=e717]: 每个自然／重组视图的监督包含：
+            - list [ref=e718]:
+              - listitem [ref=e719]:
+                - text: 全部无序账号对的
+                - strong [ref=e720]: 非加权 BCE
+                - text: ；
+              - listitem [ref=e721]: 正例 Log_out 排序项；
+              - listitem [ref=e722]:
+                - text: 权重为
+                - strong [ref=e723]: "0.5"
+                - text: 的 HardTop5。
+            - paragraph [ref=e724]: 自然与同身份重组监督各占一半。三个 H 臂为：
+            - generic [ref=e725]:
+              - table [ref=e728]:
+                - rowgroup [ref=e729]:
+                  - row "方法 实际目标" [ref=e730]:
+                    - columnheader "方法" [ref=e731]
+                    - columnheader "实际目标" [ref=e732]
+                - rowgroup [ref=e733]:
+                  - row "H_SEQ 当前监督" [ref=e734]:
+                    - cell "H_SEQ" [ref=e735]
+                    - cell "当前监督" [ref=e736]
+                  - row "H_ER 当前监督＋0.1 历史监督" [ref=e737]:
+                    - cell "H_ER" [ref=e738]
+                    - cell "当前监督＋0.1 历史监督" [ref=e739]
+                  - row "H_full 当前监督＋0.1 历史监督＋0.5 历史自然账号分数保持" [ref=e740]:
+                    - cell "H_full" [ref=e741]
+                    - cell "当前监督＋0.1 历史监督＋0.5 历史自然账号分数保持" [ref=e742]
+              - generic:
+                - button "复制表格"
+                - button "展开表格"
+            - paragraph [ref=e743]: 教师项没有误变成 0.05，旧教师不刷新，H_ER 与 H_full 使用相同 Memory 选择和载荷规则。两个既有参数也保留为 1.3051794547562026 与 1.2832655111666686。依据见 methods.py 第 25—39、71—132、256—297 行。
+            - paragraph [ref=e744]: 分块 VJP 实际经过：
+            - list [ref=e745]:
+              - listitem [ref=e746]: 编码器生成带计算图的记录表示；
+              - listitem [ref=e747]: 对完整记录表求目标梯度；
+              - listitem [ref=e748]: 分块重算记录对头，累加头部和记录表示梯度；
+              - listitem [ref=e749]: 回传 BERT；
+              - listitem [ref=e750]: 当前／历史梯度合并后统一 clip，再执行一次 AdamW 更新。
+            - paragraph [ref=e751]: 源码为 methods.py 第 177—194、227—238 行。没有发现冻结编码器、仅更新头部或漏掉某一分支梯度的错误。
+            - heading "四、CPU 证据：哪些可以接受，哪些不能扩大" [level=2] [ref=e752]
+            - generic [ref=e753]:
+              - table [ref=e756]:
+                - rowgroup [ref=e757]:
+                  - row "回合 原始 wall 秒 收费／累计秒 本轮判断" [ref=e758]:
+                    - columnheader "回合" [ref=e759]
+                    - columnheader "原始 wall 秒" [ref=e760]
+                    - columnheader "收费／累计秒" [ref=e761]
+                    - columnheader "本轮判断" [ref=e762]
+                - rowgroup [ref=e763]:
+                  - row "cpu01 4.724086 5／5 五项中四项通过，数据逻辑失败必须保留" [ref=e764]:
+                    - cell "cpu01" [ref=e765]
+                    - cell "4.724086" [ref=e766]
+                    - cell "5／5" [ref=e767]
+                    - cell "五项中四项通过，数据逻辑失败必须保留" [ref=e768]
+                  - row "cpu02 4.501218 5／10 数据修复有效；当时轨迹／恢复通过" [ref=e769]:
+                    - cell "cpu02" [ref=e770]
+                    - cell "4.501218" [ref=e771]
+                    - cell "5／10" [ref=e772]
+                    - cell "数据修复有效；当时轨迹／恢复通过" [ref=e773]
+                  - row "cpu03 4.608467 5／15 与 cpu02 五项来源完全相同，不能背书当前修订" [ref=e774]:
+                    - cell "cpu03" [ref=e775]
+                    - cell "4.608467" [ref=e776]
+                    - cell "5／15" [ref=e777]
+                    - cell "与 cpu02 五项来源完全相同，不能背书当前修订" [ref=e778]
+                  - row "cpu04 4.810376 5／20 五项来源全部匹配当前包，支持当前阶段流程" [ref=e779]:
+                    - cell "cpu04" [ref=e780]
+                    - cell "4.810376" [ref=e781]
+                    - cell "5／20" [ref=e782]
+                    - cell "五项来源全部匹配当前包，支持当前阶段流程" [ref=e783]:
+                      - strong [ref=e784]: 五项来源全部匹配当前包
+                      - text: ，支持当前阶段流程
+              - generic:
+                - button "复制表格"
+                - button "展开表格"
+            - paragraph [ref=e785]:
+              - text: 原始 wall 合计
+              - strong [ref=e786]: 18.64414711203426 秒
+              - text: ；逐回合向上取整后仍为
+              - strong [ref=e787]: 20／300 秒
+              - text: 。最高 RSS 为
+              - strong [ref=e788]: 872,755,200 字节
+              - text: ，来自 cpu02。逐项核对见附件 cpu_evidence_crosswalk.json。
+            - paragraph [ref=e789]: cpu04 的依据并非只有摘要 JSON：当前测试实际检查了 H 末端 Adam.step 为 3、VendorLink 为 1，并额外检查 VendorLink 分类头发生更新；恢复后只加载 B/C，最终模型状态逐位一致。见 tests.py 第 219—279 行。
+            - paragraph [ref=e790]:
+              - strong [ref=e791]: 仍需限定“实际分块梯度已验证”的表述：
+            - list [ref=e792]:
+              - listitem [ref=e793]:
+                - text: 实际微型 BERT 对照用了
+                - strong [ref=e794]: 20 条记录、190 对
+                - text: ，没有跨越 512 对分块边界；
+              - listitem [ref=e795]: 40 条标题／描述通道文本小于测试的 microbatch=64；
+              - listitem [ref=e796]: 28 视图数学测试只验证 table→loss，没有运行真实多块编码器／头部路径。
+            - paragraph [ref=e797]: 这不是发现跨块代码错误。**若正式形状会跨界，最小增量可以用 35 条记录、595 对、70 条通道文本做一次现有 direct-autograd 对照，或并入必要的真实英文 GPU 资格。**无需全面重测历史，也没有在本轮执行该增量。
+            - heading "五、四臂足够，VendorLink+ER 不应自动成为强制项" [level=2] [ref=e798]
+            - generic [ref=e799]:
+              - table [ref=e802]:
+                - rowgroup [ref=e803]:
+                  - row "比较 能回答的问题" [ref=e804]:
+                    - columnheader "比较" [ref=e805]
+                    - columnheader "能回答的问题" [ref=e806]
+                - rowgroup [ref=e807]:
+                  - row "H_full 对 VendorLink_SEQ 当前固定代理协议下，两套整体方案的应用表现、获得水平和遗忘变化" [ref=e808]:
+                    - cell "H_full 对 VendorLink_SEQ" [ref=e809]
+                    - cell "当前固定代理协议下，两套整体方案的应用表现、获得水平和遗忘变化" [ref=e810]
+                  - row "H_ER 对 H_SEQ H 架构内普通监督回放的作用" [ref=e811]:
+                    - cell "H_ER 对 H_SEQ" [ref=e812]
+                    - cell "H 架构内普通监督回放的作用" [ref=e813]
+                  - row "H_full 对 H_ER 相同历史样本机制与监督回放下，额外教师保持是否改善遗忘" [ref=e814]:
+                    - cell "H_full 对 H_ER" [ref=e815]
+                    - cell "相同历史样本机制与监督回放下，额外教师保持是否改善遗忘" [ref=e816]
+                  - row "H_full 对 H_SEQ 完整历史机制的整体作用" [ref=e817]:
+                    - cell "H_full 对 H_SEQ" [ref=e818]
+                    - cell "完整历史机制的整体作用" [ref=e819]
+              - generic:
+                - button "复制表格"
+                - button "展开表格"
+            - paragraph [ref=e820]:
+              - text: 因此，
+              - strong [ref=e821]: 四臂足以覆盖本轮限定的问题。
+            - paragraph [ref=e822]: VendorLink_SEQ 无记忆，而 H_full 有记忆，二者整体比较不能支持“相同历史记忆权限下优于 VendorLink”。只有要提出这个更强主张时，VendorLink+ER 才成为必要后续项。删掉它，不妨碍当前受限整体比较与 H 内部归因。
+            - paragraph [ref=e823]: 抗遗忘解释仍须分开：
+            - generic [ref=e826]:
+              - math [ref=e828]:
+                - generic [ref=e830]:
+                  - generic [ref=e831]: O
+                  - generic [ref=e832]: =
+                  - generic [ref=e833]: Q
+                  - generic [ref=e834]: −
+                  - generic [ref=e835]: F
+              - generic [aria-hidden] [ref=e836]:
+                - generic [ref=e837]: O =
+                - generic [ref=e838]: Q −
+                - generic [ref=e839]: F
+            - paragraph [ref=e840]:
+              - text: 最终旧域成绩
+              - generic [ref=e842]:
+                - math [ref=e844]:
+                  - generic [ref=e845]: O
+                - generic [ref=e849]: O
+              - text: 更高，可能来自刚学完时获得水平
+              - generic [ref=e851]:
+                - math [ref=e853]:
+                  - generic [ref=e854]: Q
+                - generic [ref=e858]: Q
+              - text: 更高，并不自动意味着遗忘
+              - generic [ref=e860]:
+                - math [ref=e862]:
+                  - generic [ref=e863]: F
+                - generic [ref=e867]: F
+              - text: 更少。H_full−H_ER 的遗忘差应以
+              - strong [ref=e868]:
+                - generic [ref=e870]:
+                  - math [ref=e872]:
+                    - generic [ref=e874]:
+                      - generic [ref=e875]: Δ
+                      - generic [ref=e876]: F
+                      - generic [ref=e877]: <
+                      - generic [ref=e878]: "0"
+                  - generic [aria-hidden] [ref=e879]:
+                    - generic [ref=e880]: ΔF <
+                    - generic [ref=e881]: "0"
+              - text: 为改善方向，同时报告获得水平、最终旧域和新域水平；不能用起初学得较差造成的低遗忘值支持“无代价抗遗忘”。这与本包 proposal 第 76—85 行的评价定义一致。
+            - heading "六、正式运行前的自然前提与可选范围" [level=2] [ref=e882]
+            - paragraph [ref=e883]:
+              - text: 以下事项尚待合同，
+              - strong [ref=e884]: 没有被我列成已经发生的实现错误
+              - text: ：
+            - list [ref=e885]:
+              - listitem [ref=e886]: "**实际数据资格：**三市场文件／字段映射、获准范围、空值、清洁账号与广告规模、实际非空划分、组大小和参数。"
+              - listitem [ref=e887]: "**正式配置与来源：**英文 BERT／tokenizer 身份、四臂实际设置、epochs／曝光规则、代码冻结。"
+              - listitem [ref=e888]: "**限定原生资格：**真实英文模型和 GPU 的更新、评分、恢复、Memory 字节以及时间／显存核验。"
+              - listitem [ref=e889]: "**最终评价交接：**关闭 F01/F02，冻结候选次序、query 加权、Q/O/F/N、配对统计和标签开放流程。"
+              - listitem [ref=e890]: "**预算与最多三路准入：**累计资格／训练／评价／失败费用、显存预留与执行许可。"
+            - paragraph [ref=e891]:
+              - text: 当前没有首阶段共享实现。
+              - strong [ref=e892]: 36 条独立三阶段轨迹对应 108 个阶段调用；90 阶段只是共享实现完成并核验后才能使用的节省数。
+            - paragraph [ref=e893]: 可选事项的边界也已明确：
+            - list [ref=e894]:
+              - listitem [ref=e895]: 不做近重复／模板敏感性分析：保留受控代理结论，但不能声称排除了这些文本信号的贡献。
+              - listitem [ref=e896]: 不引入真实控制者标签：本轮不能外推真实跨账号马甲识别。
+              - listitem [ref=e897]: 不做首阶段共享：科学比较仍成立，预算按未共享计算量估计。
+              - listitem [ref=e898]: 不做 VendorLink+ER：不能提出相同记忆权限下的方法优势。
+            - paragraph [ref=e899]: "**OUT_OF_SCOPE_OVERDESIGN：**本轮不需要自动增加全部六排列、全 epoch 诊断、全部旧基线、CKA、HPO、通用实验平台，或为显著性扩大种子与预算；也不能根据最终结果再选参数。"
+            - heading "七、交付文件与完成状态" [level=2] [ref=e900]
+            - paragraph [ref=e901]: 下载包包含：
+            - generic [ref=e902]:
+              - table [ref=e905]:
+                - rowgroup [ref=e906]:
+                  - row "文件 用途 字节" [ref=e907]:
+                    - columnheader "文件" [ref=e908]
+                    - columnheader "用途" [ref=e909]
+                    - columnheader "字节" [ref=e910]
+                - rowgroup [ref=e911]:
+                  - row "report.zh.txt 完整中文外审报告 36,157" [ref=e912]:
+                    - cell "report.zh.txt" [ref=e913]
+                    - cell "完整中文外审报告" [ref=e914]
+                    - cell "36,157" [ref=e915]
+                  - row "findings.json 四项发现、必要前提、可选项与越界项 9,718" [ref=e916]:
+                    - cell "findings.json" [ref=e917]
+                    - cell "四项发现、必要前提、可选项与越界项" [ref=e918]
+                    - cell "9,718" [ref=e919]
+                  - row "input_verification.json 输入 ZIP 与 27 载荷逐项大小／SHA 核对 10,639" [ref=e920]:
+                    - cell "input_verification.json" [ref=e921]
+                    - cell "输入 ZIP 与 27 载荷逐项大小／SHA 核对" [ref=e922]
+                    - cell "10,639" [ref=e923]
+                  - row "reading_scope.tsv 全部 28 成员的阅读范围与身份 4,359" [ref=e924]:
+                    - cell "reading_scope.tsv" [ref=e925]
+                    - cell "全部 28 成员的阅读范围与身份" [ref=e926]
+                    - cell "4,359" [ref=e927]
+                  - row "cpu_evidence_crosswalk.json 四轮 CPU 来源与费用对应 8,889" [ref=e928]:
+                    - cell "cpu_evidence_crosswalk.json" [ref=e929]
+                    - cell "四轮 CPU 来源与费用对应" [ref=e930]
+                    - cell "8,889" [ref=e931]
+                  - row "microchecks/data_metric_microcheck.py 盲载荷与同分指标微核对脚本 4,153" [ref=e932]:
+                    - cell "microchecks/data_metric_microcheck.py" [ref=e933]
+                    - cell "盲载荷与同分指标微核对脚本" [ref=e934]
+                    - cell "4,153" [ref=e935]
+                  - row "microchecks/data_metric_results.json 上述实际核对结果 1,228" [ref=e936]:
+                    - cell "microchecks/data_metric_results.json" [ref=e937]
+                    - cell "上述实际核对结果" [ref=e938]
+                    - cell "1,228" [ref=e939]
+                  - row "microchecks/static_numeric_checks.py 哈希、AST、独立公式核对脚本 8,671" [ref=e940]:
+                    - cell "microchecks/static_numeric_checks.py" [ref=e941]
+                    - cell "哈希、AST、独立公式核对脚本" [ref=e942]
+                    - cell "8,671" [ref=e943]
+                  - row "microchecks/static_numeric_results.json 上述结果与静态控制流证据 2,668" [ref=e944]:
+                    - cell "microchecks/static_numeric_results.json" [ref=e945]
+                    - cell "上述结果与静态控制流证据" [ref=e946]
+                    - cell "2,668" [ref=e947]
+                  - row "README.zh.txt 阅读与有限核对说明 1,492" [ref=e948]:
+                    - cell "README.zh.txt" [ref=e949]
+                    - cell "阅读与有限核对说明" [ref=e950]
+                    - cell "1,492" [ref=e951]
+                  - row "OUTPUT_MANIFEST.json 交付载荷逐文件大小／SHA 1,737" [ref=e952]:
+                    - cell "OUTPUT_MANIFEST.json" [ref=e953]
+                    - cell "交付载荷逐文件大小／SHA" [ref=e954]
+                    - cell "1,737" [ref=e955]
+              - generic:
+                - button "复制表格"
+                - button "展开表格"
+            - paragraph [ref=e956]: "**完成状态：审查与交付已完成；当前裁决为 TARGETED_REPAIR_REQUIRED。**没有修改项目源码、重跑训练或开放正式标签。最短后续路径是关闭评价侧修复单元、补齐旧证据来源桥，并在启用正式恢复前修正端点清单；正式数据、GPU 与预算继续按尚待批准的合同处理。"
+      - generic [ref=e958]:
+        - button "复制" [ref=e959] [cursor=pointer]
+        - button "评价回复" [ref=e962] [cursor=pointer]
+        - button "朗读" [ref=e966] [cursor=pointer]
+        - button "分享" [ref=e970] [cursor=pointer]
+        - button "重新生成回复" [ref=e974] [cursor=pointer]
+        - button "更多操作" [ref=e977] [cursor=pointer]
+        - button "来源" [ref=e981] [cursor=pointer]
+    - generic [ref=e985]: ChatGPT 可能会出错。请核查重要信息。
+  - generic:
+    - generic:
+      - generic:
+        - button [aria-hidden]
+      - heading "最新一条回复" [level=4] [ref=e989]
+      - status [ref=e990]
+      - generic [ref=e1012]:
+        - button "添加文件等内容" [ref=e1017] [cursor=pointer]
+        - textbox "询问 ChatGPT" [active] [ref=e1024]:
+          - paragraph: 询问 ChatGPT
+        - generic [ref=e1027]:
+          - button "选择 ChatGPT 模型" [ref=e1031] [cursor=pointer]:
+            - generic [ref=e1037]:
+              - generic [aria-hidden]:
+                - generic: 思考强度
+              - generic [ref=e1038]: Pro
+          - generic [ref=e1044]:
+            - button "听写" [ref=e1047] [cursor=pointer]
+            - button "开始语音" [ref=e1052] [cursor=pointer]

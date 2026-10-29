@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-29 VendorLink首轮回收与CPU增量保管
+
+首轮完整外审原文、10载荷、网页公布身份、返回清单核对与[主审处置](../reports/documentation/20261029/vendorlink/implementation/review/primary_disposition.zh.txt)已保存在Windows。35,412字节返回ZIP及同字节浏览器下载副本在载荷验证后删除；原48,396字节输入包继续作为冻结审查源码的复现依赖。cpu_transfer.zip内五份旧源与cpu01逐项同字节，作为F03来源桥保留；核对后的临时解包副本删除。清理明细见[transport_cleanup](../reports/documentation/20261029/vendorlink/implementation/review/transport_cleanup.json)，不重置大清理周期。
+
+Linux独立repair_workspace及cpu05保留本轮修复源码与手写CPU原件，回传的六份证据已核对SHA，Windows另存来源核对。21,462字节CPU传输ZIP及2,117字节证据tar在两端核对后删除；当前源码精确副本也包含在待审51,586字节修复包中，该包因在审及来源复现需要保留。累计CPU26/300秒、无预训练/正式数据/模型载荷，SSH已退出；活动三路和既有等待不改。新主审与总文档当前仅Windows，不冒称已同步Linux。首轮已处置，但同一专用会话正在进行用户明确批准的F01—F04定向复核，因此保留网页待回收，无新增自动化。
+
 ## 2026-10-26 五臂中的三臂权重清理
 
 用户要求删除五臂模型权重，获知当前新对照仍需加载 H/S 后明确选择：‘保留 H/S 54份供后续确认，其余三臂权重删除（推荐）’。11:29:59（Asia/Shanghai）已删除 Linux 的 SEQ_ref、ER0.1_ref、LOGIT0.1_ref 各27份阶段权重，共81份独立载荷、105823904280字节（98.556191GiB）。原 formal_20261023、continual_recovery/formal、continual_retry/formal 之间存在硬链接，实际删除171个文件路径；按inode去重计空间，未将路径字节重复相加。81份实际SHA均与最终完成记录匹配，所有选中inode的链接均在清理范围且无打开句柄。逐路径与保留对象见[盘点原件](../reports/maintenance/20261026/five_weights/inventory.json)，实际删除与复核见[回执](../reports/maintenance/20261026/five_weights/receipt.json)，两端大小／SHA一致。

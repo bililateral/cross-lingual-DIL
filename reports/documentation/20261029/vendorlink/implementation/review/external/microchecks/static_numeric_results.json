@@ -1,0 +1,103 @@
+{
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39"
+  },
+  "scope": "isolated review workspace; archive and AST checks plus handwritten scalar algebra",
+  "ast": [
+    {
+      "path": "scripts/step29_vendorlink_data.py",
+      "syntax_parse": "PASS",
+      "executed": false,
+      "function_count": 8
+    },
+    {
+      "path": "scripts/step29_vendorlink_methods.py",
+      "syntax_parse": "PASS",
+      "executed": false,
+      "function_count": 23
+    },
+    {
+      "path": "scripts/step29_vendorlink_run.py",
+      "syntax_parse": "PASS",
+      "executed": false,
+      "function_count": 12
+    },
+    {
+      "path": "scripts/step29_vendorlink_cpu.py",
+      "syntax_parse": "PASS",
+      "executed": false,
+      "function_count": 1
+    },
+    {
+      "path": "tests/test_step29_vendorlink.py",
+      "syntax_parse": "PASS",
+      "executed": false,
+      "function_count": 14
+    }
+  ],
+  "vendor_handwritten": {
+    "independent_float64_score": 0.6419027581604396,
+    "mean_vector_score": 0.6419027581604396,
+    "provided_cpu01_float32_score": 0.64190274477005,
+    "absolute_difference": 1.3390389574929884e-08
+  },
+  "h_pool_derivative_handwritten": {
+    "values": [
+      -0.7,
+      0.1,
+      0.5,
+      1.2
+    ],
+    "analytic": [
+      0.16278846116530954,
+      0.20909976694814453,
+      0.250462109399117,
+      0.3776496624874289
+    ],
+    "finite_difference": [
+      0.16278846118322754,
+      0.2090997669734751,
+      0.2504621094134851,
+      0.3776496624308123
+    ],
+    "maximum_error": 5.6616600296877095e-11,
+    "production_autograd_executed": false
+  },
+  "vjp_coverage_counts": {
+    "saved_actual_fixture_records": 20,
+    "saved_actual_record_pairs": 190,
+    "saved_actual_channel_texts": 40,
+    "head_block_size": 512,
+    "test_encoder_microbatch": 64,
+    "proposed_minimal_fixture_records": 35,
+    "proposed_record_pairs": 595,
+    "proposed_channel_texts": 70,
+    "proposed_fixture_executed": false
+  },
+  "resume_endpoint_static_proof": {
+    "kind": "control_flow_inference_not_execution",
+    "saved_stage1_cursor_stage": 1,
+    "subsequent_zero_based_stages": [
+      1,
+      2
+    ],
+    "endpoint_files_written_in_fresh_resume_job": [
+      "stage2.pt",
+      "stage3.pt"
+    ],
+    "completion_claims": [
+      "stage1.pt",
+      "stage2.pt",
+      "stage3.pt"
+    ],
+    "uncreated_relative_endpoint": "stage1.pt",
+    "source": "scripts/step29_vendorlink_run.py:87-99,149-159"
+  },
+  "models_loaded": 0,
+  "training_runs": 0,
+  "test_suite_runs": 0,
+  "torch_or_transformers_imported": false,
+  "project_server_accesses": 0,
+  "formal_data_or_labels_read": 0
+}
