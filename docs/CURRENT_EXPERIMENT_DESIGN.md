@@ -16,6 +16,8 @@ VendorLink后续明确范围（2026-10-29）：用户已批准服务器数据盘
 
 三市场后续明确决定（2026-10-29）：用户确定AlphaBay/Dream/Agora后，来源接线/联合盘点及原生方案已获[本轮完整外审](../reports/documentation/20261029/vendorlink/three_market/review/external/report.zh.txt)和[独立主审结案](../reports/documentation/20261029/vendorlink/three_market/review/primary_disposition.zh.txt)。冻结[输入方案](../reports/documentation/20261029/vendorlink/three_market/plan.zh.txt)按当时待授权状态保留，后续用户“外审已结束，继续按计划推进”授权按已呈现的一次固定导出/2100秒资格推进，仍须关闭新实施审查及满足所需资源。[原送审实施说明](../reports/documentation/20261029/vendorlink/native/implementation.zh.txt)按原字节保留；新增实施外审经[独立主审及最小修复](../reports/documentation/20261029/vendorlink/native/review/primary_disposition.zh.txt)闭合。当前入口改为[repair配置](../reports/documentation/20261029/vendorlink/native/repair/config.json)与[repair执行门](../reports/documentation/20261029/vendorlink/native/repair/permit.json)，仅绑定必要修复来源，implementation_review_closed=true；原false门为送审历史。修法已确定且定向证据充分，依纪律第6节主审闭合，不冒称修后已再网页复审。未变四方法生产数学/训练入口继续复用，不追加HPO、近重复或第五臂。实际GPU资格、正式36条/E/总预算和最终评价仍未完成，不把准备/CPU证据升级成正式运行或结论。
 
+资源执行补充（2026-10-29）：上述repair入口是本次实施审查关闭时的冻结版本。用户最新明确“把17G先改成10G门槛，先尝试一下”；有效入口现为[waiting配置](../reports/documentation/20261029/vendorlink/native/waiting/config.json)、[许可](../reports/documentation/20261029/vendorlink/native/waiting/permit.json)与[范围补充](../reports/documentation/20261029/vendorlink/native/waiting/scope.zh.txt)。仅首派空闲门改10GiB、分配器9GiB，四臂运算与2100累计秒不变；指定任务释放显存后按资源条件单次派发，G2仍用实测三槽门。已完成固定导出机械核对后直接复用；CLI收尾修复与一次等待接线由现有主审范围和对应手写CPU证据闭合。失败保留费用与访问，下次恢复17GiB，不能自动清零或循环重试。运行事实以交接顶部为准。
+
 ## 设计与审查沿革（历史）
 
 以下段落中的“当前”“待批准”“正在运行”只描述各自记录时点；当前适用范围见上节，不能据历史重新启动或恢复旧阻断。

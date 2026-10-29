@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-29 VendorLink导出收尾及10GiB等待
+
+本轮固定导出已在Linux `native/qualification/export` 和 `private_custody` 形成18载荷，共8454714字节；以[机械复用核对](../reports/documentation/20261029/vendorlink/native/waiting/export_reuse.json)为准，Windows未保存正式文本或qrels，仅保存聚合计数/哈希。原导出末尾CLI报错、aux15秒及原trial配置保留；原控制账另存waiting/export_failure_ledger.json，当前账承接失败后复用同一导出，未重分数据。原始15秒账同时在trial/execution按失败来源保管，不以恢复覆盖失败事实。
+
+新来源仅部署Linux `native/waiting/workspace`，旧repair/trial/fix及其他活动实验不覆盖。CPU11/12/13小证据、10GiB配置/门、范围补充、启动及观察回执两端保管；[回传清单](../reports/documentation/20261029/vendorlink/native/waiting/receive_manifest.json)记录当前7份小文件，机械核验一致。CPU11旧源码包和CPU12修复部署包含各次独有源码，继续作为必要来源证据保留；waiting传输ZIP在当前源码逐项核对及CPU13完成后删除，Linux活动副本首次真实更新后按约自删，复现源码保留。根文档本轮只在Windows更新；没有借此刷新其他批次状态、覆盖活动冻结文件或推送未获准新材料。
+
 ## 2026-10-29 原生实施外审回收与修复保管
 
 本轮46153字节返回ZIP（SHA7123f89d…）的12载荷逐项核对；[完整原文和附件](../reports/documentation/20261029/vendorlink/native/review/external/report.zh.txt)、最终网页及[独立主审](../reports/documentation/20261029/vendorlink/native/review/primary_disposition.zh.txt)保留。已结案136445字节输入ZIP与临时返回ZIP无额外用途，验收后删除；原输入身份、原配置/门/CPU07/08和Git 5c74f229源码保留，不追改送审历史。

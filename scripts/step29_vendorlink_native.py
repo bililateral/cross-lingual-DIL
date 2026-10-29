@@ -293,7 +293,8 @@ def main():
     torch.use_deterministic_algorithms(True)
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
-    torch.cuda.set_per_process_memory_fraction(16*2**30/torch.cuda.get_device_properties(0).total_memory)
+    torch.cuda.set_per_process_memory_fraction(
+        config["limits"]["gpu_allocator_bytes"]/torch.cuda.get_device_properties(0).total_memory)
     def check():
         if time.monotonic() >= deadline:
             raise TimeoutError("Native worker budget tail reserved")

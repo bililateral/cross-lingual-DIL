@@ -14,7 +14,7 @@ VendorLink扩展已由用户明确选择完整H迁移，并要求原论文方法
 
 L²R／ER+GCR的设计、实现和有限BGE资格复用[合并结案](../reports/documentation/20261024/continual_recovery/review/primary_disposition.zh.txt)，不重复资格；当前18条及新确认按上述822小时授权执行。原“新比较及独立预算尚待授权”是批准前历史，不再构成待办；资格及顺利运行仍不能代替最终效果或确认结论。
 
-VendorLink三市场AlphaBay/Dream/Agora的数据实现/划分/原生方案外审已[独立结案](../reports/documentation/20261029/vendorlink/three_market/review/primary_disposition.zh.txt)。用户随后“继续按计划推进”承接已呈现的一次固定导出和2100秒限定资格，新增实施外审已[独立处置并最小修复结案](../reports/documentation/20261029/vendorlink/native/review/primary_disposition.zh.txt)，现行来源/门见[repair配置](../reports/documentation/20261029/vendorlink/native/repair/config.json)和[许可](../reports/documentation/20261029/vendorlink/native/repair/permit.json)。本轮按用户要求先完成修复验证并汇报；下一阶段用既定一次固定导出和G1/G2范围，重查所需资源/无重复作业，再依已有一次性等待规则推进，不重复询问市场或同一2100秒预算，不要求空卡。资格后依据实测提出正式epoch、评价/依赖口径和累计预算，再获确认后正式运行36条。四臂/零新增HPO及代理任务边界保持，不能把CPU通过或外审提交当GPU资格通过。
+VendorLink三市场AlphaBay/Dream/Agora的数据实现/划分/原生方案外审已[独立结案](../reports/documentation/20261029/vendorlink/three_market/review/primary_disposition.zh.txt)，新增实施外审也已[独立处置并最小修复结案](../reports/documentation/20261029/vendorlink/native/review/primary_disposition.zh.txt)。用户授权的一次固定导出和2100秒限定资格继续执行；最新资源决定见[10GiB一次尝试补充](../reports/documentation/20261029/vendorlink/native/waiting/scope.zh.txt)，有效[配置](../reports/documentation/20261029/vendorlink/native/waiting/config.json)和[许可](../reports/documentation/20261029/vendorlink/native/waiting/permit.json)承接原失败账及已完成导出。已有唯一监听等指定任务释放显存且资源达标，不重建、不要求空卡；失败不在低门槛循环重试，下次恢复17GiB并核对实际失败与余额。G2按实测三槽门继续，不能把G1成功当三路通过。资格后依据实测提出正式epoch、评价/依赖口径和累计预算，再获确认后正式运行36条。四臂/零新增HPO及代理任务边界保持。
 
 ## 已结束Optuna的授权与恢复历史
 

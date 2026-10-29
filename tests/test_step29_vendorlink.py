@@ -27,6 +27,7 @@ import step29_vendorlink_prepare as prepare
 import step29_vendorlink_export as export_data
 import step29_vendorlink_native as native
 import step29_vendorlink_native_control as native_control
+import step29_vendorlink_wait as native_wait
 
 
 def fixture(domain="A", split="fit", component_sizes=(2, 2, 2, 2)):
@@ -94,6 +95,54 @@ class Qualification(unittest.TestCase):
     def evidence(self, name, value):
         run.write_json(Path(os.environ["VENDORLINK_TEST_ROOT"])/(name+".json"), value)
 
+    def test_native_wait_resource_and_single_dispatch(self):
+        target = dict(pid=123, created=456.)
+        gib = native_control.GIB
+        probe = lambda snap, ledger={}, created=None, ram=72*gib, disk=32*gib: native_wait.wait_reason(
+            target, snap, ledger, ram, disk, created, 10*gib)
+        self.assertEqual(probe(dict(free=20*gib, processes={123: gib}), created=456.), "TARGET_STILL_USING_GPU")
+        self.assertEqual(probe(dict(free=10*gib-1, processes={})), "INSUFFICIENT_FREE_VRAM")
+        self.assertIsNone(probe(dict(free=10*gib, processes={999: gib})))
+        self.assertIsNone(probe(dict(free=10*gib, processes={123: gib}), created=457.))
+        self.assertEqual(probe(dict(free=20*gib, processes={}), ram=24*gib-1), "INSUFFICIENT_RAM_OR_DISK")
+        self.assertEqual(probe(dict(free=14*gib, processes={}), dict(g2_admission=dict(per_slot=5*gib))), "INSUFFICIENT_FREE_VRAM")
+        self.assertEqual(probe(dict(free=15*gib, processes={}), dict(g2_admission=dict(per_slot=5*gib)), ram=71*gib), "INSUFFICIENT_RAM_OR_DISK")
+        # Invoke the real waiter and a real handwritten child: blocked first, then one launch.
+        config_path, permit_path = self.root/"config.json", self.root/"permit.json"
+        run.write_json(config_path, dict(limits=dict(initial_free_bytes=10*gib)))
+        run.write_json(permit_path, dict(job=str(self.root), approved=True, implementation_review_closed=True,
+            config_sha256=run.file_sha256(config_path), wait_target=target))
+        ledger = dict(status="WAIT_RESOURCE", config_sha256=run.file_sha256(config_path), aux=15, g1=0, g2=0)
+        run.write_json(self.root/"ledger.json", ledger)
+        active = self.root/"active_wait.py"
+        active.write_text("handwritten active copy")
+        child_source = self.root/"step29_vendorlink_native_control.py"
+        child_source.write_text("from pathlib import Path\nimport json,time\np=Path(__file__).parent\n"
+            "u=p/'g1'/'handwritten';u.mkdir(parents=True);(u/'updates.jsonl').write_text('{}\\n')\n"
+            "time.sleep(.2)\nr=json.loads((p/'ledger.json').read_text());r['status']='HANDWRITTEN_COMPLETE'\n"
+            "(p/'ledger.json').write_text(json.dumps(r))\n")
+        real_sleep = native_wait.time.sleep
+        sleep_calls = []
+        def brief_sleep(seconds):
+            sleep_calls.append(seconds)
+            real_sleep(.01)
+        with patch.object(native_wait, "__file__", str(active)), patch.object(native_wait.time, "sleep", brief_sleep), \
+             patch.object(native_wait, "gpu_snapshot", side_effect=[dict(free=9*gib, processes={}), dict(free=10*gib, processes={})]), \
+             patch.object(native_wait.psutil, "virtual_memory") as ram, patch.object(native_wait.psutil, "disk_usage") as disk:
+            ram.return_value.available, disk.return_value.free = 72*gib, 32*gib
+            native_wait.run(config_path, permit_path, self.root)
+            with self.assertRaises(ValueError):
+                native_wait.run(config_path, permit_path, self.root)
+        status = json.loads((self.root/"status.json").read_text())
+        self.assertEqual(status["status"], "HANDWRITTEN_COMPLETE")
+        self.assertEqual(sleep_calls.count(300), 1)
+        self.assertFalse(active.exists())
+        self.assertIn("self_deleted_after_update", status)
+        self.assertGreaterEqual(json.loads((self.root/"ledger.json").read_text())["aux"], 16)
+        self.evidence("native_wait", dict(target_identity_checked=True, foreign_cuda_allowed=True,
+            threshold_bytes=10*gib, g2_three_slot_gate=True, actual_handwritten_child=True,
+            once_only=True, self_deleted_after_handwritten_update=True, real_gpu_runs=0))
+
     def test_native_g1_actual_updates_and_recovery(self):
         domains = ("AlphaBay", "Dream", "Agora")
         sample_sources = {}
@@ -137,7 +186,22 @@ class Qualification(unittest.TestCase):
         partition = dict(split_seed=20261029, train_fraction=.7, dev_fraction=.15,
                          records_per_view=2, identities_per_group=8)
         expected = d.preview_counts(rows, **partition)["partitions"]
-        result = export_data.export(rows, partition, self.root/"export", self.root/"private_custody", expected)
+        source = self.root/"handwritten.jsonl"
+        source.write_text("\n".join(json.dumps(row) for row in rows)+"\n")
+        config = dict(canonical=dict(path=str(source), bytes=source.stat().st_size, sha256=run.file_sha256(source)),
+            partition=partition, export=str(self.root/"export"), custody=str(self.root/"private_custody"),
+            export_manifest=str(self.root/"export/manifest.json"), expected_partitions=expected)
+        config_path, permit_path = self.root/"config.json", self.root/"permit.json"
+        run.write_json(config_path, config)
+        digest = run.file_sha256(config_path)
+        run.write_json(permit_path, dict(operation="vendorlink_native_qualification", approved=True,
+            implementation_review_closed=True, config_sha256=digest, job=str(self.root)))
+        ledger = dict(aux=0, g1=0, g2=0, attempts=[], config_sha256=digest)
+        native_control.supervise([[sys.executable, "-B", str(Path(export_data.__file__).resolve()),
+            "--config", str(config_path), "--permit", str(permit_path)]], [self.root/"export"], 25,
+            "aux", self.root, dict(os.environ), ledger, config)
+        result = json.loads((self.root/"export/manifest.json").read_text())
+        self.assertEqual(json.loads((self.root/"export_console.txt").read_text())["partitions"], 9)
         for domain, source in result["qualification_samples"].items():
             value = json.loads(Path(source["path"]).read_text())
             self.assertEqual(len(value["groups"]), 3)

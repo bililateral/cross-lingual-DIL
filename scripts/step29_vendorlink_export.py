@@ -78,7 +78,7 @@ def main():
     rows = [json.loads(line) for line in source.read_text(encoding="utf-8").splitlines()]
     result = export(rows, config["partition"], Path(config["export"]), Path(config["custody"]),
                     config["expected_partitions"])
-    print(json.dumps(dict(status=result["status"], partitions=len(result["counts"])), flush=True))
+    print(json.dumps(dict(status=result["status"], partitions=len(result["counts"]))), flush=True)
 
 
 if __name__ == "__main__":

@@ -254,12 +254,13 @@ def main():
             return
         g1 = args.job/"g1"
         if not (g1/"result.json").exists():
-            if sample["free"] < 17*GIB:
+            admission = config["limits"]["initial_free_bytes"]
+            if sample["free"] < admission:
                 ledger["status"] = "WAIT_RESOURCE"
                 return
             nvml, elapsed = supervise([[sys.executable, "-B", str(root/"step29_vendorlink_native.py"),
                 *base, "--mode", "g1", "--job", str(g1)]], [g1], 900-ledger["g1"], "g1", args.job,
-                environment, ledger, config, reserve=17*GIB, check_aux=check_aux)
+                environment, ledger, config, reserve=admission, check_aux=check_aux)
             ledger["g1_nvml"] = nvml
         result = json.loads((g1/"result.json").read_text())
         if result["status"] != "G1_PASSED" or result["updates"] > 15:
