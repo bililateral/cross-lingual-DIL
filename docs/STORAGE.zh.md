@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-29 Agora原CSV取得与Linux保管
+
+按用户“找agora”及此前可用数据只留Linux要求，已取得VendorLink官方指向的Kaggle公开CSV ZIP，最终路径`/home/yongpeng/cross-lingual/data/vendorlink/agora_20261029/kaggle.zip`，8071841字节、SHA256 e982c503097893f5aa07a3122ef2b0a8f96c81458966d09600d9bbf0128b26d8，内含单份32484217字节Agora.csv，直接流式解析未完整解包。Linux直连超时后由Windows现有代理中转，SFTP及两端身份核对后Windows副本/临时目录已删除；Linux1407422字节未完成片段也已删除，下载失败日志保留，见[检查和清理](../reports/documentation/20261029/vendorlink/agora_inventory/report.zh.txt)。
+
+既有11650639字节Agora XLSX与9月归档SHA一致，继续作为不可变历史输入保留Linux，Windows无副本；与新CSV行数不同，不把它当同字节或已证等价转换。小型资格汇总/来源代码/清理记录两端保管，日志原件留Linux；根可变文档只Windows更新，未覆盖活动冻结文件、未推送本轮新材料，不重置大清理周期。
+
 ## 2026-10-29 Gwern候选下载、资格与按需清理
 
 用户明确要求下载检查，并指示“确认了的搬运到Linux上，windows上不留副本。不行的就直接删掉”。[本轮检查](../reports/documentation/20261029/vendorlink/gwern_inventory/report.zh.txt)后仅保留Linux `/home/yongpeng/cross-lingual/data/vendorlink/gwern_20261029/grams-20150714-20160417.tar.xz`，67788336字节，SHA256 3163bc149144b8460216ee81e7ded5594b653ad0b89bd49a88f9eff544913c97。未完整解包，AlphaBay/Dream正文只在Linux解析。两个源的大小/SHA256跨端一致，SHA1与发布方一致。

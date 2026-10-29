@@ -1,5 +1,11 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-29 查找Agora作为第三市场候选
+
+SR1快照资格不足后，用户明确“找agora”。本轮先定位Linux既有XLSX，随后因字段类型转换及异常文本长度，取得VendorLink官方指向的Kaggle原CSV并核验；不是凭文件名声称论文同版本。Linux直连慢，按此前数据下载/保管指令经Windows代理临时中转，SFTP核对后删除Windows载荷和Linux未完成片段。正文解析仅Linux py310，未载模、用GPU或生成划分/标签。
+
+[检查报告](../reports/documentation/20261029/vendorlink/agora_inventory/report.zh.txt)推荐原CSV作为Agora候选输入，现有数量足以继续准备；短描述与跨市场联合去重边界仍需进入方案。当前建议AlphaBay/Dream/Agora，尚未将用户找源要求解释为正式替换第三市场、改变四臂/判据或批准训练；旧XLSX及此前SR1事实不追改。
+
 ## 2026-10-29 授权Gwern候选下载、实际资格检查与清理
 
 用户先提供https://gwern.net/dnm-archive要求查找目标市场来源，随后明确：“现在下载下来，检查一下是否可以用于后续实验”，并补充：“确认了的搬运到Linux上，windows上不留副本。不行的就直接删掉”。本轮执行已呈现的Grams第二期及SR1 2013两小包，Windows代理中转后SFTP、跨端大小/SHA256及发布方SHA1核对，所有解析在Linux既有py310进行。没有生成正式划分、views/qrels或训练。

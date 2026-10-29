@@ -1,0 +1,85 @@
+{
+  "scope": "standalone_agora_source_eligibility_no_formal_split",
+  "observed_server": "2026-10-29T16:46:47.541909+08:00",
+  "source": {
+    "path": "/home/yongpeng/cross-lingual/2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx",
+    "bytes": 11650639,
+    "sha256": "2f32f4334fea63b7c7716b8fe7f3e5532e2f93de2e5c969e47319ed2429356d3"
+  },
+  "script_sha256": "1abb93a9117acfad15f38d0151e49ba8c091c3536cfbde38e726934eee97bc40",
+  "headers": [
+    "Vendor",
+    " Category",
+    " Item",
+    " Item Description",
+    " Price",
+    " Origin",
+    " Destination",
+    " Rating",
+    " Remarks"
+  ],
+  "field_mapping": {
+    "vendor": "Vendor",
+    "title": " Item",
+    "description": " Item Description"
+  },
+  "counts": {
+    "rows": 109760,
+    "at_excel_character_limit_Vendor": 0,
+    "at_excel_character_limit_Item": 0,
+    "at_excel_character_limit_Item Description": 0,
+    "valid_rows": 109271,
+    "description_contains_html_tag": 0,
+    "rows_with_own_handle_masked": 7177,
+    "invalid_type_or_missing": 489,
+    "invalid_Item Description": 238,
+    "invalid_Vendor": 244,
+    "within_account_masked_duplicate_rows": 216,
+    "invalid_Item": 17,
+    "excluded_shared_exact_account_texts": 1486,
+    "distinct_account_masked_texts_before_shared_filter": 109055,
+    "clean_distinct_ads": 107569
+  },
+  "observed_accounts": 3181,
+  "accounts_with_clean_ads": 3174,
+  "casefold_handle_collision_groups": 5,
+  "casefold_handle_collision_accounts": 10,
+  "eligible_accounts_by_min_ads": {
+    "4": 2787,
+    "10": 2094,
+    "20": 1474,
+    "50": 604
+  },
+  "ads_in_min20_accounts": 93823,
+  "clean_ads_per_observed_account": {
+    "count": 3181,
+    "min": 0,
+    "max": 879,
+    "p50": 17,
+    "p90": 76
+  },
+  "clean_title_characters": {
+    "count": 107569,
+    "min": 1,
+    "max": 13562,
+    "p50": 36,
+    "p90": 67
+  },
+  "clean_description_characters": {
+    "count": 107569,
+    "min": 1,
+    "max": 31269,
+    "p50": 194,
+    "p90": 201
+  },
+  "limitations": [
+    "No listing URL or product ID in workbook; distinct text is not verified distinct physical product.",
+    "Standalone exact deduplication only; joint cross-market filtering and near duplicates untested.",
+    "Case variants remain separate observed accounts; no verified real-owner aliases.",
+    "XLSX conversion equivalence to original CSV bytes not established."
+  ],
+  "no_split_views_qrels_models_gpu": true,
+  "wall_seconds": 7.326147735002451,
+  "cpu_seconds": 7.532879915,
+  "max_rss_kib": 228844
+}

@@ -14,7 +14,7 @@ VendorLink扩展已由用户明确选择完整H迁移，并要求原论文方法
 
 L²R／ER+GCR的设计、实现和有限BGE资格复用[合并结案](../reports/documentation/20261024/continual_recovery/review/primary_disposition.zh.txt)，不重复资格；当前18条及新确认按上述822小时授权执行。原“新比较及独立预算尚待授权”是批准前历史，不再构成待办；资格及顺利运行仍不能代替最终效果或确认结论。
 
-VendorLink后续推进以[资格提议](../reports/documentation/20261029/vendorlink/data_qualification/report.zh.txt)及[公开归档实际检查](../reports/documentation/20261029/vendorlink/gwern_inventory/report.zh.txt)为补充：模型准备已完成，AlphaBay/Dream已有Grams候选来源；仍需足量原始Silk Road，不能用silk road 3.1或降低门槛自动替代。新来源与论文的时间、反馈匹配和文本完整性差异须明确纳入统一四臂方案。补齐后固定划分/曝光，再将限定GPU范围作必要增量审查、确认后执行；三路资源与整批预算按实测确定。不得将待确认的2100秒提议当现行许可。
+VendorLink后续推进以[资格提议](../reports/documentation/20261029/vendorlink/data_qualification/report.zh.txt)、[公开归档检查](../reports/documentation/20261029/vendorlink/gwern_inventory/report.zh.txt)及[Agora原CSV盘点](../reports/documentation/20261029/vendorlink/agora_inventory/report.zh.txt)为补充：模型准备已完成，AlphaBay/Dream已有Grams候选；SR1不足后已按用户要求找到Agora原CSV，建议将三市场候选改为AlphaBay/Dream/Agora并明确征求方案确认，不继续把SR1缺源作为唯一方向。正式使用前固定联合清理/划分/曝光，明确时间、反馈匹配、摘要文本及代理任务边界，再将限定GPU范围作必要增量审查、确认后执行；三路资源与整批预算按实测确定。不能用找源许可自动换市场/开训，也不将待确认的2100秒提议当现行许可。
 
 ## 已结束Optuna的授权与恢复历史
 

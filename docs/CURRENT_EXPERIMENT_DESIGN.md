@@ -14,6 +14,8 @@ VendorLink新场景实现（2026-10-29）：首轮[完整外审](../reports/docu
 
 VendorLink后续明确范围（2026-10-29）：用户已批准服务器数据盘点/模型准备，并进一步批准Gwern候选下载、检查及“可用只留Linux、不适用删除”。[初次盘点及提议](../reports/documentation/20261029/vendorlink/data_qualification/report.zh.txt)保留当时范围；[下载后的实际资格检查](../reports/documentation/20261029/vendorlink/gwern_inventory/report.zh.txt)补充公开归档结果、商品去重口径、来源偏差及保管事实。新来源资格不等于正式数据合同，70/15/15及2100累计任务秒GPU提议仍未批准；不因文件已齐授予载模/开训，不用silk road 3.1替换原始Silk Road，不重开未改变的四臂实现审查。
 
+Agora候选补充（2026-10-29）：用户要求“找agora”，已完成[公开原CSV取得与资格盘点](../reports/documentation/20261029/vendorlink/agora_inventory/report.zh.txt)。建议后续将AlphaBay/Dream/Agora纳入数据方案，不将找源等同于批准第三市场替换。现有XLSX与原CSV行数不同，推荐固定新取得CSV；单市场数量不能替代联合去重、最终划分和曝光合同。短描述、无真实同控真值等边界保持，未改变四臂或启动任何GPU/正式训练。
+
 ## 设计与审查沿革（历史）
 
 以下段落中的“当前”“待批准”“正在运行”只描述各自记录时点；当前适用范围见上节，不能据历史重新启动或恢复旧阻断。
