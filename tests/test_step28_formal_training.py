@@ -227,6 +227,80 @@ class FormalTrainingTests(unittest.TestCase):
                 EVIDENCE[name] = dict(three_actual_stages=True, compact_vs_full_models_equal=True,
                                      real_update_logs_and_blind_scores_equal=True)
 
+    def test_vendor_workload_counts_actual_calls_and_survives_compact_save(self):
+        observed = {}
+        for method in vendor.METHODS:
+            with tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                model = model_for(method, root)
+                # Independent reference sizes: A=20, B=24, C=28 advertisements.
+                sizes = dict(A=(2, 2, 2, 2), B=(2, 2, 3, 3), C=(3, 3, 3, 3))
+                groups = {d: vendor_fixture(d, component_sizes=sizes[d]) for d in 'ABC'}
+                actual = dict(current_groups=0, current_ads=0, history_groups=0, history_ads=0,
+                              teacher_groups=0, teacher_ads=0)
+                backward, teacher, encode = model.backward_h, model.teacher, model.encode
+                def observed_backward(group, *args, **kwargs):
+                    result = backward(group, *args, **kwargs)
+                    kind = 'history' if (args[2] if len(args) > 2 else kwargs.get('history', False)) else 'current'
+                    actual[kind+'_groups'] += 1
+                    actual[kind+'_ads'] += dict(A=20, B=24, C=28)[group.domain]
+                    return result
+                def observed_teacher(group, *args, **kwargs):
+                    result = teacher(group, *args, **kwargs)
+                    actual['teacher_groups'] += 1
+                    actual['teacher_ads'] += dict(A=20, B=24, C=28)[group.domain]
+                    return result
+                def observed_encode(texts, *args, **kwargs):
+                    result = encode(texts, *args, **kwargs)
+                    # VendorLink's actual classifier call consumes one text/ad.
+                    if method == 'VendorLink_SEQ':
+                        actual['current_ads'] += len(texts)
+                    return result
+                job = root/'compact'
+                identity = dict(handwritten=True, method=method)
+                with patch.object(model, 'backward_h', side_effect=observed_backward), \
+                        patch.object(model, 'teacher', side_effect=observed_teacher), \
+                        patch.object(model, 'encode', side_effect=observed_encode):
+                    vendor_run.execute(model, lambda d: [groups[d]], job, order='ABC', seed=4,
+                        epochs=2, identity=identity, inference_endpoints=True)
+                completed = json.loads((job/'completion.json').read_text())
+                workload = completed['workload']
+                self.assertTrue(workload['complete_from_start'])
+                self.assertEqual(workload['totals'], actual)
+                self.assertEqual(actual['current_ads'], 144)
+                replay = method in ('H_ER', 'H_full')
+                self.assertEqual(actual['history_groups'], 4 if replay else 0)
+                # Existing A's teacher is not regenerated at the B boundary.
+                self.assertEqual(actual['teacher_groups'], 2 if replay else 0)
+                self.assertEqual(actual['teacher_ads'], 44 if replay else 0)
+                self.assertEqual([s['current_ads'] for s in workload['stages']], [40, 48, 56])
+                for key, value in actual.items():
+                    self.assertEqual(sum(s[key] for s in workload['stages']), value)
+                rows = [json.loads(line) for line in (job/'updates.jsonl').read_text().splitlines()]
+                for key in ('current_ads', 'current_groups', 'history_ads', 'history_groups'):
+                    self.assertEqual(sum(row['workload'][key] for row in rows), actual[key])
+                self.assertEqual(json.loads((job/'workload.json').read_text()), workload)
+                saved = torch.load(job/'latest.pt', map_location='cpu', weights_only=False)
+                self.assertEqual(saved['cursor']['workload'], workload)
+                (job/'latest.pt').unlink()  # Same retirement as the formal success path.
+                self.assertEqual(json.loads((job/'completion.json').read_text())['workload'], workload)
+                if replay:
+                    self.assertTrue(all(row['history']['distillation'] == 0 for row in rows[2:])
+                                    if method == 'H_ER' else any(row['history']['distillation'] > 0 for row in rows[2:]))
+                # A full-state stage checkpoint preserves prior stage work on API recovery.
+                full = root/'full'
+                reference = model_for(method, root)
+                vendor_run.execute(reference, lambda d: [groups[d]], full, order='ABC', seed=4,
+                    epochs=2, identity=identity)
+                recovered = root/'recovered'
+                vendor_run.execute(model_for(method, root), lambda d: [groups[d]], recovered,
+                    order='ABC', seed=4, epochs=2, identity=identity, resume=full/'stage1.pt')
+                self.assertEqual(json.loads((recovered/'completion.json').read_text())['workload'], workload)
+                observed[method] = actual
+        EVIDENCE['vendor_workload'] = dict(actual_calls=observed,
+            teacher_counts_include_H_ER=True, existing_teachers_not_refreshed=True,
+            compact_retirement_preserves_counts=True, stage_recovery_preserves_counts=True)
+
     def test_calibration_failure_preserves_actual_fit_before_raising(self):
         learner = forever_fixture()
         learner.phase = 'endpoint'

@@ -27,6 +27,7 @@ for row in sources:
     if len(content) != row['bytes'] or hashlib.sha256(content).hexdigest() != row['sha256']:
         raise ValueError('Actual deployment differs from CPU input')
 tests = (['test_compact_vendor_endpoints_preserve_actual_trajectory_and_scores',
+          'test_vendor_workload_counts_actual_calls_and_survives_compact_save',
           'test_single_queue_failure_charged_and_next_child_not_launched',
           'test_serial_resource_failure_stops_only_its_child',
           'test_followup_waits_for_training_completion_and_uses_its_own_bucket',

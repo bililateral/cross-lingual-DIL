@@ -1,6 +1,8 @@
 # 科研文件存储与恢复
 ## 2026-10-30 VendorLink与FOREVER正式准备、修复与外审证据
 
+开训前处理量留证增量：VendorLink cpu10四份原始小证据已SCP回传并逐项核对SHA，三阶段处理量、恢复继承及删除latest后保留行为均有手写证据。四份受影响源码版本追加到原source_archive.zip，原有成员保留；当前归档430947字节／SHA256 b6ef7ced3ba493545ed8cadbe763de7b3db6fde70589bf45a34df953549bf516，下文410142字节为初始归档身份。本次两gate继续关闭，仅重绑共用63来源并结转VendorLink CPU130秒，FOREVER133秒不变；实际部署见cpu10/deployment.json。实现说明与源码归档同步到Linux formal目录，根可变文档只在Windows维护。中转材料按本次用途清理，不触及旧回执中另有处置记录的远端包，不重置大清理周期。
+
 两项正式准备分别保存在[VendorLink formal](../reports/documentation/20261030/vendorlink/formal/)与[FOREVER formal](../reports/documentation/20261030/forever/formal/)。Linux共用隔离workspace位于vendorlink/formal/workspace，63份实际源码/手写测试/必要配置已核对；comparison_run/evaluate及其测试采用原资格冻结字节，不覆盖活动实验来源。FOREVER只链接五份已批准train输入与BGE模型目录，不链接整个旧dev/test/owners目录；H27模型仍在原保管位置。两个具体gate均关闭，无正式训练或新确认。
 
 CPU全部尝试、错误、实际收费及获准canonical依赖元数据已回Windows。小证据ZIP先核对两端SHA，再逐成员核对解包文件；84个必要源码版本按SHA/原相对路径归并为source_archive.zip（410142字节，SHA256 5218347ca63bb8049575e48c0c465ae5c4f764dd8db6a1fada34eb285ea015de），所有CPU/扫描receipt.sources均可恢复。旧失败证据未删除。Windows自建中转ZIP及展开副本在必要载荷保管/核对后清理，见[清理记录](../reports/documentation/20261030/vendorlink/formal/transport_cleanup.json)。Linux同批10个中转ZIP的删除被自动审批以缺少明确远端删除许可拒绝，实际保留，不绕过、不影响科研工作；未重置大清理周期。

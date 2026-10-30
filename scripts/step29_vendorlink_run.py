@@ -107,6 +107,25 @@ def execute(model, load_fit, job, *, order, seed, epochs, identity, check=lambda
         optimizer, cursor = load_state(resume, model, memory, identity)
     if cursor["complete"]:
         raise ValueError("Completed trajectory must not be resumed")
+    # Exposure counts, not FLOPs: H encodes title and description separately.
+    # Old recovery payloads without this field cannot establish earlier work.
+    fields = ("current_groups", "current_ads", "history_groups", "history_ads", "teacher_groups", "teacher_ads")
+    workload = cursor.setdefault("workload", {
+        "complete_from_start": resume is None,
+        "coverage": "completed_optimizer_updates_and_completed_teacher_calls",
+        "totals": dict.fromkeys(fields, 0),
+        "stages": [dict(stage=i+1, domain=domain, **dict.fromkeys(fields, 0))
+                   for i, domain in enumerate(order)]})
+
+    def ad_count(group):
+        return sum(len(view.records) for view in group.views)
+
+    def record_work(stage, kind, groups, ads):
+        for suffix, count in (("groups", groups), ("ads", ads)):
+            key = f"{kind}_{suffix}"
+            workload["totals"][key] += count
+            workload["stages"][stage][key] += count
+
     inherited = []
     try:
         # A fresh recovery directory must retain every already learned endpoint.
@@ -160,22 +179,35 @@ def execute(model, load_fit, job, *, order, seed, epochs, identity, check=lambda
                     if settings.method == "VendorLink_SEQ":
                         records, labels = zip(*batch)
                         log = update_vendor(model, optimizer, records, labels, step_seed, check)
+                        work = dict.fromkeys(fields, 0)
+                        work["current_ads"] = len(records)
                     else:
                         history, teacher = (None, None)
                         if stage and settings.method != "H_SEQ":
                             history, teacher = memory.draw(seed_for(seed, order, stage, update, "history"))
                         log = update_h(model, optimizer, batch, history, teacher, step_seed, check)
+                        work = dict.fromkeys(fields, 0)
+                        work.update(current_groups=1, current_ads=ad_count(batch))
+                        if history is not None:
+                            work.update(history_groups=1, history_ads=ad_count(history))
+                    for kind in ("current", "history"):
+                        record_work(stage, kind, work[f"{kind}_groups"], work[f"{kind}_ads"])
                     cursor["stage_updates"], cursor["updates"] = update, cursor["updates"]+1
                     with (job/"updates.jsonl").open("a", encoding="utf-8") as output:
                         output.write(json.dumps({"stage": stage+1, "epoch": epoch+1, "update": update,
-                                                 "total_updates": cursor["updates"], **log})+"\n")
+                                                 "total_updates": cursor["updates"], "workload": work, **log})+"\n")
                 cursor["next_epoch"] = epoch+1
                 save_state(job/"latest.pt", model, optimizer, memory, cursor.copy(), identity)
+                write_json(job/"workload.json", workload)
             if stage < 2 and settings.method in ("H_ER", "H_full"):
-                memory.retain(groups, stage+1, model, check)
+                def record_teacher(group):
+                    record_work(stage, "teacher", 1, ad_count(group))
+                    # Preserve every completed teacher even if later retention fails.
+                    write_json(job/"workload.json", workload)
+                memory.retain(groups, stage+1, model, check, record_teacher=record_teacher)
             # Each endpoint also includes the post-retention state required for continuation.
             cursor = {"stage": stage+1, "next_epoch": 0, "stage_updates": 0,
-                      "updates": cursor["updates"], "complete": stage == 2}
+                      "updates": cursor["updates"], "complete": stage == 2, "workload": workload}
             if inference_endpoints:
                 endpoint = job/f"stage{stage+1}.pt"
                 torch.save(dict(identity=identity, settings=asdict(settings), classes=model.classes,
@@ -183,11 +215,12 @@ def execute(model, load_fit, job, *, order, seed, epochs, identity, check=lambda
             else:
                 save_state(job/f"stage{stage+1}.pt", model, optimizer, memory, cursor.copy(), identity)
             save_state(job/"latest.pt", model, optimizer, memory, cursor.copy(), identity)
+            write_json(job/"workload.json", workload)
             del groups
         write_json(job/"completion.json", {"status": "THREE_STAGES_TRAINED_NOT_EVALUATED",
             "identity": identity, "updates": cursor["updates"], "memory_bytes": len(memory.bytes()),
             "stage_endpoints": [f"stage{i}.pt" for i in (1, 2, 3)], "inherited_endpoints": inherited,
-            "inference_endpoints": inference_endpoints})
+            "inference_endpoints": inference_endpoints, "workload": workload})
         return cursor
     except BaseException as error:
         write_json(job/"failure.json", {"status": "STOP_NO_AUTOMATIC_RETRY", "error": repr(error), "cursor": cursor})

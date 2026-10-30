@@ -259,7 +259,7 @@ class Memory:
         self.settings = settings
         self.seen, self.entries = 0, []
 
-    def retain(self, groups, stage, model, check=lambda: None):
+    def retain(self, groups, stage, model, check=lambda: None, *, record_teacher=lambda group: None):
         if stage not in (1, 2):
             raise ValueError("Only completed nonfinal stages produce history")
         # Select first, then encode new survivors only; existing teachers never refresh.
@@ -275,7 +275,9 @@ class Memory:
                     selected[slot] = row
         for row in selected:
             if row["teacher"] is None:
-                row["teacher"] = model.teacher(Group.from_dict(row["group"]), check)
+                group = Group.from_dict(row["group"])
+                row["teacher"] = model.teacher(group, check)
+                record_teacher(group)
         self.entries = selected
         if len(self.bytes()) > self.settings.memory_bytes:
             raise ValueError("Retained text, teachers and sampler state exceed the memory budget")
