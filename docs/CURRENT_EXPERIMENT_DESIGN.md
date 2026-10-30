@@ -2,7 +2,7 @@
 
 ## 当前合同入口
 
-FOREVER新增候选（2026-10-30）：[送审原方案](../reports/documentation/20261030/forever/proposal.zh.txt)＋[外审后修订补充](../reports/documentation/20261030/forever/revision.zh.txt)定义算法；用户最新已批准其中最小实现及CPU600秒/GPU3600累计任务秒/48实际更新的限定资格，并指定GPU排在VendorLink本轮完整资格之后，见[实施范围](../reports/documentation/20261030/forever/implementation/scope.zh.txt)及[许可](../reports/documentation/20261030/forever/implementation/authorization.json)。[预算依据](../reports/documentation/20261030/forever/budget.json)的116h仍是正式批次提议，108h正式训练、6h新确认、新120群/标签均未启用。未来仍只拟9条新轨迹、H27复用、零HPO/总4320前向；资格中的额外全P锚点例外明确计费，不宣称等总历史状态/算力/HPO。新增实现外审及GPU实际验收不能由方案外审或CPU通过替代；禁止正式开训。ER+FLAD保留候选，活动实验不变，动态状态只见当前交接。
+FOREVER新增候选（2026-10-30）：[送审原方案](../reports/documentation/20261030/forever/proposal.zh.txt)＋[外审后修订补充](../reports/documentation/20261030/forever/revision.zh.txt)定义算法；用户最新已批准其中最小实现及CPU600秒/GPU3600累计任务秒的限定资格；最新固定单路39调用，累计调用次数只记账、不再设48次硬门，并指定GPU排在VendorLink之后；后续已明确接受VendorLink单路结案，且FOREVER改为单路资格，见[实施范围](../reports/documentation/20261030/forever/implementation/scope.zh.txt)及[许可](../reports/documentation/20261030/forever/implementation/authorization.json)。[预算依据](../reports/documentation/20261030/forever/budget.json)的116h仍是正式批次提议，108h正式训练、6h新确认、新120群/标签均未启用。未来仍只拟9条新轨迹、H27复用、零HPO/总4320前向；资格中的额外全P锚点例外明确计费，不宣称等总历史状态/算力/HPO。新增实现外审R01—R05已由[独立主审](../reports/documentation/20261030/forever/implementation/review/primary_disposition.zh.txt)修复闭合；执行来源及门以review/repair/permit_closed.json为准，VendorLink前序改指10月30日获准回退job；后续单路范围及BGE结构性闲置参数修复见[明确补充](../reports/documentation/20261030/forever/implementation/qualification/scope_update.zh.txt)，原三槽前置不再有效。GPU实际验收仍不能由方案外审或CPU通过替代；禁止正式开训。ER+FLAD保留候选，活动实验不变，动态状态只见当前交接。
 
 本节定位各条研究线的有效范围；实际进度、PID和资源观测只在[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)维护。后面的设计与审查沿革保留原时点，不覆盖本节与后续明确授权。
 
@@ -19,6 +19,8 @@ VendorLink后续明确范围（2026-10-29）：用户已批准服务器数据盘
 三市场后续明确决定（2026-10-29）：用户确定AlphaBay/Dream/Agora后，来源接线/联合盘点及原生方案已获[本轮完整外审](../reports/documentation/20261029/vendorlink/three_market/review/external/report.zh.txt)和[独立主审结案](../reports/documentation/20261029/vendorlink/three_market/review/primary_disposition.zh.txt)。冻结[输入方案](../reports/documentation/20261029/vendorlink/three_market/plan.zh.txt)按当时待授权状态保留，后续用户“外审已结束，继续按计划推进”授权按已呈现的一次固定导出/2100秒资格推进，仍须关闭新实施审查及满足所需资源。[原送审实施说明](../reports/documentation/20261029/vendorlink/native/implementation.zh.txt)按原字节保留；新增实施外审经[独立主审及最小修复](../reports/documentation/20261029/vendorlink/native/review/primary_disposition.zh.txt)闭合。当前入口改为[repair配置](../reports/documentation/20261029/vendorlink/native/repair/config.json)与[repair执行门](../reports/documentation/20261029/vendorlink/native/repair/permit.json)，仅绑定必要修复来源，implementation_review_closed=true；原false门为送审历史。修法已确定且定向证据充分，依纪律第6节主审闭合，不冒称修后已再网页复审。未变四方法生产数学/训练入口继续复用，不追加HPO、近重复或第五臂。实际GPU资格、正式36条/E/总预算和最终评价仍未完成，不把准备/CPU证据升级成正式运行或结论。
 
 资源执行补充（2026-10-29）：上述repair入口是本次实施审查关闭时的冻结版本。用户最新明确“把17G先改成10G门槛，先尝试一下”；有效入口现为[waiting配置](../reports/documentation/20261029/vendorlink/native/waiting/config.json)、[许可](../reports/documentation/20261029/vendorlink/native/waiting/permit.json)与[范围补充](../reports/documentation/20261029/vendorlink/native/waiting/scope.zh.txt)。仅首派空闲门改10GiB、分配器9GiB，四臂运算与2100累计秒不变；指定任务释放显存后按资源条件单次派发，G2仍用实测三槽门。已完成固定导出机械核对后直接复用；CLI收尾修复与一次等待接线由现有主审范围和对应手写CPU证据闭合。失败保留费用与访问，下次恢复17GiB，不能自动清零或循环重试。运行事实以交接顶部为准。
+
+最新资格补充（2026-10-30）：用户取消VendorLink 9GiB分配器限制并接受单路G1结案、G2三路未通过。有效配置/许可与[独立处置](../reports/documentation/20261030/vendorlink/native/primary_disposition.zh.txt)保存在10月30日新目录；上述10月29日配置与首次失败按历史保留，不能继续用旧allocator或G2等待状态阻断已获准的FOREVER单路资格。正式VendorLink训练合同仍未启用。
 
 ## 设计与审查沿革（历史）
 

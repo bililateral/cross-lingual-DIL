@@ -1,0 +1,16 @@
+/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever_qualification.py", line 430, in <module>
+    worker(args)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever_qualification.py", line 357, in worker
+    timed('fixture', lambda: log(learner.update(old[0], 'fixture', check=check, before_step=physical)))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever_qualification.py", line 334, in timed
+    value = fn()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever_qualification.py", line 357, in <lambda>
+    timed('fixture', lambda: log(learner.update(old[0], 'fixture', check=check, before_step=physical)))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever.py", line 248, in update
+    row = step(self.model, self.optimizer, group, self.c, self.spec, self.stage,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever.py", line 207, in step
+    raise ValueError(f'Expected trainable parameters have no task gradient: {missing}')
+ValueError: Expected trainable parameters have no task gradient: ['encoder.0.model.pooler.dense.weight', 'encoder.0.model.pooler.dense.bias']

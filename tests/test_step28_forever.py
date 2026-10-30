@@ -6,9 +6,14 @@ from dataclasses import asdict
 import json
 import os
 from pathlib import Path
+import signal
+import subprocess
 import sys
 import tempfile
+import time
+from types import SimpleNamespace
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 import torch
@@ -58,6 +63,41 @@ def stage2_fixture():
 
 
 class ForeverTests(unittest.TestCase):
+    def test_proven_unused_bert_pooler_kept_in_full_parameter_set(self):
+        import inspect
+        from sentence_transformers.models import Transformer, Pooling, Normalize
+        from transformers import BertConfig, BertModel
+        tr = Transformer.__new__(Transformer)
+        torch.nn.Module.__init__(tr)
+        tr.model = BertModel(BertConfig(vocab_size=16, hidden_size=8,
+            num_hidden_layers=1, num_attention_heads=2, intermediate_size=16))
+        tr.modality_config = {'text': dict(method='forward', method_output_name='last_hidden_state')}
+        tr.module_output_name = 'token_embeddings'
+        tr.model_forward_params = set(inspect.signature(tr.model.forward).parameters)
+        model = m.core.build_model(torch.nn.Sequential(tr, Pooling(8, pooling_mode='cls'), Normalize()), 8, 5)
+        inputs = dict(input_ids=torch.tensor([[1, 2, 3], [1, 4, 5]]), attention_mask=torch.ones(2, 3, dtype=torch.long))
+        embeddings = model.encoder(inputs)['sentence_embedding']
+        model.head(torch.cat((embeddings, embeddings), dim=1)).sum().backward()
+        values = m.parameters(model)
+        missing = {n for n, p in values.items() if p.grad is None}
+        self.assertEqual(missing, {'encoder.0.model.pooler.dense.weight', 'encoder.0.model.pooler.dense.bias'})
+        count = len(values)
+        completed = m.complete_task_gradients(model)
+        self.assertEqual(set(completed), missing)
+        self.assertEqual(len(m.parameters(model)), count)
+        self.assertTrue(all(torch.count_nonzero(values[n].grad) == 0 for n in completed))
+        anchor = m.snapshot(model)
+        for n in completed:
+            anchor[n].add_(.25)
+        m.regularize(model, anchor, .001)
+        self.assertTrue(all(torch.allclose(values[n].grad, torch.full_like(values[n], -.0005)) for n in completed))
+        next(model.head.parameters()).grad = None
+        with self.assertRaises(ValueError):
+            m.complete_task_gradients(model)
+        EVIDENCE['unused_pooler'] = dict(random_tiny_bert=True, actual_transformer_cls_forward=True,
+            missing_names=completed, full_parameter_count=count, full_p_retained=True,
+            task_zero_and_regularizer_reference_pass=True, broken_head_still_rejected=True)
+
     def test_production_configuration_without_corpus_or_model_loading(self):
         c = m.config(m.Spec('CAB', 6))
         self.assertEqual(c['initialization_seed'], 2026101906)
@@ -171,11 +211,14 @@ class ForeverTests(unittest.TestCase):
         old_rng = learner.old.rng.getstate()
         source_order = [g.uid for g in m.parent.schedule(current, learner.c, 'ABC', 2)[0]]
         with tempfile.TemporaryDirectory(dir=os.environ.get('FOREVER_TEST_TMP')) as temp:
+            def record_row(row):
+                rows.append(row)
+                qualification.log_update(Path(temp)/'native_updates.jsonl', row)
             identity = dict(spec=learner.spec.identity(), config=learner.c, qualification_only=True)
             store = run.Store(Path(temp), identity)
             anchor_hash = m.core.state_digest(learner.anchor)
             for i in range(24):
-                learner.advance(current[i], before_step=lambda: physical.append(1), log=rows.append,
+                learner.advance(current[i], before_step=lambda: physical.append(1), log=record_row,
                                 commit=lambda: store.commit(learner, supply))
             self.assertEqual(learner.clock.current, 24)
             self.assertEqual(learner.clock.next_threshold, 1)
@@ -185,6 +228,10 @@ class ForeverTests(unittest.TestCase):
             self.assertEqual(source_order, [g.uid for g in m.parent.schedule(current, learner.c, 'ABC', 2)[0]])
             self.assertEqual(m.core.state_digest(learner.anchor), anchor_hash)
             replay = [r for r in rows if r['role'] == 'replay']
+            written = [json.loads(line) for line in (Path(temp)/'native_updates.jsonl').read_text().splitlines()]
+            self.assertEqual(len(written), 36)
+            self.assertEqual([r['epoch'] for r in written if r['role'] == 'replay'], [r['epoch'] for r in replay])
+            self.assertTrue(all(r['wall_time_epoch'] > 0 for r in written))
             self.assertEqual({r['group'] for r in replay}, {g.uid for g in learner.old.groups})
             self.assertTrue(any(r['regularizer']['penalty'] > 0 for r in replay))
             self.assertTrue(all(r['encoder_lr'] == 1e-5 for r in replay))
@@ -204,7 +251,41 @@ class ForeverTests(unittest.TestCase):
             EVIDENCE['real_entry_and_restore'] = dict(current=24, replay=12, fixture_predecessor=1,
                 next_update_branches=2, real_clock=asdict(restored.clock), replay_only_survivors=True,
                 retention_rng_unchanged=True, current_schedule_unchanged=True, model_adam_rng_next_exact=True,
+                native_logger_current_and_replay_rows=36, replay_epoch_not_overwritten=True,
                 final_adam_step=m.parent.adam_step(restored.optimizer), parameter_mapping=m.mapping(restored.model, restored.optimizer))
+
+    def test_resume_drains_multiple_due_events_before_next_current(self):
+        learner, supply, current, _ = stage2_fixture()
+        # Boundary fixture with three due events; each event still performs real gradient updates.
+        learner.clock = m.Clock(current=25, tau=5., tau_day=1., mu0=.04, mu=.04)
+        rows = []
+        with tempfile.TemporaryDirectory(dir=os.environ.get('FOREVER_TEST_TMP')) as temp:
+            identity = dict(spec=learner.spec.identity(), config=learner.c, qualification_only=True)
+            store = run.Store(Path(temp), identity)
+            def first_event():
+                store.commit(learner, supply)
+                raise RuntimeError('interrupted after first of three due events')
+            with self.assertRaises(RuntimeError):
+                learner.drain_events(log=rows.append, commit=first_event)
+            self.assertEqual(learner.clock.current, 25)
+            self.assertEqual(learner.clock.next_threshold, 1)
+            remaining = []
+            learner.advance(current[25], log=remaining.append)
+            expected = m.core.state_digest(dict(model=learner.model.state_dict(), optimizer=learner.optimizer.state_dict(),
+                                               small=learner.small(), rng=m.diag.rng_state()))
+            restored, supplied = fixture(), dispatcher(learner.spec)
+            fit, _ = run.Store(Path(temp), identity).restore(restored, supplied)
+            actual_rows = []
+            restored.advance(fit[25], log=actual_rows.append)
+            actual = m.core.state_digest(dict(model=restored.model.state_dict(), optimizer=restored.optimizer.state_dict(),
+                                             small=restored.small(), rng=m.diag.rng_state()))
+            self.assertEqual(expected, actual)
+            self.assertEqual([r['role'] for r in actual_rows], ['replay']*24+['current'])
+            self.assertEqual([r.get('event') for r in actual_rows[:24]], ['event1']*12+['event2']*12)
+            self.assertEqual(restored.clock.current, 26)
+            EVIDENCE['multiple_event_resume'] = dict(prior_event_replay_steps=len(rows),
+                restored_sequence=[r['role'] for r in actual_rows], next_current=26,
+                model_adam_clock_rng_exact=True, boundary_fixture_not_full_stage=True)
 
     def test_stage_transaction_before_after_publication_and_eviction(self):
         learner, supply, current, calibration = stage2_fixture()
@@ -214,6 +295,8 @@ class ForeverTests(unittest.TestCase):
             identity = dict(spec=learner.spec.identity(), config=learner.c, qualification_only=True)
             store = run.Store(Path(temp), identity)
             store.commit(learner, supply)
+            unrelated = Path(temp)/'models'/'keep_user_note.txt'
+            unrelated.write_text('not a Store generation')
             previous = (Path(temp)/'latest.json').read_bytes()
             def fail_before(phase):
                 if phase == 'before_publish':
@@ -224,6 +307,10 @@ class ForeverTests(unittest.TestCase):
             restored, supplied = fixture(), dispatcher(learner.spec)
             recovered = run.Store(Path(temp), identity)
             fit, cal = recovered.restore(restored, supplied)
+            self.assertEqual(len(list((Path(temp)/'work').glob('*.pt'))), 1)
+            self.assertEqual(len(list((Path(temp)/'anchors').glob('*.pt'))), 1)
+            self.assertEqual(len(list((Path(temp)/'models').glob('*.pt'))), 0)
+            self.assertEqual(len(list(Path(temp).glob('latest.*.json'))), 0)
             self.assertEqual(restored.stage, 2)
             self.assertEqual(restored.old.seen, 48)
             def fail_after(phase):
@@ -236,6 +323,13 @@ class ForeverTests(unittest.TestCase):
             self.assertEqual(final.stage, 3)
             self.assertEqual(final.phase, 'await_current')
             self.assertEqual(final.old.seen, 96)
+            self.assertEqual(len(list((Path(temp)/'work').glob('*.pt'))), 1)
+            self.assertEqual(len(list((Path(temp)/'anchors').glob('*.pt'))), 1)
+            self.assertEqual(len(list((Path(temp)/'memory').glob('*.bin'))), 1)
+            self.assertEqual(len(list((Path(temp)/'models').glob('*.pt'))), 1)
+            self.assertEqual(len(list((Path(temp)/'maps').glob('*.json'))), 1)
+            self.assertTrue(unrelated.is_file())
+            self.assertTrue((Path(temp)/'retired.jsonl').is_file())
             expected = m.memory(final.spec)
             expected.add_stage([group(i) for i in range(48)])
             expected.add_stage(sorted(current, key=lambda g: g.uid))
@@ -247,7 +341,94 @@ class ForeverTests(unittest.TestCase):
             EVIDENCE['stage_transaction'] = dict(before_publish_old_latest_preserved=True,
                 after_publish_only_new_latest=True, next_stage=final.stage, retained_seen=final.old.seen,
                 next_current_only=True, memory_matches_independent_algorithm_r=True,
+                before_and_after_publish_orphans_removed=True, committed_endpoint_preserved=True,
+                unrelated_file_preserved=True,
                 boundary_fixture_not_288_real_updates=True)
+
+    def test_qualification_budget_admission_and_compute_only_overlap(self):
+        with self.assertRaises(TimeoutError):
+            qualification.budget_delay(3600, 3590, 3)
+        self.assertEqual(qualification.budget_delay(3600, 3500, 3), 29.)
+        g = qualification.GIB
+        enough = dict(free_gpu_bytes=24*g, ram_available_bytes=190*g, disk_free_bytes=159*g)
+        admission = qualification.auxiliary_admission(enough, 6*g, 2*g, g)
+        self.assertTrue(admission['ready'])
+        self.assertFalse(qualification.auxiliary_admission(dict(enough, free_gpu_bytes=24*g-1), 6*g, 2*g, g)['ready'])
+        self.assertFalse(qualification.auxiliary_admission(dict(enough, ram_available_bytes=190*g-1), 6*g, 2*g, g)['ready'])
+        self.assertFalse(qualification.auxiliary_admission(dict(enough, disk_free_bytes=159*g-1), 6*g, 2*g, g)['ready'])
+        interval = lambda a, b: dict(started=a, ended=b)
+        main = [interval(0, 1), interval(5, 6)]  # A long checkpoint lies between, not computation.
+        self.assertEqual(qualification.compute_overlap([main, [interval(2, 4)], [interval(2, 4)]]), 0)
+        self.assertEqual(qualification.compute_overlap([main, [interval(.5, 2)], [interval(.75, 3)]]), .25)
+        children = []
+        with tempfile.TemporaryDirectory(dir=os.environ.get('FOREVER_TEST_TMP')) as temp:
+            for i in range(3):
+                ready = Path(temp)/str(i)
+                code = 'import signal,time,pathlib; signal.signal(signal.SIGTERM,signal.SIG_IGN); pathlib.Path('+repr(str(ready))+').write_text("ready"); time.sleep(30)'
+                begin = time.monotonic()
+                p = subprocess.Popen([sys.executable, '-c', code], start_new_session=True)
+                children.append(dict(process=p, started=begin, ended=None))
+            try:
+                until = time.monotonic()+2
+                while not all((Path(temp)/str(i)).exists() for i in range(3)) and time.monotonic() < until:
+                    time.sleep(.01)
+                self.assertTrue(all((Path(temp)/str(i)).exists() for i in range(3)))
+                begin = time.monotonic()
+                qualification.stop_children(children)
+                tail = time.monotonic()-begin
+                self.assertLess(tail, qualification.EXIT_GRACE+qualification.EXIT_KILL_ALLOWANCE)
+                self.assertTrue(all(r['process'].returncode == -signal.SIGKILL for r in children))
+            finally:
+                qualification.stop_children(children)
+        EVIDENCE['qualification_controls'] = dict(exit_tail_wall_seconds=tail,
+            three_term_ignoring_workers_reaped=True, actual_worker_seconds=qualification.elapsed_workers(children),
+            concurrent_exit_reserve_seconds=13, delayed_admission=admission,
+            gpu_ram_disk_shortfall_rejected=True, checkpoint_only_overlap_rejected=True,
+            compute_only_overlap_reference_seconds=.25)
+
+    def test_actual_supervisor_refuses_delayed_auxiliary_launch(self):
+        with tempfile.TemporaryDirectory(dir=os.environ.get('FOREVER_TEST_TMP')) as temp:
+            root = Path(temp)
+            args = SimpleNamespace(mode='gpu', job=root/'job', permit=root/'permit.json')
+            permit = dict(status='APPROVED_MINIMAL_IMPLEMENTATION_CPU_GPU_ONLY', sources=[],
+                cpu_seconds=600, gpu_seconds=3600, optimizer_calls=None, formal_training=False,
+                formal_data=False, implementation_review_closed=True, vendorlink_predecessor=str(root))
+            args.permit.write_text(json.dumps(permit))
+            launched = []
+            class Child:
+                pid, returncode = 12345, None
+                def poll(self):
+                    return self.returncode
+            child = Child()
+            def launch(command, **kwargs):
+                launched.append(command)
+                (args.job/'main_ready.json').write_text('{}')
+                return child
+            def kill(pid, sig):
+                self.assertEqual(pid, child.pid)
+                child.returncode = -sig
+            g = qualification.GIB
+            initial = dict(free_gpu_bytes=30*g, ram_available_bytes=192*g, disk_free_bytes=160*g)
+            reduced = dict(initial, free_gpu_bytes=24*g-1)
+            process = SimpleNamespace(memory_info=lambda: SimpleNamespace(rss=2*g), children=lambda **kw: [])
+            with patch.object(qualification, 'predecessor_ready', return_value=True), \
+                 patch.object(qualification.psutil, 'process_iter', return_value=[]), \
+                 patch.object(qualification.psutil, 'Process', return_value=process), \
+                 patch.object(qualification, 'resources', side_effect=[initial, reduced]), \
+                 patch.object(qualification.subprocess, 'check_output', return_value='12345, 6144\n'), \
+                 patch.object(qualification.subprocess, 'Popen', side_effect=launch), \
+                 patch.object(qualification.os, 'killpg', side_effect=kill):
+                with self.assertRaises(RuntimeError):
+                    qualification.supervise(args)
+            receipt = json.loads((args.job/'receipt.json').read_text())
+            self.assertEqual(len(launched), 1)
+            self.assertEqual(receipt['reason'], 'AUXILIARY_RESOURCE_CHANGED')
+            self.assertEqual(receipt['status'], 'STOP')
+            self.assertGreaterEqual(receipt['charged_seconds'], 1)
+            EVIDENCE['supervisor_delayed_dispatch'] = dict(actual_supervise_called=True,
+                handwritten_fake_processes=True, initial_free_gib=30, later_free_bytes=24*g-1,
+                launch_count=1, auxiliary_launches=0, stopped_reason=receipt['reason'],
+                outer_test_cpu_charge_only=True)
 
     def test_vendorlink_priority_gate(self):
         with tempfile.TemporaryDirectory(dir=os.environ.get('FOREVER_TEST_TMP')) as temp:
@@ -264,8 +445,19 @@ class ForeverTests(unittest.TestCase):
             self.assertTrue(qualification.predecessor_ready(root, ['python unrelated_cuda_training.py']))
             (root/'ledger.json').write_text(json.dumps(dict(status='STOP_NO_AUTOMATIC_RETRY')))
             self.assertFalse(qualification.predecessor_ready(root, []))
+            self.assertFalse(qualification.predecessor_ready(root, [], True))
+            (root/'ledger.json').write_text(json.dumps(dict(status='SINGLE_SLOT_QUALIFIED_G2_NOT_QUALIFIED')))
+            for i in range(3):
+                (root/f'g2_{i}/result.json').unlink()
+            self.assertFalse(qualification.predecessor_ready(root, []))
+            self.assertTrue(qualification.predecessor_ready(root, [], True))
+            self.assertFalse(qualification.predecessor_ready(root, ['python step29_vendorlink_native.py'], True))
+            (root/'g1/result.json').write_text(json.dumps(dict(status='FAIL')))
+            self.assertFalse(qualification.predecessor_ready(root, [], True))
             EVIDENCE['vendorlink_priority'] = dict(incomplete_blocked=True, success_and_exit_required=True,
-                failed_blocked=True, unrelated_cuda_process_not_a_blocker=True)
+                failed_blocked=True, unrelated_cuda_process_not_a_blocker=True,
+                explicit_single_slot_scope_requires_g1_success_and_exit=True,
+                single_slot_acceptance_does_not_manufacture_g2_success=True)
 
 
 if __name__ == '__main__':

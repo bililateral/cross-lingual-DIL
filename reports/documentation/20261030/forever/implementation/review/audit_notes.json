@@ -1,0 +1,235 @@
+{
+  "review_date": "2026-10-30",
+  "timezone": "Etc/GMT-8",
+  "review_kind": "新增最小实现定向静态外审；非旧方案结论回收",
+  "verdict": "REQUEST_TARGETED_REPAIR_BEFORE_GPU_QUALIFICATION",
+  "input": {
+    "zip_bytes": 400960,
+    "zip_sha256": "7db965e4b9f1cba458bad0cc25f071e601831f857501a0204ebf11d1dbb46013",
+    "member_count": 91,
+    "payload_count": 90,
+    "unique_member_names": true,
+    "unique_manifest_paths": true,
+    "inventory_exact_match": true,
+    "all_payloads_match": true
+  },
+  "input_manifest_sha256": "9a6e83f0e5614da2f60b23326e33a2771425ca5c7b811ee380737f962e782603",
+  "authorization_scope": {
+    "minimal_implementation": true,
+    "bounded_cpu_gpu_qualification": true,
+    "qualification_anchor_exception": true,
+    "gpu_requires_vendorlink_success_and_exit": true,
+    "gpu_requires_new_implementation_review_and_primary_closure": true,
+    "formal_training": false,
+    "formal_data_and_evaluation_labels": false,
+    "new_confirmation": false,
+    "proposed_116_hour_campaign": false
+  },
+  "current_gpu_state": "NOT_RUN; WAITING_VENDORLINK_NO_WORKER_STARTED; implementation_review_closed=false",
+  "mechanical_verification": {
+    "current_source_count": 44,
+    "all_current_sources_match": true,
+    "workspace_permit_equals_authorization": true,
+    "authorization_sha256": "380eff07ccc5876deee4e72aa4935d4fa5775cdebe1a3bf7672b13fc4b44dc4f",
+    "cpu_charges": [
+      5,
+      4,
+      5,
+      5
+    ],
+    "cpu_sum": 19,
+    "cpu_ceil_matches": true,
+    "all_receipts_equal_ledger_attempts": true,
+    "cpu_ledger_matches": true,
+    "gpu_seconds": 0,
+    "gpu_optimizer_calls": 0,
+    "cpu_peak_rss": 743051264,
+    "cpu_peak_disk": 298501
+  },
+  "historical_source_coverage": [
+    {
+      "cpu": 1,
+      "permit_source_count": 144,
+      "available": 44,
+      "available_matching": 44,
+      "available_mismatch": []
+    },
+    {
+      "cpu": 2,
+      "permit_source_count": 144,
+      "available": 44,
+      "available_matching": 44,
+      "available_mismatch": []
+    },
+    {
+      "cpu": 3,
+      "permit_source_count": 44,
+      "available": 44,
+      "available_matching": 44,
+      "available_mismatch": []
+    }
+  ],
+  "current_new_sources": [
+    {
+      "path": "source/scripts/step28_forever_qualification.py",
+      "bytes": 19642,
+      "sha256": "ca2984080642001fcdf16259cbc2c91b455602a2e0ec566f64ac13d13ee90cf8",
+      "match": true
+    },
+    {
+      "path": "source/scripts/step28_forever_run.py",
+      "bytes": 12038,
+      "sha256": "666a5dd019788cbada4829c101f034d4a3a0ef849d4516c186a4aa4e8cdffe82",
+      "match": true
+    },
+    {
+      "path": "source/scripts/step28_forever.py",
+      "bytes": 14324,
+      "sha256": "f78a169316782c48d8c8366696138f32850aa31471db97c1ae8b7289d84a5ddd",
+      "match": true
+    },
+    {
+      "path": "source/tests/test_step28_forever.py",
+      "bytes": 15318,
+      "sha256": "5a64e41d653679a46d3795db00007b0c3a88f4bca711899452eed8b152bd725a",
+      "match": true
+    }
+  ],
+  "findings": [
+    {
+      "id": "R01",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "severity": "HIGH",
+      "title": "事件安全点恢复未先排空已到阈值",
+      "source": [
+        "step28_forever.py:260-274",
+        "step28_forever_run.py:130-162,200-214"
+      ],
+      "impact": "一次当前位移跨多阈值、事件间保存后恢复时，先插入下一当前更新，改变事件顺序、模型/Adam和可能的beta。",
+      "minimum_fix": "共用drain_due，在下一当前更新前先排空pending事件，保留不同事件独立安全点。",
+      "validation": "既定CPU余额内跨至少两个阈值、首事件发布后中断，与不中断剩余事件及下一步对照。"
+    },
+    {
+      "id": "R02",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "severity": "MEDIUM",
+      "title": "累计worker退出尾部预留及最终上限检查不足",
+      "source": [
+        "step28_forever_qualification.py:126-148,159-198"
+      ],
+      "impact": "cap-3不足以覆盖三worker顺序wait(2)的累计尾部；最终receipt未复核累计费用后判PASS。",
+      "minimum_fix": "按活跃worker数预留累计收尾、统一退出期限、最终累计上限复核；不增3600秒。",
+      "validation": "CPU可注入时钟/假进程覆盖三worker尾部、自然结束边界及向上取整。"
+    },
+    {
+      "id": "R03",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "severity": "MEDIUM",
+      "title": "延迟派发辅槽未重新准入",
+      "source": [
+        "step28_forever_qualification.py:83-90,123-125,151-157"
+      ],
+      "impact": "初始30GiB观察不能充当共享资源预约；主槽23步后仍可能在余量不足时派辅槽。",
+      "minimum_fix": "实际辅槽派发前重查资源并计已承诺未体现占用，避免重复消费同一free；不足按既定规则等待或停止。",
+      "validation": "CPU手写资源快照在主23步后下降时拒绝辅槽派发。"
+    },
+    {
+      "id": "R04",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "severity": "MEDIUM",
+      "title": "计算重叠区间混入checkpoint I/O",
+      "source": [
+        "step28_forever_qualification.py:188-193,285-297,310-320",
+        "step28_forever.py:267-272"
+      ],
+      "impact": "三槽交集可能只发生在主槽full提交期间，现布尔条件不足以证明三路训练运算重叠。",
+      "minimum_fix": "分离已有更新/回放与commit区间，用实际更新区间判重叠；仍45次，无新增计算臂。",
+      "validation": "CPU区间反例拒绝仅I/O重叠；既定原生45次保存真实分段。"
+    },
+    {
+      "id": "R05",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "severity": "LOW",
+      "title": "Store中断遗留大文件无有界处置",
+      "source": [
+        "step28_forever_run.py:82-162,165-219",
+        "test_step28_forever.py:209-250"
+      ],
+      "impact": "发布前/后中断的失联代次不再进入后续清理，破坏短暂双份容量模型；未证明淘汰群被回读。",
+      "minimum_fix": "仅处理Store自有命名空间，保护有效latest及points依赖；清理事务遗留或明确计入恢复资源。",
+      "validation": "已有发布前/后测试后追加恢复/提交文件集合断言。"
+    }
+  ],
+  "scientific_blockers": [],
+  "scientific_blocker_scope": "没有发现要求否定已冻结候选或扩大设计的无条件科学阻断；本轮五项为实现/资格缺陷。",
+  "accepted_static_paths": [
+    "自然R0/reference=None完整目标及真实head/encoder反向",
+    "全部requires_grad参数实际前后位移，FP32差/分块FP64归约",
+    "24当前校准及正常不中断路径逐阈值回放",
+    "真实解析sum正则后统一clip/Adam",
+    "event及末尾按最新mu重算有效beta",
+    "单一Adam及当前/回放LR分离",
+    "完整存活群Algorithm R，stage1/2单次retain，stage3跳过",
+    "Supply acquired/committed状态及正常阶段原子发布",
+    "正式CLI关闭，资格无正式数据入口"
+  ],
+  "cpu_evidence_limits": [
+    "288次Clock.observe是手算状态机，不是288次模型更新",
+    "阶段终结current=288为明确边界夹具",
+    "微型Encoder无Dropout，不替代BGE随机图恢复",
+    "24个实际输入current[i]不等于完整生产日程实跑",
+    "现有真实恢复样例没有pending多阈值",
+    "末尾beta由Clock数值与源码共同支持，尚无end日志专门断言"
+  ],
+  "gpu_plan_arithmetic": {
+    "main_calls": 39,
+    "aux_calls_each": 3,
+    "planned_total_calls": 45,
+    "total_call_cap": 48,
+    "worker_seconds_cap": 3600,
+    "actual_gpu_calls_so_far": 0,
+    "actual_gpu_seconds_so_far": 0,
+    "native_qualification_passed": false
+  },
+  "optional": [
+    "O01：增加既有end日志beta断言，或缩窄证据措辞",
+    "O02：在既有receipt绑定permit/来源摘要，不复制大证据包",
+    "O03：若扩展supervisor自身恢复，增加未结算attempt简门；当前未覆盖且不得直接用旧余额重启"
+  ],
+  "pending_native_conditions": [
+    "真实BGE全P/可能闲置requires_grad参数",
+    "actual tokenizer最大形状及全小状态1MiB",
+    "实际GPU显存、RAM、I/O及三槽吞吐",
+    "VendorLink实际完整成功与相关进程退出",
+    "修复后限定资格能否在原额度内完成"
+  ],
+  "out_of_scope_overdesign": [
+    "正式九路径控制器与两系统确认统计作为本轮资格前提",
+    "H27载模、新120群生成、4320前向或正式标签操作",
+    "新增HPO/对照/seed/效果pilot/完整阶段GPU试跑",
+    "只锚head/LoRA/压缩/sum改mean/根据资格调beta",
+    "全仓回归/每步checkpoint/通用灾备平台/全卡无CUDA门"
+  ],
+  "operations_performed": [
+    "读取与安全解包输入ZIP",
+    "字节数/SHA256/清单一致性核对",
+    "源码文本及AST静态检查，未import项目",
+    "保存JSON回执的计费四则核对",
+    "报告与本附件制作"
+  ],
+  "operations_not_performed": [
+    "项目代码编辑",
+    "项目科研代码或测试执行",
+    "模型载入/训练/推理/生成",
+    "正式数据/标签读取或指标bootstrap",
+    "GPU/服务器访问或任务派发"
+  ],
+  "reading_scope": "逐文件全文/定向阅读及复用边界见report.zh.txt第九节；旧报告不当作本轮实现结论。",
+  "report": {
+    "filename": "report.zh.txt",
+    "bytes": 34679,
+    "sha256": "aa4eff19358c59a0cf67ae13457ff3374a52fae3439590645a55b40ce4967cdb",
+    "line_count": 328,
+    "encoding": "UTF-8"
+  }
+}

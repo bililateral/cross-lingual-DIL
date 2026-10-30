@@ -1,0 +1,328 @@
+FOREVER新增最小实现定向静态外审报告
+审查日期：2026-10-30（用户时区UTC+8）
+
+输入ZIP实际字节数：400960。
+输入ZIP实际SHA256：7db965e4b9f1cba458bad0cc25f071e601831f857501a0204ebf11d1dbb46013。
+ZIP实际成员数：91＝90载荷＋input_manifest.json。
+成员名无重复，清单路径无重复，载荷集合完全一致；90/90载荷字节数及SHA256全部匹配。
+当前输入：forever_implementation_review.zip。不是此前forever_plan_review.zip方案报告的回收或重复结案。
+
+裁决：REQUEST_TARGETED_REPAIR_BEFORE_GPU_QUALIFICATION。
+含义：核心方法实现及CPU证据具有实质内容；有五项具体实现／资格缺口需定向修复。当前字节不宜直接关闭新增实现审查或派发GPU。没有发现要求否定唯一候选或扩大研究设计的SCIENTIFIC_BLOCKER。
+
+一、结论与授权状态
+
+本轮应保留FOREVER_group_fixed的既定定义，不加方法、HPO、seed、正式效果pilot或全阶段GPU试跑。实际自然R0/reference=None目标、全P实际位移、24步校准、阈值回放、解析sum正则、连续Adam和两类学习率均有真实代码路径，末尾最新beta也已在实现中接通；没有发现仅记日志而不反向的“正则”，或以梯度范数冒充参数位移的“时钟”。
+
+但文件原子发布不自动保证恢复后的事件顺序正确；已有小模型PASS也不覆盖未运行的GPU supervisor分支。下列R01—R05是本轮新增实现发现编号，不沿用上轮方案发现编号。本轮确定需要修的五项是：
+R01：跨多个阈值时，事件之间已发布安全点恢复会先做下一当前更新，改变轨迹。
+R02：3600累计worker秒的停止预留只减3秒，未覆盖三个worker的累计收尾；最终PASS也缺累计费用上限复核。
+R03：主槽23步后延迟派发两个辅槽，没有重新核对共享资源。
+R04：三槽“计算重叠”判定把主槽checkpoint I/O包进计算区间，存在证据误判路径。
+R05：发布前／后中断遗留的Store大文件代次不进入后续清理，破坏已承诺的有界存储生命周期。
+
+R01是恢复语义缺陷；R02—R04属于本次已经实现并拟执行的限定资格，不是要求新增正式控制器；R05只处理当前Store自己的事务遗留，不要求九路径成功收尾系统或通用垃圾回收。五项均可通过小范围代码修改和原CPU余额内的定向核验处理，GPU仍保持原45次计划／48次总上限／3600累计秒，不增加一条正式实验。
+
+用户现已批准最小实现及限定CPU/GPU资格，以及资格中使用额外全P锚点；这取代原proposal、revision形成时的“尚未实施授权”文字。随后新增的先后顺序仍有效：FOREVER GPU必须在VendorLink本轮G1及全部G2成功结束、相关执行／等待进程退出之后，再满足本新增实现外审／独立主审和实际资源条件。
+
+当前仍禁止正式训练、正式数据与评价标签、9路径派发、新120群生成／确认及拟116小时正式预算。本次外审没有运行项目科研代码、测试、模型、训练、推理、统计或标签操作，也未连接项目Linux服务器。CPU数字来自包内既有回执及行为证据；GPU未执行。修复建议不是本审替用户启动任何动作的授权。
+
+主要证据缩写：
+M＝source/scripts/step28_forever.py（295行）。
+R＝source/scripts/step28_forever_run.py（224行）。
+Q＝source/scripts/step28_forever_qualification.py（348行）。
+T＝source/tests/test_step28_forever.py（278行）。
+REV＝background/revision.zh.txt；SCOPE＝implementation/scope.zh.txt；IMPL＝implementation/report.zh.txt。
+本报告行号均对应当前包的实际自然行。其他直接来源在第九节列明。
+
+二、身份、来源与CPU费用核对
+
+2.1 当前来源
+
+implementation/authorization.json列出44项来源；逐项比对source/实际字节数及SHA，44/44一致。qualification/workspace/permit.json与authorization.json完全同字节，SHA256为380eff07ccc5876deee4e72aa4935d4fa5775cdebe1a3bf7672b13fc4b44dc4f；deployment_chunked.json登记的permit身份也与之相同。
+
+CPU01、CPU02历史permit各列144项；本包保留其中与本轮有关的44项，可用原件／旧四文件快照全部匹配，没有可用来源的字节矛盾。其余100项是已移除的无关旧schema，本包未提供，未冒称逐项独立复核了全部144项。CPU03 permit列44项，44/44可核验匹配。
+
+CPU03到最终版的静态差异集中于M的位移／正则分块和T的跨块参考测试；R和Q与CPU03相同。M将大张量归约分成1048576元素块，T新增1049600元素样例。CPU04 console中的第8项及evidence.multiple_chunks与这项变化对应。CPU04没有单独重复一套sources目录，最终来源关联采用当前permit、deployment_chunked和该轮证据共同说明；本审没有从运行主机重新提取源文件。
+
+“哈希匹配”在这里仅证明所提供来源的一致性，不替代下面的函数行为审查。当前input_manifest中的purpose、旧报告结论或测试名称也不被当作执行本身。
+
+2.2 四轮CPU回执
+
+轮次 | 子进程elapsed秒 | 向上计费秒 | console项数 | 退出码
+cpu01 | 4.121293200994842 | 5 | 5 | 0
+cpu02 | 3.9079587110318244 | 4 | 6 | 0
+cpu03 | 4.567362800007686 | 5 | 7 | 0
+cpu04 | 4.078769035986625 | 5 | 8 | 0
+
+逐轮ceil及求和为19秒，与qualification_accounting.json的四份attempt逐项相同，CPU余额581/600秒。四份保存记录均无失败。最大观测RSS为743051264字节，执行期产物采样峰值为298501字节；这是监督器采样记录，不是本审测量或连续硬件峰值证明。对应源代码设置单线程，包内执行说明为Linux既有py310，没有本轮Windows科研执行证据。
+
+账本gpu_seconds=0、optimizer_calls=0。CPU receipt中的optimizer_calls=0来自只统计slot*/calls.jsonl的GPU调用桶，不表示微型CPU模型没有进行Adam更新。不能把这个字段误解成CPU伪运行，也不能把CPU小模型调用扣入GPU的48次额度。
+
+2.3 GPU等待状态
+
+qualification/gpu_admission01/status.json为WAITING_VENDORLINK_NO_WORKER_STARTED。当前permit的implementation_review_closed=false；保存资源观察中VendorLink为WAIT_RESOURCE，G1及三个G2结果未齐。上述文件彼此一致，不能解释为原生资格已通过。
+
+保存观察时间为2026-10-30T12:45:08+08:00，GPU总32607MiB、空闲1792MiB；这是当时快照，甚至不足一个10GiB槽，更不是现在的空闲承诺。本审没有刷新服务器资源或核查VendorLink今天随后发生的进度。[qualification/resource_observation.json；Q:46–90]
+
+三、实际机制接线：可保留的部分
+
+3.1 自然目标与真实反向
+
+M:198–199明确调用record.backward_group(..., arm='R0', reference=None)。直接依赖step28_record_replay.py:43–63先将标题和描述分别单位化，再拼接／sqrt(2)；102–127经[abs(u−v),u*v]记录对MLP及跨账号均值产生378对分数。
+
+record.objective:130–156在R0时只用自然记录分配，在reference=None时返回完整监督项，没有重组视图、出生teacher、0.1历史监督倍率或0.5蒸馏。alias_ranking.py:113–129及chinese_base.py:165–191给出BCE_378＋Rank_28＋0.5 HardTop5_28。record.backward_group:159–180实际计算table梯度并通过head、record leaf及z.backward回到encoder，不是只优化代理table。
+
+旧record.update的当前／历史合并单步没有进入新更新路径。M:fresh创建一个optimizer，M:194–195每次按角色设置LR；current encoder使用stage_lr(current_step)，replay／fixture为1e−5，head均0.001。M:204–207统一clip一次、step一次，Learner更新后核对实际Adam step与current＋replay＋fixture之和。资格fixture计数独立，不伪造288步前史。[M:43–50、179–211、237–248]
+
+3.2 全P真实位移
+
+P为所有requires_grad参数；M:53–64检查FP32、encoder/head均存在及optimizer参数成员无重复、与P集合相同。snapshot:72–73用detach().cpu().clone()，CPU夹具上也不与当前参数共享存储。
+
+每个current更新先保存P_before，真实AdamW step后计算：
+delta=sqrt(sum_P sum_elements((P_after−P_before)^2))。
+
+差值以FP32形成、平方和按1048576元素块用FP64归约；encoder/head先各累积平方和，再对总和开根号。分角色norm是解释日志，不替代全局norm。[M:76–95、191、207–208]
+
+Clock在24个current后以实际累计位移校准tau_day、mu0和mu；此后EMA=.95旧值＋.05新位移。只有role=current调用observe，回放不改变tau／mu。零总位移校准失败。阈值为1/2/4/7/15/30/60/90/120；正常不中断路径在当前步后逐项排空阈值，第288步也先处理再consolidate。[M:136–165、237–281]
+
+3.3 sum正则、末尾beta与锚点
+
+event每次现场调用clock.beta()，固定该事件beta；consolidate在所有当前更新及到达事件完成后调用event('end',1)，因此末尾使用最新mu／mu0，前次方案R01的取值歧义已经在代码中关闭。[M:250–258、276–282；REV:16]
+
+实际回放梯度为：
+grad <- grad_task＋2*beta*(P−anchor)，
+beta=.001*clip(mu/(mu0+1e−12),.5,3)。
+
+M:98–133逐块把这个量加进p.grad，同时独立记录distance_sq、beta、penalty和两类范数；随后统一裁剪。没有创建一个与参数断开的标量来冒充正则。anchor为CPU独立副本，不在regularize中原位修改；阶段内保持不变，stage1/2结束形成下一阶段锚点。[M:284–295]
+
+本轮不再要求改sum、重调0.001、复刻上游Trainer生命周期或增加另一套Adam。这些科学适配已由proposal＋revision冻结；当前问题是实现是否兑现。
+
+3.4 Memory、随机流与全P覆盖限制
+
+memory()复用底层data.Memory；replay_order只在存活old.groups的排序副本上用局部random.Random洗牌，不消费retention RNG。当前日程由独立schedule_seed/order/stage构造；dropout键含角色、当前游标和事件键，回放次数不作为下一current种子输入。[M:168–176、196–199；bge_continual.py:76–82；population_data.py:202–258]
+
+retain_and_switch要求48当前群及seen=48*(stage−1)，仅stage1/2将排序48群入池一次；stage3不retain、不创建下一阶段锚点。学习器不保存Supply／全训练表回调，回放只遍历存活群。R:101–103的提交检查将Memory及包括全局RNG、模式、P映射、Supply进度的state合计限制在1MiB；anchor另存并绑定哈希，未冒称同全部历史状态。
+
+全P存在一个必须如实保留的原生待核验条件：M:200–202在加正则之前拒绝任何P的任务grad=None，regularize:111–112也拒绝。若真实BGE存在requires_grad但不进入sentence_embedding目标链的pooler或其他闲置参数，首准备／current步会失败。包内载模函数使用本地SentenceTransformer，没有提供真实参数枚举，CPU映射只有embedding＋head五个参数，故不能断言这个条件已经发生，也不能宣布全部BGE参数已经覆盖。
+
+这一行为目前是fail closed，而非静默漏正则后继续。按原定首准备步保留精确缺失参数名及任务图角色；如实际出现，再按证据确定最小处置。不得静默移出P、只锚head、擅换LoRA，也不得一律补零掩盖真正断链。无需为条件性风险另开正式实验。[chinese_base.py:110–131；T:146–148；cpu04/evidence.parameter_mapping]
+
+四、CPU行为证据的价值与边界
+
+1. 全局位移例确实把encoder一个坐标改3、head一个坐标改4，再调用实际delta函数得到总5、分组3和4，排除了简单范数相加7的错误。[T:103–113；cpu02/03/04 evidence.actual_displacement]
+
+2. 恒定delta=1的Clock循环触发24/48/96/168，手算回放54、总更新342；末步手写Clock状态跨三个阈值，零位移校准拒绝。这是数学／状态机测试，288次Clock.observe不是288个真实模型更新。[T:70–101]
+
+3. 正则用独立autograd参考比较真实梯度，encoder/head均发生正则引起的变化；clip后Adam结果相符，anchor摘要未变。最大梯度绝对差为0。FP64日志penalty 0.013880000789165669与FP32参考0.013880000449717045的微小差异不构成错误。[T:115–148；cpu04/evidence.regularizer]
+
+4. CPU04的大参数样例为1049600元素，跨1048576块边界，末块及head梯度均与参考相同。这补到了真实跨块路径，不是只改变chunk常量或检查测试名称。[T:150–166；cpu04/evidence.multiple_chunks]
+
+5. 微型入口用例确实有1个准备更新、24 current、首次完整12 replay及两个后续分支，物理合计39次；单条恢复后逻辑Adam=38。比较内容包含模型、Adam、small状态和RNG，历史只含存活群，retention RNG及重建日程未变。[T:47–57、168–207]
+
+但其Encoder只有Embedding、均值及normalize，没有Dropout；24个实际输入为current[i]，没有执行完整production schedule。故这证明微型更新／保存恢复和独立调度函数的相应行为，不证明BGE dropout／outer recompute的原生恢复，也不证明真实288步全阶段已跑。这些范围IMPL:24及Q:332已基本正确限定。
+
+6. 阶段事务用例实际经过consolidate、校准、端点、retain及发布前／后异常，恢复后seen=96、Memory字节与独立Algorithm R构造相同、下一Supply为第三域且旧域请求被拒。其clock.current=288是显式边界夹具，只有少量实际模型更新，不能用来宣称完整阶段执行。[T:209–250]
+
+7. 最新末尾beta有静态接线和Clock早晚数值的共同支持，但当前测试未直接断言每个end回放日志中的beta。T:92–97只比较Clock.beta；阶段事务测试虽然执行真实end事件，却没有记录该字段。应避免声称“已有测试一定能抓出end入口误用旧beta”的更强结论；可选择缩窄措辞，或顺手在既有测试增加日志断言，不增加GPU更新。
+
+8. VendorLink门测试覆盖缺文件、完整成功、相关进程未退出、失败状态及无关CUDA进程。它验证该条件函数，不证明服务器当前已达到前置状态。[T:252–268]
+
+五、REPRODUCIBILITY_DEFECT：必要定向修复
+
+R01｜HIGH｜事件安全点恢复没有先排空已到阈值
+
+来源：M:260–274；R:130–162、200–214；REV:28、32、34。
+
+代码事实：advance先做当前更新，再while处理due事件；每处理一个事件便next_threshold+=1并commit。一次位移跨两个或更多阈值时，首个事件后的latest可能是phase='current'、当前步t已经完成、下一个事件仍due。恢复后stage直接调用sequence[clock.current]的下一current，advance也再次先current后due。
+
+静态反例顺序：
+不中断：current_t → event_j → 提交 → event_j+1 → current_t+1。
+中断恢复：恢复event_j之后的latest → current_t+1 → event_j+1。
+
+影响：改变历史与当前暴露顺序、模型及Adam状态，下一current还推进mu，可能改变剩余事件beta。它发生在合同明确允许的完整事件安全点，无须假设断电、损坏或篡改文件。原子latest的文件一致性不能弥补这一执行顺序错误。
+
+最小修改：提取小型drain_due逻辑，在恢复后／下一current前先排空当前保存状态已到达的阈值，并在current后继续调用同一逻辑。保持不同事件的独立安全点和288末步合并规则，不通过取消事件之间的安全点绕开修订合同。最终consolidate仍要求无pending事件。
+
+最小验证：在原CPU余额中构造一次当前步跨至少两个阈值，首事件成功发布后中断，恢复下一动作必须为第二事件。与不中断路径比较剩余事件次序、beta、模型／Adam、Clock、RNG及下一current游标。无需正式数据、更多seed或GPU全阶段。
+
+现有证据不足之处：T:83–91只操作Clock；T:168–207只从24步首事件已经排空的状态恢复，不能触达上述反例。
+
+处置：修复后再关闭实现中的安全点恢复承诺；本项是当前实现关闭前的必要项。
+
+R02｜MEDIUM｜累计worker秒的退出预留和最终上限判定不完整
+
+来源：Q:126–148、159–198；REV:54；SCOPE:14。
+
+代码事实：累计elapsed达到cap−3后停止；随后所有进程先收SIGTERM，再逐个wait(timeout=2)，超时才SIGKILL。代码允许三个worker按约2、4、6秒结束的顺序收尾路径，累计尾部约12个worker秒，尚未计轮询、观察延迟和向上取整。三累计秒不能覆盖这一路径。finally虽如实加账，receipt的PASS条件也没有再核对charged及ledger是否越过桶上限。
+
+影响：接近限额或失败收尾时，可以超过3600累计worker秒；“超过了但记账”仍不满足硬预算。此为静态可达风险，没有声称当前已有GPU超限；已保存四轮短CPU回执不受此判断否定。
+
+最小修改：按活跃worker数和统一退出期限保留累计收尾及取整余量；停止后共享一个kill截止时刻，避免每个worker重新获得顺序2秒宽限；最终结算显式检查本次及累计费用，超限绝不PASS。保持原3600秒，不以修复为由扩大额度。无需追求操作系统层面的绝对实时保证，但应正确实现自身选择的等待上界。
+
+最小验证：CPU可注入时钟／假子进程的短例覆盖三worker在宽限末尾退出、自然结束恰逢限额及ceil边界。只验证本supervisor的算术和判定，不运行GPU或新科研实验。
+
+R03｜MEDIUM｜延迟辅槽派发沿用过时资源观察
+
+来源：Q:83–90、123–125、151–157；SCOPE:10–12；REV:50、60。
+
+代码事实：三槽30GiB／RAM／disk检查仅在主槽启动前进行；主槽完成23次最大群当前更新后，看到main_ready即直接launch两个辅槽。期间共享机器占用可变化。循环虽采集GPU free，却未在补槽时用于准入。
+
+影响：初始30GiB是一时观察，不能约束外来进程的后续分配；延迟启动时可能已经没有两个槽需要的余量。不是要求全卡空闲，也不是认定当前已挤占他人作业。
+
+最小修改：在两个辅槽实际派发前重查显存、RAM和disk；按待派槽需求和本任务已承诺但尚未显现的占用计账，不重复计算已经体现的主槽占用，也不让两个辅槽同时消费同一份free。不足时按既有等待／停止政策记录已耗费用和资格未完成；不得绕过、不增额、不改他人进程。
+
+最小验证：CPU假资源快照在主23步前后由充分变为不足，断言不启动辅槽；充分时按正确剩余预留派发。无需全卡无CUDA门或共享调度平台。
+
+R04｜MEDIUM｜三槽计算重叠区间混入主槽checkpoint I/O
+
+来源：Q:188–193、285–297、310–320；M:267–272；REV:50。
+
+代码事实：主interval current24_and_replay包围advance，包含第24当前、12次回放及事件结束的Store.commit。监督器把这个大区间与两个辅槽overlap_current求交，交集>0即允许three_worker_compute_overlap通过。
+
+影响：存在交集仅落在主槽full提交I/O、而主槽训练运算已结束的时序；当前布尔条件单独不足以证明所承诺的三槽训练运算区间重叠。compute_start屏障使通常情况下重叠很可能发生，但期望不能替代未来保存的实际区间。这里不要求CUDA内核物理同时执行，也不另设性能成功门。
+
+最小修改：分开记录已有主current／replay运算与commit区间；例如在commit回调开始前结束该主计算段，或用已有单步包装记录区间。以三槽实际更新区间求交，I/O和驻留另外报告。使用已计划39＋3＋3次，不增加一步；实际重叠不足就按原合同报告资格不完整。
+
+最小验证：CPU手写区间例中，主计算已结束而仅I/O与两辅current重叠，应拒绝“计算重叠通过”；真正三路更新区间重叠应接受。后续原45步原生资格保存真实分段区间即可。
+
+正面部分：辅槽确实在自己的current和replay后驻留至main_done；main_done在主保存／恢复及下一步对照完成后产生。正常流程下的保存恢复驻留和相应外层收费已经接上，不应因R04否定这一点。[Q:298–320]
+
+R05｜LOW｜中断事务产生的失联大文件没有有界处置
+
+来源：R:82–128、130–162、165–219；T:209–250；REV:30–38。
+
+代码事实：commit仅删除“前一个latest”引用的full／Memory／anchor。发布前中断会留下新代但未被latest引用的full／Memory／anchor及可能的端点；发布后、清理前中断会留下旧代文件。restore不处理它们，后续commit只认识当前latest，因而这些失联文件不会再进入清理集合。
+
+影响：学习器仍只消费latest绑定的历史，没有已证明的淘汰群回读；问题是恢复后大载荷积累，使“新旧只事务期间短暂并存”和51p＋2的有界磁盘代理不再成立。一次不准备恢复的失败可保留现场；问题在另获恢复授权继续后，失联代次仍永远遗留。
+
+最小修改：在适用的恢复／成功提交边界，仅对Store自己的命名空间处理未被有效latest及points依赖引用的事务遗留；保留必要小型失败记录，保护所有已提交推理端点与校准。如果选择保留某大载荷，则显式计入恢复准入的现存占用，不能继续假设只保留一份latest及一个替换临时状态。无需实现正式九路径成功收尾或全仓清理。
+
+最小验证：在已有before_publish／after_publish测试后加一次恢复／提交及文件集合断言；核对有效latest、anchor、Memory、points仍完整，事务遗留按选定规则清理或计账。原CPU余额内即可，不需GPU中断试验或每步checkpoint。
+
+六、GPU资格中已经合理的安排及仍未知的部分
+
+6.1 45/48实际调用
+
+主槽：1真实准备＋24 current＋12 replay＋2个后续更新分支＝39。
+两辅槽：各1真实准备＋1 current＋1 replay＝3＋3。
+总45≤48，余3步不是必须使用。physical()在真实optimizer.step前写不可随learner回退的calls.jsonl，使用flock和既有账本检查共享48上限，单槽另有39／3限制。失败尝试保守计费，不能把失败或仅登记的调用当完成更新。[M:206–207；Q:221–241]
+
+原生代码要求主槽完成24个真实当前步的生产校准窗口和完整首事件；两个下一步分支使用同一生产单步内核。拟在同一GPU模型中原地恢复，不常驻第二个完整GPU模型；正常完成时将分别记录物理39次与恢复后的逻辑Adam38。这是尚未执行的代码安排，不能写成已有原生证据。[Q:274–308]
+
+stage2起点中old.seen=48是明确标注的资格边界夹具，不是Adam步数。每槽的1次fixture确实调用真实update，再clone anchor。不得把这一安排写成已经原生完成stage1的288步；当前文件没有这样宣称。
+
+6.2 输入、形状与资源
+
+GPU使用既有BGE与step28_comparison_native.group的手写群，没有正式文本或标签入口。载模前核对冻结模型归档身份，随后actual tokenizer检查每群448个通道输入、每个256 tokens，对超长不截断。六群Memory使用短UTF-8标点控制字节；是否真实达到上限形状并能在1MiB内保存，仍需运行检查。[Q:257–283；comparison_native.py:52–64]
+
+每worker设置单线程、确定性数值选项和8.5GiB allocator；监督器计三worker外层秒，包括载模、等待、保存、恢复和退出，父控制器纯等待不重复收费。每worker64GiB、合计192GiB RSS和96GiB输出／共享64GiB余量按既定门保留。R02/R03修正这些具体守卫即可，不提高门槛或预算。
+
+当前不知道BGE实际P数量／锚点字节、是否有闲置requires_grad参数、实际显存峰值、I/O时间、三槽吞吐或3600秒能否完成45次。不得承诺资格一定完成，也不能据静态45≤48宣布资源可行。正式4—8h/条和16—30h日历工期仍是旧代理，不因CPU结果转为原生测量。
+
+6.3 先后与外账边界
+
+predecessor_ready要求固定VendorLink目录的ledger完整成功、G1和三个G2成功，并拒绝命名匹配的VendorLink native／等待进程；不把无关CUDA进程本身作为拒绝条件。然后检查implementation_review_closed，再查资源。这个顺序符合当前授权。[Q:46–90]
+
+正常受监督worker失败及learner latest回退时，物理calls在恢复状态外，finally把所有子进程费用计入外账，现有逻辑不随模型checkpoint回滚。不能扩大声称为“监督器自身被SIGKILL／账本损坏后也可自动续跑连续计费”：总账目前只在finally落盘，worker只在启动时检查控制器PID。发生这种未结算控制器异常后应停住、保留原job，并先核对未结算消耗，不得只读旧总账就开启新尝试。
+
+本审不把控制器崩溃后的自动容灾平台列为新增资格前提；当前没有自动重试授权，完整安全点承诺主要针对受监督学习器状态。若未来要支持监督器自身恢复，才需要以未结算attempt标记等最小方式封住重新分配旧额度的路径，不能声称现有实现已覆盖。
+
+七、分类汇总：必要与可选分开
+
+SCIENTIFIC_BLOCKER：本轮无已证实无条件科学阻断。原固定方法问题、全P锚点例外及不等总历史状态的解释边界沿已结案方案，不因实现瑕疵重开研究设计。R01会使恢复执行偏离定义，但其最小修复是恢复顺序，不是改方法。
+
+REPRODUCIBILITY_DEFECT：R01—R05，来源／影响／最小修改／验证已分别列在第五节。R01—R04应在当前新增实现关闭和GPU派发前解决；R05应在当前Store恢复承诺结案前明确有界处置。全部只涉及本轮四文件内的实际新行为，不要求改旧冻结来源。
+
+OPTIONAL O01｜增强末尾beta断言或缩窄证据措辞。
+来源：T:92–97、209–250；M:250–282。
+价值／影响：避免把只检查Clock数值的测试说成已经验证end入口接线抗错。
+最小动作：在既有阶段测试收集end日志，或把报告写为“Clock样例＋源码共同支持最新beta”。
+验证：end各行beta等于该事件开始时最新值、区别于设置的旧事件值。无需新增原生步数，不作为本轮新的科学阻断。
+
+OPTIONAL O02｜回执直接绑定permit摘要。
+来源：Q:178–198；CPU04采用当前permit／deployment关联来源，未重复sources目录。
+价值／影响：后续修复多次资格时更容易把每次证据与来源版本对应，避免仅靠文件放置及叙述回推。
+最小动作：在既有receipt附permit SHA及当前来源清单摘要，保持旧回执原字节。
+验证：本次receipt所记身份与派发时许可相同。无需复制44份源码到每个attempt或制造大证据包；当前没有发现来源哈希矛盾。
+
+OPTIONAL O03｜监督器未结算尝试的简门，仅在扩展其恢复能力时考虑。
+来源：Q:66–68、107–109、164–197。
+价值／影响：控制器自身意外退出后，可防止新job误读旧余额。
+最小动作：登记in_progress并在未结算时拒绝再派发；不是自动恢复系统。
+验证：手写未结算账项阻止新派发。当前只需保留第六节边界，不要求为此扩当前资格或运行平台。
+
+OUT_OF_SCOPE_OVERDESIGN X01｜正式九路径控制器、H27实际载入、新120群生成／4320前向和统计。
+来源：SCOPE:6、14；IMPL:10、36；用户本轮明确范围。
+影响：这些尚未获准；缺失不能成为当前手写资格必须新增的工作。
+最小处置／验证：正式CLI继续关闭，本轮资格只用手写输入；后续另获正式许可再补完整批次入口、H27存续、确认盲门与评价计数。
+
+OUT_OF_SCOPE_OVERDESIGN X02｜增加HPO、对照臂、seed、完整GPU288步／三阶段或效果pilot。
+来源：proposal:74、86–92；REV:42–50。
+影响：不能修复本报告的事件恢复、监督器边界或日志判定缺陷，只会扩大研究和费用。
+最小处置／验证：仍45计划／48封顶，在剩余CPU额度做针对性例子；不让“更稳妥”成为新实验理由。
+
+OUT_OF_SCOPE_OVERDESIGN X03｜只锚head、LoRA、压缩锚点、sum改mean、根据资格读数调beta。
+来源：proposal:31、39、50–54；REV:12、18。
+影响：改变唯一冻结候选，不能用来绕过原生参数覆盖或资源失败。
+最小处置／验证：维持全P身份和有效梯度；真实不满足资格时停并按具体证据处置。
+
+OUT_OF_SCOPE_OVERDESIGN X04｜全仓回归、每步checkpoint、通用灾备／调度平台、整卡无CUDA。
+来源：REV:24–38、50、60；SCOPE:6、12。
+影响：超出五项具体缺口，且整卡无CUDA与当前准入约定不符。
+最小处置／验证：只改新增小入口及已有定向测试；Store清理限自己代次，GPU准入看实际所需资源及VendorLink前序，不干预外来作业。
+
+八、后续前提与建议修复顺序
+
+建议先修R01并加跨事件恢复例；在同一轮修Q的R02—R04；再用已有发布前／后测试补R05的有界处置。只重跑实际受影响的CPU测试和新短监督器例，保存新来源身份并累计到原19秒，不能清零或覆盖旧CPU记录。没有理由重跑旧方法、重新审论文所有实验或制造全仓证据包。
+
+本报告未写入任何项目源码，也未修改implementation_review_closed。主执行者应独立处置这些发现、按实际修改回收必要证据，再关闭相应新增实现问题。此后仍须VendorLink完整成功／退出、来源及模型身份相符、资源满足，才可执行已获准的限定GPU资格。出现闲置参数、OOM、时间／更新不足或实际重叠未达时，报告资格未完成，保留费用，不换定义补成PASS。
+
+正式研究仍是后续独立范围：九路径、H27复用、两方法新确认、108＋6＋2＝116累计小时、≤36次full提交和正式成功run保管清理都不能由本轮GPU资格自动启用。当前run.stage提供阶段内核，不等于完整正式批次系统已交付。H−S旧O/F共同门false不改变，FOREVER效果尚无任何新证据。
+
+九、实际阅读范围与未做事项
+
+9.1 本轮全文读取
+
+- review_request.zh.txt。
+- background/proposal.zh.txt、background/revision.zh.txt、background/review/primary_disposition.zh.txt。
+- implementation/scope.zh.txt、implementation/report.zh.txt、implementation/authorization.json。
+- input_manifest.json；qualification/workspace/permit.json及qualification_accounting.json。
+- M、R、Q、T四个新增文件，共1145行，逐段追读实际调用。
+- qualification/cpu01—04的console0.txt与receipt.json；cpu02—04的evidence.json。
+- qualification/resource_observation.json、gpu_admission01/status.json、deployment_final.json、deployment_chunked.json。
+- source/scripts/step28_alias_calibration.py（178行，重点fit、参数范围及校准恢复调用）。
+
+9.2 直接依赖定向读取
+
+- step28_record_replay.py：1–245，重点config/load、自然表示、R0目标、VJP及score。
+- step28_continual_five.py：1–110，重点固定order/seed与outer checkpoint wrapper；相关初始化／历史代码另搜索定位。
+- step28_continual_population.py：1–60、150–210，重点optimizer、模型身份与完整save/restore。
+- step28_bge_continual.py：1–145、232–270，重点配置、stage_lr、schedule、Supply和Adam计数。
+- step28_continual_population_data.py：1–125、185–258，重点Group、序列化、底层Algorithm R、seed及schedule。
+- step28_chinese_base.py：1–275，重点本地载模、pooling、输入两通道及原rank；未重新审其余旧实验入口。
+- step28_alias_ranking.py：85–132，重点HardTop5和目标合成。
+- step28_comparison_native.py：1–135，仅核复用最大手写group及相关载模／形状惯例，不重新验收GCR/L²R。
+- step28_replay_diagnostics.py：1–120，重点rng_state/restore_rng/neutral。
+- step28_continual_comparison_run.py：1–150，重点train-only入口；其正式旧控制／评价不在本轮实施路径。
+- step28_bge_continual_run.py：58–87，重点CPU/CUDA RNG恢复及技术访问惯例。
+- step28_continual_population_run.py：checkpoint_reserve及定向文件清理辅助的直接段落。
+- tests/test_step28_continual_comparison.py：1–95，重点实际复用Tokenizer／Encoder／group。
+
+另外按文本／AST机械检查44项来源及静态导入关系，并比较cpu01/02/03保留的新增四文件和最终版；没有import它们。保守AST扫描涉及某个旧CLI私有测试入口，不代表该未执行旧入口必须随新资格运行，未以此要求全仓补包。
+
+9.3 复用与未重新阅读
+
+background/review/report.zh.txt与同会话已全文审读的原47114字节报告SHA一致（b5a00a7be8e145bca216875056b3311da6ddb9af893fcff0d5d8a7e37c4b575c）；本轮复用其未变方案边界，重新阅读revision和独立处置，不把旧报告当新实现结论。
+
+正式论文及固定上游三原件的未变方法判断沿上一轮已完成阅读复用。本轮核对了包内文件身份，没有重新联网重读论文全部结果或下载远端commit。background/budget.json沿已核算的原预算复用，当前只核19秒CPU账、45/48资格及本轮守卫；不重新认证116h完成性。
+
+9.4 事实、推断与未知
+
+直接核验：ZIP／清单／当前来源字节身份；四轮保存回执与账本算术；所读源码控制流；测试实际构造／调用／断言与evidence字段的一致性。
+静态推断：R01—R05的可达反例及影响、解析正则等价性、正常与中断恢复语义、资格范围能支持的主张。没有把静态反例称为已在项目原生复现。
+包内已有执行证据：Linux微型CPU的数学、梯度、入口、保存恢复及手写事务结果。本审未重跑它们。
+尚未知／未验证：真实BGE参数图和字节、闲置参数、GPU峰值／吞吐／I/O、三槽实际覆盖、VendorLink当前成功状态、正式H27文件现存及可加载性、任何新数据身份／标签、正式FOREVER效果。
+本审未实施：项目代码修改、科研代码执行／import、测试、训练、推理、生成、指标／bootstrap、正式标签操作、GPU／服务器访问或任何任务派发。
+
+本轮完整报告至此。修复的是已有承诺的具体实现路径，不借审查扩研究；修复闭合以后仍只进入已授权的限定资格，正式训练继续禁止。

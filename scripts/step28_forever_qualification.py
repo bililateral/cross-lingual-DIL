@@ -15,16 +15,23 @@ import time
 import psutil
 
 GIB = 2**30
+EXIT_GRACE = 2.
+EXIT_KILL_ALLOWANCE = 2.
 
 
 def write(path: Path, value) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
 
 
+def log_update(path: Path, row: dict) -> None:
+    with path.open('a') as stream:
+        stream.write(json.dumps(dict(wall_time_epoch=time.time(), **row))+'\n')
+
+
 def verify(root: Path, permit: dict) -> None:
     if (permit['status'] != 'APPROVED_MINIMAL_IMPLEMENTATION_CPU_GPU_ONLY'
             or permit['cpu_seconds'] != 600 or permit['gpu_seconds'] != 3600
-            or permit['optimizer_calls'] != 48 or permit['formal_training'] is not False
+            or permit['optimizer_calls'] is not None or permit['formal_training'] is not False
             or permit['formal_data'] is not False):
         raise ValueError('Qualification scope differs')
     for row in permit['sources']:
@@ -36,20 +43,72 @@ def verify(root: Path, permit: dict) -> None:
 def resources() -> dict:
     import shutil
     values = subprocess.check_output(['nvidia-smi', '--id=0', '--query-gpu=memory.free,memory.total',
-                                      '--format=csv,noheader,nounits'], text=True)
+                                      '--format=csv,noheader,nounits'], text=True, timeout=2)
     free, total = [int(v)*2**20 for v in values.strip().split(',')]
     return dict(epoch=time.time(), free_gpu_bytes=free, total_gpu_bytes=total,
                 ram_available_bytes=psutil.virtual_memory().available,
                 disk_free_bytes=shutil.disk_usage(Path.cwd()).free)
 
 
-def predecessor_ready(root: Path, live_commands: list[str]) -> bool:
-    """VendorLink G1 plus all G2 workers must finish successfully and exit first."""
-    paths = [root/'ledger.json', root/'g1/result.json', *[root/f'g2_{i}/result.json' for i in range(3)]]
+def elapsed_workers(children: list[dict]) -> float:
+    now = time.monotonic()
+    for row in children:
+        if row['process'].poll() is not None and row['ended'] is None:
+            row['ended'] = now
+    return sum((row['ended'] or now)-row['started'] for row in children)
+
+
+def budget_delay(cap: float, elapsed: float, active: int) -> float:
+    # All workers receive TERM together, then KILL together; rounding is reserved once.
+    reserve = active*(EXIT_GRACE+EXIT_KILL_ALLOWANCE)+1
+    if active < 1 or cap-elapsed <= reserve:
+        raise TimeoutError('Insufficient cumulative budget including concurrent exit tail')
+    return (cap-elapsed-reserve)/active
+
+
+def stop_children(children: list[dict]) -> None:
+    for sig, duration in ((signal.SIGTERM, EXIT_GRACE), (signal.SIGKILL, EXIT_KILL_ALLOWANCE)):
+        for row in children:
+            if row['process'].poll() is None:
+                try:
+                    os.killpg(row['process'].pid, sig)
+                except ProcessLookupError:
+                    pass
+        deadline = time.monotonic()+duration
+        while any(row['process'].poll() is None for row in children) and time.monotonic() < deadline:
+            elapsed_workers(children)
+            time.sleep(.01)
+        elapsed_workers(children)
+    if any(row['process'].poll() is None for row in children):
+        raise RuntimeError('Worker not reaped after KILL; retain actual elapsed and stop')
+
+
+def auxiliary_admission(snapshot: dict, main_gpu: int, main_rss: int, disk_used: int) -> dict:
+    required = dict(free_gpu_bytes=20*GIB+max(0, 10*GIB-main_gpu),
+                    ram_available_bytes=128*GIB+max(0, 64*GIB-main_rss),
+                    disk_free_bytes=64*GIB+max(0, 96*GIB-disk_used))
+    return dict(required=required, observed=snapshot,
+                ready=all(snapshot[key] >= value for key, value in required.items()))
+
+
+def compute_overlap(intervals: list[list[dict]]) -> float:
+    # Intersect actual single-update intervals. Checkpoint I/O and idle residency are absent.
+    return sum(max(0., min(a['ended'], b['ended'], c['ended'])-
+                   max(a['started'], b['started'], c['started']))
+               for a in intervals[0] for b in intervals[1] for c in intervals[2])
+
+
+def predecessor_ready(root: Path, live_commands: list[str], g1_only_accepted: bool = False) -> bool:
+    """Use the user's accepted VendorLink scope; never manufacture G2 success."""
+    paths = [root/'ledger.json', root/'g1/result.json']
+    if not g1_only_accepted:
+        paths.extend(root/f'g2_{i}/result.json' for i in range(3))
     if not all(p.is_file() for p in paths):
         return False
     ledger, first, *workers = [json.loads(p.read_text()) for p in paths]
-    return (ledger.get('status') == 'NATIVE_QUALIFIED_NOT_FORMAL_TRAINING'
+    accepted_status = ('SINGLE_SLOT_QUALIFIED_G2_NOT_QUALIFIED' if g1_only_accepted
+                       else 'NATIVE_QUALIFIED_NOT_FORMAL_TRAINING')
+    return (ledger.get('status') == accepted_status
             and first.get('status') == 'G1_PASSED'
             and all(r.get('status') == 'G2_WORKER_PASSED' for r in workers)
             and not any('vendorlink' in cmd and ('native' in cmd or 'step29_linux_20261029' in cmd)
@@ -60,6 +119,9 @@ def supervise(args) -> None:
     root = Path(__file__).resolve().parents[1]
     permit = json.loads(args.permit.read_text())
     verify(root, permit)
+    slots = permit.get('gpu_slots', 3)
+    if slots not in (1, 3):
+        raise ValueError('Qualification supports the approved single or three slots only')
     if args.job.exists():
         raise FileExistsError('Never overwrite/restart an existing qualification attempt')
     args.job.mkdir(parents=True)
@@ -73,19 +135,20 @@ def supervise(args) -> None:
                 live.append(' '.join(p.info['cmdline'] or []))
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 pass
-        if not predecessor_ready(Path(permit['vendorlink_predecessor']), live):
+        if not predecessor_ready(Path(permit['vendorlink_predecessor']), live,
+                                 permit.get('vendorlink_g1_only_accepted', False)):
             write(args.job/'status.json', dict(status='WAITING_VENDORLINK_NO_WORKER_STARTED',
-                  reason='User requires successful complete VendorLink native qualification before FOREVER GPU'))
+                  reason='Accepted VendorLink qualification scope must succeed and related workers must exit'))
             return
         if not permit.get('implementation_review_closed'):
             write(args.job/'status.json', dict(status='WAITING_IMPLEMENTATION_REVIEW_NO_WORKER_STARTED'))
             return
         resource = resources()
         write(args.job/'admission.json', resource)
-        if (resource['free_gpu_bytes'] < 30*GIB or resource['ram_available_bytes'] < 192*GIB
+        if (resource['free_gpu_bytes'] < 10*slots*GIB or resource['ram_available_bytes'] < 64*slots*GIB
                 or resource['disk_free_bytes'] < 160*GIB):
             write(args.job/'status.json', dict(status='WAITING_RESOURCES_NO_WORKER_STARTED',
-                  reason='Three-slot qualification reserves 10 GiB per pending slot, 192 GiB RSS and 96+64 GiB disk',
+                  reason=f'{slots} slot(s) reserve 10 GiB GPU and 64 GiB RSS each, and 96+64 GiB disk',
                   formal_training=False))
             return
     bucket = 'cpu_seconds' if args.mode == 'cpu' else 'gpu_seconds'
@@ -103,24 +166,49 @@ def supervise(args) -> None:
         env['CUDA_VISIBLE_DEVICES'] = '0'
         commands = [[sys.executable, '-B', str(Path(__file__).resolve()), '--mode', 'worker',
                      '--job', str(args.job), '--slot', str(i), '--deadline', str(time.monotonic()+cap),
-                     '--permit', str(args.permit)] for i in range(3)]
+                     '--permit', str(args.permit)] for i in range(slots)]
         write(args.job/'gpu_dispatch.json', dict(controller_pid=os.getpid(),
               permit_sha256=hashlib.sha256(args.permit.read_bytes()).hexdigest(),
-              prior_optimizer_calls=ledger['optimizer_calls'], slots=3))
+              prior_optimizer_calls=ledger['optimizer_calls'], slots=slots))
     peaks = dict(rss_bytes=0, disk_bytes=0)
     last_sample = 0.
     stopped = None
+    def timeout(signum, frame):
+        raise TimeoutError('Cumulative qualification deadline including exit reserve')
+    old_handler = signal.signal(signal.SIGALRM, timeout)
+    def arm(additional=0):
+        elapsed = elapsed_workers(children)
+        active = sum(r['process'].poll() is None for r in children)+additional
+        if active:
+            signal.setitimer(signal.ITIMER_REAL, budget_delay(cap, elapsed, active))
     try:
         def launch(index):
             command = commands[index]
             stream = (args.job/f'console{index}.txt').open('w')
             logs.append(stream)
+            begin = time.monotonic()
             child = subprocess.Popen(command, cwd=root, env=env, stdout=stream, stderr=subprocess.STDOUT,
                                      start_new_session=True)
-            children.append(dict(process=child, started=time.monotonic(), ended=None, slot=index))
+            children.append(dict(process=child, started=begin, ended=None, slot=index))
+        arm(1)
         launch(0)
         while any(row['process'].poll() is None for row in children):
-            if args.mode == 'gpu' and len(children) == 1 and (args.job/'main_ready.json').exists():
+            arm()
+            if args.mode == 'gpu' and slots == 3 and len(children) == 1 and (args.job/'main_ready.json').exists():
+                main = children[0]['process']
+                process = psutil.Process(main.pid)
+                used = subprocess.check_output(['nvidia-smi', '--id=0',
+                    '--query-compute-apps=pid,used_memory', '--format=csv,noheader,nounits'], text=True, timeout=2)
+                main_gpu = sum(int(parts[1])*2**20 for line in used.splitlines()
+                               if len(parts := line.split(',')) == 2 and int(parts[0]) == main.pid)
+                main_rss = sum(p.memory_info().rss for p in [process, *process.children(recursive=True)])
+                disk_used = sum(p.stat().st_size for p in args.job.rglob('*') if p.is_file())
+                admission = auxiliary_admission(resources(), main_gpu, main_rss, disk_used)
+                write(args.job/'aux_admission.json', admission)
+                if main.poll() is not None or not admission['ready']:
+                    stopped = 'AUXILIARY_RESOURCE_CHANGED'
+                    break
+                arm(2)  # Reserve both pending slots once, before either Popen.
                 launch(1)
                 launch(2)
             elapsed, rss = 0., 0
@@ -144,8 +232,6 @@ def supervise(args) -> None:
             disk = sum(p.stat().st_size for p in files)
             peaks['rss_bytes'], peaks['disk_bytes'] = max(peaks['rss_bytes'], rss), max(peaks['disk_bytes'], disk)
             calls = sum(len(p.read_text().splitlines()) for p in args.job.glob('slot*/calls.jsonl'))
-            if elapsed >= cap-3 or calls+ledger['optimizer_calls'] > 48:
-                stopped = 'TIME_OR_CALL_CAP'
             if disk > (64*2**20 if args.mode == 'cpu' else 96*GIB):
                 stopped = 'DISK_CAP'
             if args.mode == 'gpu' and time.monotonic()-last_sample > 2:
@@ -153,21 +239,21 @@ def supervise(args) -> None:
                 snapshot = resources()
                 with (args.job/'resource_samples.jsonl').open('a') as stream:
                     stream.write(json.dumps(snapshot)+'\n')
-                if snapshot['disk_free_bytes'] < 64*GIB or rss > 192*GIB:
+                if snapshot['disk_free_bytes'] < 64*GIB or rss > 64*slots*GIB:
                     stopped = 'SHARED_RESOURCE_CAP'
             if stopped:
-                for row in children:
-                    if row['process'].poll() is None:
-                        os.killpg(row['process'].pid, signal.SIGTERM)
                 break
             time.sleep(.2)
+    except Exception as error:
+        stopped = f'{type(error).__name__}: {error}'
     finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, old_handler)
+        try:
+            stop_children(children)
+        except RuntimeError as error:
+            stopped = str(error)
         for row in children:
-            try:
-                row['process'].wait(timeout=2)
-            except subprocess.TimeoutExpired:
-                os.killpg(row['process'].pid, signal.SIGKILL)
-                row['process'].wait()
             row['ended'] = row['ended'] or time.monotonic()
         for stream in logs:
             stream.close()
@@ -175,21 +261,21 @@ def supervise(args) -> None:
         calls = sum(len(p.read_text().splitlines()) for p in args.job.glob('slot*/calls.jsonl'))
         ledger[bucket] += charged
         ledger['optimizer_calls'] += calls
+        if charged > cap:
+            stopped = 'ACTUAL_TIME_CAP_EXCEEDED'  # Never clamp or discard actual tail consumption.
         receipt = dict(mode=args.mode, job=str(args.job), charged_seconds=charged, optimizer_calls=calls,
                        children=[dict(slot=r['slot'], pid=r['process'].pid, exit_code=r['process'].returncode,
                                       elapsed_seconds=r['ended']-r['started']) for r in children],
-                       status='PASS' if stopped is None and all(r['process'].returncode == 0 for r in children) else 'STOP',
+                       status='PASS' if stopped is None and children and all(r['process'].returncode == 0 for r in children) else 'STOP',
                        reason=stopped, peaks=peaks, wall_seconds=time.monotonic()-started,
                        formal_data_reads=0, formal_training=False)
         if args.mode == 'gpu' and receipt['status'] == 'PASS':
             try:
-                results = [json.loads((args.job/f'slot{i}/result.json').read_text()) for i in range(3)]
-                intervals = [r['intervals'] for r in results]
-                main = intervals[0]['current24_and_replay']
-                aux = [v['overlap_current'] for v in intervals[1:]]
-                overlap = min(v['ended'] for v in [main, *aux])-max(v['started'] for v in [main, *aux])
-                receipt['three_worker_compute_overlap_seconds'] = overlap
-                if calls != 45 or overlap <= 0 or any(r['status'] != 'PASS_BOUNDED_NATIVE_SLOT' for r in results):
+                results = [json.loads((args.job/f'slot{i}/result.json').read_text()) for i in range(slots)]
+                overlap = compute_overlap([r['update_intervals'] for r in results]) if slots == 3 else None
+                receipt.update(qualified_slots=slots, three_worker_compute_overlap_seconds=overlap)
+                if (calls != 39+3*(slots-1) or (slots == 3 and overlap <= 0)
+                        or any(r['status'] != 'PASS_BOUNDED_NATIVE_SLOT' for r in results)):
                     receipt.update(status='STOP', reason='NATIVE_EVIDENCE_INCOMPLETE')
             except (OSError, ValueError, KeyError) as error:
                 receipt.update(status='STOP', reason='NATIVE_EVIDENCE_MISSING', detail=repr(error))
@@ -226,23 +312,14 @@ def worker(args) -> None:
         if psutil.Process().memory_info().rss > 64*GIB:
             raise RuntimeError('Worker RSS cap')
     def physical():
-        import fcntl
         if len(calls) >= allowed_calls:
             raise RuntimeError('Fixed per-slot physical update allocation exhausted')
-        with (args.job/'calls.lock').open('a') as lock:
-            fcntl.flock(lock, fcntl.LOCK_EX)
-            ledger_path = args.permit.parent/'qualification_accounting.json'
-            prior = json.loads(ledger_path.read_text()).get('optimizer_calls', 0) if ledger_path.exists() else 0
-            total = sum(len(p.read_text().splitlines()) for p in args.job.glob('slot*/calls.jsonl'))
-            if prior+total >= 48:
-                raise RuntimeError('Shared physical optimizer call allowance exhausted')
-            calls.append(dict(attempt=len(calls)+1, epoch=time.time()))
-            with (job/'calls.jsonl').open('a') as stream:
-                stream.write(json.dumps(calls[-1])+'\n')
+        calls.append(dict(attempt=len(calls)+1, epoch=time.time()))
+        with (job/'calls.jsonl').open('a') as stream:
+            stream.write(json.dumps(calls[-1])+'\n')
     def log(row):
         rows.append(row)
-        with (job/'updates.jsonl').open('a') as stream:
-            stream.write(json.dumps(dict(epoch=time.time(), **row))+'\n')
+        log_update(job/'updates.jsonl', row)
     def timed(label, fn):
         check()
         torch.cuda.synchronize()
@@ -286,15 +363,15 @@ def worker(args) -> None:
         for i in range(23):
             timed(f'current{i+1}', lambda: learner.advance(current, check, physical, log))
         write(args.job/'main_ready.json', dict(epoch=time.time()))
-        while not all((args.job/f'aux_ready{i}.json').exists() for i in (1, 2)):
+        while dispatch['slots'] == 3 and not all((args.job/f'aux_ready{i}.json').exists() for i in (1, 2)):
             check()
             time.sleep(.1)
         write(args.job/'compute_start.json', dict(epoch=time.time()))
+        # One real event checkpoint, timed independently; no duplicate full save at the same state.
         timed('current24_and_replay', lambda: learner.advance(current, check, physical, log,
-                                                             lambda: store.commit(learner, supply)))
+                    lambda: timed('full_commit', lambda: store.commit(learner, supply))))
         if learner.clock.next_threshold != 1 or learner.counts != dict(current=24, replay=12, fixture=1):
             raise ValueError('Full production calibration and first two replay epochs missing')
-        timed('full_commit', lambda: store.commit(learner, supply))
         timed('uninterrupted_next', lambda: log(learner.update(current, 'current', check=check, before_step=physical)))
         expected = m.core.state_digest(dict(model=model.state_dict(), optimizer=optimizer.state_dict(),
                                            state=learner.small(), rng=m.diag.rng_state()))
@@ -325,6 +402,7 @@ def worker(args) -> None:
     write(job/'result.json', dict(status='PASS_BOUNDED_NATIVE_SLOT', slot=args.slot, qualification_only=True,
           fixture_predecessor_updates=1, physical_calls=len(calls), logical_counts=learner.counts,
           actual_adam_step=m.parent.adam_step(optimizer), timings=timings, intervals=intervals,
+          update_intervals=[r['compute_interval'] for r in rows if r['role'] in ('current', 'replay')],
           parameters=m.mapping(model, optimizer),
           anchor_bytes=sum(t.numel()*t.element_size() for t in learner.anchor.values()),
           history_bytes=learner.historical_bytes(), maximum_group=dict(records=224, channels=2, tokens=256),

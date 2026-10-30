@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-10-30 FOREVER实现外审与两项单路GPU资格收尾
+
+完整FOREVER实现审查原文、audit_notes、完成网页及主审保存在[review目录](../reports/documentation/20261030/forever/implementation/review/)；输入包身份400960字节/SHA 7db965e4…6013及91成员/90载荷核对保留，专用页已关闭。CPU05—10、gpu01/02失败和gpu03单路PASS原始console/调用/更新/资源/receipt及各次必要旧来源保存在[资格目录](../reports/documentation/20261030/forever/implementation/qualification/)，最终小证据包170531字节/SHA 4e0c0d5bf1c5538eb840061a8e4d750a07560da5f52464b1e9842acde3dac7e2经SCP回传。Windows不保存BGE或GPU检查点；Linux成功资格状态约5GiB暂留用于本次恢复证据，未作为正式训练起点。原冻结CPU04/送审来源不改，当前独立workspace仅绑定本轮改动与原依赖，不混入并发L²R修复。
+
+[VendorLink单路证据](../reports/documentation/20261030/vendorlink/native/received/)保留两次G1账及最终单路结案/G2未通过事实，包24628字节/SHA 49999a1b…bb8两端核对。原固定导出/标签/模型/Memory留Linux，没有回Windows；旧29日资格及失败原件不覆盖。
+
+用户截图指定的Linux家目录五份中转文件已逐一核对大小/SHA和正式来源保管后删除，合计116780字节，见FOREVER qualification/final/transfer_cleanup.json；当前运行与正式工作目录未动。其他本轮用完的传输ZIP、网页部分输出和重复副本在必要原文/证据保管后清理，不重置大清理日期。仅同步本轮隔离目录的主审/范围补充，不覆盖活动冻结文件；根交接/设计/讨论/本记录只Windows维护。本轮仅范围明确的本地commit，不推送，用户汇报稿改动、另一任务的中断记录和历史删除不纳入。
+
 ## 2026-10-30 L²R校准中断与控制器修复
 
 [本轮排查/修复证据](../reports/documentation/20261030/comparison_repair/)在Windows及同相对路径Linux保管，Linux修复来源仅在该目录workspace，未覆盖10月26日正式冻结workspace/gate/budget/failure。49份依赖按sources.json绑定；不相关的本地five_run变更未带入，改用原冻结来源。CPU原始console/receipt和13:47只读现场通过SCP回传，实际大小/SHA核对；CPU新增9秒、累计54/1200秒，原训练失败账保留。没有正式数据/标签/模型/Memory回传，没有诊断重放或正式恢复。临时输入ZIP核验后两端删除，原失败及必要源码证据保留；本轮不重置大清理周期。

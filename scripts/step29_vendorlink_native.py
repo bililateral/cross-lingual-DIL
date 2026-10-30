@@ -293,8 +293,8 @@ def main():
     torch.use_deterministic_algorithms(True)
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
-    torch.cuda.set_per_process_memory_fraction(
-        config["limits"]["gpu_allocator_bytes"]/torch.cuda.get_device_properties(0).total_memory)
+    # User removed the trial's 9 GiB allocator cap on 2026-10-30.
+    # The supervisor still checks actual free memory and preserves all time/update limits.
     def check():
         if time.monotonic() >= deadline:
             raise TimeoutError("Native worker budget tail reserved")

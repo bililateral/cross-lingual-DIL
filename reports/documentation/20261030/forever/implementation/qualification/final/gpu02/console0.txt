@@ -1,0 +1,20 @@
+/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever_qualification.py", line 430, in <module>
+    worker(args)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever_qualification.py", line 377, in worker
+    timed('current24_and_replay', lambda: learner.advance(current, check, physical, log,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever_qualification.py", line 334, in timed
+    value = fn()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever_qualification.py", line 377, in <lambda>
+    timed('current24_and_replay', lambda: learner.advance(current, check, physical, log,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever.py", line 316, in advance
+    event_saved = self.drain_events(check, before_step, log, commit)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever.py", line 303, in drain_events
+    self.event(f'event{self.clock.next_threshold}', 2, check, before_step, log)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever.py", line 293, in event
+    log(dict(group=group.uid, event=event, epoch=epoch, index=index,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace/scripts/step28_forever_qualification.py", line 328, in log
+    stream.write(json.dumps(dict(epoch=time.time(), **row))+'\n')
+TypeError: dict() got multiple values for keyword argument 'epoch'

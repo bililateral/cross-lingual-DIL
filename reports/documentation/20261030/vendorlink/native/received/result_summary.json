@@ -1,0 +1,251 @@
+{
+  "server_time": "2026-10-30T13:53:27.292992",
+  "g1_status": "G1_PASSED",
+  "g1_updates": 15,
+  "prior_failed_updates": 1,
+  "total_successful_optimizer_updates": 16,
+  "method_summary": {
+    "VendorLink_SEQ": {
+      "updates": 4,
+      "classes": [
+        775,
+        270,
+        1007
+      ],
+      "recovery": "nonempty_state_roundtrip_and_stage_boundary_next_step",
+      "retention": [],
+      "peak": {
+        "allocated": 12693387264,
+        "reserved": 14514388992
+      },
+      "kd": null,
+      "tokenized_shape": [
+        32,
+        512
+      ],
+      "blind_view_pairs": 231
+    },
+    "H_SEQ": {
+      "updates": 3,
+      "classes": [
+        775,
+        270,
+        1007
+      ],
+      "recovery": null,
+      "retention": [],
+      "peak": {
+        "allocated": 11588086784,
+        "reserved": 12511608832
+      },
+      "kd": null,
+      "tokenized_shape": [
+        32,
+        256
+      ],
+      "blind_view_pairs": 231
+    },
+    "H_ER": {
+      "updates": 3,
+      "classes": [
+        775,
+        270,
+        1007
+      ],
+      "recovery": null,
+      "retention": [
+        {
+          "stage": 1,
+          "groups": 3,
+          "bytes": 65505,
+          "origins": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "stage": 2,
+          "groups": 6,
+          "bytes": 154901,
+          "origins": [
+            1,
+            1,
+            1,
+            2,
+            2,
+            2
+          ]
+        }
+      ],
+      "peak": {
+        "allocated": 11588086784,
+        "reserved": 12589203456
+      },
+      "kd": null,
+      "tokenized_shape": [
+        32,
+        256
+      ],
+      "blind_view_pairs": 231
+    },
+    "H_full": {
+      "updates": 5,
+      "classes": [
+        775,
+        270,
+        1007
+      ],
+      "recovery": "nonempty_adam_memory_rng_next_step",
+      "retention": [
+        {
+          "stage": 1,
+          "groups": 3,
+          "bytes": 65505,
+          "origins": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "stage": 2,
+          "groups": 6,
+          "bytes": 156373,
+          "origins": [
+            1,
+            1,
+            1,
+            2,
+            2,
+            2
+          ]
+        }
+      ],
+      "peak": {
+        "allocated": 12448077824,
+        "reserved": 13505658880
+      },
+      "kd": {
+        "gradient_max_difference": {
+          "encoder.": 0.009000926278531551,
+          "head.": 0.06103670224547386
+        },
+        "full": {
+          "supervised": 4.48782205581665,
+          "distillation": 0.0037561000790446997,
+          "weighted": 0.45066025853157043
+        },
+        "replay_only": {
+          "supervised": 4.48782205581665,
+          "distillation": 0.0,
+          "weighted": 0.44878220558166504
+        },
+        "optimizer_step_comparison": false
+      },
+      "tokenized_shape": [
+        32,
+        256
+      ],
+      "blind_view_pairs": 231
+    }
+  },
+  "g2_required_bytes": 50139758592,
+  "gpu_total_bytes": 34190917632,
+  "ledger": {
+    "aux": 48,
+    "g1": 76,
+    "g2": 0,
+    "attempts": [
+      {
+        "phase": "aux",
+        "tasks": [
+          {
+            "pid": 2435050,
+            "returncode": 1,
+            "started": 705520.230274783,
+            "ended": 705533.759680141,
+            "wall_seconds": 13.529405358014628,
+            "charged_seconds": 14
+          }
+        ],
+        "failure": "RuntimeError('Qualification worker exited unsuccessfully')",
+        "nvml": {},
+        "supervision_wall_seconds": 13.529826259939
+      },
+      {
+        "phase": "g1",
+        "tasks": [
+          {
+            "pid": 2725045,
+            "returncode": 1,
+            "started": 769558.622929956,
+            "ended": 769565.109656219,
+            "wall_seconds": 6.486726263072342,
+            "charged_seconds": 7
+          }
+        ],
+        "failure": "RuntimeError('Qualification worker exited unsuccessfully')",
+        "nvml": {
+          "startup": 522190848,
+          "VendorLink_SEQ": 10299113472
+        },
+        "supervision_wall_seconds": 6.608624086948112
+      },
+      {
+        "phase": "g1",
+        "tasks": [
+          {
+            "pid": 2729231,
+            "returncode": 0,
+            "started": 770761.166933848,
+            "ended": 770829.324558086,
+            "wall_seconds": 68.15762423793785,
+            "charged_seconds": 69
+          }
+        ],
+        "failure": null,
+        "nvml": {
+          "startup": 0,
+          "VendorLink_SEQ": 15193866240,
+          "H_SEQ": 13193183232,
+          "H_ER": 13270777856,
+          "H_full": 14187233280
+        },
+        "supervision_wall_seconds": 68.28892225504387
+      }
+    ],
+    "export_manifest_sha256": "3303e6a3f661502132582c1a28b907e3a9fd6568122bd056a0dd84b00a804660",
+    "status": "SINGLE_SLOT_QUALIFIED_G2_NOT_QUALIFIED",
+    "config_sha256": "eb27cab663b2cfe340932848d4b60f56e9d7d2faa3dfefc001977407e1f5494e",
+    "previous_job": "/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/qualification",
+    "previous_ledger_sha256": "f51316961099eaf87f082ad38cc87759b5005858dca371696d64a7823b4a52a6",
+    "previous_successful_updates": 1,
+    "fallback_attempt": 2,
+    "g1_nvml": {
+      "startup": 0,
+      "VendorLink_SEQ": 15193866240,
+      "H_SEQ": 13193183232,
+      "H_ER": 13270777856,
+      "H_full": 14187233280
+    },
+    "g2_admission": {
+      "method": "VendorLink_SEQ",
+      "per_slot": 16713252864,
+      "resource": {
+        "at": 770829.45092925,
+        "free": 24752685056,
+        "total": 34190917632,
+        "processes": {
+          "3406": 74448896,
+          "3625": 10485760,
+          "2477074": 22020096,
+          "2704118": 8629780480
+        }
+      }
+    },
+    "user_decision": "按单路资格结案，继续 FOREVER（推荐）",
+    "g2_qualified": false,
+    "accepted_at_server": "2026-10-30T13:53:27.292640"
+  }
+}

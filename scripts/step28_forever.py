@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 import math
 import random
+import time
 from typing import Any, Callable
 
 import numpy as np
@@ -71,6 +72,36 @@ def mapping(model: Any, optimizer: Any) -> list[dict]:
 
 def snapshot(model: Any) -> dict:
     return {n: p.detach().cpu().clone() for n, p in parameters(model).items()}
+
+
+def complete_task_gradients(model: Any) -> list[str]:
+    """Materialize zero only for BERT's proven unused pooled-output branch; keep full P."""
+    import torch
+    values = parameters(model)
+    missing = {n for n, p in values.items() if p.grad is None}
+    if not missing:
+        return []
+    from sentence_transformers.models import Transformer, Pooling, Normalize
+    from transformers.models.bert.modeling_bert import BertModel
+    modules = list(model.encoder.children())
+    permitted = set()
+    if (len(modules) == 3 and type(modules[0]) is Transformer
+            and type(modules[1]) is Pooling and type(modules[2]) is Normalize):
+        transformer = modules[0]
+        route = transformer.modality_config.get('text', {})
+        if (type(transformer.model) is BertModel
+                and route.get('method') == 'forward'
+                and route.get('method_output_name') in ('last_hidden_state', ('last_hidden_state',))
+                and transformer.module_output_name == 'token_embeddings'
+                and record.base.pooling_modes(modules[1]) == ['cls']):
+            pooler = transformer.model.pooler
+            ids = {id(p) for p in pooler.parameters()} if pooler is not None else set()
+            permitted = {n for n, p in values.items() if id(p) in ids}
+    if not missing <= permitted:
+        raise ValueError(f'Expected trainable parameters have no task gradient: {sorted(missing)}')
+    for name in missing:
+        values[name].grad = torch.zeros_like(values[name])
+    return sorted(missing)
 
 
 def delta(model: Any, before: dict, check: Callable = lambda: None) -> dict:
@@ -188,6 +219,10 @@ def step(model: Any, optimizer: Any, group: Any, c: dict, spec: Spec, stage: int
     if role != 'replay' and (anchor is not None or beta is not None):
         raise ValueError('Current/fixture objective must not use historical regularization')
     values = parameters(model, optimizer)
+    device = next(iter(values.values())).device
+    if device.type == 'cuda':
+        torch.cuda.synchronize(device)
+    started = time.monotonic()
     before = snapshot(model) if role == 'current' else None
     model.train()
     optimizer.zero_grad(set_to_none=True)
@@ -197,16 +232,18 @@ def step(model: Any, optimizer: Any, group: Any, c: dict, spec: Spec, stage: int
                          role, current_step, *key, group.uid, 'dropout')
     logs = record.backward_group(model, group, c, arm='R0', dropout_seed=seed,
                                   regroup_seed=0, reference=None, check=check)
-    missing = [n for n, p in values.items() if p.grad is None]
-    if missing:
-        raise ValueError(f'Expected trainable parameters have no task gradient: {missing}')
+    zero_task = complete_task_gradients(model)
     reg = regularize(model, anchor, beta, check) if role == 'replay' else None
     norm = torch.nn.utils.clip_grad_norm_(values.values(), 1., error_if_nonfinite=True)
     check()
     before_step()  # Physical attempted calls are charged outside recoverable state.
     optimizer.step()
     movement = delta(model, before, check) if before is not None else None
+    if device.type == 'cuda':
+        torch.cuda.synchronize(device)
     return dict(role=role, objective=logs, regularizer=reg, displacement=movement,
+                materialized_zero_task_gradients=zero_task,
+                compute_interval=dict(started=started, ended=time.monotonic()),
                 gradient_norm=float(norm), encoder_lr=optimizer.param_groups[0]['lr'],
                 head_lr=optimizer.param_groups[1]['lr'], adam_step=parent.adam_step(optimizer))
 
@@ -257,12 +294,10 @@ class Learner:
                          **self.update(group, 'replay', (event, epoch, index), beta, check, before_step)))
         self.phase = 'current'
 
-    def advance(self, group: Any, check: Callable = lambda: None,
-                before_step: Callable = lambda: None, log: Callable = lambda row: None,
-                commit: Callable = lambda: None) -> None:
+    def drain_events(self, check: Callable = lambda: None, before_step: Callable = lambda: None,
+                     log: Callable = lambda row: None, commit: Callable = lambda: None) -> bool:
         if self.phase != 'current':
             raise ValueError('Resume only a committed safe point')
-        log(dict(group=group.uid, **self.update(group, 'current', check=check, before_step=before_step)))
         event_saved = False
         while self.clock.due(bool(self.old.groups)):
             self.event(f'event{self.clock.next_threshold}', 2, check, before_step, log)
@@ -270,6 +305,15 @@ class Learner:
             if self.clock.current < 288:
                 commit()
                 event_saved = True
+        return event_saved
+
+    def advance(self, group: Any, check: Callable = lambda: None,
+                before_step: Callable = lambda: None, log: Callable = lambda row: None,
+                commit: Callable = lambda: None) -> None:
+        # A restored event checkpoint may still owe other events at the SAME current step.
+        self.drain_events(check, before_step, log, commit)
+        log(dict(group=group.uid, **self.update(group, 'current', check=check, before_step=before_step)))
+        event_saved = self.drain_events(check, before_step, log, commit)
         if self.clock.current < 288 and self.clock.current % 48 == 0 and not event_saved:
             commit()
 

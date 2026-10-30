@@ -1,0 +1,234 @@
+{
+  "actual_displacement": {
+    "total": 5.0,
+    "encoder": 3.0,
+    "head": 4.0
+  },
+  "supervisor_delayed_dispatch": {
+    "actual_supervise_called": true,
+    "handwritten_fake_processes": true,
+    "initial_free_gib": 30,
+    "later_free_bytes": 25769803775,
+    "launch_count": 1,
+    "auxiliary_launches": 0,
+    "stopped_reason": "AUXILIARY_RESOURCE_CHANGED",
+    "outer_test_cpu_charge_only": true
+  },
+  "hand_clock": {
+    "actual_trigger_steps": [
+      24,
+      48,
+      96,
+      168
+    ],
+    "current_steps": 288,
+    "replay_group_steps": 54,
+    "independent_expected": [
+      24,
+      48,
+      96,
+      168
+    ]
+  },
+  "end_beta": {
+    "previous_event": 0.000999999999999,
+    "recomputed_end": 0.0006388632453139018,
+    "last_step_crossings": [
+      0,
+      1,
+      2
+    ]
+  },
+  "production_config": {
+    "initialization_seed": 2026101906,
+    "schedule_seed": 2026102906,
+    "input": {
+      "token_budget": 256,
+      "microbatch": 4,
+      "encoder_bf16": true,
+      "activation_checkpointing": true,
+      "head_hidden": 128,
+      "account_pooling": "Per intervention; see representation",
+      "loss": "Unweighted mean BCE plus fixed intervention rank_weight times ranking objective"
+    },
+    "model_loaded": false,
+    "corpus_read": false
+  },
+  "unused_pooler": {
+    "random_tiny_bert": true,
+    "actual_transformer_cls_forward": true,
+    "missing_names": [
+      "encoder.0.model.pooler.dense.bias",
+      "encoder.0.model.pooler.dense.weight"
+    ],
+    "full_parameter_count": 27,
+    "full_p_retained": true,
+    "task_zero_and_regularizer_reference_pass": true,
+    "broken_head_still_rejected": true
+  },
+  "qualification_controls": {
+    "exit_tail_wall_seconds": 2.0124991480261087,
+    "three_term_ignoring_workers_reaped": true,
+    "actual_worker_seconds": 6.133068842114881,
+    "concurrent_exit_reserve_seconds": 13,
+    "delayed_admission": {
+      "required": {
+        "free_gpu_bytes": 25769803776,
+        "ram_available_bytes": 204010946560,
+        "disk_free_bytes": 170724950016
+      },
+      "observed": {
+        "free_gpu_bytes": 25769803776,
+        "ram_available_bytes": 204010946560,
+        "disk_free_bytes": 170724950016
+      },
+      "ready": true
+    },
+    "gpu_ram_disk_shortfall_rejected": true,
+    "checkpoint_only_overlap_rejected": true,
+    "compute_only_overlap_reference_seconds": 0.25
+  },
+  "real_entry_and_restore": {
+    "current": 24,
+    "replay": 12,
+    "fixture_predecessor": 1,
+    "next_update_branches": 2,
+    "real_clock": {
+      "current": 25,
+      "tau": 0.14493105274311469,
+      "tau_day": 0.14032266331253496,
+      "mu0": 0.0058467776380222896,
+      "mu": 0.00578485822765016,
+      "next_threshold": 1
+    },
+    "replay_only_survivors": true,
+    "retention_rng_unchanged": true,
+    "current_schedule_unchanged": true,
+    "model_adam_rng_next_exact": true,
+    "final_adam_step": 38,
+    "parameter_mapping": [
+      {
+        "name": "encoder.0.embedding.weight",
+        "shape": [
+          64,
+          4
+        ],
+        "dtype": "torch.float32",
+        "numel": 256,
+        "bytes": 1024
+      },
+      {
+        "name": "head.0.weight",
+        "shape": [
+          5,
+          16
+        ],
+        "dtype": "torch.float32",
+        "numel": 80,
+        "bytes": 320
+      },
+      {
+        "name": "head.0.bias",
+        "shape": [
+          5
+        ],
+        "dtype": "torch.float32",
+        "numel": 5,
+        "bytes": 20
+      },
+      {
+        "name": "head.2.weight",
+        "shape": [
+          1,
+          5
+        ],
+        "dtype": "torch.float32",
+        "numel": 5,
+        "bytes": 20
+      },
+      {
+        "name": "head.2.bias",
+        "shape": [
+          1
+        ],
+        "dtype": "torch.float32",
+        "numel": 1,
+        "bytes": 4
+      }
+    ]
+  },
+  "regularizer": {
+    "gradient_max_abs_error": 0.0,
+    "gradient_changed_by_role": {
+      "encoder": true,
+      "head": true
+    },
+    "logged_penalty": 0.013880000789165669,
+    "autograd_penalty": 0.013880000449717045,
+    "updated_models_agree": true,
+    "anchor_unchanged": true
+  },
+  "multiple_chunks": {
+    "encoder_elements": 1049600,
+    "chunk_elements": 1048576,
+    "per_parameter_gradient_errors": {
+      "encoder.weight": 0.0,
+      "head.weight": 0.0,
+      "head.bias": 0.0
+    },
+    "final_chunk_checked": true
+  },
+  "multiple_event_resume": {
+    "prior_event_replay_steps": 12,
+    "restored_sequence": [
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "replay",
+      "current"
+    ],
+    "next_current": 26,
+    "model_adam_clock_rng_exact": true,
+    "boundary_fixture_not_full_stage": true
+  },
+  "stage_transaction": {
+    "before_publish_old_latest_preserved": true,
+    "after_publish_only_new_latest": true,
+    "next_stage": 3,
+    "retained_seen": 96,
+    "next_current_only": true,
+    "memory_matches_independent_algorithm_r": true,
+    "before_and_after_publish_orphans_removed": true,
+    "committed_endpoint_preserved": true,
+    "unrelated_file_preserved": true,
+    "boundary_fixture_not_288_real_updates": true
+  },
+  "vendorlink_priority": {
+    "incomplete_blocked": true,
+    "success_and_exit_required": true,
+    "failed_blocked": true,
+    "unrelated_cuda_process_not_a_blocker": true,
+    "explicit_single_slot_scope_requires_g1_success_and_exit": true,
+    "single_slot_acceptance_does_not_manufacture_g2_success": true
+  }
+}

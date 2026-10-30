@@ -1,0 +1,58 @@
+{
+  "observed_server": "2026-10-30T13:37:51.533946",
+  "ledger": {
+    "status": "STOP_NO_AUTOMATIC_RETRY",
+    "config_sha256": "c396555de5808c205992cb4fdb7476e4e80d09f120355409751502a1a973b006",
+    "aux": 47,
+    "g1": 7,
+    "g2": 0,
+    "attempts": [
+      {
+        "phase": "aux",
+        "tasks": [
+          {
+            "pid": 2435050,
+            "returncode": 1,
+            "started": 705520.230274783,
+            "ended": 705533.759680141,
+            "wall_seconds": 13.529405358014628,
+            "charged_seconds": 14
+          }
+        ],
+        "failure": "RuntimeError('Qualification worker exited unsuccessfully')",
+        "nvml": {},
+        "supervision_wall_seconds": 13.529826259939
+      },
+      {
+        "phase": "g1",
+        "tasks": [
+          {
+            "pid": 2725045,
+            "returncode": 1,
+            "started": 769558.622929956,
+            "ended": 769565.109656219,
+            "wall_seconds": 6.486726263072342,
+            "charged_seconds": 7
+          }
+        ],
+        "failure": "RuntimeError('Qualification worker exited unsuccessfully')",
+        "nvml": {
+          "startup": 522190848,
+          "VendorLink_SEQ": 10299113472
+        },
+        "supervision_wall_seconds": 6.608624086948112
+      }
+    ],
+    "previous_error": "RuntimeError(\"RuntimeError('Qualification worker exited unsuccessfully')\")",
+    "previous_config_sha256": "cc63e43915cccd0d97c971f33705c14dfd27dcd0c8c59117f4659d83533179fd",
+    "export_manifest_sha256": "3303e6a3f661502132582c1a28b907e3a9fd6568122bd056a0dd84b00a804660",
+    "error": "RuntimeError(\"RuntimeError('Qualification worker exited unsuccessfully')\")"
+  },
+  "console_tail": "Traceback (most recent call last):\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/waiting/workspace/scripts/step29_vendorlink_native.py\", line 335, in <module>\n    main()\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/waiting/workspace/scripts/step29_vendorlink_native.py\", line 310, in main\n    qualify_g1(factory, stage_loader(samples), args.job, check)\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/waiting/workspace/scripts/step29_vendorlink_native.py\", line 168, in qualify_g1\n    rows.append(step(model, optimizer, current, memory, stage, 1, total, seed, check,\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/waiting/workspace/scripts/step29_vendorlink_native.py\", line 84, in step\n    log = update_vendor(model, optimizer, records, identities, seed, check)\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/waiting/workspace/scripts/step29_vendorlink_methods.py\", line 247, in update_vendor\n    output, _ = model.encode([r.title+\" [SEP] \"+r.description for r in records], model.settings.vendor_tokens)\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/waiting/workspace/scripts/step29_vendorlink_methods.py\", line 158, in encode\n    output = self.encoder(**features, output_hidden_states=hidden, return_dict=True)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1775, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1786, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py\", line 1142, in forward\n    encoder_outputs = self.encoder(\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1775, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1786, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py\", line 695, in forward\n    layer_outputs = layer_module(\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1775, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1786, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py\", line 585, in forward\n    self_attention_outputs = self.attention(\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1775, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1786, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py\", line 524, in forward\n    attention_output = self.output(self_outputs[0], hidden_states)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1775, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1786, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py\", line 467, in forward\n    hidden_states = self.dropout(hidden_states)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1775, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1786, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/dropout.py\", line 73, in forward\n    return F.dropout(input, self.p, self.training, self.inplace)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/functional.py\", line 1418, in dropout\n    _VF.dropout_(input, p, training) if inplace else _VF.dropout(input, p, training)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 48.00 MiB. GPU 0 has a total capacity of 31.32 GiB of which 13.42 GiB is free. Process 2704118 has 8.04 GiB memory in use. Including non-PyTorch memory, this process has 9.63 GiB memory in use. 9.00 GiB allowed; Of the allocated memory 8.64 GiB is allocated by PyTorch, and 366.42 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n",
+  "ledger_stat": {
+    "bytes": 1511,
+    "mtime": 1793337988.5273132
+  },
+  "gpu": "32607 MiB, 23606 MiB, 34 %\n",
+  "live_related": []
+}

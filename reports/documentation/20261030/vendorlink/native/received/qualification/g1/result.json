@@ -1,0 +1,671 @@
+{
+  "status": "G1_PASSED",
+  "methods": {
+    "VendorLink_SEQ": {
+      "classes": [
+        775,
+        270,
+        1007
+      ],
+      "recovery": "nonempty_state_roundtrip_and_stage_boundary_next_step",
+      "kd": null,
+      "updates": 4,
+      "retention": [],
+      "peak": {
+        "allocated": 12693387264,
+        "reserved": 14514388992
+      },
+      "step_rows": [
+        {
+          "label": "real_fit",
+          "stage": 1,
+          "update": 1,
+          "started": 770764.502768598,
+          "ended": 770765.200388587,
+          "seconds": 0.6976199889322743,
+          "rates": [
+            4e-05
+          ],
+          "changes": {
+            "encoder": 4.000216722488403e-05,
+            "head": 4.000216722488403e-05
+          },
+          "peak": {
+            "allocated": 6230528000,
+            "reserved": 6496976896
+          },
+          "losses": {
+            "cross_entropy": 6.849033355712891,
+            "gradient_norm": 9.23316478729248,
+            "optimizer_updates": 1
+          }
+        },
+        {
+          "label": "real_fit",
+          "stage": 2,
+          "update": 1,
+          "started": 770766.770024243,
+          "ended": 770767.288472635,
+          "seconds": 0.5184483919292688,
+          "rates": [
+            4e-05
+          ],
+          "changes": {
+            "encoder": 4.000216722488403e-05,
+            "head": 4.000216722488403e-05
+          },
+          "peak": {
+            "allocated": 11855052288,
+            "reserved": 14308868096
+          },
+          "losses": {
+            "cross_entropy": 5.6785736083984375,
+            "gradient_norm": 7.792968273162842,
+            "optimizer_updates": 1
+          }
+        },
+        {
+          "label": "restored_stage_boundary",
+          "stage": 2,
+          "update": 1,
+          "started": 770773.940806901,
+          "ended": 770774.460933897,
+          "seconds": 0.5201269959798083,
+          "rates": [
+            4e-05
+          ],
+          "changes": {
+            "encoder": 4.000216722488403e-05,
+            "head": 4.000216722488403e-05
+          },
+          "peak": {
+            "allocated": 11855052288,
+            "reserved": 14313062400
+          },
+          "losses": {
+            "cross_entropy": 5.6785736083984375,
+            "gradient_norm": 7.792968273162842,
+            "optimizer_updates": 1
+          }
+        },
+        {
+          "label": "long_stress",
+          "stage": 3,
+          "update": 1,
+          "started": 770780.418485668,
+          "ended": 770781.521570659,
+          "seconds": 1.1030849909875542,
+          "rates": [
+            4e-05
+          ],
+          "changes": {
+            "encoder": 4.000216722488403e-05,
+            "head": 4.000216722488403e-05
+          },
+          "peak": {
+            "allocated": 12693387264,
+            "reserved": 14514388992
+          },
+          "losses": {
+            "cross_entropy": 6.865567207336426,
+            "gradient_norm": 9.676913261413574,
+            "optimizer_updates": 1
+          }
+        }
+      ],
+      "tokenized_shape": [
+        32,
+        512
+      ],
+      "blind_view_pairs": 231,
+      "checkpoint": "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/native/qualification/g1/VendorLink_SEQ/stage3.pt",
+      "settings": {
+        "method": "VendorLink_SEQ",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.2832655111666686,
+        "encoder_lr": 1e-05,
+        "head_lr": 0.001,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576
+      }
+    },
+    "H_SEQ": {
+      "classes": [
+        775,
+        270,
+        1007
+      ],
+      "recovery": null,
+      "kd": null,
+      "updates": 3,
+      "retention": [],
+      "peak": {
+        "allocated": 11588086784,
+        "reserved": 12511608832
+      },
+      "step_rows": [
+        {
+          "label": "real_fit",
+          "stage": 1,
+          "update": 1,
+          "started": 770784.64981248,
+          "ended": 770785.221150291,
+          "seconds": 0.5713378110667691,
+          "rates": [
+            1.2832655111666688e-05,
+            0.0012832655111666687
+          ],
+          "changes": {
+            "encoder": 1.2934207916259766e-05,
+            "head": 0.001283489167690277
+          },
+          "peak": {
+            "allocated": 4598520832,
+            "reserved": 5173673984
+          },
+          "losses": {
+            "current": {
+              "supervised": 4.548113822937012,
+              "distillation": 0.0,
+              "weighted": 4.548113822937012
+            },
+            "gradient_norm": 0.46394842863082886,
+            "optimizer_updates": 1
+          }
+        },
+        {
+          "label": "real_fit",
+          "stage": 2,
+          "update": 1,
+          "started": 770786.376576238,
+          "ended": 770786.991012062,
+          "seconds": 0.6144358239835128,
+          "rates": [
+            1.2832655111666688e-05,
+            0.0012832655111666687
+          ],
+          "changes": {
+            "encoder": 1.2859702110290527e-05,
+            "head": 0.001285189762711525
+          },
+          "peak": {
+            "allocated": 4905030144,
+            "reserved": 5771362304
+          },
+          "losses": {
+            "current": {
+              "supervised": 4.520949840545654,
+              "distillation": 0.0,
+              "weighted": 4.520949840545654
+            },
+            "gradient_norm": 0.5230734348297119,
+            "optimizer_updates": 1
+          }
+        },
+        {
+          "label": "long_stress",
+          "stage": 3,
+          "update": 1,
+          "started": 770788.220695481,
+          "ended": 770789.476456565,
+          "seconds": 1.255761083913967,
+          "rates": [
+            1.2832655111666688e-05,
+            0.0012832655111666687
+          ],
+          "changes": {
+            "encoder": 1.2821517884731293e-05,
+            "head": 0.0012879883870482445
+          },
+          "peak": {
+            "allocated": 11588086784,
+            "reserved": 12511608832
+          },
+          "losses": {
+            "current": {
+              "supervised": 4.508637428283691,
+              "distillation": 0.0,
+              "weighted": 4.508637428283691
+            },
+            "gradient_norm": 0.5690900087356567,
+            "optimizer_updates": 1
+          }
+        }
+      ],
+      "tokenized_shape": [
+        32,
+        256
+      ],
+      "blind_view_pairs": 231,
+      "checkpoint": "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/native/qualification/g1/H_SEQ/stage3.pt",
+      "settings": {
+        "method": "H_SEQ",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.2832655111666686,
+        "encoder_lr": 1e-05,
+        "head_lr": 0.001,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576
+      }
+    },
+    "H_ER": {
+      "classes": [
+        775,
+        270,
+        1007
+      ],
+      "recovery": null,
+      "kd": null,
+      "updates": 3,
+      "retention": [
+        {
+          "stage": 1,
+          "groups": 3,
+          "bytes": 65505,
+          "origins": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "stage": 2,
+          "groups": 6,
+          "bytes": 154901,
+          "origins": [
+            1,
+            1,
+            1,
+            2,
+            2,
+            2
+          ]
+        }
+      ],
+      "peak": {
+        "allocated": 11588086784,
+        "reserved": 12589203456
+      },
+      "step_rows": [
+        {
+          "label": "real_fit",
+          "stage": 1,
+          "update": 1,
+          "started": 770792.57877541,
+          "ended": 770793.098925719,
+          "seconds": 0.5201503090793267,
+          "rates": [
+            1.2832655111666688e-05,
+            0.0012832655111666687
+          ],
+          "changes": {
+            "encoder": 1.2934207916259766e-05,
+            "head": 0.0012834928929805756
+          },
+          "peak": {
+            "allocated": 4598520832,
+            "reserved": 5173673984
+          },
+          "losses": {
+            "current": {
+              "supervised": 4.547743797302246,
+              "distillation": 0.0,
+              "weighted": 4.547743797302246
+            },
+            "gradient_norm": 0.46857723593711853,
+            "optimizer_updates": 1
+          }
+        },
+        {
+          "label": "real_fit",
+          "stage": 2,
+          "update": 1,
+          "started": 770794.576236748,
+          "ended": 770795.614836931,
+          "seconds": 1.0386001829756424,
+          "rates": [
+            1.2832655111666688e-05,
+            0.0012832655111666687
+          ],
+          "changes": {
+            "encoder": 1.2859702110290527e-05,
+            "head": 0.0012851953506469727
+          },
+          "peak": {
+            "allocated": 5255112704,
+            "reserved": 5848956928
+          },
+          "losses": {
+            "current": {
+              "supervised": 4.519778251647949,
+              "distillation": 0.0,
+              "weighted": 4.519778251647949
+            },
+            "history": {
+              "supervised": 4.522503852844238,
+              "distillation": 0.0,
+              "weighted": 0.4522503912448883
+            },
+            "gradient_norm": 0.5684492588043213,
+            "optimizer_updates": 1
+          }
+        },
+        {
+          "label": "long_stress",
+          "stage": 3,
+          "update": 1,
+          "started": 770797.347354891,
+          "ended": 770799.18408257,
+          "seconds": 1.836727679008618,
+          "rates": [
+            1.2832655111666688e-05,
+            0.0012832655111666687
+          ],
+          "changes": {
+            "encoder": 1.2874603271484375e-05,
+            "head": 0.001288001425564289
+          },
+          "peak": {
+            "allocated": 11588086784,
+            "reserved": 12589203456
+          },
+          "losses": {
+            "current": {
+              "supervised": 4.508780002593994,
+              "distillation": 0.0,
+              "weighted": 4.508780002593994
+            },
+            "history": {
+              "supervised": 4.485239505767822,
+              "distillation": 0.0,
+              "weighted": 0.44852396845817566
+            },
+            "gradient_norm": 0.6259369254112244,
+            "optimizer_updates": 1
+          }
+        }
+      ],
+      "tokenized_shape": [
+        32,
+        256
+      ],
+      "blind_view_pairs": 231,
+      "checkpoint": "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/native/qualification/g1/H_ER/stage3.pt",
+      "settings": {
+        "method": "H_ER",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.2832655111666686,
+        "encoder_lr": 1e-05,
+        "head_lr": 0.001,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576
+      }
+    },
+    "H_full": {
+      "classes": [
+        775,
+        270,
+        1007
+      ],
+      "recovery": "nonempty_adam_memory_rng_next_step",
+      "kd": {
+        "gradient_max_difference": {
+          "encoder.": 0.009000926278531551,
+          "head.": 0.06103670224547386
+        },
+        "full": {
+          "supervised": 4.48782205581665,
+          "distillation": 0.0037561000790446997,
+          "weighted": 0.45066025853157043
+        },
+        "replay_only": {
+          "supervised": 4.48782205581665,
+          "distillation": 0.0,
+          "weighted": 0.44878220558166504
+        },
+        "optimizer_step_comparison": false
+      },
+      "updates": 5,
+      "retention": [
+        {
+          "stage": 1,
+          "groups": 3,
+          "bytes": 65505,
+          "origins": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "stage": 2,
+          "groups": 6,
+          "bytes": 156373,
+          "origins": [
+            1,
+            1,
+            1,
+            2,
+            2,
+            2
+          ]
+        }
+      ],
+      "peak": {
+        "allocated": 12448077824,
+        "reserved": 13505658880
+      },
+      "step_rows": [
+        {
+          "label": "real_fit",
+          "stage": 1,
+          "update": 1,
+          "started": 770802.424217597,
+          "ended": 770802.934549444,
+          "seconds": 0.5103318470064551,
+          "rates": [
+            1.2832655111666688e-05,
+            0.0012832655111666687
+          ],
+          "changes": {
+            "encoder": 1.290440559387207e-05,
+            "head": 0.0012834928929805756
+          },
+          "peak": {
+            "allocated": 4598520832,
+            "reserved": 5173673984
+          },
+          "losses": {
+            "current": {
+              "supervised": 4.547548294067383,
+              "distillation": 0.0,
+              "weighted": 4.547548294067383
+            },
+            "gradient_norm": 0.4699057936668396,
+            "optimizer_updates": 1
+          }
+        },
+        {
+          "label": "real_fit",
+          "stage": 2,
+          "update": 1,
+          "started": 770804.576098016,
+          "ended": 770805.648699401,
+          "seconds": 1.072601384948939,
+          "rates": [
+            1.2832655111666688e-05,
+            0.0012832655111666687
+          ],
+          "changes": {
+            "encoder": 1.2859702110290527e-05,
+            "head": 0.0012851972132921219
+          },
+          "peak": {
+            "allocated": 5255112704,
+            "reserved": 5848956928
+          },
+          "losses": {
+            "current": {
+              "supervised": 4.5190019607543945,
+              "distillation": 0.0,
+              "weighted": 4.5190019607543945
+            },
+            "history": {
+              "supervised": 4.523410320281982,
+              "distillation": 4.5625856728293e-05,
+              "weighted": 0.45236384868621826
+            },
+            "gradient_norm": 0.5678291320800781,
+            "optimizer_updates": 1
+          }
+        },
+        {
+          "label": "extra_for_history_drift",
+          "stage": 2,
+          "update": 2,
+          "started": 770808.775432232,
+          "ended": 770809.572716906,
+          "seconds": 0.7972846740158275,
+          "rates": [
+            0.0,
+            0.0012832655111666687
+          ],
+          "changes": {
+            "encoder": 0.0,
+            "head": 0.0012880582362413406
+          },
+          "peak": {
+            "allocated": 5453707264,
+            "reserved": 5851054080
+          },
+          "losses": {
+            "current": {
+              "supervised": 4.485665321350098,
+              "distillation": 0.0,
+              "weighted": 4.485665321350098
+            },
+            "history": {
+              "supervised": 4.50067663192749,
+              "distillation": 0.0033748713321983814,
+              "weighted": 0.4517551064491272
+            },
+            "gradient_norm": 0.7430583238601685,
+            "optimizer_updates": 1
+          }
+        },
+        {
+          "label": "restored_nonempty_adam_next_step",
+          "stage": 2,
+          "update": 2,
+          "started": 770816.225514013,
+          "ended": 770817.249757334,
+          "seconds": 1.02424332103692,
+          "rates": [
+            0.0,
+            0.0012832655111666687
+          ],
+          "changes": {
+            "encoder": 0.0,
+            "head": 0.0012880582362413406
+          },
+          "peak": {
+            "allocated": 6130430976,
+            "reserved": 6371147776
+          },
+          "losses": {
+            "current": {
+              "supervised": 4.485665321350098,
+              "distillation": 0.0,
+              "weighted": 4.485665321350098
+            },
+            "history": {
+              "supervised": 4.50067663192749,
+              "distillation": 0.0033748713321983814,
+              "weighted": 0.4517551064491272
+            },
+            "gradient_norm": 0.7430583238601685,
+            "optimizer_updates": 1
+          }
+        },
+        {
+          "label": "long_stress",
+          "stage": 3,
+          "update": 1,
+          "started": 770823.974927351,
+          "ended": 770825.800560723,
+          "seconds": 1.8256333719473332,
+          "rates": [
+            1.2832655111666688e-05,
+            0.0012832655111666687
+          ],
+          "changes": {
+            "encoder": 1.2896023690700531e-05,
+            "head": 0.0012916558189317584
+          },
+          "peak": {
+            "allocated": 12448077824,
+            "reserved": 13505658880
+          },
+          "losses": {
+            "current": {
+              "supervised": 4.4878106117248535,
+              "distillation": 0.0,
+              "weighted": 4.4878106117248535
+            },
+            "history": {
+              "supervised": 4.46835994720459,
+              "distillation": 0.013196246698498726,
+              "weighted": 0.4534341096878052
+            },
+            "gradient_norm": 0.722957968711853,
+            "optimizer_updates": 1
+          }
+        }
+      ],
+      "tokenized_shape": [
+        32,
+        256
+      ],
+      "blind_view_pairs": 231,
+      "checkpoint": "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/native/qualification/g1/H_full/stage3.pt",
+      "settings": {
+        "method": "H_full",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.2832655111666686,
+        "encoder_lr": 1e-05,
+        "head_lr": 0.001,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576
+      }
+    }
+  },
+  "updates": 15
+}

@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import re
 import time
 import uuid
 from typing import Callable
@@ -79,6 +80,27 @@ class Store:
             raise ValueError('Checkpoint dependency identity differs')
         return path
 
+    def retire_unreferenced(self, latest: dict) -> None:
+        """Only this Store's UUID files; validate latest and all published endpoints first."""
+        meta = latest['metadata']
+        records = [latest['full']['file'], meta['memory'], meta['anchor']]
+        for point in meta['points'].values():
+            records.extend((point['model'], point['calibration']))
+        keep = {self.verify(row).resolve() for row in records if row}
+        patterns = dict(work=r'[0-9a-f]{32}\.pt', anchors=r'[0-9a-f]{32}\.pt',
+                        memory=r'[0-9a-f]{32}\.bin', models=r'stage[123]_[0-9a-f]{32}\.pt',
+                        maps=r'stage[123]_[0-9a-f]{32}\.json', **{'': r'latest\.[0-9a-f]{32}\.json'})
+        for directory, pattern in patterns.items():
+            parent = self.root/directory
+            for path in parent.iterdir():
+                if (re.fullmatch(pattern, path.name) and path.is_file() and not path.is_symlink()
+                        and path.resolve().parent == parent.resolve() and path.resolve() not in keep):
+                    with (self.root/'retired.jsonl').open('a', encoding='utf-8') as log:
+                        log.write(json.dumps(dict(latest=latest['generation'],
+                            path=str(path.relative_to(self.root)), bytes=path.stat().st_size,
+                            reason='unreferenced_store_generation'))+'\n')
+                    path.unlink()
+
     def commit(self, learner: m.Learner, supply: Supply, hook: Callable = lambda phase: None) -> dict:
         import torch
         if learner.phase not in ('current', 'await_current', 'complete'):
@@ -87,7 +109,6 @@ class Store:
         self.check(m.record.base.persistence.checkpoint_reserve(learner.model, learner.optimizer))
         learner.optimizer.zero_grad(set_to_none=True)
         generation = uuid.uuid4().hex
-        old = m.data.read_json(self.root/'latest.json') if (self.root/'latest.json').exists() else None
         if learner.anchor is not self.anchor_object:
             self.anchor_record = None
             if learner.anchor is not None:
@@ -117,13 +138,7 @@ class Store:
         hook('before_publish')
         temporary.replace(self.root/'latest.json')
         hook('after_publish')
-        # Only obsolete dependency files referenced by the preceding latest are retired.
-        if old:
-            old_rows = [old['full']['file'], old['metadata']['memory'], old['metadata']['anchor']]
-            keep = {r['path'] for r in (row['full']['file'], meta['memory'], meta['anchor']) if r}
-            for old_row in old_rows:
-                if old_row and old_row['path'] not in keep:
-                    self.verify(old_row).unlink()
+        self.retire_unreferenced(row)
         return dict(generation=generation, full_bytes=full.stat().st_size,
                     elapsed_seconds=time.monotonic()-started, history_bytes=len(payload)+len(m.data.json_bytes(state)))
 
@@ -158,6 +173,7 @@ class Store:
         self.anchor_record, self.anchor_object = meta['anchor'], learner.anchor
         self.points = meta['points']
         result = supply.restore(state['supply'], learner)
+        self.retire_unreferenced(row)
         self.last_restore_seconds = time.monotonic()-started
         return result
 
@@ -208,6 +224,7 @@ def stage(learner: m.Learner, supply: Supply, store: Store, current=None, calibr
     elif supply.acquired != learner.stage or learner.phase != 'current':
         raise ValueError('Restored current stage was not reacquired')
     sequence, _ = m.parent.schedule(current, learner.c, learner.spec.order, learner.stage)
+    learner.drain_events(store.check, before_step, log, lambda: store.commit(learner, supply))
     while learner.clock.current < 288:
         learner.advance(sequence[learner.clock.current], store.check, before_step, log,
                         lambda: store.commit(learner, supply))
