@@ -1,0 +1,19 @@
+请沿用本会话可见GPT-6／Pro，对VendorLink与FOREVER正式代码的两处修复做一次定向复审。用户最新明确要求：“把修复后的代码再提交一次外审，仔细确认这两处问题已经解决、没有引入新问题。先别训练，等我的开始指令。”若当前指定模型不可用请说明，不切换模型。
+
+前轮完整报告及主审在previous/；两项原缺陷为F-R01（旧H含development、新FOREVER只有fit/calibration，整字典比较错误拒绝正常来源）和V-R01（分数仅len/finite检查，二维坏数组可越过开标签前完整门）。请独立判断，不把主审“已闭合”、PASS或源码哈希当作行为正确证明。
+
+请先核对package_manifest.json、changes.diff和before/三个原文件，再阅读workspace/中的修后两个评价文件、完整手写测试和必要直接调用。workspace提供当前63份来源及cpu_sources，保持原资格的comparison依赖字节；不以当前其他活动项目的同名版本替换。63份完整上下文供必要追踪，不要求重新逐行审查所有未变算法。唯一源码变化为两个评价文件和测试；共享queue已撤回未部署的一次性启动扩展，仍为前轮已审字节。
+
+请具体检查：
+1. F-R01是否真正解决：有序fit/calibration比较是否保留群ID、域、顺序及必需角色约束；旧H多development信息是否正常通过；pretrained_archive精确核对、verify_reference、真实完成验证和后续18条记录组装是否仍有效。是否误读取开发集、放宽来源，或改变训练/生成/确认行为？
+2. V-R01是否真正解决：np.asarray(float64)后精确一维shape及finite检查，能否在任何qrels开放登记/读取之前拒绝二维空列、二维单列、NaN/Inf、长度错误及不能解析的分数；合法生产一维输出是否不变。请沿实际analyze调用顺序追到access/read，不能只看局部if。
+3. 必须审查测试本身及证据范围：VendorLink cpu08直接调用validate_blind，并在实际analyze坏数组路径断言access未调用；FOREVER cpu04直接调用complete_training，但verify_reference和validate_completion为限定替身，真实旧H字段模式由已获准h_partition_metadata另证。哪些行为由实际测试证明，哪些仅由静态分析支持，是否有会让修复缺失仍通过的测试漏洞？没有实际跑4104前向或加载H27。
+4. 对照before/与修后完整文件，检查修复是否引入新的科学、数据边界或普通运行缺陷。两份gate仍approved/review_closed=false，仅更新来源及实际费用；不要将CPU累计或源哈希变化误判为新算法。CPU账VendorLink110/600、FOREVER133/600，原GPU1274/3600及失败账保留。本轮不新增实验、GPU资格或正式训练。
+
+两项研究范围、预算、数据及统计定义均不改变。VendorLink仅固定数据描述比较，passed=null且无整体区间；FOREVER新120群、固定H−FOREVER条件保持。正式训练与自动资源等待均暂停，复审通过也不授予启动许可。
+
+请输出：分别给F-R01、V-R01 CLOSED或仍未解决及依据；列出修复引入的任何新必修问题，附文件/函数/行号、具体触发、影响和最小修法；若无新必修明确说明。合理可选改进与本轮必修分开，不提出HPO、追加数据/方法、全仓回归、大模型pilot或通用加固。请明确已读范围、证据局限及未执行事项。
+
+仅阅读本包及本会话上一轮已提供材料。禁止访问科研服务器，禁止执行项目代码、测试、训练、模型推理、指标重算、bootstrap或打开未提供的正式数据/标签/模型；不要求上传这些对象。必要源码比较、JSON/清单/哈希机械检查可做，但不得冒充Linux科研执行。包不含正式商品正文、账号名、关系标签、owners、权重或凭据。
+
+请在正文给出结论，并提供可下载的完整report.zh.txt与audit_notes.json。不要仅提供摘要，亦不要直接修改输入源码或gate。

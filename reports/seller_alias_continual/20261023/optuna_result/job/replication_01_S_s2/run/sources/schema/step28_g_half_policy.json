@@ -1,0 +1,78 @@
+{
+  "study": "fixed_half_mean_logavgexp",
+  "methods": [
+    "G_half"
+  ],
+  "seed": "s0",
+  "domains": "AB",
+  "main_rng_order": "ABC",
+  "physical_updates": 576,
+  "gradient_group_presentations": 864,
+  "physical_stage_states": 2,
+  "epoch_diagnostic_points": 12,
+  "history_supervision": 0.1,
+  "teacher_weight": 0.5,
+  "memory_maximum_bytes": 1048576,
+  "cpu_verification": {
+    "maximum_seconds": 180,
+    "maximum_rss_bytes": 2147483648,
+    "maximum_evidence_bytes": 67108864,
+    "prior_charged_seconds": 0
+  },
+  "native_verification": {
+    "maximum_seconds": 600,
+    "maximum_rss_bytes": 68719476736,
+    "maximum_work_bytes": 10737418240,
+    "maximum_evidence_bytes": 134217728,
+    "actual_updates": 6,
+    "prior_charged_seconds": 0
+  },
+  "runtime": {
+    "maximum_gpu_stage_seconds": 28800,
+    "maximum_output_bytes": 10737418240,
+    "maximum_cuda_reserved_bytes": 30064771072,
+    "maximum_rss_bytes": 68719476736,
+    "minimum_free_gpu_bytes": 32212254720,
+    "minimum_free_host_bytes": 77309411328,
+    "torch_cpu_threads": 1
+  },
+  "supervision": {
+    "train_parse_attempts": 1,
+    "valid_parse_attempts": 1,
+    "test_access": false,
+    "owners_access": false,
+    "automatic_retry": false
+  },
+  "evaluation": {
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 20260930,
+    "comparisons": [
+      [
+        "G_half",
+        "S"
+      ],
+      [
+        "G_half",
+        "G"
+      ]
+    ],
+    "primary_metric": "map",
+    "primary_role": "raw",
+    "success": "B_end_H_minus_S_each_AB_MAP_CI_lower_strictly_positive"
+  },
+  "pooling": {
+    "arm": "G_half",
+    "mean_weight": 0.5,
+    "logavgexp_weight": 0.5,
+    "tau": 1,
+    "record_order": "canonical_offdiagonal_upper_v1",
+    "output_dtype": "float32",
+    "numerics": {
+      "pooling": "float64_then_one_float32_cast",
+      "encoder_forward": "bfloat16",
+      "head_parameters_gradients_adam": "float32",
+      "tf32": false,
+      "deterministic_algorithms": true
+    }
+  }
+}
