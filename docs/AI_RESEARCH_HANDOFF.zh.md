@@ -2,9 +2,9 @@
 
 ## 当前工作
 
-FOREVER方案外审已回收并独立处置（2026-10-30）：用户要求“需要修改的就修改”，并在其已修改的同事汇报MD现有章节补入FOREVER。已用本地Playwright从[唯一会话](https://chatgpt.com/c/6ae406c1-160c-83ea-a5a1-3b22ccac18fc)下载[完整503行报告](../reports/documentation/20261030/forever/review/report.zh.txt)及小附件；输入159582字节/26成员/25载荷与网页身份及本地清单一致，报告字节和附件公布SHA一致。外审有条件支持受限实现，无已证实无条件科学阻断；[独立主审](../reports/documentation/20261030/forever/review/primary_disposition.zh.txt)采纳末尾beta与供给器/阶段恢复两项定义补清，另具体化资格45/48更新、三槽实运算及≤36次full提交/I/O投影，拒绝无关扩臂、HPO和通用框架。[原方案](../reports/documentation/20261030/forever/proposal.zh.txt)原字节保留，[修订补充](../reports/documentation/20261030/forever/revision.zh.txt)为当前提议；[同事汇报稿第5.5节](L2R_GCR_VENDORLINK_BRIEF.zh.md#55-forever新增近期对照的原理与独立实验方案)及相关概览/解释/口头汇报已增补，用户原修改保留。
+FOREVER限定实施/CPU资格已完成，GPU须排在VendorLink之后（2026-10-30）：用户最新授权按修订方案最小实现和限定CPU/GPU验证，并明确禁止正式训练；后续又指定“该实验的GPU校验排在vendor-link的GPU校验后面”。有效范围见[实施补充](../reports/documentation/20261030/forever/implementation/scope.zh.txt)，旧段落“实施/资格未批准”不再阻断这部分工作。新增方法/阶段安全点/限定资格入口已部署独立Linux workspace，最终44项执行依赖逐项一致，未覆盖活动来源。[实际交付与独立判断](../reports/documentation/20261030/forever/implementation/report.zh.txt)记录真实位移/解析全P正则、24当前+12回放、下一步模型/Adam/RNG一致、末尾beta及发布前后Supply/Memory恢复证据；CPU四次分别5/4/5/5秒，累计19/600秒，无失败，最终8项定向核验通过。CPU小模型/边界夹具不冒充BGE或完整阶段资格。
 
-当前仍只提议新9条FOREVER、复用H27端点、零HPO、新120群及两方法总4320前向。额外约1.22GiB参数锚点例外、116累计小时（108+6+2）、实施/数据/资格/训练均未批准；本轮未SSH、科研核验、载模、训练、生成或开标签，未改活动队列，未假称FOREVER代码已经实现。预算数值不变，正式前须实测新安全点I/O及三路资源；4—8h/条、三路含确认16—30h仍为历史代理。状态/收尾见[submission](../reports/documentation/20261030/forever/review/submission.json)与[回收](../reports/documentation/20261030/forever/review/recovery.json)。ER+FLAD仍为候选；下一步等用户决定修订实施范围，不重复方案外审或创建监听。
+GPU仍0秒/0更新，正式训练0、正式数据/标签读取0。实际准入回执为WAITING_VENDORLINK_NO_WORKER_STARTED：本轮VendorLink G1+全部G2成功结束且相关执行/等待进程退出后，才继续检查新增实现外审/主审和FOREVER实际资源；失败/停止不越过，不要求全卡无CUDA。服务器12:45:08观察单5090空闲1792MiB、VendorLink仍WAIT_RESOURCE且G1/G2结果未形成；原件见[资源及归属](../reports/documentation/20261030/forever/implementation/qualification/resource_observation.json)。已保留原VendorLink监听，无新FOREVER监听/正式控制器。用户已明确批准400960字节/SHA 7db965e4b9f1cba458bad0cc25f071e601831f857501a0204ebf11d1dbb46013的新完整实现包外发；13:05:11已在原FOREVER会话单次发送新增请求，可见GPT-6/Pro、停止按钮及审查者确认新包，当前生成中，见[唯一实施送审回执](../reports/documentation/20261030/forever/implementation/review/submission.json)。菜单同时出现使用上限文字，实际请求被接受，后台身份未独立核验；不把旧方案报告/旧附件当本轮结果。GPU何时能开始未知，不报完成日期。108h正式训练、6h新确认及新120群仍未启用，不能把原拟116h当作整批已准许执行。后续依次关闭新增实现审查、等VendorLink、实跑既定GPU资格，再汇报；禁止自动正式训练。
 
 VendorLink等待专项排查（服务器10月30日10:01）：[现场证据](../reports/documentation/20261029/vendorlink/native/waiting/wait_audit_20261030.json)发现新对照控制器在03:21:56保存过17685MiB（17.27GiB）空闲、CUDA仅两路本项目进程、RAM224.23GiB/disk246.27GiB的补位准入记录，紧接着派发CAB_s6_L²R；不能再称整夜都无足够显存。该控制器的free/PID为相邻两次查询，且不是VendorLink采样，不能证明窗口持续多久。Vendor监听实际源码与CPU13一致：首轮10GiB、只拦指定旧PID及启动身份仍占GPU、无全卡空闲要求；每次拒绝后睡300秒，并覆盖status.json，wait_console为空、control_console不存在，GPU账仍0。已证实短窗口可能漏采及历史留证不足，尚不能认定旧PID误拦、采到合格资源却未派发，或断言凌晨窗口持续超过5分钟。常见历史采集目录不存在，GPU accounting未启用；旧PID退出时刻及两次采样间变化无法还原。本轮只查现有证据，未改冻结来源、门槛、轮询或重启监听；建议最小改进为缩短轮询并逐次追加资源/判因小记录，保留原预算和单次派发条件。10:01现场空闲1792MiB，仍等待。
 
@@ -26,6 +26,10 @@ VendorLink等待专项排查（服务器10月30日10:01）：[现场证据](../r
 本轮只核对已有授权记录、已开放结果、实际入口及只读运行元数据，没有新增训练／推理／指标重算／标签开放或监听。两份新观察原件SCP回传后大小/SHA一致；可变文档本轮只更新Windows，不覆盖活动冻结来源、不自动扩大10月29日此前批次的远端push许可。保管见[存储记录](STORAGE.zh.md#2026-10-29-晚间接手核对与进度补齐)。
 
 ## 近期执行与审查历史
+
+FOREVER方案外审已回收并独立处置（2026-10-30）：用户要求“需要修改的就修改”，并在其已修改的同事汇报MD现有章节补入FOREVER。已用本地Playwright从[唯一会话](https://chatgpt.com/c/6ae406c1-160c-83ea-a5a1-3b22ccac18fc)下载[完整503行报告](../reports/documentation/20261030/forever/review/report.zh.txt)及小附件；输入159582字节/26成员/25载荷与网页身份及本地清单一致，报告字节和附件公布SHA一致。外审有条件支持受限实现，无已证实无条件科学阻断；[独立主审](../reports/documentation/20261030/forever/review/primary_disposition.zh.txt)采纳末尾beta与供给器/阶段恢复两项定义补清，另具体化资格45/48更新、三槽实运算及≤36次full提交/I/O投影，拒绝无关扩臂、HPO和通用框架。[原方案](../reports/documentation/20261030/forever/proposal.zh.txt)原字节保留，[修订补充](../reports/documentation/20261030/forever/revision.zh.txt)为当前提议；[同事汇报稿第5.5节](L2R_GCR_VENDORLINK_BRIEF.zh.md#55-forever新增近期对照的原理与独立实验方案)及相关概览/解释/口头汇报已增补，用户原修改保留。
+
+当前仍只提议新9条FOREVER、复用H27端点、零HPO、新120群及两方法总4320前向。额外约1.22GiB参数锚点例外、116累计小时（108+6+2）、实施/数据/资格/训练均未批准；本轮未SSH、科研核验、载模、训练、生成或开标签，未改活动队列，未假称FOREVER代码已经实现。预算数值不变，正式前须实测新安全点I/O及三路资源；4—8h/条、三路含确认16—30h仍为历史代理。状态/收尾见[submission](../reports/documentation/20261030/forever/review/submission.json)与[回收](../reports/documentation/20261030/forever/review/recovery.json)。ER+FLAD仍为候选；下一步等用户决定修订实施范围，不重复方案外审或创建监听。
 
 以下保留当时原件和叙述；“正在生成”“未授权”“当前”等词仅对各段注明的日期、对象成立。当前动作只由上表与对应最新合同/补充决定。
 

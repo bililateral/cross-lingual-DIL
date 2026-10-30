@@ -2,7 +2,7 @@
 
 ## 当前合同入口
 
-FOREVER新增候选（2026-10-30）：[送审原方案](../reports/documentation/20261030/forever/proposal.zh.txt)＋[外审后修订补充](../reports/documentation/20261030/forever/revision.zh.txt)构成当前提议，冲突处以后者为准；[预算依据](../reports/documentation/20261030/forever/budget.json)保持116h，不是已批准执行合同。只提议9条新轨迹、H27端点复用、零HPO和两方法新120群/总4320前向；额外全参数锚点、总步数/成本及开发机会不等明确披露。原方案外审和独立处置已完成，资格/实现/数据及预算仍待用户后续决定；方案补清不冒称实现通过。ER+FLAD保留候选，活动实验不变。动态状态仅见当前交接。
+FOREVER新增候选（2026-10-30）：[送审原方案](../reports/documentation/20261030/forever/proposal.zh.txt)＋[外审后修订补充](../reports/documentation/20261030/forever/revision.zh.txt)定义算法；用户最新已批准其中最小实现及CPU600秒/GPU3600累计任务秒/48实际更新的限定资格，并指定GPU排在VendorLink本轮完整资格之后，见[实施范围](../reports/documentation/20261030/forever/implementation/scope.zh.txt)及[许可](../reports/documentation/20261030/forever/implementation/authorization.json)。[预算依据](../reports/documentation/20261030/forever/budget.json)的116h仍是正式批次提议，108h正式训练、6h新确认、新120群/标签均未启用。未来仍只拟9条新轨迹、H27复用、零HPO/总4320前向；资格中的额外全P锚点例外明确计费，不宣称等总历史状态/算力/HPO。新增实现外审及GPU实际验收不能由方案外审或CPU通过替代；禁止正式开训。ER+FLAD保留候选，活动实验不变，动态状态只见当前交接。
 
 本节定位各条研究线的有效范围；实际进度、PID和资源观测只在[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)维护。后面的设计与审查沿革保留原时点，不覆盖本节与后续明确授权。
 

@@ -1,0 +1,736 @@
+{
+  "status": "APPROVED_MINIMAL_IMPLEMENTATION_CPU_GPU_ONLY",
+  "date": "2026-10-30",
+  "user_request": "按修改后的方案推进最小实现和限定CPU/GPU验证；先不要启动正式训练",
+  "cpu_seconds": 600,
+  "gpu_seconds": 3600,
+  "optimizer_calls": 48,
+  "formal_training": false,
+  "formal_data": false,
+  "anchor_exception_qualification": true,
+  "implementation_review_closed": false,
+  "vendorlink_predecessor": "/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/qualification",
+  "priority": "AFTER_VENDORLINK_NATIVE_COMPLETE_AND_EXITED",
+  "sources": [
+    {
+      "path": "schema/step28_alias_calibration_policy.json",
+      "bytes": 1837,
+      "sha256": "2653fe84e6e35275f1d963b9f52e31998a37da40568addccadb0b28d68e19be5"
+    },
+    {
+      "path": "schema/step28_alias_pooling_policy.json",
+      "bytes": 6823,
+      "sha256": "e308ec646f47554525e0254ea2bb6c454d29db7cd1fb35788c28be29c2be1986"
+    },
+    {
+      "path": "schema/step28_alias_ranking_policy.json",
+      "bytes": 3489,
+      "sha256": "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01"
+    },
+    {
+      "path": "schema/step28_alias_test_policy.json",
+      "bytes": 20035,
+      "sha256": "c943774b0dab596357f1b4e70abb3cad96e801a5f8c199022c728f583c9960a5"
+    },
+    {
+      "path": "schema/step28_audit_a_blind_prediction_policy.json",
+      "bytes": 3052,
+      "sha256": "9b540259267078a5761e84e7d44fa133e96556999f0ca46f8408688a2f933bc6"
+    },
+    {
+      "path": "schema/step28_audit_a_truth_evaluation_policy.json",
+      "bytes": 4143,
+      "sha256": "c1655a3b876064a1592dd284802b7a0938e1b66b1014d9e59c48076a3a80ce3d"
+    },
+    {
+      "path": "schema/step28_balanced_pooling_policy.json",
+      "bytes": 3870,
+      "sha256": "66eb3e5684739fab68f6a26418da547aaf75879c096bd561a81e45e57a541d8a"
+    },
+    {
+      "path": "schema/step28_base_model_policy.json",
+      "bytes": 3593,
+      "sha256": "3344572d6f48b4b10aabfe0db536a8052c75cac0c5cde4e1ac5c2a62c68ec5ab"
+    },
+    {
+      "path": "schema/step28_bge_continual_policy.json",
+      "bytes": 5123,
+      "sha256": "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534"
+    },
+    {
+      "path": "schema/step28_candidate_parent_policy.json",
+      "bytes": 8103,
+      "sha256": "d474d0105db91714d1e4cdcb23a170a45f41e8ec7d3d6537eb9673d383a760d9"
+    },
+    {
+      "path": "schema/step28_candidate_selection_policy.json",
+      "bytes": 6257,
+      "sha256": "9bf90e10ed8c8e5d2311f4ebc95dec34a56de2c888bfbb1a4e1d3abbf701fb89"
+    },
+    {
+      "path": "schema/step28_candidate_text_templates.json",
+      "bytes": 25210,
+      "sha256": "9a868644f76ad23be2e16973567a5b3c69d70bcbb23690453093dad3658e7a2a"
+    },
+    {
+      "path": "schema/step28_chinese_base_policy.json",
+      "bytes": 8439,
+      "sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a"
+    },
+    {
+      "path": "schema/step28_continual_catalog.json",
+      "bytes": 7875,
+      "sha256": "c4cd7a593e16b479a689822974ef82a0a08f3b6c4bf73b19aa23ef3c9e734660"
+    },
+    {
+      "path": "schema/step28_continual_cause_train_policy.json",
+      "bytes": 636,
+      "sha256": "887b2fa3e15b38392b2ad8db36c3c7a41712681207f44d837871e6b5ef173aa2"
+    },
+    {
+      "path": "schema/step28_continual_dataset_policy.json",
+      "bytes": 2390,
+      "sha256": "a95686ea46440ce1b3e7cfd005f4f59f4b5233ca363baa4125df58fdf450e2c2"
+    },
+    {
+      "path": "schema/step28_continual_diagnostic_policy.json",
+      "bytes": 2374,
+      "sha256": "475ad260f0a20a48f0a0fc59857a6912082a2ee6059c511eb3520e43f2df6989"
+    },
+    {
+      "path": "schema/step28_continual_distillation_policy.json",
+      "bytes": 1973,
+      "sha256": "01c688780a30a9ecb4d8fefb2cb809fd7fb907f140308dc2ebeeb44ea64b46ab"
+    },
+    {
+      "path": "schema/step28_continual_expression_catalog.json",
+      "bytes": 10777,
+      "sha256": "3735c59f9e7d761dca3b4525190ffc2c487f6dc51823285988a1ce4903072daf"
+    },
+    {
+      "path": "schema/step28_continual_expression_policy.json",
+      "bytes": 2935,
+      "sha256": "e1d489476ef40ad04c8d0b98a4718204d0e680543c2933e72dd045e8dedeadf6"
+    },
+    {
+      "path": "schema/step28_continual_expression_run_policy.json",
+      "bytes": 2902,
+      "sha256": "8b5b37089e2cbcff41a1950c6313344ff5ade627ff9371682294f4bfae8c7ccc"
+    },
+    {
+      "path": "schema/step28_continual_joint_policy.json",
+      "bytes": 1069,
+      "sha256": "f2f322af4b706acd72edc8850a15c45f67b05f7476a23e19f37c09fa48c69322"
+    },
+    {
+      "path": "schema/step28_continual_policy.json",
+      "bytes": 4966,
+      "sha256": "f3aa29871f3b840265d53be2ab7706e48bf9053dbbd535d2457df03553a1c540"
+    },
+    {
+      "path": "schema/step28_continual_population_policy.json",
+      "bytes": 3158,
+      "sha256": "b13bf1248783971f476dbfa9d3cbc2619155ff4bb50c51a51ec6b68f36617598"
+    },
+    {
+      "path": "schema/step28_continual_replay_policy.json",
+      "bytes": 1284,
+      "sha256": "f40da291139388d82229519fc7d340c50ad691ab24a02cc6a6887a56684767bd"
+    },
+    {
+      "path": "schema/step28_continual_replay_probe_policy.json",
+      "bytes": 1090,
+      "sha256": "108905a664748cf7de457735ddec4433479fabc73b7a5b7ffdb5984923eaeb2f"
+    },
+    {
+      "path": "schema/step28_continual_sensitivity_policy.json",
+      "bytes": 2582,
+      "sha256": "5d0dd73d77db6ec7284e4d3d0eec795829d353608d8b2bd0197de6b2871e67ae"
+    },
+    {
+      "path": "schema/step28_continual_text_policy.json",
+      "bytes": 4682,
+      "sha256": "63bb8f1cf394ad8439b9acc2f79dd3584f28492d2fa99c01e981c78fba51a81f"
+    },
+    {
+      "path": "schema/step28_continual_text_run_policy.json",
+      "bytes": 2332,
+      "sha256": "f602abcac997d5dda115bb349c2222ccd92be78cbbbaf1f483de7d1243ac9f5e"
+    },
+    {
+      "path": "schema/step28_crossfit_retention_policy.json",
+      "bytes": 1321,
+      "sha256": "a9ba5b679a6696e1e39d59d274a2bdfa2964d94d2bb1cf9ac84fcbf6fc861c92"
+    },
+    {
+      "path": "schema/step28_dataset_custody_deployment.json",
+      "bytes": 27767,
+      "sha256": "0f8135a6bea827b0c547ff738206daff2e5b5c7174e7aba4e4a4c6f841062d8d"
+    },
+    {
+      "path": "schema/step28_document_collision_policy.json",
+      "bytes": 12054,
+      "sha256": "a97252ade207a8af95155ac06cb48979484926ec1386bb2a737ed1f6d73b5966"
+    },
+    {
+      "path": "schema/step28_english_initialized_labse_finetune_policy.json",
+      "bytes": 6135,
+      "sha256": "17c472ada20f675d1f378545133f83c03bb6afa212a71e3330d11877f6471fa0"
+    },
+    {
+      "path": "schema/step28_er_low_policy.json",
+      "bytes": 5029,
+      "sha256": "201c7a766965df127803be89a9f3b7b1a5246053d95b2bcafa4dcc08cfa08c3d"
+    },
+    {
+      "path": "schema/step28_er_weight_policy.json",
+      "bytes": 3732,
+      "sha256": "9eddf92646892d5890491e068ecbd4834463d0751de530a4701b7de8a98e4396"
+    },
+    {
+      "path": "schema/step28_formal_500x4_authorization_attempt1.json",
+      "bytes": 2312,
+      "sha256": "c88547f527e77772e90d172649e218ae2ff028bf145acefbcb5c5f77c08d6ef3"
+    },
+    {
+      "path": "schema/step28_formal_500x4_collision_failed_authorization_attempt1.json",
+      "bytes": 2294,
+      "sha256": "a2a0546b1470650665187605bcdfb80b8e1bc4dfd48632739d2570daf1d6d874"
+    },
+    {
+      "path": "schema/step28_formal_500x4_policy.json",
+      "bytes": 9202,
+      "sha256": "9ec3582d537835db8633da5a41a89a16015c5184ce3fa7dea60893d3892eb43d"
+    },
+    {
+      "path": "schema/step28_formal_500x4_quality_attempt1_authorization.json",
+      "bytes": 1340,
+      "sha256": "8d8869c1cf94ef469bf4b32872d9aecba6992688336b4bb1ffb01b53d10b7190"
+    },
+    {
+      "path": "schema/step28_formal_500x4_quality_attempt1_policy.json",
+      "bytes": 15093,
+      "sha256": "12bfc32bd99f84eb338779f31c74a57343432750fbaf1bac80a8487796d8304d"
+    },
+    {
+      "path": "schema/step28_full_english_compatibility_policy.json",
+      "bytes": 5980,
+      "sha256": "c2b2be764a8c05e86c65dae9be1cae5b550a382fbcb9859c72012c6fc40a2b82"
+    },
+    {
+      "path": "schema/step28_function_memory_policy.json",
+      "bytes": 3029,
+      "sha256": "69032e8b1936ce9a67e5f857e5014254f4e804b9eb1002ecf717036372ef13da"
+    },
+    {
+      "path": "schema/step28_g_half_policy.json",
+      "bytes": 1979,
+      "sha256": "5902105c0dba6542c56e2a8d575b33702421085aacb68ea1036548c69cabf042"
+    },
+    {
+      "path": "schema/step28_h_consistency_policy.json",
+      "bytes": 2571,
+      "sha256": "0f2642622fff330ec325571555d5d8f7a0f1105d877f0913fefab5d02097f170"
+    },
+    {
+      "path": "schema/step28_identity_history_aligned_policy.json",
+      "bytes": 1437,
+      "sha256": "9d7c23a0aadd43054066a4d54a9d6d02a8af4c5df053507bdcabf5772731dcba"
+    },
+    {
+      "path": "schema/step28_identity_history_ambiguity_excluded_policy.json",
+      "bytes": 2303,
+      "sha256": "4c75b6d9e4197fe794509156f33f921b876b62dfc82f4a7fdc5a661dec022245"
+    },
+    {
+      "path": "schema/step28_identity_history_balanced_states_policy.json",
+      "bytes": 2525,
+      "sha256": "3c052bd2eeea36cad5b1ec5dbf3fc7943c454dff8ca4a26828ed0770a1daa54e"
+    },
+    {
+      "path": "schema/step28_identity_history_conservative_support_policy.json",
+      "bytes": 2959,
+      "sha256": "4f399f777e231b3c68c36af49143b311f14b7f6d1c6a13f025f9f88efd7d69a6"
+    },
+    {
+      "path": "schema/step28_identity_history_controlled_policy.json",
+      "bytes": 1426,
+      "sha256": "bea57f2c6a222a7d4c3671637da712ae944cb80c0c05f9510ac8a4e135612984"
+    },
+    {
+      "path": "schema/step28_identity_history_english_source_policy.json",
+      "bytes": 2294,
+      "sha256": "07b46d08c0f04f69cf0d428ac7e4391936009cd5ecb38b5d4b3ac173fd3dd672"
+    },
+    {
+      "path": "schema/step28_identity_history_label_blind_policy.json",
+      "bytes": 10113,
+      "sha256": "582b568e6139b9ac326c2b47705e5fc170829839a0eabd94e413bdf23bf06f80"
+    },
+    {
+      "path": "schema/step28_identity_history_paired_policy.json",
+      "bytes": 9779,
+      "sha256": "509edfc5b789a2785fdfb459bb47e46aa91e60fad9ca9dd251117ccaa5c077e5"
+    },
+    {
+      "path": "schema/step28_identity_history_state_weighted_policy.json",
+      "bytes": 23636,
+      "sha256": "198565679f5a1bdcee69b6669d4750cf0d182e7185427d109d05d01a0ed03e5f"
+    },
+    {
+      "path": "schema/step28_identity_history_support_aware_policy.json",
+      "bytes": 2730,
+      "sha256": "0c60d4b0c19eb6e3b02ebfba25ad65a918f15a8230450c0b45fda795298037ee"
+    },
+    {
+      "path": "schema/step28_identity_history_unique_states_policy.json",
+      "bytes": 15625,
+      "sha256": "9297a9532e8ab475bc5647dbd8aefb35a6c05c9d0c730b5cecd47d0d4c12544d"
+    },
+    {
+      "path": "schema/step28_labse_direct_finetune_execution.json",
+      "bytes": 457,
+      "sha256": "30185179d67826c0600c8bb756eb5465c6207ea9aa94f354cbf6de9578fe27bb"
+    },
+    {
+      "path": "schema/step28_labse_direct_finetune_policy.json",
+      "bytes": 6088,
+      "sha256": "68d181efb1a709a7aa61e198b914165f77447d4e60314e515e94e13977f00816"
+    },
+    {
+      "path": "schema/step28_logit_low_policy.json",
+      "bytes": 6675,
+      "sha256": "8df56ee17a0159e6d3e56e86dadf8dab26290c6b34bc8dec04e926826af61da0"
+    },
+    {
+      "path": "schema/step28_logit_weight_policy.json",
+      "bytes": 5059,
+      "sha256": "2aaf41724055ed3dff93ad65a8be2cc4e83c8f35d4515dace34bcdc44b081deb"
+    },
+    {
+      "path": "schema/step28_metadata_shortcut_audit_lock.json",
+      "bytes": 13313,
+      "sha256": "4b2b450ce4194e613e3fe206c235e6db06a4e587ccf7f869a9f7c89f1af269b3"
+    },
+    {
+      "path": "schema/step28_method_root_authorization_attempt1.json",
+      "bytes": 2131,
+      "sha256": "c5a876cf762dae1c22ad27228901563acee1586ce80a2e79e9aa2e82e3d6910b"
+    },
+    {
+      "path": "schema/step28_method_root_policy.json",
+      "bytes": 2921,
+      "sha256": "c165fd02d4201ccf1c9ccd3707036bf19f5f270a60bbefc07b76259949367a5c"
+    },
+    {
+      "path": "schema/step28_method_root_quality_attempt3_authorization.json",
+      "bytes": 1313,
+      "sha256": "8c034752049cb81f9abaed400b347901a886048938f2e2df068d1c441c70c166"
+    },
+    {
+      "path": "schema/step28_method_root_quality_attempt3_policy.json",
+      "bytes": 10654,
+      "sha256": "c0ec0b7968db8f78d168dfc15b9e2b725563ae4447ea6ce3d090679836f92f81"
+    },
+    {
+      "path": "schema/step28_model_experiment_policy.json",
+      "bytes": 26380,
+      "sha256": "a473624feec04efd024a4334815fa854b6ec4023b88bf21c709a6c5dccf61a9e"
+    },
+    {
+      "path": "schema/step28_model_training_amendment.json",
+      "bytes": 18968,
+      "sha256": "0f20d7491b01b49f70c88c7d499b30761ed23c2ac7f3caad60a7bb3a13a1d687"
+    },
+    {
+      "path": "schema/step28_model_training_policy.json",
+      "bytes": 7681,
+      "sha256": "1adc58a822e1ed2789d0b2cf9bed3ec65dbabfe21f72e199c08db7b873e2d9e8"
+    },
+    {
+      "path": "schema/step28_model_visible_shortcut_policy.json",
+      "bytes": 4641,
+      "sha256": "ecaf745973ef0d6cc3417c299a0e01e2b1305f61290c25cba6dd193a93ca8911"
+    },
+    {
+      "path": "schema/step28_natural_variation_policy.json",
+      "bytes": 8131,
+      "sha256": "a628733991291b6870d5dc4f23c52145e33eb7da325bfa1fc3feed6751149979"
+    },
+    {
+      "path": "schema/step28_optuna_policy.json",
+      "bytes": 545,
+      "sha256": "428c8b78c7a7de9d8f4972cd3913edd3366b6814537ff42c299f7c6f5e57c1c5"
+    },
+    {
+      "path": "schema/step28_parser_template_fixture.json",
+      "bytes": 20171,
+      "sha256": "e5b3b2a6b317f186eab3d37e7b18e9f25de58bb7570fdbda2da69f6550ea3ca8"
+    },
+    {
+      "path": "schema/step28_positive_ranking_policy.json",
+      "bytes": 3618,
+      "sha256": "fab05a1917d23a8eff26a0cc80cdf0fba9110599e72dd9fd4d9c00634cea60f3"
+    },
+    {
+      "path": "schema/step28_prebuild_gate_authorization_attempt3.json",
+      "bytes": 10469,
+      "sha256": "b263c0adec09be6dccb908733d6b195061300ca11cd2818ff6d9e5edb488d6db"
+    },
+    {
+      "path": "schema/step28_public_projection_authorization_attempt1.json",
+      "bytes": 4899,
+      "sha256": "00f705ed39b5fdb1b962fae077d0c20c615683c40a147cfc04c81355294d1450"
+    },
+    {
+      "path": "schema/step28_public_projection_gpu_policy.json",
+      "bytes": 3705,
+      "sha256": "ca7e001e34dcd51acbd52edbb0711984224849cd12ff51395231e57916a15f35"
+    },
+    {
+      "path": "schema/step28_public_projection_policy.json",
+      "bytes": 9284,
+      "sha256": "ac4e322c9455c617382a1f3db6ce8ce416d21e17ce211f24b659df6c585fe2ad"
+    },
+    {
+      "path": "schema/step28_quality_channel_sensitivity_policy.json",
+      "bytes": 24278,
+      "sha256": "3bb751007d2f06bba033e87066113500a4df57f148c41b3754474796529cbd07"
+    },
+    {
+      "path": "schema/step28_query_replay_policy.json",
+      "bytes": 1655,
+      "sha256": "d7701c7e6ce9dee2c1bbc1f21d1910085ba11bfb783ef703e8fdd7a292f87c53"
+    },
+    {
+      "path": "schema/step28_record_attribution_policy.json",
+      "bytes": 1756,
+      "sha256": "0ce82105ac4b9e2e03f3897fa88b00ee50201fa18f5930fb107db3cad7860bc4"
+    },
+    {
+      "path": "schema/step28_record_replay_policy.json",
+      "bytes": 1680,
+      "sha256": "fbf82f180ed8e0e1140d1a11d137abc1ff3efb50ceac877d843d63e1e89a065f"
+    },
+    {
+      "path": "schema/step28_regression_cleanup.json",
+      "bytes": 2491,
+      "sha256": "df21b48c0a039935e396cfd5adea4ca4ab26416fdbce295ad0b6c8a73192e80a"
+    },
+    {
+      "path": "schema/step28_regression_compatibility.json",
+      "bytes": 3412,
+      "sha256": "47448e2bb3ac53906a0c8c0343af9286aaa69dd182a90c2bf1b90c8f973f7e24"
+    },
+    {
+      "path": "schema/step28_regression_english_replay.json",
+      "bytes": 3810,
+      "sha256": "0c168adff776c80462b32b7a9f1ff6506465dc1be94d3c37cfe316158efbe4a0"
+    },
+    {
+      "path": "schema/step28_regression_historical.json",
+      "bytes": 3631,
+      "sha256": "f68e219d4b000a4c6b8ad600181134158baf00f2325774a14f6e71e4e83d8b3f"
+    },
+    {
+      "path": "schema/step28_regression_projection.json",
+      "bytes": 3651,
+      "sha256": "f815faa6781e2f849c9915c90ad5983d114f2596af7a5800d145d0874895d05f"
+    },
+    {
+      "path": "schema/step28_regression_training.json",
+      "bytes": 3936,
+      "sha256": "d2ad64f22298cdb6db633fb2ed9442335a4e30acd24f1821e40a275d47611a76"
+    },
+    {
+      "path": "schema/step28_relation_memory_policy.json",
+      "bytes": 1209,
+      "sha256": "95a9b5a3374f337d99fa65a85fae9fd56e6d29a43ce92baac348962c2dfa34b9"
+    },
+    {
+      "path": "schema/step28_replay_dataset_builder_policy.json",
+      "bytes": 17769,
+      "sha256": "63260f868894a117128b9e1f7e5e097e1ddceb3512df9a41cbd350bab76a1476"
+    },
+    {
+      "path": "schema/step28_replay_improvement_policy.json",
+      "bytes": 1905,
+      "sha256": "fa72c1dffcfc4d9e4c8b4c50f6b6cc32fa3a24107a5242aed18e524b04df488d"
+    },
+    {
+      "path": "schema/step28_risk_policy.json",
+      "bytes": 7174,
+      "sha256": "5706629736dfe9c598f1d59cc61f04bb65e9fd83b4275e391dfc3d2ebf2e5548"
+    },
+    {
+      "path": "schema/step28_scientific_dataset_builder_policy.json",
+      "bytes": 8135,
+      "sha256": "4436b3f455c371c1fec21a067703f980ff3f1b8311e34aafb1f702380f671ccb"
+    },
+    {
+      "path": "schema/step28_scientific_quality_audit_external_review_attestation.json",
+      "bytes": 1692,
+      "sha256": "6bb3d8e2febe4309ccd783d6d154374dca0a58c325b7eaefad368e542217c329"
+    },
+    {
+      "path": "schema/step28_specialist_policy.json",
+      "bytes": 3932,
+      "sha256": "38e0af7b9d3bdc4156596bbd9761e1dee78fc10d41f312b367fb3dc951ac973d"
+    },
+    {
+      "path": "schema/step28_style_transfer_policy.json",
+      "bytes": 9841,
+      "sha256": "17d4389fe903a29cb22563510ca96b03a03655c66a66347535318c05c10b621b"
+    },
+    {
+      "path": "schema/step28_synthetic_chinese_dataset_policy.json",
+      "bytes": 197954,
+      "sha256": "e0c5dbba5818c7fc45d757795d923fcda3392250f4980b67f1670370050aa389"
+    },
+    {
+      "path": "schema/step28_synthetic_text_templates.json",
+      "bytes": 21860,
+      "sha256": "8c4db177f6594c663fcbaff23c130062aff22c0765d8dac9e98ab5b53252bfe7"
+    },
+    {
+      "path": "schema/step28_train_development_execution_policy.json",
+      "bytes": 4414,
+      "sha256": "d392d33639567d79db7ca064945e36ddd5815b3540eb614f0ed5765673baa876"
+    },
+    {
+      "path": "schema/step28_training_ready_dataset_policy.json",
+      "bytes": 11439,
+      "sha256": "cd923f10a3ea992584ed458c39338f3a7b1e103c981d9adf40c63eca0b1f85bc"
+    },
+    {
+      "path": "schema/step28_training_ready_order_repair_policy.json",
+      "bytes": 13099,
+      "sha256": "f20c10f388dffb3c0ac011faeacb3e5660fc80b67a2e60de7f1f0176fbe74192"
+    },
+    {
+      "path": "schema/step28_training_ready_order_repair_scientific_contract.json",
+      "bytes": 7657,
+      "sha256": "c939978601c79b2fd11e72bab1b2137e573408cef43a6defb930ecebaa0f460d"
+    },
+    {
+      "path": "schema/step28_training_ready_scientific_contract.json",
+      "bytes": 6242,
+      "sha256": "a0204004ae4b38c9df2b9dfc74c9f4c78280029a3abd76ebe97e47c68b5dfc27"
+    },
+    {
+      "path": "schema/step28_transfer_claim_controls_policy.json",
+      "bytes": 3092,
+      "sha256": "1095086df77468350ca6de42fc98408748234797cbd41f299befa693bc73374b"
+    },
+    {
+      "path": "schema/step28_transferable_identity_history_guarded_application_policy.json",
+      "bytes": 24018,
+      "sha256": "95edba4af483f77a7c79397775ba56a301e6249c734186b670c42635dbfb3e03"
+    },
+    {
+      "path": "schema/step28_transferable_identity_history_policy.json",
+      "bytes": 8991,
+      "sha256": "91e910cffc963c67049bc280d389cc031734f3bf8400c040ad9d61587db01e45"
+    },
+    {
+      "path": "scripts/step28_alias_calibration.py",
+      "bytes": 8818,
+      "sha256": "d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca"
+    },
+    {
+      "path": "scripts/step28_alias_ranking.py",
+      "bytes": 11658,
+      "sha256": "1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274"
+    },
+    {
+      "path": "scripts/step28_balanced_pooling_run.py",
+      "bytes": 55111,
+      "sha256": "561b53c651e432c4ddb0480a1e216ffb187134074a68b3acbed418f093db52d1"
+    },
+    {
+      "path": "scripts/step28_balanced_pooling.py",
+      "bytes": 14383,
+      "sha256": "2a4b10aeca83d9a52a493a18cec8fe6e200058512a5db64e19a85c3f7e3fbc0c"
+    },
+    {
+      "path": "scripts/step28_bge_continual_evaluate.py",
+      "bytes": 13765,
+      "sha256": "55e9bf419801ec57686898cf78d8237962fc5e5549849a2e0eac3e66318353f1"
+    },
+    {
+      "path": "scripts/step28_bge_continual_run.py",
+      "bytes": 34672,
+      "sha256": "4ab2840dfe7ee27912e8e6ed19d3dd3d9919e668f1cbc10998ade2843966d181"
+    },
+    {
+      "path": "scripts/step28_bge_continual.py",
+      "bytes": 17275,
+      "sha256": "62a3c6d5eeb1180a9014f157c79c9ccf210df2f379946d345184d2b544869e0d"
+    },
+    {
+      "path": "scripts/step28_chinese_base.py",
+      "bytes": 51352,
+      "sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc"
+    },
+    {
+      "path": "scripts/step28_comparison_gcr.py",
+      "bytes": 15068,
+      "sha256": "bb3bcd296cdc325ce2b4d7295da41c3bcfaaaf60f5ce83b17c0cf5db3c1b395b"
+    },
+    {
+      "path": "scripts/step28_comparison_l2r.py",
+      "bytes": 17712,
+      "sha256": "913cdf63e40d861fe2ab08dc5208dd88884ec1d4d8242f7bdf1aa8e78a861cb0"
+    },
+    {
+      "path": "scripts/step28_comparison_native.py",
+      "bytes": 16533,
+      "sha256": "da9fd3c5ce91bd2f6b20f205c6ea8047b1de334d774eff916799afe69b819835"
+    },
+    {
+      "path": "scripts/step28_continual_comparison_evaluate.py",
+      "bytes": 20107,
+      "sha256": "9992ef962169cfecb39e532234deb19d753a617f184d7c7622dae4c78a4346ca"
+    },
+    {
+      "path": "scripts/step28_continual_comparison_run.py",
+      "bytes": 14837,
+      "sha256": "8bba9539ed713a904ff6ff884ad0311f3f6b075618326bdf4e5dc5401670422e"
+    },
+    {
+      "path": "scripts/step28_continual_comparison.py",
+      "bytes": 7533,
+      "sha256": "900b8888a869a8dcbc8506b9bbc38a8a92a1204a352cc0bb495364c38f1568a4"
+    },
+    {
+      "path": "scripts/step28_continual_expression_data_verify.py",
+      "bytes": 22678,
+      "sha256": "28391e8c89c4cf9bd637dff8c5c7600c68c24d6bd9c72cf2b6684d9c082b45fe"
+    },
+    {
+      "path": "scripts/step28_continual_expression_data.py",
+      "bytes": 18179,
+      "sha256": "23608792b288891f9bf9d51c4765c1ad0d38b13acefb9e904f509ed93376f7ef"
+    },
+    {
+      "path": "scripts/step28_continual_expression_run.py",
+      "bytes": 26322,
+      "sha256": "3df878e3d78c07444cc0400b574adaf3a495b74fe193a14853706c7e9f67a760"
+    },
+    {
+      "path": "scripts/step28_continual_five_control.py",
+      "bytes": 17826,
+      "sha256": "95da8b50ab412efc4b81a9675eb9d9ab4b6ad3e85b2fe1e3263c03224575c3eb"
+    },
+    {
+      "path": "scripts/step28_continual_five_evaluate.py",
+      "bytes": 19698,
+      "sha256": "a517b4d5923374cedb80c568942784909aad96795c21452bcceda97d161f9359"
+    },
+    {
+      "path": "scripts/step28_continual_five_run.py",
+      "bytes": 15683,
+      "sha256": "1099a94cd2ac9ecd82a1255a8403d6065fbab0609eb4cedc48798b6874ce335a"
+    },
+    {
+      "path": "scripts/step28_continual_five.py",
+      "bytes": 11302,
+      "sha256": "803f883b6b02705a52d5c4c0355f6810cc22577701ef80a65bea6ffbb02441d6"
+    },
+    {
+      "path": "scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+    },
+    {
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "bytes": 20911,
+      "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a"
+    },
+    {
+      "path": "scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+    },
+    {
+      "path": "scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+    },
+    {
+      "path": "scripts/step28_crossfit_retention.py",
+      "bytes": 12471,
+      "sha256": "0e98c4229807182a88472364d771dd8345def09e4e0593eb920f2a240db70f8a"
+    },
+    {
+      "path": "scripts/step28_er_weight.py",
+      "bytes": 17560,
+      "sha256": "626d2e325166a18d995e1eb9dcb28d04349024455f54fe4b3b30d17df8e516c4"
+    },
+    {
+      "path": "scripts/step28_forever_qualification.py",
+      "bytes": 16870,
+      "sha256": "c36d662833a4a06b9d51e8bd2c24a278ada484c9dee40e9d6d9bfc534ad1d5a9"
+    },
+    {
+      "path": "scripts/step28_forever_run.py",
+      "bytes": 12038,
+      "sha256": "666a5dd019788cbada4829c101f034d4a3a0ef849d4516c186a4aa4e8cdffe82"
+    },
+    {
+      "path": "scripts/step28_forever.py",
+      "bytes": 13541,
+      "sha256": "a262a45abb1b084644e0162414924442962e4ee27d1cad0c907270c05a98b076"
+    },
+    {
+      "path": "scripts/step28_g_half.py",
+      "bytes": 6786,
+      "sha256": "350f7d057a786aa151073ac54f1f697f40d081ecb5b67c02d6ee456a785febcb"
+    },
+    {
+      "path": "scripts/step28_optuna.py",
+      "bytes": 11090,
+      "sha256": "0ff083717ee0f01720ddf21ef41cce61def85ab0eef28817386aecba66873336"
+    },
+    {
+      "path": "scripts/step28_positive_ranking.py",
+      "bytes": 7690,
+      "sha256": "182a0a73cf4f44c539e6fa8819746e37e74f37ffaee10fe75d5612ee1229e3e1"
+    },
+    {
+      "path": "scripts/step28_record_replay_run.py",
+      "bytes": 33426,
+      "sha256": "584ea874e50134e837613a664b531773797dad451be07b1d1ff06de4b3c38338"
+    },
+    {
+      "path": "scripts/step28_record_replay_verify.py",
+      "bytes": 11627,
+      "sha256": "c9b81490b83d9174ed4ee003ffe896dda20daf9fa4408bb8ca516b4cda38f2b9"
+    },
+    {
+      "path": "scripts/step28_record_replay.py",
+      "bytes": 15543,
+      "sha256": "ca3a7aadaa16d51e78d65d6e25fe714dcf1495b9bab60f2dce3b3cb8893e7f0d"
+    },
+    {
+      "path": "scripts/step28_replay_diagnostics.py",
+      "bytes": 11971,
+      "sha256": "8b09a00bcd973045d198e1ca305afe55030d21a953cc1334d457dde89974c2ea"
+    },
+    {
+      "path": "scripts/step28_risk_study.py",
+      "bytes": 4037,
+      "sha256": "1aa0a436aaf41d5db84d9ac401619b16e28a1f6a229e1ee2209b1c88b4271012"
+    },
+    {
+      "path": "tests/test_step28_continual_comparison.py",
+      "bytes": 29925,
+      "sha256": "2805fb97d40897f08ac834e2761aeca8f9b755c4d0359380af5879844cddc00a"
+    },
+    {
+      "path": "tests/test_step28_forever.py",
+      "bytes": 10581,
+      "sha256": "995962af5de576b71333f66c5f760a46bedb3c7724b061e5541fb1db3cbf0a37"
+    }
+  ]
+}

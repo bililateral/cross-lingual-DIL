@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-10-30 FOREVER限定实现与CPU证据
+
+新代码及[实施范围/许可/报告](../reports/documentation/20261030/forever/implementation/)在Windows维护，Linux隔离部署于`/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace`。最终44项实际源码/必要政策/测试核对一致，只有既有BGE目录链接，没有正式数据链接。前期打包100份无关政策副本已从新workspace及暂存中移除；原仓库及旧活动冻结文件未动。
+
+CPU各次原始console/receipt/evidence、旧版四文件/permit及实际部署/资源回执保存在[资格目录](../reports/documentation/20261030/forever/implementation/qualification/)，通过SCP回传并核对传输包两端实际大小/SHA。资格只用手写输入，临时小模型/Memory在测试结束即由临时目录释放；没有GPU载荷或正式数据/标签/模型回传。用户另行明确批准400960字节新完整实施包后，已于13:05在原FOREVER会话单次提交；唯一授权/提交/完整请求/页面观察见implementation/review，原方案包许可未被泛化。在审新ZIP仍保留，已核对的CPU传输ZIP和打包暂存已清理，原始资格证据及实际旧来源保留。
+
+本轮只同步新FOREVER隔离来源/证据，不更新或覆盖服务器已有活动实验的文档和冻结文件；根交接/设计/讨论/存储文档只Windows更新。本地Git交付排除用户已有汇报稿修改、历史表删除和其他未跟踪材料，不自动扩大先前具体批次push许可。临时传输副本在核对后清理，不重置15天大清理周期。
+
 ## 2026-10-30 FOREVER静态方案外审材料
 
 [本轮方案、预算与审查目录](../reports/documentation/20261030/forever/)仅保存在Windows。三份官方源码是固定提交bbeb549a21e59d9490f20a2b02099ee766a67f48的静态阅读原件，没有执行；方案包159582字节、26成员，身份及25载荷大小/SHA核对见[清单](../reports/documentation/20261030/forever/review/input_manifest.json)和[包记录](../reports/documentation/20261030/forever/review/package.json)。用户明确批准该完整包后上传到本轮chatgpt.com专用会话，提交/授权/完整请求及页面观察保留。没有正式文本/标签载荷、模型、Memory或凭据进入包中。

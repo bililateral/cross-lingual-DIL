@@ -1,0 +1,18 @@
+请对FOREVER新增最小实现作定向静态外审，重点避免过度设计、伪实现；回复中文完整报告和必要小附件。
+
+背景：中文合成商品账号关联的三域抗遗忘主线。H_pos_tuned已有Optuna开发，五方法45条已完成，H−S旧O/F共同门false保持。本轮FOREVER正式计划为固定9路径、复用H27、零HPO、新120群/4320前向/拟116h，新增全P锚点明确不是等全部历史状态比较。方案已在同一会话外审，完整原文与独立处置在包内；原proposal及revision共同定义，修订后末尾新beta、Supply阶段事务、45/48资格及≤36次full提交等不能回到旧歧义。
+
+用户本次明确只批准最小实现与CPU/GPU资格，禁止正式训练；随后明确FOREVER GPU排在VendorLink GPU资格后。CPU600累计秒/单线程/4GiB/64MiB，GPU3600累计worker秒/48实际optimizer调用，只手写输入与既有BGE；正式数据、评价标签、9条开训、生成/确认预算均未开放。GPU尚未执行，先后门实际返回等待VendorLink，不能认定原生已通过。GPU还等本新增实现外审/主审、前序成功结束退出、资源满足。请勿要求为审查运行正式数据或补效果pilot。
+
+已实施仅scripts/step28_forever.py、step28_forever_run.py、step28_forever_qualification.py及tests/test_step28_forever.py；未改旧活动来源。run.py提供真实阶段入口、校准/端点和恢复，正式CLI关闭；完整九路径派发和两系统确认统计尚不在本次实施范围，不能把缺少正式控制器当作已授权资格必须新增的任务。现有自然目标/Algorithm R/载模/模型状态函数复用，包内source/为44项直接导入闭包和必要政策/测试。请优先审新4文件及直接调用，勿重新要求全仓回归或扩研究。
+
+CPU全部在Linux既有py310实跑，cpu01/02/03/04完整console/receipt、结构化evidence及来源身份在包内：总19/600秒，无失败；必要实测见implementation/report.zh.txt。没有Windows科研执行。旧版来源在CPU证据中保存；最终与cpu04来源同字节。cpu04补全参数分块归约和跨1048576元素边界的真实梯度参考。请核对而不以PASS、哈希或测试数量替代行为判断。CPU阶段边界夹具不是288实际步，GPU夹具1准备步不伪造Adam；原生实际numel/显存/I/O/三槽吞吐仍未知。
+
+重点：
+1. 实际自然R0/reference=None目标与全P真实位移；时钟24步、跨阈值、末步事件、回放不推进、最新end beta；一个Adam和两类LR，解析正则是否真实接入所有应训练参数。
+2. Memory只保留完整存活群，独立RNG、阶段retain一次/第三阶段不retain；样本与小状态≤1MiB，额外anchor显式计费。静态可能存在的BGE闲置参数/覆盖缺口应具体说明，不擅改P或算法。
+3. 新latest原子发布、阶段cal/endpoint/retain/anchor/Supply状态的一致性，当前域恢复不回读旧淘汰群，物理费用/调用不回滚；只完整安全点进程恢复，不要求通用灾备。
+4. GPU资格主39＋辅3＋3=45次、全48封顶、3600累计worker秒，辅槽延迟到主23步后启动、实际计算重叠与保存恢复驻留收费。先VendorLink完整成功/进程退出，再新外审及资源；不要换成全卡无CUDA。
+5. 仅在定义或执行真实缺口时要求最小修复；若只是正式批次调度/评价后续必须补齐的部分，明确列未来前提而不扩本次授权。不得要求新增HPO、对照臂、种子、全阶段GPU试跑、每步checkpoint或共享基础设施。
+
+请在网页及报告开头报告输入ZIP的实际字节/SHA256、成员数及清单一致性；说明实际阅读范围、发现的具体代码行和能支持结论的证据。区分SCIENTIFIC_BLOCKER、REPRODUCIBILITY_DEFECT、OPTIONAL和OUT_OF_SCOPE_OVERDESIGN；不给尚未执行GPU或正式开训背书。返回完整报告与小型audit_notes.json即可，不复制输入包或制造大附件。
