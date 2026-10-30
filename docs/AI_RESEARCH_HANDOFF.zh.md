@@ -2,24 +2,58 @@
 
 ## 当前工作
 
-以下状态分别采用各项注明的观测时点；文档维护不代表服务器新观测。服务器已知约比客户端快5分钟，未调整时钟。合同见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)，后续动作见[计划](RESEARCH_PLAN.md)。
+本表是本页唯一当前状态入口：四条正在推进／准备的研究线，以及两项直接衔接的已结案工作，每线一项。服务器及外审状态分别采用各行注明的观测时点。整理文档不代表新的服务器观测，旧PID仍须按科研纪律第7节核实。时间均为UTC+8；服务器已知约比客户端快5分钟，未调整时钟。合同总入口见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)，通用后续安排见[计划](RESEARCH_PLAN.md)。
 
-| 工作 | 最新有效状态与证据 | 下一步与边界 |
-|---|---|---|
-| L²R／ER+GCR新对照 | 服务器10月30日20:14:31观测、20:15:01复核：**14/18完整成功复用、3活跃、1待派发**；恢复控制器2787646正常，无新failure或预算超限。[现场原件](../reports/documentation/20261030/comparison_resume/progress_20261030_201431.json)。 | 原822累计小时、最多三路；最后CAB_s6 GCR等空槽。失败退休单槽、健康槽继续补位，无自动重试；全18条/108状态完整后才生成、确认和分析。诊断尚未到首阶段校准，不能称旧故障已解决。[工期依据](../reports/documentation/20261030/comparison_resume/eta_20261030_201431.json)：连续三路且无新失败/等待时训练余35.73h；含确认/分析余38.23—39.73h，预计服务器11月1日10:28—11:58，自本次恢复共43.2—44.7h，外审另计。慢20%情景为1日17:37—19:07，非保证；822h是硬预算。 |
-| S_default＋历史H（G_half） | 服务器10月30日20:14—20:15复核：唯一监听2814827正常WAITING，训练0、无failure；控制累计1318.96/7200秒，CPU68/120秒。[当前等待证据](../reports/documentation/20261030/comparison_resume/eta_20261030_201431.json)。 | 已批18条/54端点、110累计小时、单条6h、最多三路；只训练及旧dev盲分数。等本恢复批训练、108状态完整性、生成、确认、分析全部成功且相关进程退出，再查资源。自身worker失败只退休该槽；前序失败仍使监听退出，补跑后须重新绑定唯一监听。前序结束及资源满足时点未定，不报完成日期。 |
-| VendorLink四臂与三市场 | 36条/40轮/单路296h范围已接受，CPU110/600秒。V-R01已修复并主审闭合；用户要求修后再次外审，10月30日20:21—20:23已单次提交原GPT-6／Pro会话，正在复审、尚无新结论，见[本轮回执](../reports/documentation/20261030/forever/formal/review/recheck/submission.json)。服务器20:15:21[最后实查](../reports/documentation/20261030/forever/formal/review/repair/hold_observation.json)：63来源匹配，gate关闭、训练0、无本批进程/自动等待/启动脚本。 | 回收复审并独立处置；等用户新的开始训练指令，复审通过或显存空闲均不自动启动。仅固定数据描述比较，无整体区间或统计验收，不重跑G1/G2。连续运行仅更新投影约154.75h另加保存/评分，296h为硬总限；开始未定，不报完成日期。 |
-| FOREVER与H比较 | 新9条/复用H27/单路116h及新120群已接受；CPU133/600秒、原资格GPU1274/3600秒，失败账保留。F-R01已修复并主审闭合；同轮[修后复审](../reports/documentation/20261030/forever/formal/review/recheck/submission.json)已提交、尚无新结论。服务器20:15:21最后实查：63来源匹配，gate关闭、训练/新确认0、无本批进程或自动等待。 | 回收复审并独立处置；等用户新的开始训练指令。启动前核对H27身份、部署及资源，不重复资格；原确认判据不变。连续运行估计58—87h，116h为硬总限；开始未定，不报完成日期。 |
-| 原五方法45条 | 已完成并结案，10月26日02:08:11收尾，剩余工作0。[结果主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)保留H−S最终旧域MAP正向及原O/F共同主门false。 | 不重训翻转判据，不把排序收益写成额外抗遗忘已确认；H/S54端点留作后续基线，已删三臂81份权重不可由SHA恢复。 |
-| S/S_pos/H_pos有限Optuna | 已结束搜索、复验及分析，剩余工作0；[结果报告](../reports/seller_alias_continual/20261023/optuna_result/report.zh.md)保留旧六格门失败及既有选择依据。 | 不追加搜索、重训或改变原验收；后续比较按各自合同执行。 |
+| 研究线与目标 | 有效范围与实际入口 | 最新已核实状态与证据 | 下一步与边界 |
+|---|---|---|---|
+| **L²R／ER+GCR新对照**：补持续学习方法比较并诊断CAB_s6校准中断 | [恢复补充](../reports/documentation/20261030/comparison_resume/scope.zh.txt)已替代“暂不重放”及阶段一即停提议：复用14成功，原seed重跑三条CAB L²R，继续末条GCR；原822累计小时、最多三路，单条L²R72h／GCR12h。实际使用comparison_resume独立workspace，见[正式门](../reports/documentation/20261030/comparison_resume/formal_gate.json)和[启动身份／路径](../reports/documentation/20261030/comparison_resume/launch.json)。 | 服务器10月30日20:14:31观测、20:15:01复核：**14/18完整、3活跃、1待派发**，控制器2787646及三worker身份相符，无新failure或超限。CAB_s6/s4第一阶段C各144/288，s5为96/288；尚无本次阶段末校准结论，旧数值根因仍未确定。[现场原件](../reports/documentation/20261030/comparison_resume/progress_20261030_201431.json)。 | 沿现有队列观察诊断并补末条GCR；校准通过后继续完整三阶段，失败退休单槽、健康槽继续补位，无自动重试。若CAB_s6再失败，先查因修复，再按有效补跑范围处理；缺项仍阻断全18条／108状态及后续生成、确认、分析。[同次工期](../reports/documentation/20261030/comparison_resume/eta_20261030_201431.json)：连续三路且无新失败／等待时，自20:14起训练余35.73h，含确认／分析余38.23—39.73h，预计服务器11月1日10:28—11:58，自恢复共43.2—44.7h；慢20%情景为1日17:37—19:07，外审另计，均非保证。 |
+| **S_default＋历史H（G_half）**：补默认配置参照 | [失败隔离补充](../reports/documentation/20261030/defaults_repair/scope.zh.txt)已替代旧H/S整批连停策略；18条／54端点、110累计小时、单条6h、最多三路及只训练／旧dev盲分数范围保持。实际使用defaults_repair独立workspace，见[正式门](../reports/documentation/20261030/defaults_repair/formal_gate.json)和[监听启动身份／路径](../reports/documentation/20261030/defaults_repair/launch.json)，不再用旧waiting或comparison_resume/defaults入口。 | 服务器10月30日20:14—20:15复核：唯一监听2814827正常WAITING，训练0、无failure；控制累计1318.96/7200秒，CPU68/120秒。[等待证据](../reports/documentation/20261030/comparison_resume/eta_20261030_201431.json)。 | 保持唯一监听：前序comparison_resume训练、108状态完整性、生成、确认和分析全部成功且相关进程退出后，再检查资源。自身worker失败退休该槽、健康槽继续补位；前序失败仍使监听退出，补跑后须重绑定唯一监听，不放宽成功门。前序结束及资源满足时点未定，不报完成日期。 |
+| **VendorLink四臂与三市场**：真实商品文本上的观察账号视图比较 | [已接受范围](../reports/documentation/20261030/vendorlink/formal/authorization.json)与[正式方案](../reports/documentation/20261030/vendorlink/formal/plan.zh.txt)：36条、每市场40轮、单路296h，仅固定数据描述比较，无整体区间／统计验收。实际入口及部署来源见[实现说明](../reports/documentation/20261030/vendorlink/formal/implementation.zh.txt)、[正式门](../reports/documentation/20261030/vendorlink/formal/gate.json)。用户[后续暂停与再次复审决定](RESEARCH_DISCUSSION.zh.md#2026-10-30-补齐vendorlink与forever正式训练)保留方案，但要求等新开始指令。 | 第二轮[完整报告](../reports/documentation/20261030/forever/formal/review/recheck/report.zh.txt)关闭原V-R01，新增V-R02（数字字符串检查与实际消费不一致）。已一行修复、Linux cpu09定向通过，[主审](../reports/documentation/20261030/forever/formal/review/recheck/primary_disposition.zh.txt)逐项处置；CPU累计118/600秒。客户端10月30日20:49已提交[V-R02再次复审](../reports/documentation/20261030/forever/formal/review/closure/submission.json)，尚无本次复审结论。服务器20:53:45[核对](../reports/documentation/20261030/forever/formal/review/recheck/deployment.json)：63来源一致、CPU已退出、gate关闭、训练目录不存在、无本批训练或自动等待。 | 回收本次定向复审并独立处置；等用户新的开始训练指令。复审通过或显存空闲均不自动开训／建等待队列，不重跑G1/G2。固定数据描述范围及原判据不变。连续运行仅更新投影约154.75h另加保存／评分，296h是硬总限；开始未定，不报完成日期。 |
+| **FOREVER与H比较**：补近期持续学习方法对照 | [已接受范围](../reports/documentation/20261030/forever/formal/authorization.json)与[正式方案](../reports/documentation/20261030/forever/formal/plan.zh.txt)：新9条／复用H27、单路116h、全参数锚点及新120群／4320前向。实际入口及来源见[实现说明](../reports/documentation/20261030/forever/formal/implementation.zh.txt)、[正式门](../reports/documentation/20261030/forever/formal/gate.json)。同一[后续决定](RESEARCH_DISCUSSION.zh.md#2026-10-30-补齐vendorlink与forever正式训练)要求再次复审及等待新开始指令。 | 第二轮[完整报告](../reports/documentation/20261030/forever/formal/review/recheck/report.zh.txt)关闭F-R01，未发现FOREVER新增必修；[主审](../reports/documentation/20261030/forever/formal/review/recheck/primary_disposition.zh.txt)已核对并维持关闭，本轮未新增FOREVER测试。CPU133/600秒、原资格GPU1274/3600秒及失败账保留。服务器20:53:45[部署核对](../reports/documentation/20261030/forever/formal/review/recheck/deployment.json)：63来源一致，gate关闭、训练／新确认0、无本批进程或自动等待。 | 等用户新的开始训练指令；启动前核对H27身份、部署及资源，不重复资格。VendorLink局部新问题不重开本项已关闭结论；原独立确认判据保持，两项新队列不同时启用。连续运行估计58—87h，116h是硬总限；开始未定，不报完成日期。 |
+| **原五方法45条**：已结案，提供结论与后续基线 | 固定五系统、三循环、s4—s6与新120群的已完成范围，见[结果报告](../reports/seller_alias_continual/20261026/continual_result/report.zh.txt)和[结果主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)。后续范围由各自合同另定。 | 10月26日02:08:11训练／确认／分析收尾，结果外审与主审已结案，剩余工作0。H−S最终旧域MAP有正向证据，原O/F共同主门false保持。 | 保留结果与后续所需H/S54端点；已删三臂81份权重不可由SHA恢复。不重训翻转判据，不把最终排序收益写成额外抗遗忘已确认。 |
+| **S/S_pos/H_pos有限Optuna**：已结案，保留选参依据 | [有限搜索合同](SELLER_ALIAS_OPTUNA.zh.md)及其明确补充下的36搜索＋9复验已完成；范围与后续选参使用见[结果报告](../reports/seller_alias_continual/20261023/optuna_result/report.zh.md)。 | 10月23日09:58:42训练／分析控制器退出；后续[结果外审与主审](../reports/seller_alias_continual/20261023/optuna_result/review/primary_disposition.zh.txt)已结案，剩余工作0。两候选旧六格门失败及既有选择依据保留。 | 不追加搜索、重训或改变原验收；后续比较按各自合同执行，不把开发集上的选择证据当作独立最终确认。 |
 
 ## 近期执行与审查历史
 
+### 2026-10-30 20:42：第二轮复审回收后、V-R02修复前的状态
+
+以下两项已由当前表中的修复、cpu09和再次复审提交替代；保留当时记录及原始证据。
+
+| 研究线与目标 | 当时范围与实际入口 | 当时已核实状态与证据 | 当时下一步与边界 |
+|---|---|---|---|
+| **VendorLink四臂与三市场**：真实商品文本上的观察账号视图比较 | [已接受范围](../reports/documentation/20261030/vendorlink/formal/authorization.json)与[正式方案](../reports/documentation/20261030/vendorlink/formal/plan.zh.txt)：36条、每市场40轮、单路296h，仅固定数据描述比较，无整体区间／统计验收。实际入口及部署来源见[实现说明](../reports/documentation/20261030/vendorlink/formal/implementation.zh.txt)、[正式门](../reports/documentation/20261030/vendorlink/formal/gate.json)。用户[后续暂停与再次复审决定](RESEARCH_DISCUSSION.zh.md#2026-10-30-补齐vendorlink与forever正式训练)保留方案，但要求等新开始指令。 | 最近服务器实查为20:15:21：[63来源匹配、gate关闭、训练0、无本批进程／自动等待](../reports/documentation/20261030/forever/formal/review/repair/hold_observation.json)，当时CPU110/600秒。20:42本地核对已见[修后复审原文](../reports/documentation/20261030/forever/formal/review/recheck/report.zh.txt)：外审确认V-R01关闭，新增V-R02（分数转换副本与实际消费者不一致），尚待修复核验和本轮主审闭合；不再沿用提交时“尚无新结论”。 | 独立处置V-R02并形成对应核验证据，完成本轮复审收尾；等用户新的开始训练指令。复审通过或显存空闲均不自动开训／建等待队列，不重跑G1/G2。连续运行仅更新投影约154.75h另加保存／评分，296h是硬总限；开始未定，不报完成日期。 |
+| **FOREVER与H比较**：补近期持续学习方法对照 | [已接受范围](../reports/documentation/20261030/forever/formal/authorization.json)与[正式方案](../reports/documentation/20261030/forever/formal/plan.zh.txt)：新9条／复用H27、单路116h、全参数锚点及新120群／4320前向。实际入口及来源见[实现说明](../reports/documentation/20261030/forever/formal/implementation.zh.txt)、[正式门](../reports/documentation/20261030/forever/formal/gate.json)。同一[后续决定](RESEARCH_DISCUSSION.zh.md#2026-10-30-补齐vendorlink与forever正式训练)要求再次复审及等待新开始指令。 | 最近服务器实查为20:15:21：[63来源匹配、gate关闭、训练／新确认0、无本批进程或自动等待](../reports/documentation/20261030/forever/formal/review/repair/hold_observation.json)；CPU133/600秒、原资格GPU1274/3600秒，失败账保留。20:42本地核对[修后复审原文](../reports/documentation/20261030/forever/formal/review/recheck/report.zh.txt)：外审确认F-R01关闭，未列FOREVER新增必修；本轮主审／收尾仍待落实，不把外审判断写成正式运行通过。 | 完成本轮独立处置及收尾，等用户新的开始训练指令；启动前核对H27身份、部署及资源，不重复资格。原独立确认判据不受VendorLink描述范围影响，两项新队列不同时启用。连续运行估计58—87h，116h是硬总限；开始未定，不报完成日期。 |
+
+以下均为历史记录，按各自日期、对象和形成时点解释；其中“当前／待授权／正在生成”不作为现行状态。原始运行、失败和审查证据保留，执行与交接只取顶部对应行。
+
+### 2026-10-30 20:21—20:25：修后复审提交时的状态
+
+以下两行由当前区移入；20:42文档核对已见本地复审原文，故“尚无新结论”不再用于当前交接。提交回执仍保留其原始观察，不能据本段推定复审闭合或开训许可。
+
+| 工作 | 当时状态与证据 | 当时下一步与边界 |
+|---|---|---|
+| VendorLink四臂与三市场 | 36条/40轮/单路296h范围已接受，CPU110/600秒。V-R01已修复并主审闭合；用户要求修后再次外审，10月30日20:21—20:23已单次提交原GPT-6／Pro会话，正在复审、尚无新结论，见[本轮回执](../reports/documentation/20261030/forever/formal/review/recheck/submission.json)。服务器20:15:21[最后实查](../reports/documentation/20261030/forever/formal/review/repair/hold_observation.json)：63来源匹配，gate关闭、训练0、无本批进程/自动等待/启动脚本。 | 回收复审并独立处置；等用户新的开始训练指令，复审通过或显存空闲均不自动启动。仅固定数据描述比较，无整体区间或统计验收，不重跑G1/G2。连续运行仅更新投影约154.75h另加保存/评分，296h为硬总限；开始未定，不报完成日期。 |
+| FOREVER与H比较 | 新9条/复用H27/单路116h及新120群已接受；CPU133/600秒、原资格GPU1274/3600秒，失败账保留。F-R01已修复并主审闭合；同轮[修后复审](../reports/documentation/20261030/forever/formal/review/recheck/submission.json)已提交、尚无新结论。服务器20:15:21最后实查：63来源匹配，gate关闭、训练/新确认0、无本批进程或自动等待。 | 回收复审并独立处置；等用户新的开始训练指令。启动前核对H27身份、部署及资源，不重复资格；原确认判据不变。连续运行估计58—87h，116h为硬总限；开始未定，不报完成日期。 |
+
+### 整理前的研究背景与旧入口说明
+
+以下原段未统一标注观测时点，现按旧叙述保留；其中VendorLink准备状态、运行目录与入口已由顶部合同／回执取代，不恢复为当前限制。
+
+目标为具有实质方法贡献的CCF B／C期刊或会议投稿；刊会与期限未指定，不阻塞已批准工作。历史训练数据可用量有限，新卖家群体按分布分批到达，研究旧分布未见卖家的候选排序／基础识别保持和新群体学习。中文合成受控主线输入只含屏蔽标题／描述，无身份特征；新增VendorLink是用户明确选择的真实商品文本场景扩展，当前仅实现/资格及外审完成，正式数据尚未准备。两者不混用标签含义或确认结论；不转向一般作者识别或AI文本检测。
+
+中文合成合同每群28账号、每查询27候选且有同控候选，不能直接外推全市场、无正候选查询或真实中文市场。Optuna三臂开发及五方法45轨迹确认均已结束；正在执行的是L²R／ER+GCR补充，原版S/H另有已批准等待。VendorLink按观察账号的两组互斥商品视图构造代理关系，不能等同真实跨账号同控；候选规模与正式数据参数尚待落实。基础排序提升、已知方法适配、调λ或常规模块叠加均不自动构成创新。用户允许修改算法核心，但具体新方案仍须按相应范围确认和外审，见顶部。
+
+| 历史导航项 | 当时入口与边界 |
+|---|---|
+| 当前计算、真实更新及资格 | 由[设计入口](CURRENT_EXPERIMENT_DESIGN.md)按实验选择合同和实际代码。L²R/GCR用10月26日comparison独立workspace，原版S/H用defaults等待门，VendorLink用step29四臂及其限定资格；不得把已结束五方法的61来源入口当全部项目的活动入口。历史五方法/Optuna的来源和恢复账仍按各自合同追溯，不作为新启动许可。 |
+
+### 2026-10-30 20:14—20:15：复审提交前快照
+
 2026-10-30修后复审提交前的当前区快照（原服务器观测20:14—20:15；现由上表替代）：以下内容按当时状态保留，其中“修后未再次网页外审”已被本轮复审提交取代，不作当前执行依据。
 
-本节统一记录最新已核实状态，不将维护文档的时间冒充新观测。L²R/GCR及H/S按服务器2026-10-30 20:14:31观测、20:15:01复核；VendorLink/FOREVER按20:15:21暂停核对，均为Asia/Shanghai。服务器已知约比客户端快5分钟，未调整时钟。合同见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)，后续动作见[计划](RESEARCH_PLAN.md)。
+以下为复审提交前的历史快照：L²R/GCR及H/S按服务器2026-10-30 20:14:31观测、20:15:01复核；VendorLink/FOREVER按20:15:21暂停核对，均为Asia/Shanghai。旧“最新／当前／下一步”仅指该时点，执行须回到顶部有效状态。
 
-| 工作 | 最新有效状态与证据 | 下一步与边界 |
+| 工作 | 当时状态与证据 | 当时下一步与边界 |
 |---|---|---|
 | L²R／ER+GCR新对照 | **14/18完整成功复用、3活跃、1待派发**；恢复控制器2787646正常，无新failure或预算超限。[现场原件](../reports/documentation/20261030/comparison_resume/progress_20261030_201431.json)。 | 原822累计小时、最多三路；最后CAB_s6 GCR等空槽。失败退休单槽、健康槽继续补位，无自动重试；全18条/108状态完整后才生成、确认和分析。诊断尚未到首阶段校准，不能称旧故障已解决。 |
 | S_default＋历史H（G_half） | 唯一监听2814827正常WAITING，训练0、无failure；控制累计1318.96/7200秒，CPU68/120秒。[当前等待证据](../reports/documentation/20261030/comparison_resume/eta_20261030_201431.json)。 | 已批18条/54端点、110累计小时、单条6h、最多三路；只训练及旧dev盲分数。等本恢复批训练、108状态完整性、生成、确认、分析全部成功且相关进程退出，再查资源。自身worker失败只退休该槽；前序失败仍使监听退出，补跑后须重新绑定唯一监听。 |
@@ -29,7 +63,7 @@
 
 本次恢复的三条活动轨迹均为L²R从固定起点重跑，并非原Adam步续训；旧失败进度不叠加到本次有效进度。每条总864更新，每阶段288更新，日志每24步报告：
 
-| 当前轨迹 | worker PID | 第一阶段C最新日志 | 本次累计更新 |
+| 当时轨迹 | worker PID | 20:14第一阶段C日志 | 当次累计更新 |
 |---|---:|---:|---:|
 | CAB_s6_L2R_text_fixed（诊断路） | 2789106 | 144/288 | 144/864 |
 | CAB_s4_L2R_text_fixed | 2789115 | 144/288 | 144/864 |
@@ -163,7 +197,7 @@ VendorLink实现与外审（2026-10-29 13:33，本机Asia/Shanghai）：首轮�
 
 项目大清理（2026-10-22完成）：用户将原定次日清理提前，已按确认范围删除Windows 77个／Linux 15个历史重复归档，共197.27MiB；Optuna全部实验文件及相关临时材料当时排除；用户当时所说“明天”指10月23日，日期到达不自动授权清理；10月23日后续明确授权仅删除Optuna训练权重，已执行，其他Optuna材料继续保留。最终保留原件已核对，恢复映射、实际数量及新周期统一见[存储记录](STORAGE.zh.md#2026-10-22-两端项目大清理提前完成)，[用户决定](RESEARCH_DISCUSSION.zh.md#2026-10-22-提前执行两端大清理并保留optuna)。三份可变总文档同步Linux项目根docs，冻结workspace不动；本次仅文件保管维护，没有重新验收Optuna进度或开放结果。删除及文档作本地Git提交，原有进度文档修改保留，不扩大推送许可。
 
-| 项目 | 当前范围、证据与接手动作 |
+| 项目 | 历史范围、证据与当时动作 |
 |---|---|
 | 当前Optuna完整结果（2026-10-23） | **S/S_pos/H_pos各12/12搜索、各3/3复验，45轨迹全部完成；两候选六格开发方向门均未通过。** 09:58:42正常退出，无新增训练失败，原控制器／训练／监听均退出。当前workspace仍为`/home/yongpeng/cross-lingual/reports/documentation/20261021/optuna_reboot/workspace`，当前54来源及门一致；各run原51/53/54来源快照共2399项逐项一致。成功轨迹25920更新/38880呈现/90端点/540捕获；train46/valid37/heldout0/owners0，含旧中断train1；九复验valid0盲完成退出后统一valid一次。三新seed B末raw MAP均值：S旧A0.492919/新B0.501011；S_pos0.498511/0.500538；H_pos0.517302/0.501338。H_pos−S旧A+0.024383 CI[0.011594,0.037059]，新B+0.000327 CI[-0.011354,0.011628]；5/6格正，s1新B下降。S_pos4/6格正，两域总差区间跨零。H_pos较少遗忘仅点估计，区间跨零；raw概率误差更差，完整排序/校准/诊断见报告。总收费325695.192351秒=90.470887小时/272小时（按外审主审附注更正原末位文字），含原失败、中断、CPU188、原生876及本轮分析1秒；C98.762683/E58.382356/A12.173054均在限内。最大候选累计10939.655008/21600秒，剩余运行时间0。7639正式小证据+10分析文件完整回传；既有36090字段及新增179478标量核对通过，新增最大差4.44e-16，无新标签/载模。完成时保留的18权重23478977354字节已按后续明确要求留证删除，旧中断另1权重同时删除；90Memory载荷30883495字节继续留Linux，不加载。只有A→B和重复开发集，未做三域多顺序／新80群最终确认；不加trial/换seed/重启。成果见[独立主审报告](../reports/seller_alias_continual/20261023/optuna_result/report.zh.md)、[完整指标](../reports/seller_alias_continual/20261023/optuna_result/tables.zh.md)。7679成员／103538522字节具体结果包已获准并单次提交，55文件外审已完整回收、独立处置结案且专用页关闭，见[提交／关闭回执](../reports/seller_alias_continual/20261023/optuna_result/review/submission.json)；两次恢复免审不泛化。 |
 | Optuna恢复依据与历史费用 | 用户明确9GiB空闲/允许其他CUDA、从中断处继续，并确认“是，此次免审，按既定条件继续”；见[免审决定](../reports/documentation/20261019/optuna_recovery/review/waiver.json)、[具体补充](../reports/documentation/20261019/optuna_recovery/scope.zh.txt)及[最终独立主审](../reports/documentation/20261019/optuna_recovery/qualification/resume/primary.zh.txt)。2026-10-19 18:58:18恢复、18:58:38确认真实新更新。原三个完成结果直接复用，原S_pos trial1参数不重抽；不是从头重训。当前[正式门](../reports/documentation/20261019/optuna_recovery/qualification/resume/formal_gate.json)绑定53来源、原517文件及零派发失败；CPU累计158/300秒，原18调用/外层876秒复用，无新原生。18:52首次恢复因Windows/Linux来源列表顺序不同在gate停止，0派发/数据/更新、C1.766382秒保留；原资源失败1.834630秒、原search20381.732162/C9.232568及资格费用一并继承，恢复前累计21426.731112/979200秒，不清零。9GiB是每次准入条件，不要求无其他CUDA；资源不足在派发前等待，严格载模前exit75仅延后同候选，其他训练失败停止。恢复时[15文件回传](../reports/documentation/20261019/optuna_recovery/resume_execution/receive_manifest.json)及原workspace/原门保持。此次未送GPT，不冒称外审通过；未来结果外审未豁免。 |
@@ -190,9 +224,9 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 
 以下为H_cons冻结结果及保管历史；其独立[state](../reports/documentation/20261016/h_consistency_implementation/qualification/state.json)不再作为新双臂实现入口。
 
-| 项目 | 当前范围、证据与接手动作 |
+| 项目 | 历史范围、证据与当时动作 |
 |---|---|
-| 当前作业状态 | H_cons，s0、A→B；2026-10-16 15:30:59—17:11:42（Asia/Shanghai），外层exit_code=0。**正式运行、完整回传、Linux独立分析及结果外审/独立主审均已完成；本固定配置有效未达主目标结案**。576次更新／864梯度群呈现、2端点／12诊断齐全；19:11:01复核无相关活动进程/failure，完成/访问/44来源与资格原件一致，见[审查收尾](../reports/seller_alias_continual/20261016/h_consistency_result/review/closeout.json)。不重启或增加候选。 |
+| 完成状态 | H_cons，s0、A→B；2026-10-16 15:30:59—17:11:42（Asia/Shanghai），外层exit_code=0。**正式运行、完整回传、Linux独立分析及结果外审/独立主审均已完成；本固定配置有效未达主目标结案**。576次更新／864梯度群呈现、2端点／12诊断齐全；19:11:01复核无相关活动进程/failure，完成/访问/44来源与资格原件一致，见[审查收尾](../reports/seller_alias_continual/20261016/h_consistency_result/review/closeout.json)。不重启或增加候选。 |
 | 执行依据与冻结范围 | [H_cons原合同](SELLER_ALIAS_H_CONSISTENCY.zh.md)、[原生资格补充](SELLER_ALIAS_H_CONSISTENCY_NATIVE_AMENDMENT.zh.md)、[完整批准](../reports/documentation/20261016/h_consistency_implementation/authorization.json)、[补充批准](../reports/documentation/20261016/h_consistency_implementation/qualification/objective_requalification_authorization.json)及用户最新“既然GPU原生验证通过就开始正式训练”。[正式门](../reports/documentation/20261016/h_consistency_implementation/qualification/formal_gate.json)及其44来源现场逐项一致；[启动回执](../reports/documentation/20261016/h_consistency_implementation/qualification/formal_start.json)冻结。固定576更新/864梯度群呈现、2端点/12诊断，不重训S/H、不读旧Memory；52份保存对照启动前已核验。 |
 | 资格、历史失败与精度 | CPU累计51/180秒；GPU累计418/600秒、旧3+新6=9/9次更新。attempt01载模前缺链接失败0更新/3秒，attempt02在FP32总值相等处失败3更新/87秒，原件及[失败分析](../reports/documentation/20261016/h_consistency_implementation/qualification/recovery_outcome.zh.txt)不追改。获准attempt03于15:17:41—15:23:09完成6调用、外层计328秒；五同K原精度、真实encoder/head梯度/参数/Adam、两恢复及下一更新逐位一致均通过，见[独立验收](../reports/documentation/20261016/h_consistency_implementation/qualification/objective_outcome.zh.txt)。仅取消舍入总值严格不等硬门，实际相等保留、FP32分项/加法精确重建；H/JS、原梯度精度与训练目标不变。无attempt04许可，剩余秒数不授权再试。 |
 | 外审边界 | 合并外审未变科学部分及R01已由[原主审](../reports/documentation/20261016/h_consistency_implementation/review/primary_disposition.zh.txt)关闭；总目标条件的定向外审由用户明确免除，未上传包已删，该修订由[增量主审](../reports/documentation/20261016/h_consistency_implementation/review/objective_primary.zh.txt)及原生独立验收负责，不冒称经过新网页外审。未来具体结果包仍须自己的外发许可。资格通过不等于性能或论文创新成立。 |
@@ -237,9 +271,9 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 
 ## 研究问题与目标
 
-目标为具有实质方法贡献的CCF B／C期刊或会议投稿；刊会与期限未指定，不阻塞已批准工作。历史训练数据可用量有限，新卖家群体按分布分批到达，研究旧分布未见卖家的候选排序／基础识别保持和新群体学习。中文合成受控主线输入只含屏蔽标题／描述，无身份特征；新增VendorLink是用户明确选择的真实商品文本场景扩展，当前仅实现/资格及外审完成，正式数据尚未准备。两者不混用标签含义或确认结论；不转向一般作者识别或AI文本检测。
+目标为具有实质方法贡献的CCF B／C期刊或会议投稿；刊会与期限未指定，不阻塞已批准工作。历史训练数据可用量有限，新卖家群体按分布分批到达，研究旧分布未见卖家的候选排序／基础识别保持和新群体学习。中文合成受控主线输入只含屏蔽标题／描述，无身份特征；VendorLink是真实商品文本场景扩展，按观察账号的两组互斥商品视图构造代理关系，不等同真实跨账号同控。两者不混用标签含义或确认结论；不转向一般作者识别或AI文本检测。
 
-中文合成合同每群28账号、每查询27候选且有同控候选，不能直接外推全市场、无正候选查询或真实中文市场。Optuna三臂开发及五方法45轨迹确认均已结束；正在执行的是L²R／ER+GCR补充，原版S/H另有已批准等待。VendorLink按观察账号的两组互斥商品视图构造代理关系，不能等同真实跨账号同控；候选规模与正式数据参数尚待落实。基础排序提升、已知方法适配、调λ或常规模块叠加均不自动构成创新。用户允许修改算法核心，但具体新方案仍须按相应范围确认和外审，见顶部。
+中文合成合同每群28账号、每查询27候选且有同控候选，不能直接外推全市场、无正候选查询或真实中文市场；VendorLink的数据、候选规模和评价范围由其本轮合同规定。各线执行进度、授权与下一步统一见[当前工作](#当前工作)，本节只说明研究问题。基础排序提升、已知方法适配、调λ或常规模块叠加均不自动构成创新。用户允许修改算法核心，具体新方案仍须按相应范围确认和外审。
 
 ## 接手顺序与信息地图
 
@@ -248,7 +282,7 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 | 要掌握的信息 | 入口与使用边界 |
 |---|---|
 | 用户问题、研究前提、后续决定 | [讨论记录](RESEARCH_DISCUSSION.zh.md)、[计划](RESEARCH_PLAN.md)；辨认每项决定的对象、时点和范围。 |
-| 当前计算、真实更新及资格 | 由[设计入口](CURRENT_EXPERIMENT_DESIGN.md)按实验选择合同和实际代码。L²R/GCR用10月26日comparison独立workspace，原版S/H用defaults等待门，VendorLink用step29四臂及其限定资格；不得把已结束五方法的61来源入口当全部项目的活动入口。历史五方法/Optuna的来源和恢复账仍按各自合同追溯，不作为新启动许可。 |
+| 当前计算、真实更新及资格 | 从[当前工作](#当前工作)对应行取得有效范围、正式门和实际入口／启动回执，再由[设计入口](CURRENT_EXPERIMENT_DESIGN.md)补读本轮合同及直接实现。旧workspace、旧等待门及历史资格只用于各自适用证据，不作为当前入口或新启动许可。 |
 | 数据究竟改变什么 | [表达生成结果](SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md)、[首轮数据合同](SELLER_ALIAS_BGE_CONTINUAL.zh.md#2-数据和逐阶段可见范围)；主题混合与表达机制同时变化，不称纯表达因果实验。 |
 | 早期来源与身份资格 | [schema](STEP1_SCHEMA.md)、[隔离](STEP2_SPLIT_AND_LEAKAGE.md)、[画像](STEP3_SELLER_PROFILE.md)、[silver候选](STEP4_SILVER_CANDIDATES.md)、[复核冻结](STEP5_REVIEW_AND_FREEZE.md)；历史来源链不授予真值或当前正式数据读取许可。 |
 | 评价定义与不确定性 | 本轮合同明确继承的[首轮第7节](SELLER_ALIAS_BGE_CONTINUAL.zh.md#7-评价对象和统计)及实际评价函数。区分AP、逐查询MAP、raw与校准，不从简称重写公式。 |
@@ -258,30 +292,44 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 
 ## Linux与活动文件
 
-- 历史数值补核已无活动监听／核验作业（10月9日16:54回查及随后核对）；当前五方法位置与活动身份只看顶部，Optuna已结束。原监听PID3505392已退出，scripts/run_step28_numerics_linux_20261009.sh已在16:39:43实际更新后自删；不重建或重复启动。完整启动／退出账在reports/maintenance/20261009/runtime_numerics_gpu/listener，唯一attempt01已PASS。核验脚本scripts/step28_record_replay_numerics.py、Windows监听源码及source_snapshot.zip作为复现证据保留。该作业是已完成手写原生补核，不是历史正式训练重跑。
 - 服务器：yongpeng@10.201.109.111；项目根：/home/yongpeng/cross-lingual；Python：/home/yongpeng/miniconda3/envs/py310/bin/python。沿用既有SSH认证，密码只作认证输入，不写入项目。同步用SFTP／SCP，Git仅在Windows执行。
-- 已结束的72小时五臂workspace：/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261008/replay_improvement_execution/20261008_151407/workspace，28项来源见[来源清单](../reports/documentation/20261008/record_replay_improvement/budget_72h/sources.json)。原48小时workspace（同一上级下20261008_131300/workspace）和首次原生证据保留；均为历史证据，不作为现行启动入口。
-- 已完成五臂作业：上述72小时workspace下reports/job；资格与启动记录在reports/qualification，历史正式入口scripts/run_step28_replay_improvement_linux_20261008.sh。原单CPU0／GPU0训练PID3407207及wrapper3407201已于10月9日13:38:39正常退出，不重启。完整小结果及分析归档为reports/seller_alias_continual/20261009/replay_improvement_result；原job/run/models的36权重已于14:48:54按许可留证删除，36份Memory继续保留job/run/memory。旧workspace的attempt01亦已结束。
-- 主目录的规则与交接是可维护文件；10月9日已撤下主目录五臂活动入口。独立workspace及结果归档中的冻结源码、合同、来源身份和运行证据不得被同步或代码清理覆盖；该五臂已送审28来源仍保持原字节，Optuna最终执行的54来源另按顶部核对，前期51/53来源快照保持各自身份。
-- 旧运行路径只用于追溯：C/S为reports/seller_alias_continual/20261007/record_replay_execution/20261007_225409/workspace，完整小结果为reports/seller_alias_continual/20261008/record_replay_result；LOGIT0.1为reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/workspace；ER0.1为reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job；LOGIT0.25为reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace。这些作业已结束，旧监听已退出／自删，不重建或重启。
+
+- 各研究线的实际workspace、入口和来源绑定由顶部对应正式门／启动回执定位；本节不另存一份活动状态。旧目录、PID和清理事实见[旧运行入口与权限历史](#整理前的旧运行入口与数据权限说明)，不能据历史路径直接恢复作业。
+- 主目录规则与交接可按任务维护；独立workspace中的冻结源码、合同、来源清单和运行证据保持原件，同步前按[科研纪律第7、9节](RESEARCH_DISCIPLINE.zh.md)核对对象与许可。
 
 ## 数据、保管和未授权范围
 
-以下数据根和固定维度描述中文合成历史/持续学习合同，不是VendorLink真实数据规格：reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data。每域60个train群分48拟合／12校准，另20 valid／40已用基础test群。历史与附属状态采用六群Algorithm R及1MiB上限，具体权限以本轮合同为准；调度器可见全表不等于学习器可见未来域，研究归档不等于可用记忆。VendorLink来源/划分/候选参数按其后续正式合同确定，不能复制此处28账号或中文BGE维度作为新数据事实。
+以下数据根和固定维度描述中文合成历史/持续学习合同，不是VendorLink真实数据规格：reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data。每域60个train群分48拟合／12校准，另20 valid／40已用基础test群。历史与附属状态采用六群Algorithm R及1MiB上限，具体权限以本轮合同为准；调度器可见全表不等于学习器可见未来域，研究归档不等于可用记忆。VendorLink来源/划分/候选参数按其本轮合同确定，不能复制此处28账号或中文BGE维度作为新数据事实。
 
-记录表模型将分别L2归一化的标题／描述表示拼接并除以√2，得到2048维记录表示；记录对头4096→128→1，再按账号汇总。LOGIT账号汇总为4096维、头输入8192维。历史五臂中四个记录表臂的A0/A1监督与teacher系数、LOGIT目标分别见该五臂合同；当前五方法目标及精度只按顶部现行合同与补充，不把跨架构比较当作单一机制归因。
+记录表模型将分别L2归一化的标题／描述表示拼接并除以√2，得到2048维记录表示；记录对头4096→128→1，再按账号汇总。LOGIT账号汇总为4096维、头输入8192维。历史五臂中四个记录表臂的A0/A1监督与teacher系数、LOGIT目标分别见该五臂合同；各方法目标及精度按所属合同与明确补充，不把跨架构比较当作单一机制归因。
 
 命名须结合实验日期与合同：[中文基础](SELLER_ALIAS_CHINESE_RESULT.zh.md)的A／B／C／D、[困难排序](SELLER_ALIAS_RANKING_RESULT.zh.md)的A／B／C与[记录作用表](SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md)的C／S不是同一组算法；A／B／C也可表示三个数据域。记录表S包含A0／A1重组监督和原分配教师保持，不能简写成“无重组”；[三臂](SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md)R0才关闭重组监督，该10月9—11日归因三臂没有训练C。C／S的具体差别是教师保持分配，C_plus与S_strong另按[五臂合同](SELLER_ALIAS_REPLAY_IMPROVEMENT.zh.md)解释。
 
-10月8—9日五臂均使用已选中文BAAI/bge-large-zh-v1.5同一预训练归档（revision 79e7739b6ab944e86d6171e44d24c997fc1e0116）；四个记录表臂网络相同，LOGIT的聚合／头不同，各自训练后参数分化。36份Memory是27个记录表与9个LOGIT物理阶段的历史缓存快照，共11,479,595字节；每条实时路径最多六群／完整状态1MiB，包含允许的训练文本、标签、教师目标及附属状态。归档快照不合并成学习器可用历史，不等于模型权重；具体说明见[关闭记录](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)。
-
-10月9—11日归因实验中，O为最终两个旧域能力，N为后两阶段刚学完的新域能力，Z为最终最新域能力；F_first为首域获得后至最终的损失，G为同一路径的新域学习增益。三个顺序不是三个训练种子；已结束Optuna按A→B合同完成s0搜索及s1/s2/s3复验，逐域比较，不混用三顺序汇总对象。开发valid不是独立确认集，既有120群基础test已使用。本轮五方法的三域120新确认群及s4/s5/s6已获附前提许可，生成／评分／标签开放分别等合同完整门；该范围以外的新留出、追加seed、大候选库和无正候选查询尚无执行许可。Audit A/B真值、Audit B预测、owners与私有身份资产保持既定封存边界。
-
-保管按最新[存储记录](STORAGE.zh.md)及实际依赖核对：BGE预训练、首轮三个共享首域完整状态、排序s0_hard与s0_d两份例外及必要科研证据继续保留。ER0.1六份末端权重已于10月16日10:09按本轮Linux清理要求、核对无现行载模依赖后留证删除，共7,838,864,652字节；273份其余文件SHA不变，含三份Memory。另删57份冗余／成员已保管ZIP，本轮合计63文件约7.49GiB，见[实际回执](../reports/maintenance/20261016/linux_cleanup/receipt.json)。10月9日本轮36权重、此前C/S十五权重、旧LOGIT0.1／risk十二权重、LOGIT0.25六权重及关系／函数记忆相关已清理权重，不按旧清单假定仍存在。SHA不能恢复已删模型，重训仍需相应授权。
+开发valid、已用基础test与各轮独立确认分别解释；生成、评分和标签开放按各自合同及[当前工作](#当前工作)中的有效范围执行。已经使用的数据不因新合同变回未见；Audit A/B真值、Audit B预测、owners与私有身份资产保持既定封存边界。O/N/Z/F_first等评价对象从本轮合同取得，不混用历史三顺序与固定A→B的汇总单位。
 
 最近一次两端项目大清理为10月22日，下一到期日期为11月6日；日期与独立提醒任务统一以[清理周期](STORAGE.zh.md#项目大清理周期)为准。提醒仅提示到期，实际清理仍须先说明理由、范围、空间收益及保留依赖并征得许可。10月23日Optuna权重局部清理不重置周期，普通删除提交不等于改写Git历史。
 
 ## 近期历史进展
+
+### 整理前的旧运行入口与数据权限说明
+
+以下从“Linux与活动文件”“数据、保管和未授权范围”移入。旧PID、已结束作业、历史Memory／删除记录和当时待开放条件仅用于追溯；具体运行及数据权限以顶部有效范围为准。原句中的“当前／顶部”指形成时点。
+
+- 历史数值补核已无活动监听／核验作业（10月9日16:54回查及随后核对）；当前五方法位置与活动身份只看顶部，Optuna已结束。原监听PID3505392已退出，scripts/run_step28_numerics_linux_20261009.sh已在16:39:43实际更新后自删；不重建或重复启动。完整启动／退出账在reports/maintenance/20261009/runtime_numerics_gpu/listener，唯一attempt01已PASS。核验脚本scripts/step28_record_replay_numerics.py、Windows监听源码及source_snapshot.zip作为复现证据保留。该作业是已完成手写原生补核，不是历史正式训练重跑。
+
+- 已结束的72小时五臂workspace：/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261008/replay_improvement_execution/20261008_151407/workspace，28项来源见[来源清单](../reports/documentation/20261008/record_replay_improvement/budget_72h/sources.json)。原48小时workspace（同一上级下20261008_131300/workspace）和首次原生证据保留；均为历史证据，不作为现行启动入口。
+
+- 已完成五臂作业：上述72小时workspace下reports/job；资格与启动记录在reports/qualification，历史正式入口scripts/run_step28_replay_improvement_linux_20261008.sh。原单CPU0／GPU0训练PID3407207及wrapper3407201已于10月9日13:38:39正常退出，不重启。完整小结果及分析归档为reports/seller_alias_continual/20261009/replay_improvement_result；原job/run/models的36权重已于14:48:54按许可留证删除，36份Memory继续保留job/run/memory。旧workspace的attempt01亦已结束。
+
+- 主目录的规则与交接是可维护文件；10月9日已撤下主目录五臂活动入口。独立workspace及结果归档中的冻结源码、合同、来源身份和运行证据不得被同步或代码清理覆盖；该五臂已送审28来源仍保持原字节，Optuna最终执行的54来源另按顶部核对，前期51/53来源快照保持各自身份。
+
+- 旧运行路径只用于追溯：C/S为reports/seller_alias_continual/20261007/record_replay_execution/20261007_225409/workspace，完整小结果为reports/seller_alias_continual/20261008/record_replay_result；LOGIT0.1为reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/workspace；ER0.1为reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job；LOGIT0.25为reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace。这些作业已结束，旧监听已退出／自删，不重建或重启。
+
+10月8—9日五臂均使用已选中文BAAI/bge-large-zh-v1.5同一预训练归档（revision 79e7739b6ab944e86d6171e44d24c997fc1e0116）；四个记录表臂网络相同，LOGIT的聚合／头不同，各自训练后参数分化。36份Memory是27个记录表与9个LOGIT物理阶段的历史缓存快照，共11,479,595字节；每条实时路径最多六群／完整状态1MiB，包含允许的训练文本、标签、教师目标及附属状态。归档快照不合并成学习器可用历史，不等于模型权重；具体说明见[关闭记录](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)。
+
+保管按最新[存储记录](STORAGE.zh.md)及实际依赖核对：BGE预训练、首轮三个共享首域完整状态、排序s0_hard与s0_d两份例外及必要科研证据继续保留。ER0.1六份末端权重已于10月16日10:09按本轮Linux清理要求、核对无现行载模依赖后留证删除，共7,838,864,652字节；273份其余文件SHA不变，含三份Memory。另删57份冗余／成员已保管ZIP，本轮合计63文件约7.49GiB，见[实际回执](../reports/maintenance/20261016/linux_cleanup/receipt.json)。10月9日本轮36权重、此前C/S十五权重、旧LOGIT0.1／risk十二权重、LOGIT0.25六权重及关系／函数记忆相关已清理权重，不按旧清单假定仍存在。SHA不能恢复已删模型，重训仍需相应授权。
+
+10月9—11日归因实验中，O为最终两个旧域能力，N为后两阶段刚学完的新域能力，Z为最终最新域能力；F_first为首域获得后至最终的损失，G为同一路径的新域学习增益。三个顺序不是三个训练种子；已结束Optuna按A→B合同完成s0搜索及s1/s2/s3复验，逐域比较，不混用三顺序汇总对象。开发valid不是独立确认集，既有120群基础test已使用。本轮五方法的三域120新确认群及s4/s5/s6已获附前提许可，生成／评分／标签开放分别等合同完整门；该范围以外的新留出、追加seed、大候选库和无正候选查询尚无执行许可。Audit A/B真值、Audit B预测、owners与私有身份资产保持既定封存边界。
 
 以下均为已结束阶段或历史决定，按所属日期解释。详细过程、原始审查、计数、来源及删除记录留在所引原件中；本表不授予新运行权限。
 
