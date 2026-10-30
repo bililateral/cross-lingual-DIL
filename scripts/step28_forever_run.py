@@ -188,6 +188,9 @@ def endpoint(learner: m.Learner, calibration: list, store: Store) -> dict:
         scores = m.record.score(learner.model, calibration, learner.c, store.check)
         fitted = m.parent.calibration.fit(scores, np.asarray([g.labels for g in calibration], np.uint8),
                                           role='calibration', check=store.check)
+    # Preserve the actual failed fit; a failure must not erase its diagnosis.
+    map_path = store.root/'maps'/f'stage{number}_{generation}.json'
+    m.data.write_json(map_path, fitted)
     if fitted['status'] != 'PASS_CALIBRATION_FIT':
         raise ValueError('Current calibration failed')
     current = dict(zip(('a', 'b'), m.parent.calibration.parameters(fitted)))
@@ -206,8 +209,6 @@ def endpoint(learner: m.Learner, calibration: list, store: Store) -> dict:
     for module, mode in zip(learner.model.modules(), modes, strict=True):
         module.training = mode
     m.diag.restore_rng(rng)
-    map_path = store.root/'maps'/f'stage{number}_{generation}.json'
-    m.data.write_json(map_path, fitted)
     return dict(stage=number, model=store.record(model_path), state_sha256=saved['state_sha256'],
                 calibration=store.record(map_path), maps=metadata['maps'], counts=learner.counts.copy(),
                 calibration_ids=[g.uid for g in calibration], inference_restore_verified=True)

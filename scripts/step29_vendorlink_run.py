@@ -86,7 +86,8 @@ def set_rates(optimizer, settings, update, total):
         optimizer.param_groups[1]["lr"] = settings.head_lr*settings.lr_multiplier
 
 
-def execute(model, load_fit, job, *, order, seed, epochs, identity, check=lambda: None, resume=None):
+def execute(model, load_fit, job, *, order, seed, epochs, identity, check=lambda: None, resume=None,
+            inference_endpoints=False):
     """Only requests the current domain. History comes exclusively from Memory.
 
     H retains its Adam state across domains, as in the existing mainline.
@@ -95,6 +96,8 @@ def execute(model, load_fit, job, *, order, seed, epochs, identity, check=lambda
     """
     if len(order) != 3 or len(set(order)) != 3 or epochs < 1 or job.exists():
         raise ValueError("Three distinct domains, positive exposure and fresh job required")
+    if inference_endpoints and resume is not None:
+        raise ValueError("Compact formal endpoints do not authorize a recovery")
     job.mkdir(parents=True)
     settings = model.settings
     memory = Memory(seed_for(seed, order, "reservoir"), settings)
@@ -173,12 +176,18 @@ def execute(model, load_fit, job, *, order, seed, epochs, identity, check=lambda
             # Each endpoint also includes the post-retention state required for continuation.
             cursor = {"stage": stage+1, "next_epoch": 0, "stage_updates": 0,
                       "updates": cursor["updates"], "complete": stage == 2}
-            save_state(job/f"stage{stage+1}.pt", model, optimizer, memory, cursor.copy(), identity)
+            if inference_endpoints:
+                endpoint = job/f"stage{stage+1}.pt"
+                torch.save(dict(identity=identity, settings=asdict(settings), classes=model.classes,
+                                model=model.state_dict(), stage=stage+1, updates=cursor['updates']), endpoint)
+            else:
+                save_state(job/f"stage{stage+1}.pt", model, optimizer, memory, cursor.copy(), identity)
             save_state(job/"latest.pt", model, optimizer, memory, cursor.copy(), identity)
             del groups
         write_json(job/"completion.json", {"status": "THREE_STAGES_TRAINED_NOT_EVALUATED",
             "identity": identity, "updates": cursor["updates"], "memory_bytes": len(memory.bytes()),
-            "stage_endpoints": [f"stage{i}.pt" for i in (1, 2, 3)], "inherited_endpoints": inherited})
+            "stage_endpoints": [f"stage{i}.pt" for i in (1, 2, 3)], "inherited_endpoints": inherited,
+            "inference_endpoints": inference_endpoints})
         return cursor
     except BaseException as error:
         write_json(job/"failure.json", {"status": "STOP_NO_AUTOMATIC_RETRY", "error": repr(error), "cursor": cursor})

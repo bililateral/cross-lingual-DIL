@@ -1,0 +1,17 @@
+test_compact_vendor_endpoints_preserve_actual_trajectory_and_scores (__main__.FormalTrainingTests) ... ERROR
+test_single_queue_failure_charged_and_next_child_not_launched (__main__.FormalTrainingTests) ... ok
+
+======================================================================
+ERROR: test_compact_vendor_endpoints_preserve_actual_trajectory_and_scores (__main__.FormalTrainingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/formal/workspace/tests/test_step28_formal_training.py", line 36, in test_compact_vendor_endpoints_preserve_actual_trajectory_and_scores
+    vendor_run.execute(model, vendor_fixture, job, order='ABC', seed=4, epochs=2,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/formal/workspace/scripts/step29_vendorlink_run.py", line 127, in execute
+    if not groups or any(g.domain != order[stage] or g.split != "fit" for g in groups):
+TypeError: 'Group' object is not iterable
+
+----------------------------------------------------------------------
+Ran 2 tests in 5.041s
+
+FAILED (errors=1)

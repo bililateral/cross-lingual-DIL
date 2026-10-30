@@ -1,0 +1,23 @@
+test_single_queue_failure_charged_and_next_child_not_launched (__main__.FormalTrainingTests) ... ok
+test_followup_waits_for_training_completion_and_uses_its_own_bucket (__main__.FormalTrainingTests) ... ok
+test_vendor_query_metrics_and_cross_market_dependencies (__main__.FormalTrainingTests) ... FAIL
+
+======================================================================
+FAIL: test_vendor_query_metrics_and_cross_market_dependencies (__main__.FormalTrainingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/formal/workspace/tests/test_step28_formal_training.py", line 47, in test_vendor_query_metrics_and_cross_market_dependencies
+    self.assertEqual(dependency['components'], [['Left:heldout:0', 'Right:heldout:0']])
+AssertionError: Lists differ: [] != [['Left:heldout:0', 'Right:heldout:0']]
+
+Second list contains 1 additional elements.
+First extra element 0:
+['Left:heldout:0', 'Right:heldout:0']
+
+- []
++ [['Left:heldout:0', 'Right:heldout:0']]
+
+----------------------------------------------------------------------
+Ran 3 tests in 15.044s
+
+FAILED (failures=1)

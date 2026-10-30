@@ -1,0 +1,40 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - link "跳转到内容" [ref=e119] [cursor=pointer]:
+      - /url: "#_R_etmf9l6basslhi5pklhlb5_"
+    - generic [ref=e4]:
+      - complementary [ref=e5]:
+        - generic [ref=e9]:
+          - navigation "应用导航" [ref=e10]:
+            - generic [ref=e11]:
+              - button "首页" [ref=e13] [cursor=pointer]
+              - button "资料空间" [ref=e120] [cursor=pointer]
+              - button "定时任务" [ref=e23] [cursor=pointer]
+              - button "插件" [ref=e28] [cursor=pointer]
+              - button "探索" [ref=e33] [cursor=pointer]
+              - button "站点" [ref=e127] [cursor=pointer]
+            - button "打开个人资料菜单" [ref=e43] [cursor=pointer]
+          - navigation "首页" [ref=e52]:
+            - generic [ref=e53]:
+              - generic [ref=e54]
+              - generic [ref=e75]
+            - generic [ref=e139]:
+              - generic [ref=e142]
+              - generic [ref=e166]
+        - generic:
+          - separator
+      - generic [ref=e88]:
+        - main [ref=e90]:
+          - generic:
+            - generic:
+              - generic
+          - region "对话" [ref=e549]:
+            - generic [ref=e550]:
+              - generic [ref=e554]
+              - generic [ref=e2575]: ChatGPT 可能会出错。请核查重要信息。
+            - generic:
+              - generic
+        - status [ref=e2645]
+  - status [ref=e2646]
+  - status [ref=e2647]
+  - status [ref=e2648]

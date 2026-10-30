@@ -1,0 +1,29 @@
+VendorLink 正式入口：增量实现与证据
+2026-10-30。对应plan.zh.txt、authorization.json、gate.json；正式训练0，效果未开放。本说明与FOREVER/formal/implementation.zh.txt合读，共用派发器不另建审查体系。
+
+新增内容及用途
+1. step29_vendorlink_formal.py固定36条、40轮和逐市场fit供给，接入原execute；当前阶段外的fit读取会被拒绝。三阶段计数与端点实物核对后才写训练完整。
+2. step29_vendorlink_run.py仅新增inference_endpoints可选保存方式，默认旧行为不变。正式不自动恢复，阶段权重不携带冗余Adam/Memory；epoch latest仍完整，成功后才清理latest。避免108个端点重复携带优化器状态挤满磁盘。
+3. step29_vendorlink_evaluate.py接通216格盲评分、query ID/形状/有限值完整门、一次qrels开放及10指标。按query加权，保留全部比较；最新用户决定明确描述范围，删除整体bootstrap和显著性验收。
+4. 共用step28_formal_queue.py单路派发，真实子进程失败停派并保留费用；阶段完整后才进后续任务，按桶计费。CPU统计/准备同样受父进程监督RSS/磁盘/截止时间约束。没有恢复、并发、选模或通用调度扩展。
+
+Linux手写CPU账及实际行为
+cpu01收费13秒：紧凑端点夹具返回Group而非list，报错；真实失败子进程停派检查通过。原错误保留。
+cpu02收费10秒：VendorLink_SEQ和H_full分别实际跑两个小模型三阶段，紧凑/完整保存方式的参数、更新日志和盲分数完全相同。证明保存选项不改变这两个分支的训练轨迹，不冒称全大小真实BERT或36条已跑。
+cpu03收费23秒：失败停派和后续任务完整门通过；依赖夹具的文本在掩码后重复，按原去重规则被剔除，导致夹具失败。修正手写文本风格ID，未改生产清理。
+cpu04收费8秒：修正后的手算排序与跨市场同名连接通过。
+cpu05收费18秒：准备费、训练完成后再分析及旧bootstrap共享权重算例通过。旧bootstrap后来按用户决定移除，不引用为当前统计确认资格。
+cpu06收费23秒：真实子进程失败保留原7秒费用并停下一条；训练完整门先于后续任务；实际超RSS子进程被终止、失败费用保留。只终止本测试子进程。
+cpu07收费8秒：当前描述统计路径通过。手算query AP=[1/3,1/3,1,1]，大小不一群按query加权为0.375而非错误0.5；同名大小写关联及无账号名输出保持。故意提供全部大正向差值，程序仍输出passed=null且无区间，不能升级为统计确认。
+累计103/600秒。CPU均使用既有Linux py310、单线程、无GPU/预训练模型/正式文本或标签，原失败未清零。共用派发器证据用于两项正式队列，不重复计费。
+
+获准的依赖保管扫描
+dependency_preflight/receipt.json：一次canonical解析，qrels0，wall24.190361717秒、收费25准备秒、峰值RSS1350545408字节。57群/912视图、10分量、最大48群，Dream全部8群同属最大分量。输出不含账号名、正文或qrels。用户据此明确接受描述范围；不是根据模型效果改变判据。正式队列只复用这份元数据，不再解析缓存。
+
+源码与旧证据的适用边界
+cpu_sources.json及各次receipt.sources固定实际字节，历史来源归并保存在source_archive.zip。最新63份含正式入口、手写测试和必要配置；FOREVER生成器两个schema为部署补齐，未改生成数学。三份comparison依赖保留原资格字节（见FOREVER/formal/reused_sources），不混入其他活动实验的并发修改。
+compact保存分支自cpu02后未改；其真实轨迹证据继续适用。之后的正式入口变化为后续评分/统计串接、preflight绑定和描述范围，未改execute的更新计算。共享queue后续增加preflight计费及活跃资源监督，分别由cpu05/06实测。最后仅VendorLink整体bootstrap移除、已有依赖文件复用和字段early_evaluation_opening澄清；cpu07覆盖新的统计作用，旧bootstrap证据不再支持任何当前区间。
+旧资格见../native/primary_disposition.zh.txt及received原件；原方法单路GPU运算、梯度、Memory和恢复证据复用。不能从CPU通过推断正式长程、效果或全批存储一定成功。
+
+下一步
+按当前两项具体范围定向网页GPT 6 Pro外审，独立处理实际缺陷。两个gate仍false，禁止据本说明或PASS字样直接启用。源码/配置部署核对、H参考完整性及实际资源仍在启动前落实。新审查不重开未变方法，也不扩到HPO、三槽或新的数据统计方案。

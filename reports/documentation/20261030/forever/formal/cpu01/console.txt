@@ -1,0 +1,29 @@
+test_calibration_failure_preserves_actual_fit_before_raising (__main__.FormalTrainingTests) ... ok
+test_forever_real_formal_three_stage_flow_on_handwritten_tiny_model (__main__.FormalTrainingTests) ... {"event": "updates", "stage": 1, "counts": {"current": 24, "replay": 0, "fixture": 0}}
+{"event": "updates", "stage": 1, "counts": {"current": 48, "replay": 0, "fixture": 0}}
+ERROR
+
+======================================================================
+ERROR: test_forever_real_formal_three_stage_flow_on_handwritten_tiny_model (__main__.FormalTrainingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/formal/workspace/tests/test_step28_formal_training.py", line 112, in test_forever_real_formal_three_stage_flow_on_handwritten_tiny_model
+    result = forever.execute(job, spec, time.monotonic() + 450, allowed)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/formal/workspace/scripts/step28_forever_formal.py", line 142, in execute
+    result['points'][str(number)] = run.stage(learner, supply, store, log=log)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/formal/workspace/scripts/step28_forever_run.py", line 230, in stage
+    learner.advance(sequence[learner.clock.current], store.check, before_step, log,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/formal/workspace/scripts/step28_forever.py", line 318, in advance
+    commit()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/formal/workspace/scripts/step28_forever_run.py", line 231, in <lambda>
+    lambda: store.commit(learner, supply))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/formal/workspace/scripts/step28_forever_run.py", line 109, in commit
+    self.check(m.record.base.persistence.checkpoint_reserve(learner.model, learner.optimizer))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261030/vendorlink/formal/workspace/scripts/step28_continual_comparison_run.py", line 92, in check
+    raise RuntimeError('Independent comparison resource allowance exceeded')
+RuntimeError: Independent comparison resource allowance exceeded
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.685s
+
+FAILED (errors=1)
