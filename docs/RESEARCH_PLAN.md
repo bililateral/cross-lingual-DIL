@@ -6,7 +6,7 @@ L²R／ER+GCR按[822小时原执行范围](../reports/documentation/20261026/con
 
 S_default＋历史H（G_half）按[失败隔离补充](../reports/documentation/20261030/defaults_repair/scope.zh.txt)及[实际监听切换](../reports/documentation/20261030/defaults_repair/execution.zh.txt)执行，沿用18条、54端点、110h、单条6h及最多三路。只训练并保存旧dev盲分数，不开放评价标签、不新增确认/HPO。现有唯一监听等comparison_resume整批训练、108状态完整性、生成、确认、分析全部成功及相关进程退出，再检查剩余显存、预留、RAM和磁盘；不要求整卡没有CUDA。自身worker失败只退休该槽、健康槽继续补位，缺项不发布完整成功；前序失败仍使监听退出，补跑后须重新绑定，禁止重复监听及自动重试。
 
-VendorLink和FOREVER正式范围已分别获明确接受：[VendorLink四臂36条/每市场40轮/单路296h](../reports/documentation/20261030/vendorlink/formal/plan.zh.txt)，[FOREVER新增9条/复用H27/单路116h及新120群/4320前向](../reports/documentation/20261030/forever/formal/plan.zh.txt)。算法、单路GPU资格及适用旧证据复用；正式编排/评价已接入，两项外审必修经Linux定向CPU证据及[主审](../reports/documentation/20261030/forever/formal/review/primary_disposition.zh.txt)闭合，修后未再次网页送审。用户最新明确先别训练、等开始指令，因此当前不启用这两项训练或自动资源等待。收到新开始指令后，核对实际部署、H27身份与共享资源，再先后启用两个新队列，不改活动L²R及已有H/S监听，不重复G1/G2或FOREVER资格。
+VendorLink和FOREVER正式范围已分别获明确接受：[VendorLink四臂36条/每市场40轮/单路296h](../reports/documentation/20261030/vendorlink/formal/plan.zh.txt)，[FOREVER新增9条/复用H27/单路116h及新120群/4320前向](../reports/documentation/20261030/forever/formal/plan.zh.txt)。算法、单路GPU资格及适用旧证据复用；按用户本次要求，对两处修复开展[定向复审](../reports/documentation/20261030/forever/formal/review/recheck/request.zh.txt)，完整回收后独立核实原问题是否解决及是否引入新问题，实际状态只看交接。用户最新明确先别训练、等开始指令，因此当前不启用这两项训练或自动资源等待。收到新开始指令后，核对实际部署、H27身份与共享资源，再先后启用两个新队列，不改活动L²R及已有H/S监听，不重复G1/G2或FOREVER资格。
 
 VendorLink依赖扫描发现57群中48群相连且包含Dream全部8群，用户接受固定数据描述比较：保存完整排序/遗忘差值，不计算整体置信区间、不作统计验收，不宣称真实潜在同控识别或统计确认抗遗忘。不得为获得区间重分群、选账号、加数据或改统计模型。FOREVER保留额外全参数锚点、原O/F主比较及N/Z点值保护，不重训H、不追加HPO；不将两线预算或评价权限互借。
 
