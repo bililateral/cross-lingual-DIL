@@ -269,7 +269,7 @@ def execute(gate_path: Path, active: Path) -> None:
             lambda row, job, deadline, metadata: training_command(row, job, deadline, metadata, gate_path),
             admit=lambda count: resources(campaign, count, startup=not (ledger.active or ledger.completed))['ready'],
             check=lambda: shared.campaign_size(campaign, gate['limits']),
-            observe=lambda: first_update(campaign, active, run_ids))
+            observe=lambda: first_update(campaign, active, run_ids), retire_failed_slots=True)
         tick = time.monotonic()
         try:
             records = complete_blind(campaign, gate)

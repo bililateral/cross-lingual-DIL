@@ -151,6 +151,57 @@ class DefaultsControlTest(unittest.TestCase):
             self.assertIn('Exact original-S/H blind-training scope or sources differ', result.stderr)
             self.assertFalse((root/'formal').exists())
 
+    def test_actual_h_s_entry_keeps_healthy_slots_and_rejects_incomplete_success(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            campaign = root/'formal'
+            specs = control.m.specifications()[:5]
+            identities = [s.run_id for s in specs]
+            script = root/'worker.py'
+            script.write_text("import sys,time,os,json\nfrom pathlib import Path\n"
+                "p=Path(sys.argv[1]);p.mkdir()\n"
+                "(p/'start.json').write_text(json.dumps({'time':time.monotonic(),'cpu':list(os.sched_getaffinity(0))}))\n"
+                "if p.name==sys.argv[2]:\n"
+                " time.sleep(.1);raise SystemExit(3)\n"
+                "deadline=time.monotonic()+4\n"
+                "while not (p.parent/'dispatch'/sys.argv[2]/'failure.json').exists():\n"
+                " if time.monotonic()>deadline:raise SystemExit(9)\n"
+                " time.sleep(.01)\n"
+                "time.sleep(.1)\n"
+                "(p/'end.json').write_text(json.dumps({'time':time.monotonic()}))\n")
+            gate = dict(campaign=str(campaign), prior_used_seconds={'control': 347}, predecessor={},
+                        sources=control.run.sources(), limits={'disk_bytes': 128*control.GIB, 'small_bytes': 2*control.GIB})
+            original_dispatch = control.shared.dispatch
+            def dispatch(*args, **kwargs):
+                return original_dispatch(*args, **kwargs, poll_seconds=.02)
+            command = lambda row, job, deadline, metadata, gate_path: [
+                sys.executable, '-B', str(script), str(job), identities[0]]
+            with patch.object(control, 'validate_gate', return_value=gate), \
+                    patch.object(control.m, 'specifications', return_value=specs), \
+                    patch.object(control, 'predecessor_state', return_value={'ready': True}), \
+                    patch.object(control, 'resources', return_value={'ready': True}), \
+                    patch.object(control, 'training_command', side_effect=command), \
+                    patch.object(control.shared, 'dispatch', side_effect=dispatch), \
+                    patch.object(control, 'complete_blind') as complete:
+                with self.assertRaisesRegex(RuntimeError, 'after active siblings finished'):
+                    control.execute(root/'gate.json', root/'active_defaults_wait.py')
+            complete.assert_not_called()
+            self.assertFalse((campaign/'completion.json').exists())
+            failure = control.data.read_json(campaign/'failure.json')
+            outcomes = {r['id']: r['success'] for r in failure['budget']['completed']}
+            self.assertEqual(outcomes, {name: name != identities[0] for name in identities})
+            self.assertGreater(failure['budget']['used']['training'], .1)
+            self.assertGreaterEqual(failure['budget']['used']['control'], 347)
+            self.assertEqual(failure['budget']['active'], {})
+            starts = {name: control.data.read_json(campaign/name/'start.json') for name in identities}
+            for name in identities[3:]:
+                self.assertNotEqual(starts[name]['cpu'], starts[identities[0]]['cpu'])
+                previous = next(k for k in identities[1:3] if starts[k]['cpu'] == starts[name]['cpu'])
+                self.assertGreaterEqual(starts[name]['time'], control.data.read_json(campaign/previous/'end.json')['time'])
+            print('Actual H/S entry evidence:', dict(outcomes=outcomes,
+                  cpu_assignment={k: v['cpu'] for k, v in starts.items()},
+                  failed_slot_not_reused=True, completion_published=False), flush=True)
+
     def test_wait_wiring_one_claim_fixed_queue_and_actual_training_entry(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

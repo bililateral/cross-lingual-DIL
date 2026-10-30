@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-30 H/S失败隔离监听切换
+
+[defaults_repair](../reports/documentation/20261030/defaults_repair/)保存用户范围、独立主审、CPU01/02、来源、正式门及switch/launch/observation。Linux新workspace从旧57份编排来源复制并覆盖H/S控制/测试及已核验共享控制文件，另保留共享测试，共58份资格来源；44科学来源不变，沿用原7个模型/数据链接（含已获准旧dev无标签items），没有解析正式数据。旧comparison_resume/defaults监听在无训练/子进程时结束，原gate/workspace/预算/记录保留；新监听唯一，不改活动L²R。
+
+CPU首轮11通过和一个测试名加载错误（收费6秒）保留，随后仅补漏项通过（3秒），累计68/120秒；全部旧等待/失败/原生费用继续承接。小证据SCP回Windows并按清单逐成员核对，报告/范围/执行说明两端保管。中转input/evidence ZIP核验后两端删除；活动数据/模型/Memory不动，不重置大清理周期。根可变文档仅Windows维护，本地范围提交，不推送。
+
 ## 2026-10-30 L²R恢复及S/H交接重新绑定
 
 [comparison_resume](../reports/documentation/20261030/comparison_resume/)为独立恢复目录；Linux workspace50份代码/测试/合同政策核验，沿用原五份训练输入及BGE链接，无dev/test/owners/private_custody链接。14成功及三条旧失败目录用硬链接保管、纳入原存储额度；原formal/gate/budget/failure未覆盖。诊断失败时保留校准前完整状态，成功阶段端点双恢复通过后退役该临时完整状态；不清理活动权重或Memory。
