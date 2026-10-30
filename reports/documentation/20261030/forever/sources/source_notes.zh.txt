@@ -1,0 +1,27 @@
+来源索引，2026-10-30。仅静态读取，没有执行下载代码。
+
+论文正式版本： https://aclanthology.org/2026.acl-long.1144.pdf
+正式出版元数据： https://aclanthology.org/2026.acl-long.1144/
+论文作者HTML： https://arxiv.org/html/2601.03938v2
+CCF： https://www.ccf.org.cn/Academic_Evaluation/AI/ （ACL为A；不依赖非官方列表）
+
+三个upstream文件均下载自 https://raw.githubusercontent.com/WoodScene/FOREVER/bbeb549a21e59d9490f20a2b02099ee766a67f48/ ：
+train.py = src/finetune_cl_our_qwen.py
+load_data.py = utils/load_data.py
+run_train.sh = scripts/run_train_cl_ours_qwen.sh
+本地原字节身份列在送审input_manifest.json。run_train.sh中dummy_offline_key为原公开源码的占位文本，不是项目凭据。
+
+静态定位（原始文件行号）：
+train.py 33—109：实际位移、CPU参数拼接、CSV只恢复step/tau。
+train.py 125—172：回放实际loss，0.001乘beta_t。
+train.py 333—350：权重恢复和上一阶段theta_star。
+train.py 380—394：九阈值、EMA0.05、beta倍率与clip。
+train.py 402—480：24步校准及新Trainer。
+train.py 490—669：触发、每次重新建立当前/回放Trainer、固定参数锚点、回放后重新设置位移参照。
+train.py 577—587：日志beta_loss_reg未乘有效0.001。
+train.py 677—745：任务末尾memory_epochs回放，与论文算法1的1遍不同。
+load_data.py 94—162：实际使用的load_memory_buffer重新读取全部历史任务文件并按output类别抽样。
+run_train.sh：实际脚本调用finetune_cl_ours_qwen.py，而固定提交对应文件为src/finetune_cl_our_qwen.py。
+
+项目直接来源：record.backward_group/原rank目标、data.Memory的Algorithm R、five.Method/H恢复、comparison_run/evaluate中的step*288硬编码、core.save_state/restore_state。原核心save_state不是原子发布；提案已将原子latest作为小增量而非冒称旧证据。
+本轮已读旧结果外审R05/R09及独立处置，保持固定系统/开发不对称和防过度设计边界。budget.json只从已开放完成回执提取耗时/计数/文件字节并作机械算术，没有重算指标或读新结果。

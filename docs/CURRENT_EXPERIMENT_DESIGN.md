@@ -2,6 +2,8 @@
 
 ## 当前合同入口
 
+FOREVER新增候选（2026-10-30）：[迁移方案](../reports/documentation/20261030/forever/proposal.zh.txt)及[预算依据](../reports/documentation/20261030/forever/budget.json)只用于用户要求的静态方案外审，不是执行合同。只提议9条新轨迹、H27端点复用、零HPO和两方法新确认；明确额外参数锚点与旧全部历史状态1MiB不兼容、总步数/成本不相等。是否采用、数据及116h预算待外审/独立处置和用户后续决定；ER+FLAD保留候选，活动实验不变。审查动态状态仅见当前交接。
+
 本节定位各条研究线的有效范围；实际进度、PID和资源观测只在[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)维护。后面的设计与审查沿革保留原时点，不覆盖本节与后续明确授权。
 
 VendorLink新场景实现（2026-10-29）：首轮[完整外审](../reports/documentation/20261029/vendorlink/implementation/review/external/report.zh.txt)和[独立处置](../reports/documentation/20261029/vendorlink/implementation/review/primary_disposition.zh.txt)之后，F01—F04必要修复已获[定向复核](../reports/documentation/20261029/vendorlink/implementation/review/repair/external/report.zh.txt)，并经[独立主审](../reports/documentation/20261029/vendorlink/implementation/review/repair/primary_disposition.zh.txt)全部关闭，没有新增必修项。四臂、受控账号视图代理及原方法掩码平均复现假设保持；cpu05当时受影响四项通过、累计26/300秒；未变方法/训练入口与该来源对应，后续数据和资格变更从下方当前入口进入。原[实现说明](../reports/documentation/20261029/vendorlink/implementation/implementation.zh.txt)与[静态提议](../reports/documentation/20261029/vendorlink/proposal.zh.txt)按历史范围保留，冲突处以上述两轮主审补充为准。每query单正例使当前MAP=MRR；只验证观察账号视图检索/遗忘，不证明真实马甲。当时正式三市场/GPU尚未获准，后续许可见下方明确决定；36条未批准，无共享时108阶段，不虚计90阶段节省，不改变活动实验。

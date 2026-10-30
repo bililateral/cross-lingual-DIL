@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-30 FOREVER静态方案外审材料
+
+[本轮方案、预算与审查目录](../reports/documentation/20261030/forever/)仅保存在Windows。三份官方源码是固定提交bbeb549a21e59d9490f20a2b02099ee766a67f48的静态阅读原件，没有执行；方案包159582字节、26成员，身份及25载荷大小/SHA核对见[清单](../reports/documentation/20261030/forever/review/input_manifest.json)和[包记录](../reports/documentation/20261030/forever/review/package.json)。用户明确批准该完整包后上传到本轮chatgpt.com专用会话，提交/授权/完整请求及页面观察保留；待完整审查回收前保留必要输入包。没有正式文本/标签载荷、模型、Memory或凭据进入包中。
+
+方案/预算/导航/决定记录作本地Git交付；ZIP保留本地供回收核对，内部项目来源由清单指向当前Git文件，未复制出另一套可执行workspace。未同步Linux、推送远端、覆盖活动冻结文件或重置大清理周期；已存在的汇报稿修改、历史删除及其他未跟踪文件不在本轮提交中。
+
 ## 2026-10-30 VendorLink GPU校验进度查询
 
 仅通过SSH读取既有监听、资格账、进程、GPU/RAM/disk及七执行来源身份，未读取正式文本、标签、权重或效果指标。新增[现场原件](../reports/documentation/20261029/vendorlink/native/waiting/observation_20261030.json)在Linux/Windows两端保管，4750字节，SHA256 `ca0a2c29a272efe674d652b0003ef4454fdd996c2db8e45559dd9e11dbc41575`；SCP回传后与Linux实际大小/SHA一致。旧观察、配置、许可、启动及失败账不覆盖；无新监听或科研计算，SSH/SCP会话已关闭。根交接与本记录仅Windows更新，本轮只本地Git，未同步Linux可变文档或推送；不重置大清理周期。

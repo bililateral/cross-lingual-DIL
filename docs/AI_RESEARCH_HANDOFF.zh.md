@@ -2,6 +2,8 @@
 
 ## 当前工作
 
+FOREVER方案外审（2026-10-30，本机10:54已提交）：用户批准[完整159582字节方案包](../reports/documentation/20261030/forever/review/package.json)外发后，通过本地Playwright在[本轮专用会话](https://chatgpt.com/c/6ae406c1-160c-83ea-a5a1-3b22ccac18fc)单次上传/发送，已见审查开场和停止按钮，当前待完整回收。原主线会话链接两次返回首页，不声称沿用成功。可见选择器GPT-6/Pro，后台身份未独立核验。[方案](../reports/documentation/20261030/forever/proposal.zh.txt)提议仅新9条FOREVER、复用H27端点、零HPO、新120群确认；额外约1.22GiB参数锚点不能算在旧1MiB全部历史状态内，需明确新比较口径。116累计小时、资源门、数据和实施均未批准；本轮未SSH、运行科研核验/训练、生成或开放标签，未改活动队列。ER+FLAD仍为候选。下一步只回收这次完整报告、独立处置必要意见并向用户汇报，不重复提交或因等待创造任务；当前身份/许可/请求见[submission](../reports/documentation/20261030/forever/review/submission.json)。
+
 VendorLink等待专项排查（服务器10月30日10:01）：[现场证据](../reports/documentation/20261029/vendorlink/native/waiting/wait_audit_20261030.json)发现新对照控制器在03:21:56保存过17685MiB（17.27GiB）空闲、CUDA仅两路本项目进程、RAM224.23GiB/disk246.27GiB的补位准入记录，紧接着派发CAB_s6_L²R；不能再称整夜都无足够显存。该控制器的free/PID为相邻两次查询，且不是VendorLink采样，不能证明窗口持续多久。Vendor监听实际源码与CPU13一致：首轮10GiB、只拦指定旧PID及启动身份仍占GPU、无全卡空闲要求；每次拒绝后睡300秒，并覆盖status.json，wait_console为空、control_console不存在，GPU账仍0。已证实短窗口可能漏采及历史留证不足，尚不能认定旧PID误拦、采到合格资源却未派发，或断言凌晨窗口持续超过5分钟。常见历史采集目录不存在，GPU accounting未启用；旧PID退出时刻及两次采样间变化无法还原。本轮只查现有证据，未改冻结来源、门槛、轮询或重启监听；建议最小改进为缩短轮询并逐次追加资源/判因小记录，保留原预算和单次派发条件。10:01现场空闲1792MiB，仍等待。
 
 本节只维护当前状态、有效范围和下一步；历史叙述按原观测时点保留，不作为新启动或新授权。合同从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)进入，后续动作看[计划](RESEARCH_PLAN.md)。L²R/GCR与S/H最新实际观测为服务器2026-10-30 09:51（Asia/Shanghai），VendorLink另于同日09:51:25完成独立现场核对；沿用已知服务器约比本机快5分钟的时钟差异，未调系统时钟，下列预计完成时刻采用服务器时钟。
