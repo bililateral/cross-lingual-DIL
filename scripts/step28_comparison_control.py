@@ -29,13 +29,14 @@ class Ledger:
         self.path, self.limits, self.clock = path, limits, clock
         self.used = {key: float(prior_used.get(key, 0.)) for key in limits}
         self.active, self.completed, self.failed = {}, [], False
+        self.budget_exceeded = False
         self.write_carry = 0.
         if any(value < 0 or value > limits[key] for key, value in self.used.items()):
             raise ValueError('Invalid inherited comparison charges')
 
     def snapshot(self):
         return dict(limits=self.limits, used=self.used, active=self.active,
-                    completed=self.completed, failed=self.failed,
+                    completed=self.completed, failed=self.failed, budget_exceeded=self.budget_exceeded,
                     cumulative_seconds=sum(self.used.values()))
 
     def save(self):
@@ -60,11 +61,16 @@ class Ledger:
         row = self.active.pop(identity)
         actual = self.clock()-row['started']
         self.used[row['bucket']] += actual
-        self.completed.append({**row, 'actual_seconds': actual, 'success': bool(success)})
-        self.failed |= not success or actual > row['allowance'] or self.used[row['bucket']] > self.limits[row['bucket']]
+        result = {**row, 'actual_seconds': actual,
+                  'success': bool(success and actual <= row['allowance']),
+                  'allowance_exceeded': actual > row['allowance']}
+        self.completed.append(result)
+        self.budget_exceeded |= self.available(row['bucket']) < 0
+        self.failed |= not result['success'] or self.budget_exceeded
         self.save()
-        if self.failed:
-            raise RuntimeError('Failed/over-budget attempt retained; no retry')
+        if self.budget_exceeded:
+            raise RuntimeError('Cumulative bucket/reservation exceeded')
+        return result
 
     def charge(self, bucket, seconds):
         tick = self.clock()
@@ -72,14 +78,15 @@ class Ledger:
             seconds += self.write_carry
             self.write_carry = 0.
         self.used[bucket] += seconds
-        self.failed |= self.available(bucket) < 0
+        self.budget_exceeded |= self.available(bucket) < 0
+        self.failed |= self.budget_exceeded
         try:
             self.save()
         finally:
             if bucket == 'control':
                 self.write_carry += self.clock()-tick
-        if self.failed:
-            raise RuntimeError('Cumulative budget stopped this campaign')
+        if self.budget_exceeded:
+            raise RuntimeError(f'Cumulative {bucket} budget exceeded')
 
 
 def validate_gate(path: Path) -> dict:
@@ -148,25 +155,36 @@ def campaign_size(campaign, limits):
 
 def dispatch(queue, campaign, ledger, bucket, command, *, max_workers=3,
              admit=None, check=lambda: None, observe=lambda: None, poll_seconds=30.):
-    """Reviewed refill structure; dispatch metadata is outside worker-owned job dirs."""
-    active, index, tick = {}, 0, None
+    """On a child failure, stop admission and drain already running siblings."""
+    active, index, tick, failures = {}, 0, None, []
     cores = psutil.Process().cpu_affinity()[:max_workers]
     if len(cores) != max_workers:
         raise RuntimeError('Distinct worker CPU cores unavailable')
     try:
-        while active or index < len(queue):
+        while active or (index < len(queue) and not ledger.failed):
             tick = time.monotonic()
             for identity, (process, log, _) in list(active.items()):
+                timed_out = False
                 if process.poll() is None and time.monotonic() >= ledger.active[identity]['deadline']-60:
                     tick += prior.terminate_owned(process)
-                    raise TimeoutError('Owned child stopped within reserved termination tail')
+                    timed_out = True
                 if process.poll() is not None:
                     log.close()
                     del active[identity]
-                    ledger.settle(identity, process.returncode == 0)
+                    settled = ledger.settle(identity, process.returncode == 0 and not timed_out)
+                    if not settled['success']:
+                        failure = dict(id=identity, returncode=process.returncode,
+                                       deadline_stopped=timed_out, allowance_exceeded=settled['allowance_exceeded'],
+                                       worker_failure_path=str(campaign/identity/'failure.json'))
+                        failures.append(failure)
+                        write(campaign/'dispatch'/identity/'failure.json', failure)
             check()
             observe()
-            while len(active) < max_workers and index < len(queue):
+            if failures:
+                write(campaign/'status.json', dict(status='DRAINING_ACTIVE_WORKERS', epoch=time.time(),
+                      failed_workers=failures, active=list(active),
+                      not_dispatched=[row['id'] for row in queue[index:]]))
+            while not ledger.failed and len(active) < max_workers and index < len(queue):
                 if admit and not admit(len(active)):
                     break
                 row = queue[index]
@@ -185,6 +203,15 @@ def dispatch(queue, campaign, ledger, bucket, command, *, max_workers=3,
                 try:
                     process = subprocess.Popen(line, stdout=log, stderr=subprocess.STDOUT,
                                                env=env, start_new_session=True)
+                except OSError as error:
+                    log.close()
+                    ledger.settle(row['id'], False)
+                    failure = dict(id=row['id'], error=repr(error), returncode=None,
+                                   deadline_stopped=False, worker_started=False)
+                    failures.append(failure)
+                    write(metadata/'failure.json', failure)
+                    index += 1
+                    break
                 except BaseException:
                     log.close()
                     ledger.settle(row['id'], False)
@@ -195,11 +222,12 @@ def dispatch(queue, campaign, ledger, bucket, command, *, max_workers=3,
                 index += 1
             ledger.charge('control', time.monotonic()-tick)
             tick = None
-            if active or index < len(queue):
+            if active or (index < len(queue) and not ledger.failed):
                 next_stop = min((ledger.active[k]['deadline']-60 for k in active),
                                 default=time.monotonic()+poll_seconds)
                 time.sleep(max(0., min(poll_seconds, next_stop-time.monotonic())))
     finally:
+        handling_error = sys.exc_info()[0] is not None
         cleanup_tick, waited = time.monotonic(), 0.
         if tick is not None:
             try:
@@ -216,7 +244,16 @@ def dispatch(queue, campaign, ledger, bucket, command, *, max_workers=3,
                 ledger.settle(identity, False)
             except RuntimeError:
                 pass
-        ledger.charge('control', time.monotonic()-cleanup_tick-waited)
+        try:
+            ledger.charge('control', time.monotonic()-cleanup_tick-waited)
+        except RuntimeError:
+            if not handling_error:
+                raise
+    if failures:
+        write(campaign/'status.json', dict(status='FAILED_WORKERS_DRAINED_NO_RETRY', epoch=time.time(),
+              failed_workers=failures, active=[], not_dispatched=[row['id'] for row in queue[index:]]))
+        raise RuntimeError('Worker failure retained after active siblings finished: '
+                           + ', '.join(row['id'] for row in failures))
 
 
 def execute(gate_path):

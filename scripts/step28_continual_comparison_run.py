@@ -165,7 +165,13 @@ def checkpoint(root, method, model, optimizer, stage, calibration, c, first_map,
         fitted = m.parent.calibration.fit(scores, np.asarray([g.labels for g in calibration], np.uint8),
                                           role='calibration', check=budget.check)
         if fitted['status'] != 'PASS_CALIBRATION_FIT':
-            raise ValueError('Current calibration failed; no retry or confirmation refit')
+            # Keep the returned diagnostics before unwinding; do not refit or relax the gate.
+            failure_path = root/'maps'/f'stage{number}_failed.json'
+            data.write_json(failure_path, fitted)
+            save_array(root/'scores'/f'stage{number}_calibration_failed.npy', scores, root)
+            raise ValueError('Current calibration failed; no retry or confirmation refit; '
+                             f'diagnostics={failure_path}; optimizer={fitted["optimizer_message"]}; '
+                             f'projected_gradient_max={fitted["projected_gradient_max"]}')
         current_map = dict(zip(('a', 'b'), m.parent.calibration.parameters(fitted)))
         first_map = current_map if first_map is None else first_map
         # GCR maintenance differentiates the real head; neutral() disables autograd.

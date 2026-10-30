@@ -1,6 +1,8 @@
 # 当前科研交接
 
 ## 当前工作
+L²R校准中断排查与控制器修复已交付（2026-10-30）：服务器13:47:27复核原失败/文件/来源及无相关活跃进程。已证实单worker失败经Ledger→dispatch finally连带终止同伴，并由清理计费异常覆盖顶层原因；并非训练预算耗尽。旧入口在校准非PASS时尚未保存分数/拟合诊断/阶段模型，故具体数值失败项无法由原件确定。新控制器已改为单条失败/超时/启动失败停止新派发、让已运行同伴完成，最后整批报失败；共享预算/资源错误仍保留全局停机，失败整批不能进入确认。校准失败先保存原拟合诊断和分数，原公式/判据不改。Linux独立workspace的10项定向CPU证据通过，新增9秒，CPU累计54/1200；原训练及失败账保持。详见[排查、修复与独立主审](../reports/documentation/20261030/comparison_repair/report.zh.txt)和[CPU原件](../reports/documentation/20261030/comparison_repair/cpu01/receipt.json)。用户明确“暂不重放，先交付修复与现有证据”：不启动诊断重放/三条重训/剩余GCR或默认配置监听。修复来源仅部署新隔离目录，旧正式workspace/gate不覆盖；正式恢复与具体数值原因仍未完成。以下中断及其他任务状态分别按各自观测/授权解释。
+
 
 FOREVER限定实施/CPU资格已完成，GPU须排在VendorLink之后（2026-10-30）：用户最新授权按修订方案最小实现和限定CPU/GPU验证，并明确禁止正式训练；后续又指定“该实验的GPU校验排在vendor-link的GPU校验后面”。有效范围见[实施补充](../reports/documentation/20261030/forever/implementation/scope.zh.txt)，旧段落“实施/资格未批准”不再阻断这部分工作。新增方法/阶段安全点/限定资格入口已部署独立Linux workspace，最终44项执行依赖逐项一致，未覆盖活动来源。[实际交付与独立判断](../reports/documentation/20261030/forever/implementation/report.zh.txt)记录真实位移/解析全P正则、24当前+12回放、下一步模型/Adam/RNG一致、末尾beta及发布前后Supply/Memory恢复证据；CPU四次分别5/4/5/5秒，累计19/600秒，无失败，最终8项定向核验通过。CPU小模型/边界夹具不冒充BGE或完整阶段资格。
 

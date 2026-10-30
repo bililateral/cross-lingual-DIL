@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-30 L²R校准中断与控制器修复
+
+[本轮排查/修复证据](../reports/documentation/20261030/comparison_repair/)在Windows及同相对路径Linux保管，Linux修复来源仅在该目录workspace，未覆盖10月26日正式冻结workspace/gate/budget/failure。49份依赖按sources.json绑定；不相关的本地five_run变更未带入，改用原冻结来源。CPU原始console/receipt和13:47只读现场通过SCP回传，实际大小/SHA核对；CPU新增9秒、累计54/1200秒，原训练失败账保留。没有正式数据/标签/模型/Memory回传，没有诊断重放或正式恢复。临时输入ZIP核验后两端删除，原失败及必要源码证据保留；本轮不重置大清理周期。
+
+Windows代码/测试及可变交接/讨论/本记录更新；Linux只同步本轮独立修复目录及说明，未同步根可变文档。按范围作本地Git提交，不推送，其他任务已有未提交修改及历史删除保持。
+
 ## 2026-10-30 FOREVER限定实现与CPU证据
 
 新代码及[实施范围/许可/报告](../reports/documentation/20261030/forever/implementation/)在Windows维护，Linux隔离部署于`/home/yongpeng/cross-lingual/reports/documentation/20261030/forever/implementation/workspace`。最终44项实际源码/必要政策/测试核对一致，只有既有BGE目录链接，没有正式数据链接。前期打包100份无关政策副本已从新workspace及暂存中移除；原仓库及旧活动冻结文件未动。

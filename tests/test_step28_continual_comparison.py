@@ -379,6 +379,42 @@ class ComparisonTests(unittest.TestCase):
                   memory=memory.summary(), full_restore=True, inference_restore=True,
                   calibration_group_forwards=36, state_rng_modes_unchanged=True), flush=True)
 
+    def test_failed_calibration_is_saved_before_checkpoint_rejects(self):
+        # A controlled fit failure tests evidence plumbing, not numerical convergence.
+        method, model, optimizer, c = fixture('L2R_text_fixed')
+        stage = mock.Mock(stage=1)
+        calibration = [group(i) for i in range(60, 72)]
+        scores = np.arange(12*378, dtype=np.float32).reshape(12, 378)/100
+        fitted = dict(status='FAILED_CALIBRATION_FIT_NO_RETRY', a=.1, b=-2.,
+                      optimizer_success=True, optimizer_message='fixture: relative loss stopped',
+                      projected_gradient_max=2e-6, trajectory=[dict(iteration=1, nll=.3)])
+        before = m.core.state_digest(dict(model=model.state_dict(), optimizer=optimizer.state_dict(),
+                                         rng=m.diag.rng_state(), modes=[v.training for v in model.modules()]))
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for name in ('maps', 'scores', 'points', 'models', 'memory', 'work'):
+                (root/name).mkdir()
+            with mock.patch.object(m.parent, 'adam_step', return_value=288), \
+                 mock.patch.object(method, 'score', return_value=scores), \
+                 mock.patch.object(m.parent.calibration, 'fit', return_value=fitted) as fit, \
+                 mock.patch.object(run, 'save') as save:
+                with self.assertRaisesRegex(ValueError, 'projected_gradient_max=2e-06'):
+                    run.checkpoint(root, method, model, optimizer, stage, calibration,
+                                   c, None, mock.Mock(check=lambda *a: None))
+            fit.assert_called_once()
+            self.assertIs(fit.call_args.args[0], scores)
+            np.testing.assert_array_equal(fit.call_args.args[1], np.asarray([g.labels for g in calibration], np.uint8))
+            self.assertEqual(fit.call_args.kwargs['role'], 'calibration')
+            self.assertEqual(m.data.read_json(root/'maps/stage1_failed.json'), fitted)
+            np.testing.assert_array_equal(np.load(root/'scores/stage1_calibration_failed.npy'), scores)
+            stage.retain.assert_not_called()
+            save.assert_not_called()
+            self.assertFalse((root/'points/stage1.json').exists())
+            self.assertFalse((root/'maps/stage1.json').exists())
+        after = m.core.state_digest(dict(model=model.state_dict(), optimizer=optimizer.state_dict(),
+                                        rng=m.diag.rng_state(), modes=[v.training for v in model.modules()]))
+        self.assertEqual(before, after)
+
     def test_evaluation_domain_pairing_order_guard_and_four_directions(self):
         spec = m.Spec('L2R_text_fixed', 'BCA', 4)
         cells = {f'{a}_{b}': np.full((40, 22), a*10+b, float) for a, b in ev.CELLS}
