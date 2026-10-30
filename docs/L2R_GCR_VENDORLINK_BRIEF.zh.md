@@ -59,8 +59,8 @@ FOREVER来源：[正式论文页](https://aclanthology.org/2026.acl-long.1144/)�
 |---|---|---|
 | L²R | 两个检索基准均设初始阶段与三个后续阶段；比较ER、MIR、GSS、OCS等，观察检索表现、遗忘、前向迁移及效率 | 原文以文档库增长为主，采用Success/Recall/MRR等指标；我们是三个有监督账号域、有限群排序，不是原检索库的四阶段复现 |
 | GCR | 以ResNet18在CIFAR、TinyImageNet等图像数据上做离线Class-IL、Task-IL及在线学习比较；改变记忆容量，报告准确率与遗忘 | Task-IL可利用任务身份，Class-IL需区分已见类别；我们的测试账号身份未参与训练，输出为关联排序。原论文分类准确率不可与我们的MAP直接比较 |
-| VendorLink | 先比较卖家分类架构与训练方式，再用表示相似度分析潜在别名，并研究低资源市场适配 | 原文没有我们这种“逐市场学习后重复评旧市场”的抗遗忘矩阵；分类指标、潜在别名案例也不等于本项目留出账号视图的MAP |
-| FOREVER | 在Standard CL、Long Sequence、SuperNI上比较最终表现OP和后向迁移BWT；主实验使用LoRA，多模型规模；附录B.1另有Qwen3-0.6B、SuperNI单顺序的全参数微调补充 | 我们使用BGE全参数账号关联排序、固定全局6群Memory和三阶段；不复现原语言生成基准，也不把原OP/BWT数值当作本项目MAP证据 |
+| VendorLink | 先比较卖家分类架构与训练方式，再用表示相似度分析潜在别名，并研究低资源市场适配 | 我们让模型依次学习三个市场的数据，每学完一个市场，就重新测试它在此前市场上的账号关联能力，观察是否发生遗忘。原论文没有做这样的遗忘测试。它报告的卖家分类成绩和疑似马甲案例，不能直接与我们判断“同一账号的两组商品能否相互匹配”的检索成绩比较。 |
+| FOREVER | 在Standard CL、Long Sequence、SuperNI上比较最终表现OP和后向迁移BWT；主实验使用LoRA，多模型规模；附录B.1另有Qwen3-0.6B、SuperNI单顺序的全参数微调补充 | 我们把 FOREVER 用于账号关联：根据商品标题和描述，把更可能有关联的账号排在前面。训练时更新 BGE 和评分头的全部可训练参数，依次学习三个数据域；所有已学数据域合计最多保留6组历史训练样本，每组包含多个账号，供后续回放。原论文主要测试模型生成文本的能力，我们测试的是账号关联能力。 |
 
 原实验依据分别为 [L²R §5–6](https://jiafengguo.github.io/2023/CIKM2023-L2R.pdf)、[GCR §5–6](https://openaccess.thecvf.com/content/CVPR2022/papers/Tiwari_GCR_Gradient_Coreset_Based_Replay_Buffer_Selection_for_Continual_Learning_CVPR_2022_paper.pdf)、[VendorLink §4–5](https://aclanthology.org/2023.acl-long.481.pdf)。本项目既没有把原论文表格分数当作我们的直接对照，也没有宣称复现了它们全部实验。
 
