@@ -115,9 +115,10 @@ def validate_blind(result, allowed):
                 raise ValueError('Actual market/group IDs differ')
             for group in public[domain]:
                 row = values[group.uid]
+                scores = np.asarray(row['scores'], dtype=np.float64)
                 if (row['view_ids'] != [v.uid for v in group.views]
-                        or len(row['scores']) != len(group.views) * (len(group.views)-1)//2
-                        or not np.isfinite(row['scores']).all()):
+                        or scores.shape != (len(group.views) * (len(group.views)-1)//2,)
+                        or not np.isfinite(scores).all()):
                     raise ValueError('Blind score shape, IDs or finite values differ')
     return public
 

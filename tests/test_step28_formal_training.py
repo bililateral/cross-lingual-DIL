@@ -1,5 +1,6 @@
 """Linux-only handwritten evidence for the two new formal training entries."""
 import copy
+from dataclasses import asdict
 import json
 import os
 from pathlib import Path
@@ -66,6 +67,39 @@ class FormalTrainingTests(unittest.TestCase):
         EVIDENCE['vendor_statistics'] = dict(query_ap=[1/3, 1/3, 1., 1.],
             cross_market_casefold_component=True, no_handle_text_or_label_output=True,
             unequal_query_weight_reference=.375, favorable_points_cannot_pass_statistical_acceptance=True)
+        # Exercise the actual blind gate, with handwritten public groups and file reads.
+        spec = dict(id='hand', order='ABC')
+        groups = {d: vendor_fixture(d, 'heldout').blind() for d in vendor.DOMAINS.values()}
+        payloads = {d: [asdict(g)] for d, g in groups.items()}
+        cells = {}
+        for stage, position in vendor_eval.CELLS:
+            domain, key = vendor.DOMAINS['ABC'[position-1]], f'{stage}_{position}'
+            group = groups[domain]
+            payloads[key] = {group.uid: dict(view_ids=[v.uid for v in group.views],
+                scores=[0.] * (len(group.views)*(len(group.views)-1)//2))}
+            cells[key] = dict(domain=domain, scores=key)
+        blind = dict(runs={'hand': cells}, forwards=4104, sources=[])
+        allowed = dict(heldout_sources={d: d for d in groups}, sources=[])
+        with patch.object(vendor, 'specifications', return_value=[spec]), \
+                patch.object(vendor_eval, 'read', side_effect=lambda rec: payloads[rec]):
+            vendor_eval.validate_blind(blind, allowed)
+            last = payloads['3_3'][groups['Agora'].uid]
+            count = len(last['scores'])
+            for invalid in ([[]] * count, [[0.]] * count, [float('nan')] * count, [0.] * (count-1)):
+                last['scores'] = invalid
+                with self.assertRaises(ValueError):
+                    vendor_eval.validate_blind(blind, allowed)
+            last['scores'] = [[]] * count
+            with tempfile.TemporaryDirectory() as temp:
+                campaign = Path(temp)
+                (campaign/'scoring').mkdir()
+                queue.write(campaign/'scoring/all_blind_complete.json', blind)
+                with patch.object(vendor_eval, 'complete_training'), patch.object(vendor_eval, 'access') as opening:
+                    with self.assertRaises(ValueError):
+                        vendor_eval.analyze(campaign, campaign/'analysis', allowed, None)
+                    opening.assert_not_called()
+        EVIDENCE['vendor_blind_shape'] = dict(flat_scores_accepted=True,
+            empty_nested_column_nan_and_short_rejected=True, actual_analyze_did_not_open_qrels=True)
 
     def test_forever_metric_formulas_and_complete_blind_gate(self):
         spec = forever.m.Spec('ABC', 4)
@@ -99,6 +133,37 @@ class FormalTrainingTests(unittest.TestCase):
                 forever.verify_reference(allowed)
         EVIDENCE['forever_statistics'] = dict(hand_reference=actual, missing_cell_rejected=True,
                                              no_generated_or_formal_data=True)
+        # Old H's completion includes development metadata; compare only shared
+        # learning roles, while still rejecting any fit/calibration/archive change.
+        with tempfile.TemporaryDirectory() as temp:
+            campaign = Path(temp)
+            queue.write(campaign/'training_complete.json', dict(
+                status='ALL_TRAINING_COMPLETE_EVALUATION_CLOSED', completed=[dict(success=True)] * 9))
+            partition = dict(fit=[dict(group_uid='fit', domain='A')],
+                             calibration=[dict(group_uid='cal', domain='A')])
+            current = dict(partition=partition, pretrained_archive={'content_sha256': 'hand-model'})
+            refs = []
+            for s in forever.specs():
+                path = campaign/f'{s.run_id}.json'
+                queue.write(path, dict(spec=s.identity(),
+                    partition={**copy.deepcopy(partition), 'development': [{'group_uid': 'old-dev', 'domain': 'A'}]},
+                    pretrained_archive=current['pretrained_archive']))
+                refs.append(dict(completion=queue.record(path)))
+            with patch.object(forever, 'verify_reference'), \
+                    patch.object(forever, 'validate_completion', return_value=current):
+                self.assertEqual(len(forever_eval.complete_training(campaign, dict(h_reference_runs=refs))), 18)
+                for role in ('fit', 'calibration'):
+                    original = current['partition'][role]
+                    current['partition'][role] = []
+                    with self.assertRaisesRegex(ValueError, 'partition or pretrained'):
+                        forever_eval.complete_training(campaign, dict(h_reference_runs=refs))
+                    current['partition'][role] = original
+                current['pretrained_archive'] = {'content_sha256': 'wrong'}
+                with self.assertRaisesRegex(ValueError, 'partition or pretrained'):
+                    forever_eval.complete_training(campaign, dict(h_reference_runs=refs))
+        EVIDENCE['forever_reference_partition'] = dict(old_development_metadata_allowed=True,
+            actual_complete_training_assembles_18_records=True,
+            changed_fit_calibration_or_pretrained_archive_rejected=True)
 
     def test_followup_waits_for_training_completion_and_uses_its_own_bucket(self):
         with tempfile.TemporaryDirectory() as temp:

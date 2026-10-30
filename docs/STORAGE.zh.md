@@ -1,5 +1,5 @@
 # 科研文件存储与恢复
-## 2026-10-30 VendorLink与FOREVER正式准备、证据及待审包
+## 2026-10-30 VendorLink与FOREVER正式准备、修复与外审证据
 
 两项正式准备分别保存在[VendorLink formal](../reports/documentation/20261030/vendorlink/formal/)与[FOREVER formal](../reports/documentation/20261030/forever/formal/)。Linux共用隔离workspace位于vendorlink/formal/workspace，63份实际源码/手写测试/必要配置已核对；comparison_run/evaluate及其测试采用原资格冻结字节，不覆盖活动实验来源。FOREVER只链接五份已批准train输入与BGE模型目录，不链接整个旧dev/test/owners目录；H27模型仍在原保管位置。两个具体gate均关闭，无正式训练或新确认。
 
@@ -7,7 +7,7 @@ CPU全部尝试、错误、实际收费及获准canonical依赖元数据已回Wi
 
 11份正式方案/实现说明/许可/关闭gate/源码归档/外审记录已SFTP同步到两项独立formal目录；[部署回执](../reports/documentation/20261030/vendorlink/formal/deployment.json)记服务器19:46:14、63份来源一致、无本批活动进程、六个精确链接。该次准备实际向上取整1秒，记FOREVER preparation，启用gate时须与原CPU125/GPU1274一并承接；VendorLink preparation已用25秒、CPU103秒。当前待审gate保留其提交时预算身份，启用前只结转实际费用，不清零。
 
-具体外审包926333字节/125载荷、SHA256 8dee9a952919a8215a1e83058e541db6a933f867548e91655a46ba951acbe731获用户明确批准后，19:36单次提交既有ChatGPT GPT-6 Pro会话。保留待审原包、完整清单、请求、具体许可、提交和页面回执；无正式商品文本/账号名/关系标签/owners/权重/密码。审查未回收前保留必要包，不冒称已审通过。根可变文档本轮只在Windows维护；本地Git交付不等于push或Linux根文档更新。
+具体外审包926333字节/125载荷、SHA256 8dee9a952919a8215a1e83058e541db6a933f867548e91655a46ba951acbe731获用户明确批准后，19:36单次提交既有ChatGPT GPT-6 Pro会话。保留待审原包、完整清单、请求、具体许可、提交和页面回执；无正式商品文本/账号名/关系标签/owners/权重/密码。完整报告report.zh.txt、audit_notes.json与主审处置已回收保管，原包用于复核本轮实际输入及固定清单。原审查要求两项定向修复；修后经主审闭合，未冒称再次网页送审。cpu08/04及repair保存新增源码与原始证据，CPU账分别110/133秒；hold_observation保存两gate关闭/各63来源一致/无本批进程的只读现场。用户要求等待明确开始，不创建自动队列。根可变文档本轮只在Windows维护；本地Git交付不等于push或Linux根文档更新。
 
 ## 2026-10-30 H/S失败隔离监听切换
 

@@ -1,0 +1,14 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - link "跳转到内容" [ref=e119] [cursor=pointer]:
+      - /url: "#_R_etmf9l6basslhi5pklhlb5_"
+    - generic [ref=e4]:
+      - complementary [ref=e5]:
+        - generic [ref=e9]
+        - generic
+      - generic [ref=e88]:
+        - main [ref=e90]
+        - status [ref=e2645]
+  - status [ref=e2646]: 回答已完成
+  - status [ref=e2647]
+  - status [ref=e2648]

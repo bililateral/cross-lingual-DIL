@@ -1,0 +1,324 @@
+VendorLink 与 FOREVER 新正式入口、合同与评价接线：定向科研外审
+审查日期：2026-10-30（UTC+8）
+模型说明：使用当前会话标识的 GPT-6 Astra Pro；本轮未切换模型。
+
+一、输入身份与审查总裁决
+
+实际输入：formal_training_review.zip
+实际字节数：926333
+实际 SHA256：8dee9a952919a8215a1e83058e541db6a933f867548e91655a46ba951acbe731
+ZIP 成员：134 个，全部路径唯一；其中 126 个文件、8 个目录项。
+package_manifest.json 列出 125 个载荷，加清单自身正好是 126 个文件。125/125 载荷的实际字节数及 SHA256 与清单一致；无缺失载荷、无未列出的额外文件。8 个目录项不属于清单载荷，不构成成员不一致。
+
+本轮裁决：REQUEST_TWO_TARGETED_REPAIRS_BEFORE_FORMAL_GATE_CLOSURE。
+
+分别裁决：
+1. VendorLink：未发现新增 SCIENTIFIC_BLOCKER；发现 1 项 REPRODUCIBILITY_DEFECT，编号 V-R01，中等严重度，涉及集中开标签前的分数数组形状校验。
+2. FOREVER：未发现需要重开既定方法或研究合同的 SCIENTIFIC_BLOCKER；发现 1 项 REPRODUCIBILITY_DEFECT，编号 F-R01，高严重度，涉及旧 H 与新 FOREVER 完成记录的分区模式不兼容。
+3. 共用单 worker 队列：在本轮明确的顺序启用、失败停止、无自动重试范围内，未发现另一项必须阻断本批的缺陷。
+
+两个缺陷均可在少量现有代码内修复，并用手写元数据／分数夹具补核。无需新增 HPO、方法、种子、正式数据、效果 pilot、三路资格或完整大模型试跑。两套训练主体有实际算法调用；不是用日志、计数或 PASS 字段代替运算。
+
+用户已经接受两项具体正式范围。本报告不回用此前“正式预算尚未批准”或“FOREVER GPU 尚未运行”的旧状态。当前两个 formal/gate.json 的 approved、review_closed 仍为 false；本报告未修改这些门，也不代替独立主审、部署核对、单队列先后启用和实际资源准入。缺陷修复及定向证据闭合前不应启用正式门。
+
+本轮仅阅读所给包。没有访问科研服务器、外部论文／仓库、未提供的数据／模型／标签；没有执行或导入项目代码、训练、生成器、推理、测试、指标或 bootstrap。ZIP、JSON、源码文本、哈希、预算加法和源版本比对属于本次机械核对，不是科研运行。
+
+二、必修项 F-R01：H 与 FOREVER 的 partition 被作整字典比较
+
+分类：REPRODUCIBILITY_DEFECT。
+严重度：高；按声明的旧 H 生产入口，正常完整训练后会在后续确认入口被拒绝。
+
+精确位置：
+- workspace/scripts/step28_forever_evaluate.py，complete_training()，第 28—48 行；关键是第 44 行 row['partition'] != old['partition']。
+- 新分区生产者：workspace/scripts/step28_continual_comparison_run.py，training_inputs()，第 145—148 行，只生成 fit、calibration 两个键。
+- 新完成记录：workspace/scripts/step28_forever_formal.py，execute()，第 132、139 行，将上述分区原样写入记录。
+- 旧 H 分区生产者：workspace/scripts/step28_continual_five_run.py，execute()，第 244—255 行，调用 base.partition() 并保存完整 partition。
+- workspace/scripts/step28_chinese_base.py，partition()，第 66—79 行，明确包含 fit、calibration、development 三个键。
+- 包内已存在的兼容做法：workspace/scripts/step28_continual_comparison_evaluate.py，full_gate()，第 44—48 行，只投影 fit/calibration 再比较。
+
+具体触发与影响：
+若旧 H 按包内声明的冻结入口生成，其 partition 含 development；新 FOREVER 只含 fit/calibration。即使共同训练群、校准群及其顺序完全一致，两个字典也不相等。
+
+新评价 CLI 在 generate、confirmation、analyze 任一动作之前，均调用 complete_training()（step28_forever_evaluate.py 第 236—250 行）。因此本批正常顺序是：九条训练全部完成、各条恢复载荷成功清理之后，首次 generate 在生成任何新群之前就被第 44 行拒绝。这是提前可识别的接线错误，不是效果不佳或预算不足。
+
+证据边界：包内提供 H 完成记录与 27 端点的身份／存在性元数据，没有提供实际 H completion 全文和权重。本审查没有打开这些未提供对象。该判定来自包内明确的旧记录生产者与新消费者模式；不是声称已经在服务器复现了报错。
+
+最小修改：
+在 complete_training() 中，对双方 partition 都仅提取有序的 fit、calibration 列表后比较；缺少必要键仍应失败。继续保持 pretrained_archive 的精确比较。不要修改旧 H 文件，也不要为使字典相等而读取旧 development 文本／标签或把它加入新训练输入。只投影比较，不必删去 records 中原有的旧元数据。
+
+可采用的局部逻辑为：
+  roles = ('fit', 'calibration')
+  new_partition = {key: row['partition'][key] for key in roles}
+  old_partition = {key: old['partition'][key] for key in roles}
+  if new_partition != old_partition or row['pretrained_archive'] != old['pretrained_archive']:
+      raise ValueError(...)
+
+这不是放宽来源合同：应比较的是同一训练／校准划分，不应要求 train-only 完成记录复刻旧开发集记录结构。
+
+最小验证：
+用手写完成元数据直接覆盖 complete_training() 的共同路径：
+1. H 多 development 键，两侧 fit/calibration 完全相同，应通过。
+2. 改变共同分区中的群 ID、域或顺序，应拒绝。
+3. 改变 pretrained_archive，应拒绝。
+可以用手写小文件或对未提供实物验证的限定替身，不载模型、不运行生成器、不读正式数据。保留当前缺模型、错误来源和缺格负例即可，不必重跑整个 864 步小模型测试来验证一个分区投影。
+
+现有证据为何未捕获：FOREVER cpu02 运行真实小模型 execute，测试到完成、清理及删除端点拒绝；它没有组合旧 H 完成记录进入 complete_training。cpu03 增加的是 H 错误 source_files 的拒绝负例，尚未到共同分区比较。参见 tests/test_step28_formal_training.py 第 70—101、207—249 行及对应 cpu02/03 原测试来源。
+
+三、必修项 V-R01：VendorLink 完整盲门没有要求真实一维分数形状
+
+分类：REPRODUCIBILITY_DEFECT。
+严重度：中；涉及一次标签开放边界，修法很小。不是四方法数学错误。
+
+精确位置：
+- workspace/scripts/step29_vendorlink_evaluate.py，validate_blind()，第 102—122 行，尤其第 117—121 行。
+- 同文件 analyze() 第 220 行调用全批盲门，第 228—229 行登记并读取三个 qrels。
+- workspace/scripts/step29_vendorlink_run.py，query_ap()，第 215—221 行随后向一维上三角槽赋值。
+
+具体触发：
+设某群 n 个视图，需要 m=n(n−1)/2 个标量分数。当前门只要求 len(row['scores'])==m，并检查 np.isfinite(row['scores']).all()。若保存的分数是 [[], [], …]、外层恰为 m 项，外层长度正确；内部为空的二维数组没有非有限元素，all() 也为真。[[x], [x], …] 同样有正确外层长度和有限值，却不是所需的一维向量。
+
+在其余元数据、文件身份及格数齐全时，该群可通过当前 validate_blind；analyze 随后先登记并打开 qrels，之后 query_ap 的矩阵赋值才因形状不兼容失败。这样不满足“所有真实分数形状完整后，才一次集中开放标签”的明确合同。
+
+必须准确限定：当前生产 Model.score()（step29_vendorlink_methods.py 第 201—213 行）的两个分支均正常返回一维分数。本报告没有声称正式评分已生成上述坏数组，更没有声称实际标签已经泄漏。缺陷是集中盲门作为独立完整性检查不够严格；用户专门要求审查的“缺分数能否越门”确有这一反例。哈希只证明读回的是所记录的文件，不能补足形状语义检查。
+
+最小修改：
+在 validate_blind 内，把每群 scores 转成数值数组，并要求 shape 恰为 (m,)，再检查有限性。例如：
+  scores = np.asarray(row['scores'], dtype=np.float64)
+  if scores.shape != (m,) or not np.isfinite(scores).all():
+      raise ValueError(...)
+保留现有 run/cell/domain/group/view ID 检查。无需改模型、评分数学、导出数据或建立通用 schema 框架。
+
+最小验证：
+只用手写 public groups、分数文件和固定格目录，测试完整合法向量，以及缺格、二维空列／单列、NaN 等小反例。在 analyze 的 qrels 读取边界放读取计数替身，断言这些错误都在标签开放登记及读取之前失败。夹具中的 216 格／4104 计数字段只是门结构测试，不可称为实际完成了 4104 次模型前向。
+
+现有证据为何未捕获：本包十次 CPU receipt 所指定的实际测试版本均未直接调用 VendorLink 的 validate_blind、完整 score/analyze 或新 formal.execute；它们覆盖保存口径、小型指标、依赖连接和队列组成行为。cpu07 对 comparison_summary 的描述限制测试有效，但不是完整标签盲门测试。补这一小段边界证据足够，不要求完整 BERT pilot。
+
+四、VendorLink：逐环节的实际作用与可接受范围
+
+4.1 固定输入、更新与数据顺序
+
+step29_vendorlink_formal.py 的 specifications()/validate_scope()（第 30—43 行）固定四方法 VendorLink_SEQ、H_SEQ、H_ER、H_full，ABC/BCA/CAB×seed4/5/6，共 36 条；每市场 40 轮、单条 8 小时、训练桶 288 小时，无自动重试、无提前评价、固定描述结论。
+
+execute.load_fit()（第 108—120 行）按 order 的下一市场才读取指定 fit 导出，读取前记录尝试，再核对字节身份、群数、domain 和 split。实际调用 run.execute(... inference_endpoints=True) 在第 123—124 行。训练路径没有调用 heldout、dev、qrels、owners 或 canonical 读取。
+
+既有 run.execute 第 124—175 行真正建立每阶段数据流并更新：VendorLink 从当前 fit 的完整类别建立分类头和优化器，广告按固定种子洗牌后分批；H 保持跨市场优化器，H_SEQ 不抽历史，H_ER/H_full 从存活 Memory 抽历史。update_vendor()/update_h() 实际反向、裁剪和 optimizer.step 后，外层才增加更新计数并记录日志。非末阶段才 retain；淘汰历史不是通过重读旧 fit 回流。
+
+input_metadata.json 的固定导出计数为：AlphaBay 97 群／3100 条选定广告，Dream 34 群／1080 条，Agora 126 群／4028 条。按 VendorLink batch32，每市场向上取整恰为 97、34、126 次；H 每群一次也为这些数。因此每条 (97+34+126)×40=10280 次当前更新，全批 370080 次；8208×40×36=11819520 次当前广告曝光。以上仅为所给导出元数据与代码的算术核对，没有重新读取商品数据。
+
+共同当前曝光不等于共同总计算：H 历史反向、teacher 生成、不同输入与模型头的费用仍应分别报告。40 轮是本轮已接受的固定设置。本审查没有访问外部论文，故不独立认证方案所引论文段落；只确认实际新入口按固定 40 轮调用，不按正式效果选轮或追加训练。
+
+4.2 紧凑阶段端点与后续评分
+
+run.execute 第 179—182 行紧凑保存 identity/settings/classes/model.state_dict/stage/updates。model.state_dict 包含 encoder、H head 或 VendorLink classifier 的完整参数及 buffers。评分不需要 Adam、Memory 或训练 RNG：Model.score 显式 eval，使用固定 encoder/检索头计算。
+
+formal.execute 第 127—144 行逐一读取三个阶段文件，核对 settings、identity、stage、累计更新；VendorLink 先按 classes 重建分类头，再 strict=True 加载全部 state。evaluate.score 第 143—157 行采用相同模型设置／类别重建和严格加载，然后调用 run.evaluate。分类头虽然不是检索评分本身所需，仍保留以保证模型状态可严格恢复。
+
+epoch latest 仍保存完整训练状态；阶段 compact 只是减少推理端点的重复恢复载荷。只有三个实际端点核验并写完成回执后，formal 第 147—151 行才记录 latest 身份并删除 latest。失败不被转成继续下一条的许可。缺 Adam/Memory 不是推理端点缺陷；本轮 fresh-only 正式入口也没有承诺自动恢复。
+
+cpu02 的准确支持范围是：VendorLink_SEQ 与 H_full，各以完整／紧凑两种保存方式真跑三个手写小模型阶段，每阶段 2 epoch；三个端点的所有模型 tensor、更新日志相同，训练后内存模型的最终 blind scores 相同。它没有用 fresh model 从每个 compact 文件重载后跑全部正式评分器，不能称为“216 格重载评分已实测”。完整重载接线可从代码判断；补 fresh load/score 可选，不另列必修。
+
+4.3 全批训练完整门、盲评分与标签开放
+
+evaluate.complete_training 第 92—99 行要求固定 36 个 run ID、36 条成功，并逐条重验正式完成回执和三个端点。score 第 128—133 行先过训练完整门才读固定 heldout 公共群，拒绝携带 identity 的群。每条六个已见市场格，合计 216 格；固定留出 57 群在循环位置加权出现，合计 4104 群前向。
+
+validate_blind 检查全方法／路径集合、每条完整六格、实际域、群 ID、view ID、分数数量和有限性。缺 run、缺 cell、缺 group、错误 ID、普通一维少分数或 NaN/Inf 均会拒绝；V-R01 是需补齐的维度例外。analyze 第 216—227 行还重验训练、sources、依赖元数据的 canonical/partition 及群集合／query 数，之后才开放三个固定 qrels。access() 拒绝同角色重试，动作目录也拒绝已有产物的静默重启。
+
+4.4 指标、query 权重和结论限制
+
+VendorLink 独立使用十指标：MAP、MRR、Recall@1/3/5/10、NDCG@1/3/5/10。query_metrics 第 170—189 行按 query 的唯一正例名次计算，并显式要求每 query 恰好一个正例以及 AP=MRR；tie 沿用不含关系标签的 opaque ID 顺序。
+
+该项目定义为：Q=(R11+R22)/2，O=(R31+R32)/2，F=Q−O，N=R33。F 可以为负。它没有使用 FOREVER 的 N=(R22+R33)/2 或 Z。
+
+analyze 第 245、255—256 行先保存每群 query 指标和，再除以该市场的实际总 query 数；九条 order/seed 等权。因而 Dream 的四账号尾群按 8/120 查询权重计，不是按 1/8 群权重计。query 加权在完整聚合中有真实接线，不只是 cpu07 的手算。
+
+comparison_summary 第 203—212 行固定输出 H_full−VendorLink_SEQ、H_full−H_ER、H_full−H_SEQ；对全部 Q/O/F/N 与十指标都保留点差，并始终返回 primary_status=DESCRIPTIVE_FIXED_DATA_ONLY、passed=null、区间=null。当前文件没有整体 bootstrap 执行或显著性验收。队列的 ALL_FORMAL_ACTIONS_COMPLETE 仅表示任务执行完成，不会把 passed=null 改成统计通过。
+
+已提供 dependencies.json 记录 57 群、912 query、10 个分量；最大分量 48 群，含 AlphaBay19、Dream8、Agora21，其余九个单群。本轮机械核对分量名单及数量与摘要吻合，没有重盘 canonical。prepare_dependencies 及获准 dependency_preflight.py 的源码没有 qrels 读取；回执记录 canonical_parse_attempts=1、qrels_reads=0、24.190361717 秒／收费25秒。正式队列只 verify 这份依赖文件，分析只读其元数据，不重新调用 canonical 扫描。
+
+因此用户接受的固定数据描述范围已落实。不能把 57 群或九条路径当独立重复来恢复整体显著性，也不应为恢复区间追加数据、改群或换统计方案。该任务仍是同一观察账号的两份商品文本视图检索；跨市场 casefold 连接是依赖连接，不是已经验证的真实 owners。不能直接比较英文真实市场和中文合成主线的绝对分数。
+
+五、FOREVER：逐环节的实际作用与可接受范围
+
+5.1 真正的九条三阶段入口
+
+step28_forever_formal.py 第 27—38 行固定九条、6 epoch、108 小时训练桶及单条12小时。execute 第 132—147 行实际调用 train-only training_inputs、Supply、fresh、Learner 和三次 run.stage，不是把预期的 864 填入回执。
+
+run.stage 第 223—237 行依次获取当前阶段 fit/cal、建立固定当前顺序、排空应执行事件、完成 288 次 current、末尾 consolidation、实际校准／端点恢复核对、retain 和事务提交。Learner.update 第 277—284 行在真正 step 返回后才累计 current/replay，并要求真实 Adam step 等于计数总和。
+
+现有自然 R0/reference=None、全 P 实际位移、sum 正则与连续 Adam 接线保持：forever.py 第 233—240 行把任务梯度、有限的结构性 pooler 数学零处理、解析正则和统一梯度裁剪接到同一次 optimizer.step。回放不推进 current 时钟；event 第 289 行每次计算本次 beta；末尾 end 单独调用，未回到旧 beta 歧义。已修复的 pending-event 排空位于 advance 第 314 行及 stage 第 228 行。
+
+每阶段 current288，三阶段864；第一阶段无历史。后两阶段各最多九次两遍回放，加末尾一遍，每遍最多六个完整群，所以上限为 2×(9×2+1)×6=228；总更新≤1092。retain_and_switch 第 331—338 行只在前两阶段 retain／新锚点，末阶段不制造未来历史。
+
+完整 P 锚点不被悄悄改成 head-only 或 LoRA。包内已开放原生证据给出 326046977 个参数、FP32 锚点1304187908字节，约1.215GiB；样本 Memory 与小状态仍单独受1MiB约束。该额外历史参数状态已获用户接受，但比较不是等总历史状态、等计算或等 HPO。
+
+5.2 校准失败与成功清理
+
+forever_run.endpoint 第 187—195 行先真实评分／拟合，随即保存拟合详情，再对 FAILED 状态拒绝；不把失败拟合删除掉后只剩一条错误字符串。拟合公式及成功门沿用原函数。本轮 CPU01 用已知失败返回验证详情落盘及无成功模型，属于受控失败路径证据，不是声称在真实 BGE 正式数据上出现过拟合失败。
+
+成功端点保存真实模型状态；第 205—208 行重载并重评分当前校准群，要求分数完全一致。validate_completion 第 65—85 行要求864 current、0 fixture、回放≤228、三个阶段、每阶段12个正确当前校准群、实际模型文件及成功校准映射。
+
+retire_completed 第 89—109 行先完成上述核对，检查 latest.phase=complete，保留删除前 latest/full/anchor 身份，再仅删除该条已经不需恢复的 full/anchor/latest。推理模型、maps、Memory、小状态与清理记录保留。新正式入口明示 fresh-only；若发生失败则停止，不能凭尚存 checkpoint 自动重试。
+
+cpu02 的新证据是真实调用 formal.execute，用手写小模型完成864 current＋120 replay、0 fixture，包含三个真实校准／推理端点、非零回放正则、成功清理，以及删除一模型后完成门拒绝。它与旧阶段边界夹具不同，但仍不代表真实 BGE 的完整三阶段或正式数据长程已运行。
+
+5.3 H27 来源绑定和剩余接线缺陷
+
+verify_reference 第 41—62 行验证九条唯一 order/seed、H_pos_tuned 名称、旧完成状态、864 updates、旧 source_files 与固定旧 gate 的 sources、三个模型／mapping 文件身份及既有恢复证据。训练前有 preflight；后续动作重新检查。缺 H 不会自动改成重训。
+
+确认加载 H 时，evaluate 第 139—144 行调用 Method.restore；five.Method.restore 第 253—258 行除了恢复 state digest，还 bind 方法／order／seed／目标元数据，并恢复模式与 RNG。新 FOREVER 端点也经 core.restore_state 验证摘要；实际 stage/maps 必须等于记录。
+
+这些链接有意义，不能因本轮未重新拟合 H 的校准就要求重做 H。包内 input_metadata 仅报告九条完成记录身份及27端点存在性／字节信息；我没有将其当成已经亲自重读27权重的证明。实际文件核验是启动和完整门中的真实代码前提。
+
+F-R01 是这条链上目前明确的正常路径阻断：共享 fit/calibration 一致性应保留，但比较方式必须投影共同分区。修复后保留预训练档案精确一致、模型与原校准绑定即可。
+
+5.4 新120群、完整盲门和固定统计
+
+generate 第 51—89 行使用同一生成器／catalog、新 namespace=forever_confirmation_20261030、seed2026103001；固定每域40群。它验证新 group/account/controller ID、跨新群重复及与旧 partition 群ID交叉，生成／验证新的 owners 和 pairs 后封存 owners。该生成步骤本来就被批准持有新生成关系；不应把生成验证时形成 pairs 误称为评分阶段提前揭盲。
+
+confirmation 第 118—124 行核对生成来源，只通过公共加载器读取新文本。18条路径、54模型、每条六格，共108格／4320前向。validate_cells 第 92—108 行核对路径全集、六格、总数、120唯一群、实际域和ID顺序。
+
+这一门不仅检查JSON格数：shared.calibrated_roles（comparison_evaluate.py 第 120—126 行）在每格产生时就要求 raw 为(40,378)、FP32、全有限；随后 evaluate 第 160—166 行验证保存数组身份和校准排序／ties，再写 all_blind_complete。第167行以后才登记一次新pairs开放并读取标签。缺阶段或分数不能在正常接线中越过这一链。不能仅看 validate_cells 本身未打开数组就误报其没有真实形状门。
+
+FOREVER 的22指标、raw/stage-cal/first-cal 通过原 metric_set 保存；每组28query的十个排序指标与组指标对应、分类分母未定义者保留缺失，不能零填。统计采用：
+- O=(R31+R32)/2。
+- A_acq=(R11+R22)/2。
+- F=A_acq−O。
+- N=(R22+R33)/2。
+- Z=R33。
+
+shared.contributions 将阶段位置映射到实际A/B/C域。analyze 第191、208—212行固定5000次、seed2026103002，按实际域40个完整群配对抽样；两方法、阶段、九条固定路径共用索引，九路径等权。第219—227行主比较是H−FOREVER：raw MAP 的O条件95%区间下界>0、F上界<0，同时N/Z点差≥0。N/Z不是统计非劣效，区间不覆盖重训／调参不确定性或真实市场总体。
+
+没有旧分数拼接、新增结果选择或因原H−S共同门失败而改门。本报告也不预言H或FOREVER哪一方更优。新群独立性限于本次冻结方案后的新生成群；先前方法开发经历仍存在并已在结论限制中承认。
+
+六、共用队列、预算、资源与停止条件
+
+6.1 调度和实际执行
+
+step28_formal_queue.py 的 gate 第42—58行检查当前实验、Linux、两个正式布尔门、单worker、批准动作、授权身份、source身份以及真正入口／queue位于来源清单。当前两个 gate=false 会拒绝正式执行。
+
+dispatch 第98—107行要求新campaign、固定唯一任务ID、全部预留任务加历史费用不超各桶。第159—175行实际创建受控子进程并等待退出；非零退出、资源失败或完成核验失败均停止后续派发。只有所有训练任务完成核验后，第189—191行才发布 training_complete.json，然后才进入生成、评分、分析等后续任务。
+
+第177—188行在 finally 停止本任务、记完整实际外层耗时，包含启动、载模、保存、失败及退出后的完成核验；费用不因失败截断或回滚。单条、桶超限不能变成success。第197—200行保留STOP_NO_AUTOMATIC_RETRY现场。
+
+两项新队列不同时启用资源等待者，是已接受的操作前提。该helper没有通用跨实验锁；在本轮已明确按先后启用的范围内，这不是必须新增系统的理由。启动处置要实际落实这一前提，不要把两个独立父进程同时开起来后各自把同一空闲资源当作可用。
+
+6.2 预算核对
+
+VendorLink：
+- training 1036800秒=288h=36×8h。
+- confirmation 21600秒=6h。
+- cpu600＋control1800＋analysis900＋preparation3900=7200秒=2h。
+- 合计1065600秒=296h；单条8h包含在训练桶内。
+- 新CPU七次13+10+23+8+18+23+8=103秒；剩余497秒。
+- 已获准依赖扫描24.190361717秒，收费25准备秒，gate已承接。
+- 原单路资格124秒按方案另列历史费用，不把它抹去，也不重复扣成这批新增资格。
+
+FOREVER：
+- training388800秒=108h=9×12h。
+- confirmation21600秒=6h。
+- cpu600＋native3600＋generation600＋control600＋analysis900＋preparation900=7200秒=2h。
+- 合计417600秒=116h；单条12h不是额外额度。
+- 原CPU70＋新增9+39+7=125秒；剩余475秒。authorization中的70是增量前的账，gate中的125正确承接新增55秒。
+- 原GPU25+481+768=1274/3600秒；两次失败费用保留。成功一次39实际调用，历史累计65调用。qualification/scope_update第15行已明确撤销旧48累计调用硬限，不能拿已撤销条款重新否定当前单路结案。
+
+各次CPU charged_seconds 均等于其 wall_seconds 向上取整，失败cpu01/cpu03等没有被清零。当前两gate的prior_used_seconds与包内回执一致。这里只核对已给账，不向项目账本写入本次静态外审耗时。
+
+6.3 资源与不保证完成
+
+resources 第61—70行读取实际GPU0空闲、可用RAM、当前共享磁盘。VendorLink显存门17GiB；FOREVER10GiB并保持8.5GiB allocator；两项RSS64GiB、campaign96GiB、共享余量64GiB。磁盘准入考虑本campaign已占用及剩余名义承诺。单worker前一任务退出后才发下一任务，不存在本队列内部三槽尚未反映的自有承诺。
+
+check_running 第83—92行检查父子及后代RSS、实际campaign大小和共享余量；各worker还有其预算检查。任务提前60秒进入停止，stop只处理本任务进程组。等待sleep不计控制费，活跃查询／监督计控制费。资源不足等待，任务失败则停止并留费，不抢占他人作业。
+
+不能由这些逻辑推断现有空闲资源或全批一定完成。VendorLink每条120个epoch latest及阶段保存、FOREVER完整校准、H27读取／核对、54模型恢复、确认前向与后处理均消耗真实时间和I/O。给定296h／116h是硬上限；历史单步外推不是完成保证，单路工期不能除以3。
+
+范围说明：dispatch的同步preflight在父进程第126—138行执行，完成／异常后计准备费并核对额度；它不是另一个被父进程轮询杀停的子worker。后续generation/analysis才是受监督子任务。报告应按实际边界描述，无需因此建立通用preflight平台、控制器SIGKILL恢复或永久I/O阻塞灾备。
+
+七、原证据与本轮增量到底支持什么
+
+7.1 机械来源核对
+
+- workspace/cpu_sources.json包含63份实际源码／测试／配置，与工作区全一致。
+- 两个gate的63项sources均对应同一实际工作区并逐项吻合。
+- source_archive.zip包含84个版本文件；每个文件实际SHA等于其路径内SHA。
+- 十次CPU receipt.sources的每一项都可按SHA／原相对路径找到，实际字节数一致；没有以当前测试覆盖旧失败版本。
+- 三份comparison依赖按包内原资格冻结身份使用；source_observation记录的gcr/l2r/native身份与当前工作区吻合。本审查未访问、替换或引用当前活动仓库根目录的同名文件。
+
+关键复用边界：VendorLink cpu02的run.py与当前同字节；cpu06的queue与当前同字节；FOREVER cpu02的forever.py和forever_run.py与当前同字节。后续正式入口变化主要是H来源/preflight/后续接线，不能把旧小模型轨迹测试扩称为新增完整评价连接已经测过。
+
+7.2 本轮CPU证据摘要
+
+VendorLink：
+cpu01／13秒：compact夹具返回Group而非list，失败原件保留；真实失败子进程停止后续派发的部分证据有效。
+cpu02／10秒：两方法、两保存口径、三个真实小模型阶段，端点tensor／日志／最终内存模型分数一致。
+cpu03／23秒：队列失败与后续门通过；依赖夹具因掩码后重复文本被原清理剔除，失败保留。
+cpu04／8秒：修正手写文本后，指标与casefold依赖连接通过。
+cpu05／18秒：准备费／后续桶及当时旧统计算例；已移除的bootstrap算例不再支持当前任何区间。
+cpu06／23秒：真实失败子进程保留原7秒费用；真实超RSS子进程被终止；下一条未派发、训练完整门在后续任务之前。
+cpu07／8秒：AP手算、大小不一群query加权、全部大正点差仍passed=null及无区间。当前comparison_summary确被调用。
+
+FOREVER：
+cpu01／9秒：失败校准详情留存通过；完整小模型尝试因夹具64MiB名义桶与固定序列化余量冲突失败，生产限制未放宽。
+cpu02／39秒：真实864+120三阶段、三个校准／推理端点、成功清理／缺模型拒绝、O/F/N/Z手算／缺格拒绝。夹具名义桶2GiB只容纳固定余量；外层仍强制实际64MiB，采样产物峰值841074字节。
+cpu03／7秒：H错误原source拒绝及公式／缺格复用，不覆盖F-R01的正常旧H分区连接。
+
+这些都是包内提供的Linux py310既有执行证据。我本轮没有重跑它们。CPU数量、退出0和哈希不能证明正式效果，也不能替代本次发现的两个实际行为缺口。
+
+7.3 已闭合原生资格的复用
+
+FOREVER包内提供最终gpu_summary及39行已开放更新日志；本轮阅读摘要、关键更新／恢复对照日志及资格范围修订。数据明确区分物理39调用与恢复后单分支逻辑Adam38；日志有实际encoder/head位移与非零正则，不只是PASS标签。原生pooler处理限定官方结构中未使用分支，未删全P。该单路资格不覆盖正式九条、全部数据校准、三路或最终效果。
+
+VendorLink单路G1闭合按用户明确状态及包内native主审原文复用。当前包没有要求我重新打开其未附的完整received原生现场；我没有将主审叙述冒称本轮亲自重跑G1或逐步验证未提供的权重。无需追加G2、三路或全模型长程pilot。
+
+八、OPTIONAL 与 OUT_OF_SCOPE_OVERDESIGN
+
+OPTIONAL O01：可在现有compact手写测试中，用fresh小模型从所存阶段文件重载并评分，加强新score入口的证据。现有参数保存／严格载入链已经可静态核对，这项不是为修复V-R01必须增加的训练。
+
+OPTIONAL O02：最终结果增加直接可读的每格query加权均值表／每条O/F等汇总会更易审阅。当前每格query指标或22列矩阵已保存，不构成数值丢失；无需改变统计器。
+
+OPTIONAL O03：收窄“所有准备过程均被父进程硬监督”的概括，区分同步preflight与后续子任务。控制费退出异常的末小段结算可顺手精确化，但不因几秒级管理边界要求通用调度重构；本报告没有把它列为第三必修项。
+
+明确排除的过度设计：
+- 新HPO、新方法／VendorLink+ER、新种子、全排列或追加数据。
+- 为VendorLink恢复整体bootstrap／显著性而改群、换划分、换统计模型。
+- 重训缺失H，或改旧H冻结来源／校准／结果以绕过比较门。
+- 重开已接受的单路资格，要求三路、全卡无CUDA、正式数据pilot或完整40轮／三阶段大模型资格。
+- 改FOREVER为head-only锚点、压缩／LoRA、mean正则或重调beta。
+- 每步checkpoint、全仓回归、自动重试、共享实验基础设施或通用灾备／锁平台。
+
+九、实际阅读范围与未验证事项
+
+全文阅读的本轮关键资料：
+- package_manifest.json、request.zh.txt。
+- 两项formal/plan.zh.txt、implementation.zh.txt、authorization.json；gate配置字段完整读取，source长表逐项机械核对。
+- workspace/scripts/step28_formal_queue.py（200行）。
+- step28_forever_formal.py（202行）、step28_forever_evaluate.py（256行）。
+- step29_vendorlink_formal.py（203行）、step29_vendorlink_evaluate.py（290行）。
+- step28_forever_run.py（242行）、step29_vendorlink_run.py（282行）。
+- tests/test_step28_formal_training.py（262行）、workspace/run_cpu.py、vendorlink/formal/dependency_preflight.py。
+- VendorLink cpu01—07及FOREVER cpu01—03的console、evidence、receipt；来源按各自原版本追踪。
+
+定向读取的直接调用：
+- step28_forever.py的Spec/config/fresh、参数覆盖、位移／正则、Clock、step和Learner状态路径。
+- step29_vendorlink_methods.py的Model、score、两种真实更新、优化器与Memory；data.py的Group、清理、划分／组构造相关函数。
+- comparison_run.training_inputs/Budget；comparison_evaluate.full_gate/calibrated_roles/validate_cells/contributions/interval。
+- five_run.execute及H完成记录生产；five.Method的配置／fresh／score／restore；five_evaluate的access、confirmation_public、metric_set、field_terms。
+- chinese_base.partition/model_config/load_model相关段落；continual_population.model_files及状态接口；alias_calibration的参数、变换、保序和拟合返回。
+- 手写测试使用的FOREVER/VendorLink夹具及相关旧测试调用；source_archive中对应实际测试版本和关键变更diff。
+
+必要旧结论／元数据：
+- FOREVER implementation/review/primary_disposition、qualification/scope_update、final/gpu_summary、gpu03关键更新日志。
+- VendorLink implementation修复主审、three_market主审、native主审。
+- dependency_preflight的元数据／回执、input_metadata、source_observation、evaluation_access及两个来源清单。
+- 更早的完整方案／外审原件作为闭合历史保留，本轮未逐段重审其数学，也未把旧审查结论当作新正式入口无缺陷的证据。
+
+没有把63份来源或84个归档版本全部宣称逐行审完。身份机械核对覆盖全部这些文件；行为审查集中在上述新入口、真实直接调用及与本轮证据相关的版本。
+
+未运行、未验证：实际正式商品文本、账号名、关系标签、owners、H27/BGE/BERT权重实物、实时服务器资源、正式36/9条、全部确认前向、最终分数或统计结论。本轮没有重新计算正式指标，也没有请求上传这些对象。代码反例为静态推导，不冒称已由本轮执行实证。
+
+十、定向闭合条件
+
+保留两项已接受的研究范围及原数学。先分别修复F-R01、V-R01，在各自已有CPU余额／既定手写边界内完成上述小补核，保留新旧源码与失败账；由主执行者独立处置具体修法。随后核对实际部署身份、H原参考前提和资源，并落实两个新队列只先后启用；这些审查与启动条件闭合后，再由主执行者按已批准范围启用相应正式门。
+
+若正式运行因资源、校准、来源、模型、完整盲门或预算失败，应停止并保留现场／费用；不能用部分方法、部分路径、缺格或提前开放标签的结果改写为完整比较，也不能自动追加预算或重试。
+
+VendorLink即使全部执行成功，结论仍是固定数据描述比较，passed=null；FOREVER只有冻结新群上的固定H−FOREVER门经正式完整结果审查后才能谈是否满足本轮条件。任何资格通过、文件同SHA、退出0或队列完成状态都不是抗遗忘效果结论。

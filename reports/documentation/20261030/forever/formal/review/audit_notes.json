@@ -1,0 +1,137 @@
+{
+  "review_date": "2026-10-30",
+  "timezone": "UTC+8",
+  "model_context": "当前会话标识 GPT-6 Astra Pro；未切换模型",
+  "scope": "仅本包的两项新正式入口、合同、评价接线和必要证据复用；定向静态科研外审",
+  "input": {
+    "name": "formal_training_review.zip",
+    "bytes": 926333,
+    "sha256": "8dee9a952919a8215a1e83058e541db6a933f867548e91655a46ba951acbe731",
+    "zip_members": 134,
+    "file_members": 126,
+    "directory_members": 8,
+    "manifest_payloads": 125,
+    "payload_bytes_and_hashes_matched": 125,
+    "duplicate_paths": 0,
+    "missing_files": 0,
+    "unlisted_files_excluding_manifest": 0
+  },
+  "verdict": "REQUEST_TWO_TARGETED_REPAIRS_BEFORE_FORMAL_GATE_CLOSURE",
+  "per_project": {
+    "VendorLink": {
+      "scientific_blockers": 0,
+      "reproducibility_defects": ["V-R01"],
+      "conclusion_scope": "DESCRIPTIVE_FIXED_DATA_ONLY",
+      "planned_effect_acceptance_passed": null
+    },
+    "FOREVER": {
+      "scientific_blockers": 0,
+      "reproducibility_defects": ["F-R01"],
+      "comparison": "固定 H-FOREVER；新群 raw MAP O/F 条件区间门及 N/Z 点值保护",
+      "effect_result_available": false
+    },
+    "shared_single_worker_queue": {
+      "additional_mandatory_defects": 0,
+      "condition": "两项新队列按已接受方案先后启用，不同时启动两个资源等待者"
+    }
+  },
+  "findings": [
+    {
+      "id": "F-R01",
+      "class": "REPRODUCIBILITY_DEFECT",
+      "severity": "HIGH",
+      "must_fix": true,
+      "location": "workspace/scripts/step28_forever_evaluate.py::complete_training, line 44",
+      "support": [
+        "step28_continual_comparison_run.py::training_inputs, lines 145-148",
+        "step28_continual_five_run.py::execute, lines 244-255",
+        "step28_chinese_base.py::partition, lines 66-79",
+        "step28_continual_comparison_evaluate.py::full_gate, lines 44-48"
+      ],
+      "trigger": "旧 H 按声明入口保存 fit/calibration/development，新 FOREVER 只保存 fit/calibration；整字典比较拒绝相同共同划分。",
+      "impact": "九条训练完成后，首次 generate 之前正常来源也被拒绝，无法继续新确认。",
+      "minimal_fix": "双方仅投影有序 fit/calibration 列表后比较；继续严格比较 pretrained_archive；不修改旧 H，不读旧开发集文本或标签。",
+      "minimal_validation": "手写元数据直接覆盖 complete_training：旧 H 多 development 的合法正例；共同群ID/域/顺序或预训练来源变化的拒绝负例。",
+      "evidence_limit": "依据包内旧生产者与新消费者静态推导；未打开未提供的实际 H completion 或权重，未执行复现。"
+    },
+    {
+      "id": "V-R01",
+      "class": "REPRODUCIBILITY_DEFECT",
+      "severity": "MEDIUM",
+      "must_fix": true,
+      "location": "workspace/scripts/step29_vendorlink_evaluate.py::validate_blind, lines 117-121",
+      "support": [
+        "step29_vendorlink_evaluate.py::analyze, lines 220-229",
+        "step29_vendorlink_run.py::query_ap, lines 215-221",
+        "step29_vendorlink_methods.py::Model.score, lines 201-213"
+      ],
+      "trigger": "scores=[[]]*pair_count 或二维单列分数满足现有外层len及finite检查，却不是一维标量向量。",
+      "impact": "完整盲门可先通过并开放 qrels，随后指标赋值才因形状错误失败。",
+      "minimal_fix": "开标签前将scores转数值数组，要求shape恰为(pair_count,)，再检查有限性。",
+      "minimal_validation": "手写合法盲结果及缺格、二维空列/单列、NaN反例；读取spy证明拒绝在qrels开放之前，不运行模型。",
+      "evidence_limit": "当前生产score正常返回一维；这是盲门保证缺口，未声称正式坏分数或实际泄漏已发生；本轮未执行反例。"
+    }
+  ],
+  "source_checks": {
+    "current_workspace_sources": 63,
+    "both_gate_source_lists_match_workspace": true,
+    "source_archive_versions": 84,
+    "all_archive_path_hashes_match": true,
+    "cpu_receipts_with_complete_source_coverage": 10,
+    "comparison_dependencies": "使用本包原资格冻结字节；未访问活动仓库根版本",
+    "reading_scope": "新正式/评价/队列入口及两个run文件全文；关键直接调用、手写测试与原CPU版本定向阅读。并非63来源或84版本全部逐行重审。"
+  },
+  "budget_checks": {
+    "VendorLink": {
+      "total_seconds": 1065600,
+      "total_hours": 296,
+      "training_hours": 288,
+      "per_run_hours_included": 8,
+      "cpu_charged_seconds": 103,
+      "cpu_remaining_seconds": 497,
+      "dependency_scan_preparation_seconds": 25,
+      "old_native_cost_separately_retained_seconds": 124
+    },
+    "FOREVER": {
+      "total_seconds": 417600,
+      "total_hours": 116,
+      "training_hours": 108,
+      "per_run_hours_included": 12,
+      "cpu_charged_seconds": 125,
+      "cpu_remaining_seconds": 475,
+      "native_charged_seconds": 1274,
+      "native_historical_optimizer_calls": 65,
+      "successful_single_slot_attempt_calls": 39,
+      "old_cumulative_48_call_gate_withdrawn_by_latest_scope": true
+    },
+    "failures_retained": true,
+    "completion_guaranteed": false
+  },
+  "optional": [
+    "已有compact小模型测试补fresh模型逐阶段重载评分；非当前必修。",
+    "增加每格/每条直接可读均值汇总；现有详细指标文件已保存。",
+    "准确区分同步preflight与受监督子任务，不扩通用框架。"
+  ],
+  "out_of_scope": [
+    "HPO、新方法、种子、数据、结果选择或效果pilot",
+    "为VendorLink恢复显著性而改群、改划分或换统计器",
+    "重开单路资格、三槽、全卡无CUDA、完整大模型长程资格",
+    "改旧H冻结来源/校准或重训H；改FOREVER全P锚点/正则",
+    "全仓回归、每步checkpoint、自动重试和通用调度灾备"
+  ],
+  "execution_boundary": {
+    "package_only": true,
+    "research_server_access": false,
+    "external_paper_or_repository_access": false,
+    "project_code_import_or_execution": false,
+    "tests_run_by_reviewer": false,
+    "formal_data_model_label_opening": false,
+    "formal_metric_recalculation": false,
+    "source_files_modified": false,
+    "gates_modified": false,
+    "both_input_gates_approved": false,
+    "both_input_gates_review_closed": false,
+    "authorization_expanded_by_review": false
+  },
+  "next_condition": "分别完成两项最小修复及手写补核，独立主审处置、部署/参考/实时资源核对并落实队列先后启用后，方按既有批准范围启用相应门；本报告不直接开训。"
+}

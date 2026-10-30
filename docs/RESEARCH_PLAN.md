@@ -2,7 +2,7 @@
 
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md)，本页说明后续动作及其授权边界，不复制执行流水。
 
-VendorLink和FOREVER正式范围已获得明确接受，按[VendorLink方案](../reports/documentation/20261030/vendorlink/formal/plan.zh.txt)与[FOREVER方案](../reports/documentation/20261030/forever/formal/plan.zh.txt)推进。已有算法、单路GPU资格和适用旧证据复用；新增整批训练、端点完整门、盲评分/统一标签开放、统计及成功清理已接入实际入口，CPU必要增量证据见各formal/implementation.zh.txt。下一步回收本轮定向GPT-6 Pro外审并独立处理具体缺陷；必要条件闭合后核对实际部署和资源，再按各自单路预算执行。两个新队列先后启用，不重复预占同一资源，不改活动L²R或已有H/S监听。
+VendorLink和FOREVER正式范围已获得明确接受，按[VendorLink方案](../reports/documentation/20261030/vendorlink/formal/plan.zh.txt)与[FOREVER方案](../reports/documentation/20261030/forever/formal/plan.zh.txt)推进。已有算法、单路GPU资格和适用旧证据复用；新增整批训练、端点完整门、盲评分/统一标签开放、统计及成功清理已接入实际入口，CPU必要增量证据见各formal/implementation.zh.txt。本轮定向GPT-6 Pro外审已回收，两项必修已修复并经Linux定向CPU证据及[独立主审](../reports/documentation/20261030/forever/formal/review/primary_disposition.zh.txt)闭合；修后未第二次网页送审。用户随后明确先别训练、等待开始指令，因此当前不启用任何本批训练或自动资源等待队列。收到新开始指令后，再核对实际部署、H参考身份及共享资源；两个新队列须先后启用，不改活动L²R或已有H/S监听。
 
 VendorLink为四臂36条、每市场40轮、296累计任务小时。获准依赖扫描发现57群中48群相连且包含Dream全部8群，用户接受固定数据比较及结论限制：保留完整排序/遗忘差值，不计算整体置信区间、不作统计验收，不宣称真实潜在同控识别或统计确认抗遗忘。不得为了获得区间重分群、选账号、加数据或改统计模型；未来统计确认另议。FOREVER为9条新增、H27复用、单路116h、额外全参数锚点和新120群/4320前向；原O/F主比较及N/Z点值保护不变，不重训H、不追加HPO。旧“正式范围尚未批准”已被本次明确接受取代，核验/外审仍是启动前提。
 原版S_default＋历史H（G_half）的补充范围也已批准：三顺序×三种子×两方法18条、最多三路、108h训练＋2h辅助=110h，单条6h；只训练、保存54端点及旧dev盲分数，不开放评价标签、不新增确认或HPO。[等待增量主审](../reports/documentation/20261026/continual_defaults/waiting/review/primary_disposition.zh.txt)及必要修复核验已完成，[唯一监听](../reports/documentation/20261026/continual_defaults/waiting/launch.json)已启用。下一步由现有监听等指定L²R／ER+GCR整批训练、生成、确认和分析全部成功、相关进程退出，再按实验所需剩余显存和RAM/disk门逐路派发；不要求整卡没有CUDA进程，禁止重复启动。失败停止且不自动重试，原失败和费用均承接。

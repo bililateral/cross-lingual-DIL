@@ -41,7 +41,10 @@ def complete_training(campaign, allowed):
         root = campaign/spec.run_id/'run'
         row = formal.validate_completion(spec, root, allowed)
         old_root, old = references[(spec.order, spec.seed)]
-        if row['partition'] != old['partition'] or row['pretrained_archive'] != old['pretrained_archive']:
+        # Old H also recorded development IDs; this train-only run deliberately
+        # has no development partition. Compare the two learning roles only.
+        if (any(row['partition'][role] != old['partition'][role] for role in ('fit', 'calibration'))
+                or row['pretrained_archive'] != old['pretrained_archive']):
             raise ValueError('H/FOREVER actual fit/calibration partition or pretrained archive differs')
         for name, path, item in ((m.NAME, root, row), ('H_pos_tuned', old_root, old)):
             records.append(dict(name=name, order=spec.order, seed=spec.seed, root=str(path), record=item))
