@@ -78,6 +78,76 @@ def fixture(name):
 
 
 class ComparisonTests(unittest.TestCase):
+    def test_diagnostic_checkpoint_retains_failure_and_continues_success(self):
+        _, model, optimizer, c = fixture('L2R_text_fixed')
+        method = m.Method(m.Spec('L2R_text_fixed', 'CAB', 6))
+        method.bind(model, method.metadata())
+        c.update(comparison_spec=method.spec.identity(), diagnostic_calibration=True)
+        current, calibration = [group(i) for i in range(48)], [group(i) for i in range(60,72)]
+        stage = method.stage(1,current,method.memory(),model)
+        for step in range(1,289):
+            method.update(model,optimizer,stage,current[(step-1)%48],c,step)
+        self.assertEqual(m.parent.adam_step(optimizer),288)
+        before = m.core.state_digest(dict(model=model.state_dict(),optimizer=optimizer.state_dict(),
+                                         rng=m.diag.rng_state(),modes=[v.training for v in model.modules()]))
+        for passed in (False,True):
+            with self.subTest(passed=passed), tempfile.TemporaryDirectory() as folder:
+                root=Path(folder)
+                for name in ('models','work','memory','maps','scores','points'):
+                    (root/name).mkdir()
+                fitted=dict(status='PASS_CALIBRATION_FIT' if passed else 'FAILED_CALIBRATION_FIT_NO_RETRY',
+                            a=1.,b=0.,optimizer_message='controlled evidence-path fixture',projected_gradient_max=0. if passed else 2e-6)
+                with mock.patch.object(m.parent.calibration,'fit',return_value=fitted) as fit:
+                    if passed:
+                        point, _, _ = run.checkpoint(root,method,model,optimizer,stage,calibration,c,None,mock.Mock(check=lambda *a:None))
+                        self.assertTrue(point['full_restore_verified'] and point['inference_restore_verified'])
+                        self.assertFalse((root/'work/stage1_precalibration.pt').exists())
+                        self.assertTrue((root/'precalibration_retired.json').exists())
+                    else:
+                        with self.assertRaisesRegex(ValueError,'Current calibration failed'):
+                            run.checkpoint(root,method,model,optimizer,stage,calibration,c,None,mock.Mock(check=lambda *a:None))
+                        saved=m.data.read_json(root/'precalibration.json')['state']
+                        with torch.no_grad(): next(model.parameters()).add_(1.)
+                        metadata=method.restore(root/'work/stage1_precalibration.pt',saved,model,optimizer)
+                        self.assertEqual(metadata['transient'],stage.transient())
+                        self.assertEqual(metadata['memory'],stage.memory.to_bytes().decode('utf-8'))
+                        self.assertFalse((root/'points/stage1.json').exists())
+                fit.assert_called_once()
+                self.assertEqual(m.data.read_json(root/'maps/stage1_diagnostic.json'),fitted)
+                np.testing.assert_array_equal(np.load(root/'scores/stage1_diagnostic.npy'),fit.call_args.args[0])
+                after=m.core.state_digest(dict(model=model.state_dict(),optimizer=optimizer.state_dict(),
+                                              rng=m.diag.rng_state(),modes=[v.training for v in model.modules()]))
+                self.assertEqual(before,after)
+        print('Diagnostic checkpoint: 288 real handwritten updates; failed state restored exactly; passed endpoint returns normally.',flush=True)
+
+    def test_full_gate_accepts_only_pinned_reused_completion(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base=Path(folder);spec=m.Spec('L2R_text_fixed','CAB',4)
+            root=base/spec.run_id/'run';root.mkdir(parents=True)
+            old_sources=[dict(path='old_source',sha256='old')];new_sources=[dict(path='new_source',sha256='new')]
+            old_gate=base/'old_gate.json';reference_gate=base/'reference_gate.json'
+            m.data.write_json(old_gate,dict(sources=old_sources))
+            m.data.write_json(reference_gate,dict(status='APPROVED_IMPLEMENTATION_AND_RESOURCES',sources=[]))
+            (root/'model').write_bytes(b'handwritten inference payload')
+            m.data.write_json(root/'mapping.json',dict(status='PASS_CALIBRATION_FIT',a=1.,b=0.))
+            part=dict(fit=[],calibration=[dict(group_uid=f'{d}{i}',domain=d) for d in 'CAB' for i in range(12)])
+            points={str(n):{**m.inference_method(spec).metadata(),'stage':n,'adam_step':n*288,
+                           'calibration_ids':[r['group_uid'] for r in part['calibration'] if r['domain']==spec.order[n-1]],
+                           'full_restore_verified':True,'inference_restore_verified':True,
+                           'model':m.data.record(root/'model',root),'mapping':m.data.record(root/'mapping.json',root),
+                           'maps':dict(first=dict(a=1.,b=0.),stage=dict(a=1.,b=0.))} for n in (1,2,3)}
+            row=dict(status=run.COMPLETE,spec=spec.identity(),updates=864,source_files=old_sources,points=points,
+                     access=dict(train=1,valid=0,heldout=0,owners=0,worker_train_reads=1),partition=part,pretrained_archive={})
+            m.data.write_json(root/'completion.json',row)
+            pin=lambda p:{**m.data.record(p,base),'path':str(p)}
+            allowed=dict(sources=new_sources,reference_gate=pin(reference_gate),reference_campaign=str(base),
+                         recovery=dict(original_gate=pin(old_gate),reused={spec.run_id:pin(root/'completion.json')}))
+            with mock.patch.object(m,'specifications',return_value=[spec]):
+                self.assertEqual(len(ev.full_gate(base,allowed)),1)
+                row['unexpected_mutation']='changed after pinning'
+                m.data.write_json(root/'completion.json',row)
+                with self.assertRaises(ValueError): ev.full_gate(base,allowed)
+
     def test_omp_ridge_zero_and_small_improvement(self):
         w, _ = m.gcr.nonnegative_omp(np.array([[2.]]), np.array([3.]), ['a'])
         self.assertAlmostEqual(w['a'], 6/4.5)

@@ -1,0 +1,24 @@
+test_all_failed_slots_leave_remaining_queue_unstarted (test_step28_comparison_control.ComparisonControlTest) ... ok
+test_deadline_stops_only_the_expired_child (test_step28_comparison_control.ComparisonControlTest) ... ok
+test_failed_dispatch_blocks_confirmation (test_step28_comparison_control.ComparisonControlTest) ... ok
+test_failed_slot_retires_but_healthy_slots_refill (test_step28_comparison_control.ComparisonControlTest) ... Retired-slot evidence: {'outcomes': {'bad': False, 'other1': True, 'other2': True, 'next1': True, 'next2': True}, 'cpu_assignment': {'bad': [0], 'other1': [1], 'other2': [2], 'next1': [1], 'next2': [2]}, 'no_failed_slot_refill': True}
+ok
+test_global_error_still_stops_children_and_is_not_masked_by_cleanup (test_step28_comparison_control.ComparisonControlTest) ... ok
+test_long_reservation_retains_failures_and_whole_queue (test_step28_comparison_control.ComparisonControlTest) ... ok
+test_real_failed_child_drains_two_siblings_and_keeps_cost (test_step28_comparison_control.ComparisonControlTest) ... ok
+test_real_three_children_own_dirs_and_low_slot_waits (test_step28_comparison_control.ComparisonControlTest) ... ok
+test_recovery_keeps_old_failures_cost_and_only_exact_successes (test_step28_comparison_control.ComparisonControlTest) ... ok
+test_slot_reserves_unmaterialized_allocations (test_step28_comparison_control.ComparisonControlTest) ... ok
+test_spawn_error_drains_running_child (test_step28_comparison_control.ComparisonControlTest) ... ok
+test_success_cost_only_once_and_active_reservations_are_not_spent (test_step28_comparison_control.ComparisonControlTest) ... ok
+test_diagnostic_checkpoint_retains_failure_and_continues_success (test_step28_continual_comparison.ComparisonTests) ... {"event": "diagnostic_calibration", "run_id": "CAB_s6_L2R_text_fixed", "status": "FAILED_CALIBRATION_FIT_NO_RETRY", "optimizer_message": "controlled evidence-path fixture", "projected_gradient_max": 2e-06}
+{"event": "diagnostic_calibration", "run_id": "CAB_s6_L2R_text_fixed", "status": "PASS_CALIBRATION_FIT", "optimizer_message": "controlled evidence-path fixture", "projected_gradient_max": 0.0}
+Diagnostic checkpoint: 288 real handwritten updates; failed state restored exactly; passed endpoint returns normally.
+ok
+test_full_gate_accepts_only_pinned_reused_completion (test_step28_continual_comparison.ComparisonTests) ... ok
+test_failed_calibration_is_saved_before_checkpoint_rejects (test_step28_continual_comparison.ComparisonTests) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 41.755s
+
+OK

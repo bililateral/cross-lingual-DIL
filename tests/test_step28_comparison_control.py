@@ -11,6 +11,106 @@ import step28_comparison_control as control
 
 
 class ComparisonControlTest(unittest.TestCase):
+    def test_failed_slot_retires_but_healthy_slots_refill(self):
+        with tempfile.TemporaryDirectory() as directory:
+            campaign = Path(directory)
+            script = campaign/'worker.py'
+            script.write_text("import sys,time,os,json\nfrom pathlib import Path\n"
+                "p=Path(sys.argv[1]);p.mkdir()\n"
+                "(p/'start.json').write_text(json.dumps({'time':time.monotonic(),'cpu':list(os.sched_getaffinity(0))}))\n"
+                "time.sleep(.12 if p.name=='bad' else .35)\n"
+                "(p/'end.json').write_text(json.dumps({'time':time.monotonic()}))\n"
+                "raise SystemExit(3 if p.name=='bad' else 0)\n")
+            rows = [dict(id=n, allowance=120.) for n in ('bad', 'other1', 'other2', 'next1', 'next2')]
+            ledger = control.Ledger(campaign/'budget.json', dict(training=1000, control=30), {})
+            command = lambda row, job, deadline, metadata: [sys.executable, '-B', str(script), str(job)]
+            with self.assertRaisesRegex(RuntimeError, 'after active siblings finished: bad'):
+                control.dispatch(rows, campaign, ledger, 'training', command,
+                                 retire_failed_slots=True, poll_seconds=.02)
+            self.assertEqual({r['id']: r['success'] for r in ledger.completed},
+                             dict(bad=False, other1=True, other2=True, next1=True, next2=True))
+            starts = {r['id']: control.data.read_json(campaign/r['id']/'start.json') for r in rows}
+            ends = {r['id']: control.data.read_json(campaign/r['id']/'end.json')['time'] for r in rows}
+            for identity in ('next1', 'next2'):
+                self.assertNotEqual(starts[identity]['cpu'], starts['bad']['cpu'])
+                previous = next(n for n in ('other1', 'other2') if starts[n]['cpu'] == starts[identity]['cpu'])
+                self.assertGreaterEqual(starts[identity]['time'], ends[previous])
+            self.assertTrue(ledger.failed)
+            self.assertFalse(ledger.budget_exceeded)
+            self.assertEqual(control.data.read_json(campaign/'status.json')['not_dispatched'], [])
+            print('Retired-slot evidence:', dict(outcomes={r['id']: r['success'] for r in ledger.completed},
+                  cpu_assignment={k:v['cpu'] for k,v in starts.items()}, no_failed_slot_refill=True), flush=True)
+
+    def test_all_failed_slots_leave_remaining_queue_unstarted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            campaign = Path(directory)
+            ledger = control.Ledger(campaign/'budget.json', dict(training=1000, control=30), {})
+            command = lambda row, job, deadline, metadata: [sys.executable, '-c', 'import time;time.sleep(.1);raise SystemExit(3)']
+            with self.assertRaisesRegex(RuntimeError, 'after active siblings finished'):
+                control.dispatch([dict(id=n, allowance=120.) for n in ('a', 'b', 'c', 'pending')],
+                                 campaign, ledger, 'training', command, retire_failed_slots=True, poll_seconds=.02)
+            self.assertEqual(len(ledger.completed), 3)
+            self.assertFalse((campaign/'dispatch/pending').exists())
+            with self.assertRaises(ValueError):
+                ledger.reserve('a', 'training', 120, allow_failed_campaign=True)
+
+    def test_slot_reserves_unmaterialized_allocations(self):
+        gib = 2**30
+        self.assertTrue(control.slot_admission(23*gib, [], set(), 0)['slot_ready'])
+        row = control.slot_admission(23*gib, [], {10}, 2)
+        self.assertFalse(row['slot_ready'])
+        self.assertEqual(row['required_free_gpu_bytes'], int(25.5*gib))
+        self.assertFalse(control.slot_admission(11*gib, [(10,6*gib),(11,6*gib)], {10,11}, 2)['slot_ready'])
+        self.assertTrue(control.slot_admission(10*gib, [(10,int(7.75*gib))], {10}, 1)['slot_ready'])
+
+    def test_recovery_keeps_old_failures_cost_and_only_exact_successes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            old, campaign = root/'old', root/'formal'
+            old.mkdir(); campaign.mkdir()
+            pending = ['CAB_s6_L2R_text_fixed','CAB_s4_L2R_text_fixed','CAB_s5_L2R_text_fixed','CAB_s6_ER_GCR_group_fixed']
+            specs = control.m.specifications(new_only=True)
+            success = [s for s in specs if s.run_id not in pending]
+            source = [dict(path='fixed_algorithm.py', bytes=1, sha256='fixed')]
+            old_gate = dict(campaign=str(old), sources=source, budget_seconds=dict(training=1000,control=30))
+            control.data.write_json(root/'old_gate.json', old_gate)
+            completed = [dict(id=s.run_id,success=True,actual_seconds=10.) for s in success]
+            completed += [dict(id=n,success=False,actual_seconds=15.) for n in pending[:3]]
+            prior = dict(training=185.,control=3.)
+            failure = dict(status='STOP_NO_RETRY',budget=dict(active={},completed=completed,used=prior,failed=True))
+            control.data.write_json(root/'failure.json',failure)
+            reused = {}
+            for spec in success:
+                path = old/spec.run_id/'run';path.mkdir(parents=True)
+                (path/'payload').write_bytes(b'handwritten artifact')
+                payload = control.data.record(path/'payload',path)
+                points = {str(i):dict(adam_step=i*288,full_restore_verified=True,inference_restore_verified=True,
+                                      model=payload,mapping=payload,memory=payload,calibration_scores=payload)
+                          for i in (1,2,3)}
+                control.data.write_json(path/'completion.json',dict(status=control.run.COMPLETE,updates=864,
+                    spec=spec.identity(),source_files=source,points=points,
+                    access=dict(train=1,valid=0,heldout=0,owners=0,worker_train_reads=1)))
+                reused[spec.run_id] = control.data.record(path/'completion.json',path)
+            for name in pending[:3]:
+                (old/name).mkdir();(old/name/'failure.txt').write_text('old failure retained')
+            pin = lambda p: {**control.data.record(p,root),'path':str(p)}
+            gate = dict(sources=source,budget_seconds=old_gate['budget_seconds'],prior_used_seconds=prior,
+                recovery=dict(original_gate=pin(root/'old_gate.json'),original_failure=pin(root/'failure.json'),
+                              pending_ids=pending,reused=reused,failure_policy='retire_failed_slot_continue_healthy'))
+            ledger = control.Ledger(campaign/'budget.json',gate['budget_seconds'],prior)
+            self.assertEqual(control.adopt_recovery(campaign,gate,ledger),pending)
+            self.assertEqual(ledger.used,prior)
+            self.assertEqual(len(ledger.completed),14)
+            self.assertTrue(all(r['success'] for r in ledger.completed))
+            self.assertFalse(ledger.failed)
+            self.assertEqual(len(control.data.read_json(campaign/'recovery.json')['prior_attempts']),17)
+            import os
+            self.assertTrue(os.path.samefile(old/success[0].run_id/'run/payload',campaign/success[0].run_id/'run/payload'))
+            self.assertTrue((campaign/'prior_failed'/pending[0]/'failure.txt').is_file())
+            gate['prior_used_seconds']={**prior,'training':0.}
+            with self.assertRaisesRegex(ValueError,'inherited charges'):
+                control.recovery_attempts(gate)
+
     def test_long_reservation_retains_failures_and_whole_queue(self):
         with tempfile.TemporaryDirectory() as directory:
             clock = [0.]

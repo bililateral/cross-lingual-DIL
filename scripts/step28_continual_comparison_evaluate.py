@@ -22,6 +22,15 @@ PRIMARY = (('H_pos_tuned', 'L2R_text_fixed'), ('H_pos_tuned', 'ER_GCR_group_fixe
 SECONDARY = (('H_pos_tuned', 'S_tuned'), ('S_tuned', 'L2R_text_fixed'), ('S_tuned', 'ER_GCR_group_fixed'))
 
 
+def trajectory_sources(allowed: dict, identity: str, completion: Path) -> list:
+    recovery = allowed.get('recovery')
+    if not recovery or identity not in recovery['reused']:
+        return allowed['sources']
+    data.verify(completion, recovery['reused'][identity])
+    pinned = recovery['original_gate']
+    return data.read_json(data.verify(Path(pinned['path']), pinned))['sources']
+
+
 def full_gate(campaign: Path, allowed: dict) -> list[dict]:
     """Check all 108 actual endpoints; H/S are pinned existing runs, never substitutes."""
     old_gate_path = Path(allowed['reference_gate']['path'])
@@ -37,7 +46,7 @@ def full_gate(campaign: Path, allowed: dict) -> list[dict]:
         expected_spec = spec.identity() if new else m.five.Spec(spec.name, spec.order, spec.seed).identity()
         expected_status = run.COMPLETE if new else prior.run.COMPLETE
         if (row['status'] != expected_status or row['spec'] != expected_spec or row['updates'] != 864
-                or row['source_files'] != (allowed['sources'] if new else old_gate['sources'])
+                or row['source_files'] != (trajectory_sources(allowed, spec.run_id, root/'completion.json') if new else old_gate['sources'])
                 or set(row['points']) != {'1', '2', '3'}
                 or row['access'] != dict(train=1, valid=0, heldout=0, owners=0, worker_train_reads=1)):
             raise ValueError('Incomplete/foreign comparison run; missing H/S never triggers retraining')

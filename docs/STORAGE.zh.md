@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-10-30 L²R恢复及S/H交接重新绑定
+
+[comparison_resume](../reports/documentation/20261030/comparison_resume/)为独立恢复目录；Linux workspace50份代码/测试/合同政策核验，沿用原五份训练输入及BGE链接，无dev/test/owners/private_custody链接。14成功及三条旧失败目录用硬链接保管、纳入原存储额度；原formal/gate/budget/failure未覆盖。诊断失败时保留校准前完整状态，成功阶段端点双恢复通过后退役该临时完整状态；不清理活动权重或Memory。
+
+CPU15项原件、来源、新正式门/启动/15:19运行快照和S/H重新绑定小证据通过SCP回传并按transfer_manifest逐项大小/SHA核对。启动后本轮comparison launcher已按首个真实更新自删，源码保留Windows scripts及身份清单。S/H首次导入失败的gate/launch/console保存在defaults的*.import_failure.*，失败记录中的当时原路径按该改名恢复查找；无formal/数据访问，保守5秒计费后修正原PYTHONPATH环境，唯一新监听继续等待。
+
+本轮新增CPU44秒，比较批CPU累计98/1200；旧训练291.508706h和所有失败费继承。新恢复说明/实际执行记录在两端保管，根可变文档仅Windows更新。中转输入/回传ZIP核验后两端删除；旧必要原件、来源与活动运行保留，不重置大清理周期。仅作范围清楚的本地Git提交，不推送，保留其他任务已有修改。
+
 ## 2026-10-30 FOREVER实现外审与两项单路GPU资格收尾
 
 完整FOREVER实现审查原文、audit_notes、完成网页及主审保存在[review目录](../reports/documentation/20261030/forever/implementation/review/)；输入包身份400960字节/SHA 7db965e4…6013及91成员/90载荷核对保留，专用页已关闭。CPU05—10、gpu01/02失败和gpu03单路PASS原始console/调用/更新/资源/receipt及各次必要旧来源保存在[资格目录](../reports/documentation/20261030/forever/implementation/qualification/)，最终小证据包170531字节/SHA 4e0c0d5bf1c5538eb840061a8e4d750a07560da5f52464b1e9842acde3dac7e2经SCP回传。Windows不保存BGE或GPU检查点；Linux成功资格状态约5GiB暂留用于本次恢复证据，未作为正式训练起点。原冻结CPU04/送审来源不改，当前独立workspace仅绑定本轮改动与原依赖，不混入并发L²R修复。

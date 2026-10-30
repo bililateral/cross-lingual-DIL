@@ -160,10 +160,29 @@ def checkpoint(root, method, model, optimizer, stage, calibration, c, first_map,
         raise ValueError('Current calibration/stage endpoint differs')
     optimizer.zero_grad(set_to_none=True)
     rng, modes = m.diag.rng_state(), [v.training for v in model.modules()]
+    diagnostic_path = None
+    if c.get('diagnostic_calibration') and number == 1:
+        if method.spec.run_id != 'CAB_s6_L2R_text_fixed':
+            raise ValueError('Diagnostic state is limited to the failed CAB_s6 first stage')
+        diagnostic_path = root/'work'/'stage1_precalibration.pt'
+        diagnostic_metadata = {**method.metadata(), 'stage': 1, 'adam_step': 288,
+                               'rng': rng, 'modes': modes, 'transient': stage.transient(),
+                               'memory': stage.memory.to_bytes().decode('utf-8'),
+                               'calibration_ids': [g.uid for g in calibration]}
+        diagnostic = save(diagnostic_path, model, optimizer, diagnostic_metadata, budget)
+        data.write_json(root/'precalibration.json', dict(state=diagnostic,
+                        purpose='One authorized CAB_s6 calibration diagnosis; no automatic retry'))
     with m.diag.neutral(model):
         scores = method.score(model, calibration, c, budget.check)
+        if diagnostic_path is not None:
+            save_array(root/'scores'/'stage1_diagnostic.npy', scores, root)
         fitted = m.parent.calibration.fit(scores, np.asarray([g.labels for g in calibration], np.uint8),
                                           role='calibration', check=budget.check)
+        if diagnostic_path is not None:
+            data.write_json(root/'maps'/'stage1_diagnostic.json', fitted)
+            print(json.dumps(dict(event='diagnostic_calibration', run_id=method.spec.run_id,
+                  status=fitted['status'], optimizer_message=fitted['optimizer_message'],
+                  projected_gradient_max=fitted['projected_gradient_max'])), flush=True)
         if fitted['status'] != 'PASS_CALIBRATION_FIT':
             # Keep the returned diagnostics before unwinding; do not refit or relax the gate.
             failure_path = root/'maps'/f'stage{number}_failed.json'
@@ -205,6 +224,9 @@ def checkpoint(root, method, model, optimizer, stage, calibration, c, first_map,
              'calibration_scores': save_array(root/'scores'/f'stage{number}_calibration.npy', scores, root)}
     data.write_json(root/'points'/f'stage{number}.json', point)
     m.base.persistence.remove_work_file(full_path, root)
+    if diagnostic_path is not None:
+        m.base.persistence.remove_work_file(diagnostic_path, root)
+        data.write_json(root/'precalibration_retired.json', dict(reason='Stage passed and both restored endpoints verified'))
     return point, memory, first_map
 
 
@@ -221,6 +243,8 @@ def execute(job: Path, spec: m.Spec, deadline: float, gate_path: Path) -> dict:
     m.parent.configure_numerics()
     torch.cuda.set_per_process_memory_fraction(allowed['limits']['allocator_bytes']/torch.cuda.get_device_properties(0).total_memory)
     method, c = m.Method(spec), m.config(spec)
+    if allowed.get('recovery') and spec.run_id == 'CAB_s6_L2R_text_fixed':
+        c['diagnostic_calibration'] = True
     archive = m.core.model_files(m.base.model_config(c, 'split_rank'))
     if any(archive[k] != c['models']['split_rank'][k] for k in ('file_count', 'total_size_bytes', 'content_sha256')):
         raise ValueError('Pretrained BGE source differs')
