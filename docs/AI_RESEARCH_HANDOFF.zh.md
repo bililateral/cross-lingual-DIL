@@ -1,45 +1,44 @@
 # 当前科研交接
 
 ## 当前工作
-VendorLink／FOREVER正式准备及暂停（2026-10-30；服务器20:15:21，Asia/Shanghai）：本轮完整网页GPT-6 Pro外审已回收，F-R01（旧H分区多development导致正常完成门拒绝）与V-R01（二维坏分数可越过标签前完整门）已最小修复，Linux定向正反例通过并由[独立主审](../reports/documentation/20261030/forever/formal/review/primary_disposition.zh.txt)闭合；修后未再网页复审，不冒称第二轮通过。VendorLink CPU110/600秒；FOREVER含旧CPU133/600秒、原GPU1274/3600秒、准备1秒；失败账保留。旧真实小模型/单路原生证据复用，本轮修复无新GPU、正式文本/标签或载模。
 
-用户最新明确“先别训练，等我的开始训练指令”，因此两项正式训练及自动资源等待均不启动；即使显存空闲也不能自动开训。原VendorLink36条/40轮/单路296h、FOREVER9条/复用H27/单路116h与新120群范围保留。服务器[实际核对](../reports/documentation/20261030/forever/formal/review/repair/hold_observation.json)：两gate均approved/review_closed=false，各63来源一致，无本批训练/等待进程、无启动脚本、两个training目录不存在；空闲12436/32607MiB、利用率92%，只代表该时点。已撤回未部署的本地自动启动扩展，共享queue仍为已审已测字节。VendorLink保持固定数据描述比较、不计算整体区间/统计验收；FOREVER原确认条件不变。等待新开始指令后才做H27全SHA及当时部署/资源等启动前核对，不动其他实验。连续运行估计仍FOREVER58—87h；VendorLink更新投影154.75h另加保存/评分，296h/116h是硬总限。当前开始时点由用户决定，不能给日历完成日。
-
-接手进展核对（2026-10-30，服务器15:28—15:32，Asia/Shanghai，已知约快于客户端5分钟）：VendorLink当前7份资格来源、FOREVER44份来源与各自许可逐项大小/SHA一致；两项均无活动资格/正式进程，单路资格已完成，不重复G1或要求G2。VendorLink固定导出manifest与原账SHA一致；FOREVER拟复用H27端点全部存在、大小与完成记录相符、原校准元数据齐全，本轮未载模或重算指标，未重新散列27个大权重。正式训练缺口已按现有合同与实际CLI补入[计划](RESEARCH_PLAN.md)：VendorLink尚需E/统计/预算及整批入口，FOREVER尚需正式派发/新确认/收尾接线和按单路实测更新的正式合同；两者正式许可均未启用。现场另见已获后续授权的L²R恢复控制器2787646及CAB_s6/s4两worker2789106/2789115，S/H新监听2790518身份相符；详见[本次恢复范围](../reports/documentation/20261030/comparison_resume/scope.zh.txt)与[15:19启动原件说明](../reports/documentation/20261030/comparison_resume/execution.zh.txt)，下方“暂不重放/已停止”按较早时点解释。15:28 GPU空闲10670MiB、RAM约215GiB、磁盘约217GiB；旧作业未退出，不把表面10GiB空闲视为可新增VendorLink/FOREVER额度，仍需计入既有承诺及各自准入。本轮仅只读核对和可变文档维护，无正式文本/标签/Memory读取、科研计算或新启动。
-
-L²R诊断恢复已实际启动（服务器2026-10-30 15:37:36，Asia/Shanghai）：用户后续明确批准重跑，取代此前“暂不重放”。独立恢复控制器2787646、诊断CAB_s6 worker2789106及正常CAB_s4 worker2789115身份相符，两路均已产生真实更新；CAB_s5及末条GCR仍待派发，保留原14完整成功。15:19资源现场空闲10.42GiB小于第三槽所需12.88GiB（含当前两路尚未显现的预留），所以当前两路是资源限制，尚无本轮校准结论或失败；资源满足即由原队列补位。诊断第一阶段通过后继续完整C→A→B；失败只退休该槽，健康槽继续接任务，无自动重试。新15项Linux CPU核验通过，累计98/1200秒；旧训练291.508706h及所有失败费继承，原822h分桶和完整门保持。源码/范围/核验见[恢复说明](../reports/documentation/20261030/comparison_resume/report.zh.txt)，实际入口与费用见[启动及交接](../reports/documentation/20261030/comparison_resume/execution.zh.txt)、[15:37原件](../reports/documentation/20261030/comparison_resume/handoff_observation.json)。按历史速度，若持续两槽，恢复至确认/分析约75.11—76.61h、11月2日18:19—19:49结束，距15:37约74.69—76.19h；若第三槽很快可用，约42.91—44.41h、11月1日10:07—11:37结束，距15:37约42.49—43.99h。均为无新故障的条件估计，外审另计；单L²R72h/GCR12h上限不变。
-
-H/S单worker失败隔离已部署（服务器2026-10-30 16:02:33，UTC+8）：用户明确要求将同样逻辑应用H/S，已在新独立workspace部署实际入口retire_failed_slots=True及已验证共享调度器。核对原2790518仍无训练/子进程后结束它，继承最终控制费1111.463208秒；16:01:19启用唯一新监听2814827，16:02实际身份/源码/绑定一致，WAITING/PREDECESSOR_STILL_RUNNING，无failure、训练0，控制累计1300.657801/7200秒。12个不同CPU测试有通过证据；首轮误写一个测试名的加载错误及6秒费用保留，补漏项3秒，累计68/120秒。44科学来源不变，H/S原目标/18条/54端点/110h/资源门保持。单worker失败退休该槽，健康槽继续并补位，缺项不发布整批成功；共享预算/资源硬错误仍按既有规则处理。实际前序仍为comparison_resume，2787646/2789106/2789115身份不变，未重启L²R。见[范围与主审](../reports/documentation/20261030/defaults_repair/report.zh.txt)、[切换记录](../reports/documentation/20261030/defaults_repair/execution.zh.txt)和[现场原件](../reports/documentation/20261030/defaults_repair/observation.json)。H/S开训仍取决于前序完成及资源，等待时长未知，不新造保证工期；原单条6h强制上限保持。
-
-H/S前序成功条件未放宽：本恢复批训练/108状态完整性/生成/确认/分析全部成功且相关进程退出后，才检查S/H资源。用户此前明确若CAB_s6诊断再次失败，先确认原因并修复、再单独补跑；前序根failure仍使监听退出，后续须复用其余成功、保留全部费用并重新绑定唯一监听，不能只放入另一个目录的单条成功文件就视作整批成功。该前序失败分支与本次H/S自身worker失败隔离不同。以下较早“暂不重放/已停止/09:51”和2790518等待记录按各自原时点解释。
-
-FOREVER新增实现外审修复及单路GPU资格已完成（2026-10-30）：完整审查R01—R05由[独立主审](../reports/documentation/20261030/forever/implementation/review/primary_disposition.zh.txt)修复闭合，专用页已关闭。用户先接受VendorLink单路结案，随后明确FOREVER只做单路，并反对重复的48次累计调用硬限；当前范围以[后续补充](../reports/documentation/20261030/forever/implementation/qualification/scope_update.zh.txt)为准。取消三槽前置与累计调用次数硬门，固定单路39步和原3600累计任务秒保持，不运行正式训练。
-
-gpu03单路完整PASS：39次实际调用（1准备＋24当前＋12回放＋2恢复对照），模型/Adam/时钟/游标/RNG的恢复后下一步与不中断分支完全一致；真实BGE最大224记录×两通道×256token，encoder/head实际位移及全P锚点正则均有证据。实际耗时767.042673秒（12分47秒）/收费768秒，显存分配峰值7894606848字节，保留峰值7923040256字节。前两次失败分别为已确认闲置pooler任务梯度误判（25秒/0调用）和回放日志epoch重名（481秒/26调用），均保留并定向修复；详见[完整资格及来源原件](../reports/documentation/20261030/forever/implementation/qualification/final/)。CPU累计70/600秒，GPU累计1274/3600秒、65实际调用，余额2326秒不自动授权新任务。服务器14:50核实资格进程全部退出，剩余资格工作0；不再追加测试或监听。44来源一致，原冻结依赖未混入并行L²R修复；正式数据/标签读取0，正式训练和108h/6h预算均未启用。
-VendorLink本轮单路资格已通过并按用户决定结案，见[原生主审](../reports/documentation/20261030/vendorlink/native/primary_disposition.zh.txt)。取消9GiB分配器上限后的G1完成15次更新，实际68.157624秒/收费69秒；旧失败7秒/1更新保留，累计aux48、G176、G20，共124/2100秒。实际峰值推得三槽46.70GiB，大于整卡31.84GiB，因此G2未启动且未通过；不再按三路等待。四臂真实损失/更新、Memory及H_full KD梯度作用、保存恢复证据成立，完整训练/效果结论尚无。前序进程已退出，未改正式36条/epoch/预算/评价开放权限。用户截图中的5份无用中转文件已核对后删除，工作目录和证据保留。
-VendorLink等待专项排查（服务器10月30日10:01）：[现场证据](../reports/documentation/20261029/vendorlink/native/waiting/wait_audit_20261030.json)发现新对照控制器在03:21:56保存过17685MiB（17.27GiB）空闲、CUDA仅两路本项目进程、RAM224.23GiB/disk246.27GiB的补位准入记录，紧接着派发CAB_s6_L²R；不能再称整夜都无足够显存。该控制器的free/PID为相邻两次查询，且不是VendorLink采样，不能证明窗口持续多久。Vendor监听实际源码与CPU13一致：首轮10GiB、只拦指定旧PID及启动身份仍占GPU、无全卡空闲要求；每次拒绝后睡300秒，并覆盖status.json，wait_console为空、control_console不存在，GPU账仍0。已证实短窗口可能漏采及历史留证不足，尚不能认定旧PID误拦、采到合格资源却未派发，或断言凌晨窗口持续超过5分钟。常见历史采集目录不存在，GPU accounting未启用；旧PID退出时刻及两次采样间变化无法还原。本轮只查现有证据，未改冻结来源、门槛、轮询或重启监听；建议最小改进为缩短轮询并逐次追加资源/判因小记录，保留原预算和单次派发条件。10:01现场空闲1792MiB，仍等待。
-
-本节维护当前状态、有效范围和下一步；较早叙述按原观测时点保留，不作为新启动或新授权。合同从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)进入，后续动作看[计划](RESEARCH_PLAN.md)。L²R/GCR训练进度按服务器2026-10-30 15:37，H/S最新部署核对为16:02，VendorLink/FOREVER修复与暂停按服务器20:15:21，先前资格/模型元数据核对按15:28—15:32；均为UTC+8，沿用已知服务器约比本机快5分钟的时钟差异，未调系统时钟。
+本节统一记录最新已核实状态，不将维护文档的时间冒充新观测。L²R/GCR及H/S按服务器2026-10-30 20:14:31观测、20:15:01复核；VendorLink/FOREVER按20:15:21暂停核对，均为Asia/Shanghai。服务器已知约比客户端快5分钟，未调整时钟。合同见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)，后续动作见[计划](RESEARCH_PLAN.md)。
 
 | 工作 | 最新有效状态与证据 | 下一步与边界 |
 |---|---|---|
-| L²R／ER+GCR新对照 | 30日15:37[恢复现场](../reports/documentation/20261030/comparison_resume/handoff_observation.json)：**14/18完整、2活跃、2待派发**。CAB_s6/s4 L²R已真实更新，s5 L²R与s6 GCR在队列；控制器2787646无根failure。旧失败端点/账另行保留，不计作新完整成功。 | 原822累计小时、最高三路；失败退休单槽、健康槽续接，缺条目仍阻断全18/108状态完整门。诊断再失败先查因修复，再单独补跑；旧成功复用、不清费用。新确认/分析未开始，尚无新效果结论。 |
-| S_default＋历史H（G_half） | 30日16:02唯一有效监听2814827已部署自身worker失败隔离，仍WAITING／PREDECESSOR_STILL_RUNNING，训练0，无failure；旧2790518等待态切换退出。CPU累计68/120秒、控制1300.66/7200秒，原失败账保留，[实际证据](../reports/documentation/20261030/defaults_repair/observation.json)。 | 已批18条、最多三路、110累计小时、单条6h，仅训练、54端点及旧dev盲分数。自身worker失败退休该槽、健康槽继续补位；缺项不发布完整成功。前批仍须全部成功/退出，资源合格才派发；前批失败后补跑须重绑定监听。原rank/结果开放边界保持。 |
-| VendorLink四臂与三市场 | 已接受36条/40轮/单路296h；CPU110/600秒。外审V-R01已修复并主审闭合；保留固定数据描述比较。 | 用户要求等明确开始指令；gate关闭、正式训练0、无自动等待。没有整体区间或统计确认，不重跑G1/G2。 |
-| FOREVER与H比较 | 已接受9条/复用H27/单路116h、新120群；CPU133/600秒、原GPU1274秒。外审F-R01已修复并主审闭合。 | 用户要求等明确开始指令；训练/新确认0、无自动等待。启动前核对H实际身份及资源，资格不重复。 |
-| 原五方法45条及Optuna | 均已完成并结案。五方法训练／新120群确认／统计于26日02:08:11收尾；[结果主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)保留H−S最终旧域MAP正向及原O/F共同主门false。 | 不重训以翻转判据，不把排序收益改称额外抗遗忘已确认。H/S54端点保留给新对照；已删SEQ/ER/LOGIT81份独立权重不可由SHA恢复。Optuna旧六格门失败也保持。 |
+| L²R／ER+GCR新对照 | **14/18完整成功复用、3活跃、1待派发**；恢复控制器2787646正常，无新failure或预算超限。[现场原件](../reports/documentation/20261030/comparison_resume/progress_20261030_201431.json)。 | 原822累计小时、最多三路；最后CAB_s6 GCR等空槽。失败退休单槽、健康槽继续补位，无自动重试；全18条/108状态完整后才生成、确认和分析。诊断尚未到首阶段校准，不能称旧故障已解决。 |
+| S_default＋历史H（G_half） | 唯一监听2814827正常WAITING，训练0、无failure；控制累计1318.96/7200秒，CPU68/120秒。[当前等待证据](../reports/documentation/20261030/comparison_resume/eta_20261030_201431.json)。 | 已批18条/54端点、110累计小时、单条6h、最多三路；只训练及旧dev盲分数。等本恢复批训练、108状态完整性、生成、确认、分析全部成功且相关进程退出，再查资源。自身worker失败只退休该槽；前序失败仍使监听退出，补跑后须重新绑定唯一监听。 |
+| VendorLink四臂与三市场 | 36条/40轮/单路296h范围已接受；单路资格及正式实现外审修复已主审闭合，CPU110/600秒。[暂停现场](../reports/documentation/20261030/forever/formal/review/repair/hold_observation.json)。 | 用户明确等新的开始训练指令；gate关闭、训练0、无自动资源等待。固定数据描述比较，不计算整体置信区间或统计验收，不重跑G1/G2。 |
+| FOREVER与H比较 | 新9条/复用H27/单路116h及新120群已接受；资格及正式实现外审修复已主审闭合。CPU133/600秒、资格GPU1274/3600秒，失败账保留。 | 同样等新的开始训练指令；gate关闭、训练/新确认0、无自动等待。启动前核对H27实际身份、部署及资源，不重复资格；原确认判据不变。 |
+| 原五方法45条及Optuna | 已完成并结案。五方法于26日02:08:11收尾；[结果主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)保留H−S最终旧域MAP正向及原O/F共同主门false；Optuna旧六格门失败保持。 | 不重训以翻转判据，不把排序收益改称额外抗遗忘已确认。H/S54端点继续保留；已删SEQ/ER/LOGIT81份独立权重不可由SHA恢复。 |
 
-三路最新日志（30日09:51）：CAB_s4_L²R第二阶段A 264/288（累计552/864），CAB_s5_L²R第二阶段A 96/288（累计384/864），CAB_s6_L²R第一阶段C 168/288；PID2311259／2416861／2611656。09:51:38再次核对owner/create_time/cwd相符，约24秒user CPU分别增加23.75／23.64／23.77秒。全批至少13200/15552更新（84.88%，每24步日志，非瞬时精确值）。单5090总32607MiB、空闲1794MiB、GPU88%、64℃；三worker显存7686／7648／6464MiB，另有zhangdele的2679593占8228MiB，未干预。RAM可用207.77GiB、disk244.84GiB；三槽全占，当前没有空槽等待。未来补位仍按10GiB门，当前free加首条预计释放仅约9480MiB的瞬时粗算不能作为准入。训练结算237.13h＋活跃43.79h；预算／单条硬限保持。只核对运行元数据，未读效果、正式文本、模型/Memory或标签，未重启／降门／增监听。
+本次恢复的三条活动轨迹均为L²R从固定起点重跑，并非原Adam步续训；旧失败进度不叠加到本次有效进度。每条总864更新，每阶段288更新，日志每24步报告：
 
-工期按同次内嵌operational_eta、原FIFO／三槽和step24起同顺序同阶段多步区间计算：CAB前两阶段已实测约118.37／179.58秒/步，第三阶段仍借跨顺序池155.03秒/步；端点复用77.97秒代理，最后待派GCR约4.11h代理。持续可补位时训练余30.20h，预计服务器10月31日16:03；再留确认／分析2.5—4h，31日18:33—20:03，距观测32.70—34.20h，从26日10:25启动计约128.1—129.6h，结果外审另计。三条活动L²R分别余13.42／21.54／30.20h，预计30日23:16／31日07:23／31日16:03。慢20%且无额外等待情景为11月1日00:35—02:05全流程完成，不是置信区间或上界。CAB第二阶段实测较29日早前代理更慢，故此前31日中午估计后移；外来CUDA后续占用及未测CAB第三阶段仍可改变工期。原观察保留，不以822累计小时作为工期。新快照229454字节已SFTP回传，SHA两端一致；本轮可变交接只更新Windows，不扩大此前push许可。
+| 当前轨迹 | worker PID | 第一阶段C最新日志 | 本次累计更新 |
+|---|---:|---:|---:|
+| CAB_s6_L2R_text_fixed（诊断路） | 2789106 | 144/288 | 144/864 |
+| CAB_s4_L2R_text_fixed | 2789115 | 144/288 | 144/864 |
+| CAB_s5_L2R_text_fixed | 2823288 | 96/288 | 96/864 |
 
-本次梳理的理解沿用已审结论：中文合成主线检验未见身份上的保持／学习，五方法证明固定系统的最终排序优势但未建立H对S的额外抗遗忘；L²R/GCR补已有持续学习方法的固定系统比较，原版S/H补默认配置与历史池化参照；VendorLink扩展到真实商品文本，但标签来自同一观察账号的两个人工视图，单query单正例、MAP=MRR，不能写成真实跨账号马甲识别已验证。四线的数据资格、预算、评价开放和解释边界独立。详细方法参照已有[同事汇报稿](L2R_GCR_VENDORLINK_BRIEF.zh.md)，该稿不是新的实验合同。
+14条完整轨迹加本次日志确认合计12480/15552更新（80.25%），42/54新方法端点；尚无本次新阶段末校准结论。三worker属主、创建时刻、命令和cwd相符，约30秒复核各增加29.7秒user CPU。GPU利用率88%、19640/32607MiB已用、12436MiB空闲、60℃；CUDA仅本批三worker，各约6460—6466MiB；RAM227.74GiB、磁盘222.78GiB可用。三槽已满，无需因表面显存空闲再建worker。已结算训练291.508706h加本次活动已过13.615h，预约额度不当作已消耗，旧失败费不清零。
 
-本轮只核对已有授权记录、已开放结果、实际入口及只读运行元数据，没有新增训练／推理／指标重算／标签开放或监听。两份新观察原件SCP回传后大小/SHA一致；可变文档本轮只更新Windows，不覆盖活动冻结来源、不自动扩大10月29日此前批次的远端push许可。保管见[存储记录](STORAGE.zh.md#2026-10-29-晚间接手核对与进度补齐)。
+[本次工期计算](../reports/documentation/20261030/comparison_resume/eta_20261030_201431.json)使用恢复后首阶段123.83秒/步、既有CAB第二阶段179.58秒/步、跨顺序第三阶段155.03秒/步代理及端点77.97秒代理。三条L²R分别余约31.62/31.61/33.11h，末条GCR补位后仍需约4.11h，决定整批训练完成时点。若持续三路且无新失败或资源等待：从20:14观测起训练剩35.73h，预计服务器11月1日07:58；加确认/分析2.5—4h，剩38.23—39.73h，预计1日10:28—11:58，自30日15:15恢复训练起共43.2—44.7h，结果外审另计。未来用时慢20%且无额外等待情景为1日17:37—19:07，非置信区间或保证上界；822h为预算上限，不是预计工期。CAB_s6诊断未到原失败位置，仍可能改变进度和后续启动条件。
+
+VendorLink/FOREVER正式外审F-R01（旧H多development分区完成门）及V-R01（二维坏分数标签前门）已最小修复，Linux定向正反例及[主审处置](../reports/documentation/20261030/forever/formal/review/primary_disposition.zh.txt)闭合，修后未再次网页外审。两项各63来源一致，正式训练目录不存在、无本批训练/等待进程及启动脚本；不得因资源空闲自动启用。未启用时不报日历完成日；连续运行代理仍为FOREVER58—87h、VendorLink154.75h另加保存/评分，各116h/296h仅为硬总限。
+
+中文合成主线检验未见身份上的保持／学习；五方法支持固定系统最终排序优势，未确认H对S的额外抗遗忘。L²R/GCR补固定持续学习对照，S/H补默认配置与历史池化参照；VendorLink只检验同一观察账号两视图的检索/遗忘，单query单正例使MAP=MRR，不证明真实跨账号马甲识别。各线数据资格、预算和评价开放独立，执行范围以设计入口中的合同和明确补充为准。
+
+本次文档维护复用上述已回传且大小/SHA一致的证据，未新增现场观测、训练、推理、指标重算、标签开放、重启或监听。可变文档与活动冻结运行来源分开保管；历史PID、旧工期及已被取代的等待措辞已从当前区删除，原始运行/失败/审查文件保留。
 
 ## 近期执行与审查历史
 
-FOREVER方案外审已回收并独立处置（2026-10-30）：用户要求“需要修改的就修改”，并在其已修改的同事汇报MD现有章节补入FOREVER。已用本地Playwright从[唯一会话](https://chatgpt.com/c/6ae406c1-160c-83ea-a5a1-3b22ccac18fc)下载[完整503行报告](../reports/documentation/20261030/forever/review/report.zh.txt)及小附件；输入159582字节/26成员/25载荷与网页身份及本地清单一致，报告字节和附件公布SHA一致。外审有条件支持受限实现，无已证实无条件科学阻断；[独立主审](../reports/documentation/20261030/forever/review/primary_disposition.zh.txt)采纳末尾beta与供给器/阶段恢复两项定义补清，另具体化资格45/48更新、三槽实运算及≤36次full提交/I/O投影，拒绝无关扩臂、HPO和通用框架。[原方案](../reports/documentation/20261030/forever/proposal.zh.txt)原字节保留，[修订补充](../reports/documentation/20261030/forever/revision.zh.txt)为当前提议；[同事汇报稿第5.5节](L2R_GCR_VENDORLINK_BRIEF.zh.md#55-forever新增近期对照的原理与独立实验方案)及相关概览/解释/口头汇报已增补，用户原修改保留。
+2026-10-30中断与恢复沿革：13:23:06，旧CAB_s6 L²R第一阶段288更新后校准返回非PASS，原入口抛出Current calibration failed，旧控制器连带停止s4/s5；Cumulative budget stopped为失败传播，并非额度耗尽。14条完整成功保留，旧训练费用291.508706h；s4/s5分别止于累计624/456更新，s6为288，末条GCR未派发。旧入口未保存失败拟合的具体数值判据，推理权重不含Adam、work完整状态不存在，不能原步续训。证据见[原始中断现场](../reports/documentation/20261026/continual_comparison/qualification/interruption_20261030.json)及[旧H/S前序失败](../reports/documentation/20261026/continual_comparison/qualification/defaults_failure_20261030.json)。未运行草稿scripts/step28_comparison_diagnose.py及Linux diagnosis_20261030/diagnose.py不具备已核验正式资格，不与实际恢复入口混淆。
+
+用户随后批准按固定起点重跑三条CAB L²R并继续末条GCR，取代暂不重放决定；新独立恢复目录复用14条成功及原H/S54状态、继承全部失败费用。诊断路第一阶段通过后继续完整C→A→B，失败只退休该槽，健康槽继续补位，无自动重试；缺项仍阻断全108状态和确认。15项Linux CPU核验通过，累计98/1200秒；范围、主审和启动见[恢复说明](../reports/documentation/20261030/comparison_resume/report.zh.txt)、[实际执行](../reports/documentation/20261030/comparison_resume/execution.zh.txt)。
+
+H/S随后按明确授权部署同样的自身worker失败隔离，16:01:19以唯一监听2814827替换无训练的2790518，旧费用承接。12项CPU通过；首轮误写测试名的加载错误及6秒收费保留，累计68/120秒。44科学来源及18条/54端点/110h范围不变，前序必须全部成功的条件不放宽；见[范围与主审](../reports/documentation/20261030/defaults_repair/report.zh.txt)、[监听切换](../reports/documentation/20261030/defaults_repair/execution.zh.txt)。旧监听/PID及当时两路状态仅作历史，不作当前启动依据。
+
+FOREVER方案外审已回收并独立处置（2026-10-30）：用户要求“需要修改的就修改”，并在其已修改的同事汇报MD现有章节补入FOREVER。已用本地Playwright从[唯一会话](https://chatgpt.com/c/6ae406c1-160c-83ea-a5a1-3b22ccac18fc)下载[完整503行报告](../reports/documentation/20261030/forever/review/report.zh.txt)及小附件；输入159582字节/26成员/25载荷与网页身份及本地清单一致，报告字节和附件公布SHA一致。外审有条件支持受限实现，无已证实无条件科学阻断；[独立主审](../reports/documentation/20261030/forever/review/primary_disposition.zh.txt)采纳末尾beta与供给器/阶段恢复两项定义补清，另具体化资格45/48更新、三槽实运算及≤36次full提交/I/O投影，拒绝无关扩臂、HPO和通用框架。[原方案](../reports/documentation/20261030/forever/proposal.zh.txt)原字节保留，[修订补充](../reports/documentation/20261030/forever/revision.zh.txt)为当前提议；[当时汇报稿第5.5节](https://github.com/bililateral/cross-lingual-DIL/blob/5d170ea6/docs/L2R_GCR_VENDORLINK_BRIEF.zh.md#55-forever新增近期对照的原理与独立实验方案)及相关概览/解释/口头汇报已增补，用户原修改保留。
 
 当前仍只提议新9条FOREVER、复用H27端点、零HPO、新120群及两方法总4320前向。额外约1.22GiB参数锚点例外、116累计小时（108+6+2）、实施/数据/资格/训练均未批准；本轮未SSH、科研核验、载模、训练、生成或开标签，未改活动队列，未假称FOREVER代码已经实现。预算数值不变，正式前须实测新安全点I/O及三路资源；4—8h/条、三路含确认16—30h仍为历史代理。状态/收尾见[submission](../reports/documentation/20261030/forever/review/submission.json)与[回收](../reports/documentation/20261030/forever/review/recovery.json)。ER+FLAD仍为候选；下一步等用户决定修订实施范围，不重复方案外审或创建监听。
 

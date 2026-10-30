@@ -1,22 +1,16 @@
 # 科研计划
 
-状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md)，本页说明后续动作及其授权边界，不复制执行流水。
+状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)，本页仅列后续动作和授权边界。有效合同及增量修复从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)进入，不复制PID、计数或过期工期。
 
-VendorLink和FOREVER正式范围已获得明确接受，按[VendorLink方案](../reports/documentation/20261030/vendorlink/formal/plan.zh.txt)与[FOREVER方案](../reports/documentation/20261030/forever/formal/plan.zh.txt)推进。已有算法、单路GPU资格和适用旧证据复用；新增整批训练、端点完整门、盲评分/统一标签开放、统计及成功清理已接入实际入口，CPU必要增量证据见各formal/implementation.zh.txt。本轮定向GPT-6 Pro外审已回收，两项必修已修复并经Linux定向CPU证据及[独立主审](../reports/documentation/20261030/forever/formal/review/primary_disposition.zh.txt)闭合；修后未第二次网页送审。用户随后明确先别训练、等待开始指令，因此当前不启用任何本批训练或自动资源等待队列。收到新开始指令后，再核对实际部署、H参考身份及共享资源；两个新队列须先后启用，不改活动L²R或已有H/S监听。
+L²R／ER+GCR按[822小时原执行范围](../reports/documentation/20261026/continual_comparison/execution.zh.txt)及[10月30日恢复补充](../reports/documentation/20261030/comparison_resume/scope.zh.txt)继续：复用14条完整成功和H/S54端点，三条未完成CAB L²R从各自固定起点重跑，再完成末条GCR。诊断路第一阶段通过后继续完整三阶段；自身worker失败退休单槽，健康槽继续接任务，无自动重试。全18条及108状态完整后，连续完成原定新120群生成、确认和统计；缺条目不越过完整门。失败费用、访问及原算法/判据保留；若诊断再次失败，先查因修复，依用户明确范围另行补跑，不把新目录的单条成功当整批成功。既有算法及有限BGE资格复用[合并结案](../reports/documentation/20261024/continual_recovery/review/primary_disposition.zh.txt)，不重复资格；本次新增编排免审不扩大到新算法或结果审查。
 
-VendorLink为四臂36条、每市场40轮、296累计任务小时。获准依赖扫描发现57群中48群相连且包含Dream全部8群，用户接受固定数据比较及结论限制：保留完整排序/遗忘差值，不计算整体置信区间、不作统计验收，不宣称真实潜在同控识别或统计确认抗遗忘。不得为了获得区间重分群、选账号、加数据或改统计模型；未来统计确认另议。FOREVER为9条新增、H27复用、单路116h、额外全参数锚点和新120群/4320前向；原O/F主比较及N/Z点值保护不变，不重训H、不追加HPO。旧“正式范围尚未批准”已被本次明确接受取代，核验/外审仍是启动前提。
-原版S_default＋历史H（G_half）的补充范围也已批准：三顺序×三种子×两方法18条、最多三路、108h训练＋2h辅助=110h，单条6h；只训练、保存54端点及旧dev盲分数，不开放评价标签、不新增确认或HPO。[等待增量主审](../reports/documentation/20261026/continual_defaults/waiting/review/primary_disposition.zh.txt)及必要修复核验已完成，[唯一监听](../reports/documentation/20261026/continual_defaults/waiting/launch.json)已启用。下一步由现有监听等指定L²R／ER+GCR整批训练、生成、确认和分析全部成功、相关进程退出，再按实验所需剩余显存和RAM/disk门逐路派发；不要求整卡没有CUDA进程，禁止重复启动。失败停止且不自动重试，原失败和费用均承接。
+S_default＋历史H（G_half）按[失败隔离补充](../reports/documentation/20261030/defaults_repair/scope.zh.txt)及[实际监听切换](../reports/documentation/20261030/defaults_repair/execution.zh.txt)执行，沿用18条、54端点、110h、单条6h及最多三路。只训练并保存旧dev盲分数，不开放评价标签、不新增确认/HPO。现有唯一监听等comparison_resume整批训练、108状态完整性、生成、确认、分析全部成功及相关进程退出，再检查剩余显存、预留、RAM和磁盘；不要求整卡没有CUDA。自身worker失败只退休该槽、健康槽继续补位，缺项不发布完整成功；前序失败仍使监听退出，补跑后须重新绑定，禁止重复监听及自动重试。
 
-两新对照的现行执行范围已于2026-10-26明确批准：[822小时执行范围](../reports/documentation/20261026/continual_comparison/execution.zh.txt)覆盖L²R／ER+GCR各9条、H/S54阶段权重复用及原定新120群确认；新增编排明确免外审，既有算法／资格结论复用。按固定队列完成18条盲训练、全108端点门后连续进入生成／确认／统计；失败保留费用并停派，不自动重试。下方关于新正式预算尚待授权的旧段落不再是当前状态，原算法及结果审查边界保持。
+VendorLink和FOREVER正式范围已分别获明确接受：[VendorLink四臂36条/每市场40轮/单路296h](../reports/documentation/20261030/vendorlink/formal/plan.zh.txt)，[FOREVER新增9条/复用H27/单路116h及新120群/4320前向](../reports/documentation/20261030/forever/formal/plan.zh.txt)。算法、单路GPU资格及适用旧证据复用；正式编排/评价已接入，两项外审必修经Linux定向CPU证据及[主审](../reports/documentation/20261030/forever/formal/review/primary_disposition.zh.txt)闭合，修后未再次网页送审。用户最新明确先别训练、等开始指令，因此当前不启用这两项训练或自动资源等待。收到新开始指令后，核对实际部署、H27身份与共享资源，再先后启用两个新队列，不改活动L²R及已有H/S监听，不重复G1/G2或FOREVER资格。
 
-原五方法45条及冻结新确认／统计已经完成，结果外审与独立主审已结案，见[结果主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)。原O/F共同主要门未过：H相对S最终MAP正向，但额外抗遗忘尚未确认。原490累计小时及恢复账保留，不再据旧启动计划重复训练或开放标签。H/S54端点继续服务已批准新对照确认；其余三方法的81份独立权重已按用户选择清理，非权重证据保留，见[存储记录](STORAGE.zh.md#2026-10-26-五臂中的三臂权重清理)。
+VendorLink依赖扫描发现57群中48群相连且包含Dream全部8群，用户接受固定数据描述比较：保存完整排序/遗忘差值，不计算整体置信区间、不作统计验收，不宣称真实潜在同控识别或统计确认抗遗忘。不得为获得区间重分群、选账号、加数据或改统计模型。FOREVER保留额外全参数锚点、原O/F主比较及N/Z点值保护，不重训H、不追加HPO；不将两线预算或评价权限互借。
 
-原45条的资源故障与恢复按[当前明确重试范围](../reports/documentation/20261024/continual_retry/scope.zh.txt)及[独立处置](../reports/documentation/20261024/continual_retry/primary.zh.txt)接续：保留24成功轨迹，未完成21条按原身份运行；旧费用和读取不清零。资源不足只暂停补入一个空槽，其他worker继续；首次启动和其他故障条件保持。已有控制器／监听的身份、真实更新和完成状态统一看交接，不因旧待运行文字重复建队列。此恢复不是任意中断的自动断点续训授权。
-
-L²R／ER+GCR的设计、实现和有限BGE资格复用[合并结案](../reports/documentation/20261024/continual_recovery/review/primary_disposition.zh.txt)，不重复资格；当前18条及新确认按上述822小时授权执行。原“新比较及独立预算尚待授权”是批准前历史，不再构成待办；资格及顺利运行仍不能代替最终效果或确认结论。
-
-VendorLink三市场数据与原生方案的[外审主审](../reports/documentation/20261029/vendorlink/three_market/review/primary_disposition.zh.txt)、[实施修复闭合](../reports/documentation/20261029/vendorlink/native/review/primary_disposition.zh.txt)及后续[单路结案](../reports/documentation/20261030/vendorlink/native/primary_disposition.zh.txt)共同构成已有证据。10月29日10GiB/9GiB allocator一次尝试、旧等待门及G2提议为历史；后续用户取消allocator限制并接受单路范围，旧失败与读取账保留。后续正式合同及新增编排/评价只核验实际增量，按科研纪律第6节处理需要外审的新增范围；已闭合核心方法、数据导出和单路GPU资格不重复测试或再审，不将本次进展梳理当成新的实施/预算/正式运行许可。
-
+原五方法45条及其新确认/统计、结果外审和[主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)均已结束。H相对S最终MAP正向，但原O/F共同主门未过、额外抗遗忘未确认，不重复旧恢复或为翻转结果重训。H/S54端点继续服务新对照；其余三方法81份独立权重已按用户选择删除，非权重证据和原490h/失败账保留，见[存储记录](STORAGE.zh.md#2026-10-26-五臂中的三臂权重清理)。
 ## 已结束Optuna的授权与恢复历史
 
 已按[S/S_pos/H_pos有限Optuna合同](SELLER_ALIAS_OPTUNA.zh.md)、[272小时预算补充](../reports/documentation/20261019/optuna_budget/proposal.zh.txt)及[自动执行授权](../reports/documentation/20261019/optuna_budget/authorization.json)完成三臂36次搜索、9次新seed复验与集中评价/独立分析；审查与实际执行状态只看[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。既有18次原生调用复用，不增加资格尝试，不重复启动已派发的控制器或已自删监听。已发生资源停止的恢复仅按[具体补充](../reports/documentation/20261019/optuna_recovery/scope.zh.txt)及最新用户决定：9GiB空闲/允许其他CUDA、从S_pos第2次搜索原参数继续，三个已完成实验不重跑；保留失败收费，本轮明确免审、独立主审及恢复门通过后已于10月19日18:58恢复，实际状态只看交接。

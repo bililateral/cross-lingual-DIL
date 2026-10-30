@@ -16,6 +16,8 @@ CPU全部尝试、错误、实际收费及获准canonical依赖元数据已回Wi
 CPU首轮11通过和一个测试名加载错误（收费6秒）保留，随后仅补漏项通过（3秒），累计68/120秒；全部旧等待/失败/原生费用继续承接。小证据SCP回Windows并按清单逐成员核对，报告/范围/执行说明两端保管。中转input/evidence ZIP核验后两端删除；活动数据/模型/Memory不动，不重置大清理周期。根可变文档仅Windows维护，本地范围提交，不推送。
 
 ## 2026-10-30 L²R恢复及S/H交接重新绑定
+20:14—20:15只读查询的[进度原件](../reports/documentation/20261030/comparison_resume/progress_20261030_201431.json)（32164字节，SHA256 f5feccdbf0fc0e958db7e33ba9d95ff7a0112d7f401dcd43a02b0eb4da672426）与[工期及等待状态](../reports/documentation/20261030/comparison_resume/eta_20261030_201431.json)（6331字节，SHA256 5f02068eb86eeae1a34317b3e01eca92cfcd52704b6cc22b8ea08216988ec1e3）已SFTP回Windows并核对两端大小/SHA，原件保留；动态计数只在交接顶部维护。本次仅精简可变记录，删除已被取代的状态文字及重复旧工期，不删除冻结证据或活动载荷。根文档未同步覆盖Linux活动workspace。
+
 
 [comparison_resume](../reports/documentation/20261030/comparison_resume/)为独立恢复目录；Linux workspace50份代码/测试/合同政策核验，沿用原五份训练输入及BGE链接，无dev/test/owners/private_custody链接。14成功及三条旧失败目录用硬链接保管、纳入原存储额度；原formal/gate/budget/failure未覆盖。诊断失败时保留校准前完整状态，成功阶段端点双恢复通过后退役该临时完整状态；不清理活动权重或Memory。
 
