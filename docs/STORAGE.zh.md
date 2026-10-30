@@ -2,9 +2,11 @@
 
 ## 2026-10-30 FOREVER静态方案外审材料
 
-[本轮方案、预算与审查目录](../reports/documentation/20261030/forever/)仅保存在Windows。三份官方源码是固定提交bbeb549a21e59d9490f20a2b02099ee766a67f48的静态阅读原件，没有执行；方案包159582字节、26成员，身份及25载荷大小/SHA核对见[清单](../reports/documentation/20261030/forever/review/input_manifest.json)和[包记录](../reports/documentation/20261030/forever/review/package.json)。用户明确批准该完整包后上传到本轮chatgpt.com专用会话，提交/授权/完整请求及页面观察保留；待完整审查回收前保留必要输入包。没有正式文本/标签载荷、模型、Memory或凭据进入包中。
+[本轮方案、预算与审查目录](../reports/documentation/20261030/forever/)仅保存在Windows。三份官方源码是固定提交bbeb549a21e59d9490f20a2b02099ee766a67f48的静态阅读原件，没有执行；方案包159582字节、26成员，身份及25载荷大小/SHA核对见[清单](../reports/documentation/20261030/forever/review/input_manifest.json)和[包记录](../reports/documentation/20261030/forever/review/package.json)。用户明确批准该完整包后上传到本轮chatgpt.com专用会话，提交/授权/完整请求及页面观察保留。没有正式文本/标签载荷、模型、Memory或凭据进入包中。
 
-方案/预算/导航/决定记录作本地Git交付；ZIP保留本地供回收核对，内部项目来源由清单指向当前Git文件，未复制出另一套可执行workspace。未同步Linux、推送远端、覆盖活动冻结文件或重置大清理周期；已存在的汇报稿修改、历史删除及其他未跟踪文件不在本轮提交中。
+10月30日完整回收后保存report.zh.txt（47114字节，SHA256 b5a00a7be8e145bca216875056b3311da6ddb9af893fcff0d5d8a7e37c4b575c）、audit_notes.json、完整网页观察、[回收身份](../reports/documentation/20261030/forever/review/recovery.json)、主审及revision.zh.txt。上传包25个载荷与现存来源全部同大小/SHA，已由原提交a728ddd2及原项目Git保存；本轮关闭方案处置后删除无独立后续用途的重复ZIP和首次不完整DOM，保留完整外审原文与必要来源。未复制出另一套可执行workspace。
+
+本轮补入同事汇报稿并作范围清楚的本地Git交付，保留用户已有修改。未同步Linux、推送远端、覆盖活动冻结文件或重置大清理周期；其他历史删除及未跟踪文件不纳入。本节中的96GiB及恢复文件清理规则是未来FOREVER提议，不是对现有实验文件的清理许可。
 
 ## 2026-10-30 VendorLink GPU校验进度查询
 

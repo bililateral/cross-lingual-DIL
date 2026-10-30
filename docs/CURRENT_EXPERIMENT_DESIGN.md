@@ -2,7 +2,7 @@
 
 ## 当前合同入口
 
-FOREVER新增候选（2026-10-30）：[迁移方案](../reports/documentation/20261030/forever/proposal.zh.txt)及[预算依据](../reports/documentation/20261030/forever/budget.json)只用于用户要求的静态方案外审，不是执行合同。只提议9条新轨迹、H27端点复用、零HPO和两方法新确认；明确额外参数锚点与旧全部历史状态1MiB不兼容、总步数/成本不相等。是否采用、数据及116h预算待外审/独立处置和用户后续决定；ER+FLAD保留候选，活动实验不变。审查动态状态仅见当前交接。
+FOREVER新增候选（2026-10-30）：[送审原方案](../reports/documentation/20261030/forever/proposal.zh.txt)＋[外审后修订补充](../reports/documentation/20261030/forever/revision.zh.txt)构成当前提议，冲突处以后者为准；[预算依据](../reports/documentation/20261030/forever/budget.json)保持116h，不是已批准执行合同。只提议9条新轨迹、H27端点复用、零HPO和两方法新120群/总4320前向；额外全参数锚点、总步数/成本及开发机会不等明确披露。原方案外审和独立处置已完成，资格/实现/数据及预算仍待用户后续决定；方案补清不冒称实现通过。ER+FLAD保留候选，活动实验不变。动态状态仅见当前交接。
 
 本节定位各条研究线的有效范围；实际进度、PID和资源观测只在[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)维护。后面的设计与审查沿革保留原时点，不覆盖本节与后续明确授权。
 
