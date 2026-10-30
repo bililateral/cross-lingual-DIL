@@ -1,0 +1,21 @@
+第三轮V-R02定向复审：独立主审结案
+2026-10-30，客户端21:02—21:03（UTC+8）。正式训练与自动资源等待继续暂停，等用户新的开始指令。
+
+完整回收
+既有网页会话停止按钮为0，新report.zh.txt、audit_notes.json完整下载并阅读全文。输入398054字节、82载荷加清单，SHA256 ab37c8c6a946ab974909984ee0da069d919b7969d45baca72035a97ce4169b88，对应closure提交而非上一轮。报告SHA256 35232910823fcac60ec25322192493c94a98ecfc931d6d1c68e6fdf75f4fe5f2；audit SHA256 2790f057ce69ef0c87728e24cfe450eb2bc645c7fce915e073598497620a5105。原文与第二轮原件分别保留。可见会话沿用GPT-6／Pro；审查者自述GPT-6 Astra Pro，后台身份未独立核实。
+
+逐项裁决
+1. F-R01维持CLOSED。第二轮已确认旧H额外development元数据不再导致新FOREVER误拒，双方完整有序fit/calibration及预训练档案仍精确比较。生产函数及对应测试方法本轮未改，复用原cpu04及第二轮主审，不把旧cpu04称为当前共享测试文件的新运行。真实H27完整身份核对与新正式分区匹配仍属以后获准执行的前提。
+2. V-R01维持CLOSED。真实validate_blind保留精确shape=(pair_count,)；cpu09继续验证合法一维、二维空列/单列、NaN和短向量。实际analyze仍先完成整个盲门，再登记/读取标签。
+3. V-R02本轮CLOSED，接受第三轮结论。独立对照当前代码、diff、CPU09及实际消费者：唯一生产变化恢复对原row['scores']的finite检查，float64副本仅供shape。数字字符串在盲门内失败，未到qrels登记/读取；正常数值列表及指标算法不变。测试直接调用真实门；撤回该行时数字字符串不抛错，assertRaises会失败，这是由固定夹具和代码可确定的反事实，并未额外运行mutation实验。真实analyze前段的access/read-qrels断言同时有界支持标签前拒绝。
+4. 异常传递无新增必修。重新读取evaluate末尾、formal后续派发及queue失败分支：TypeError会写failure.json并重抛，子进程非零导致停止后续派发、保留费用，不会吞为成功。此为未变入口的静态接线核对，不称CPU09新跑了整条队列。
+5. 第三轮没有新增SCIENTIFIC_BLOCKER、REPRODUCIBILITY_DEFECT或必要追加验证。独立核对未发现与此相反的具体证据；不将“未发现”说成已证明所有正式运行路径永远无错。
+6. 可选统一错误提示、Inf/不可解析值变体：已有明确失败路径，当前无诊断缺口，不采纳为本轮改动。全仓回归、通用schema、全模型pilot、4104真实前向、重新开放qrels、重跑FOREVER/GPU资格等均不需要。本轮到此停止代码扩展和科研验证，不再开新外审轮次。
+
+费用、来源与证据边界
+cpu09仅在Linux既有py310运行一个手写测试方法；外层7.604980685049668秒、计费8秒，VendorLink CPU累计118/600秒。FOREVER CPU133/600及native1274/3600、准备费和失败账保持。当前两份源码哈希与审查原文、cpu09及两gate一致；两gate各63来源已由recheck/deployment.json现场核对。
+测试使用限定specifications/read/complete_training替身和access观察，不是36条正式训练、108端点或4104真实前向验证；零正式读取字段是harness声明，不是系统I/O审计。本轮没有载模、正式标签读取、训练或GPU运行。正常评分生产为数值tolist，V-R02是此前局部补丁新增的接受范围问题，尚未在正式批次造成失败或泄漏。
+recheck/deployment.json为服务器20:53:45快照，源文件、关闭gate和无本批进程的时点证据真实保留；外审没有现场连服务器，不把该快照变成当前显存可用证明。审查问题已闭合，但执行gate的approved/review_closed继续false，避免用户暂停期间被用于启动。
+
+交付与后续
+当前交接仅替换VendorLink和FOREVER对应项，被替代状态移入既有历史区；报告、原CPU证据和旧修复来源保留。完成本轮审查收尾后等待用户开始指令。届时仍须核对实际部署、H27身份及共享资源，按原计划先后启用两队列；不从审查通过推导自动等待或开训许可。VendorLink固定数据描述限制、FOREVER原确认判据及已有负结果均保持。

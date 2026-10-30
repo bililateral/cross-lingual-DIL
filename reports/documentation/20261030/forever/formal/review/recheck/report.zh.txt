@@ -1,0 +1,325 @@
+VendorLink 与 FOREVER 正式代码两处修复：定向科研复审
+审查日期：2026-10-30（UTC+8）
+模型说明：沿用当前会话标识的 GPT-6 Astra Pro；未切换模型。
+
+一、输入身份与总裁决
+
+实际输入：formal_repair_review.zip
+实际字节数：412846
+实际 SHA256：ab0165d3424183a6696468e3cd126c474add3075f41c6783df87a391609d787c
+ZIP 成员：89 个文件，路径全部唯一，没有目录项。
+package_manifest.json 列出 88 项载荷；加清单自身为 89 个文件。
+88/88 项实际字节数与 SHA256 均与清单一致。无重复路径、缺失载荷、未列出的额外文件或哈希不符。
+清单指定的上一轮基线 SHA256 为 8dee9a952919a8215a1e83058e541db6a933f867548e91655a46ba951acbe731，与本会话上一轮输入身份一致。
+
+总裁决：原 F-R01、V-R01 的具体缺陷均已修复；FOREVER 本轮无新增必修。VendorLink 修复引入一个新的分数表示与实际消费者不一致问题 V-R02，列为中等 REPRODUCIBILITY_DEFECT，仍需一处局部修正及对应手写反例闭合。没有发现需要改变研究方法或统计合同的新增 SCIENTIFIC_BLOCKER。
+
+逐项状态：
+- F-R01：CLOSED。旧 H 多 development 元数据不再导致正常共享分区被拒；有序 fit/calibration、预训练档案及既有来源/完成验证均保留。
+- V-R01：CLOSED。二维空列、二维单列等原反例被精确一维 shape 门阻断，拒绝发生在 qrels 开放登记和读取之前。
+- V-R02：OPEN，REPRODUCIBILITY_DEFECT，MEDIUM，本轮唯一新增必修。盲门验证 float64 转换副本，指标仍消费原始 JSON 值；可解析数字字符串能过新门，却在开标签后触发原消费者错误。
+- FOREVER：新增 SCIENTIFIC_BLOCKER 0；新增 REPRODUCIBILITY_DEFECT 0。
+- VendorLink：新增 SCIENTIFIC_BLOCKER 0；新增 REPRODUCIBILITY_DEFECT 1，即 V-R02。
+- 共享 queue、来源固定、预算继承及暂停状态：本轮未发现新增必修。
+
+以上是代码与证据范围内的审查结论，不是正式执行或效果结论。用户最新明确要求“先别训练，等我的开始指令”，故无论复审结论如何，正式训练、自动资源等待和自动开训均继续暂停。本报告没有修改任何输入源码或 gate，没有代用户签发开始许可。
+
+二、改动边界与核验方法
+
+2.1 对实际文件的核对
+
+先读 package_manifest.json，再核对 changes.diff 与 before/ 三个原文件，随后对照 workspace/ 修后完整文件。与本会话上一轮正式入口包逐字节比较，63 份源码/测试/配置中仅下列三份发生变化：
+1. scripts/step28_forever_evaluate.py：256 行变为 259 行，仅 complete_training 的共同分区比较及注释改变。
+2. scripts/step29_vendorlink_evaluate.py：290 行变为 291 行，仅 validate_blind 的数组转换/形状/有限性检查改变。
+3. tests/test_step28_formal_training.py：262 行变为 327 行，增加 asdict 导入，以及上述两项定向边界测试。
+
+另有 cpu_sources.json 随来源字节更新。changes.diff 的各 hunk 可在内存中由 before 文本重建出修后文本；没有藏在完整文件中但未列于 diff 的源码变动。before/ 三份原文件均与上一轮相同文件逐字节一致。源码 AST 的改变也仅落在两个目标函数及手写测试类；本次只解析语法树，没有导入或执行模块。
+
+63/63 来源与 workspace/cpu_sources.json 一致；VendorLink cpu08 与 FOREVER cpu04 的 receipt.sources 完整对应这 63 份实际字节；两份 gate 的 sources 按其 workspace 相对路径映射后同样全部吻合。三份 comparison 依赖沿用原资格冻结字节。共享 step28_formal_queue.py 为前轮已审的 9826 字节，SHA256 d76d174b8bdd48148fa157cdd71fbb8021034cc2e0939e1c077b00fa6e0f5134，没有保留撤回的一次性启动扩展。
+
+两份 plan.zh.txt 与上一轮完全相同。两份 gate 相比上一轮仅 sources 与 prior_used_seconds 改变，研究范围、预算桶、方法、轮数、指标与结论边界未变。previous/report.zh.txt 与 previous/audit_notes.json 分别与本会话上轮交付逐字节一致。
+
+这些核对用于确认“审的是哪份代码、证据对应哪份代码”；不以哈希、PASS 或测试数替代以下行为判断。
+
+2.2 本轮执行限制
+
+本轮只做本包及上一轮已提供材料的文本阅读、ZIP/JSON/哈希/源码比较、AST 解析与简单费用算术。未运行项目代码、测试、训练、生成器、模型推理、指标重算或 bootstrap；未访问科研服务器、外部网页/论文/仓库，未读取未提供的正式数据、标签、owners、模型或凭据。
+
+下面提到的 CPU 行为是包内已存在的 Linux 执行记录，外审者没有重跑。下面的新增反例是静态调用链推断，未执行 NumPy 反例或项目指标函数。不存在把本地机械检查冒充 Linux 科研执行的情形。
+
+三、F-R01：CLOSED，且未发现该修复引入新的必修问题
+
+3.1 修复保留的是完整有序学习分区，不是只有群数
+
+位置：workspace/scripts/step28_forever_evaluate.py::complete_training，第 28—51 行；实际改动在第 44—48 行。
+
+修后条件为：
+  any(row['partition'][role] != old['partition'][role]
+      for role in ('fit', 'calibration'))
+  or row['pretrained_archive'] != old['pretrained_archive']
+
+这精确解决了原来的模式不兼容：旧 H 有 fit/calibration/development，新 FOREVER 只有 fit/calibration；只要两个共同学习角色完全相同，额外 development 键不再使整条路径失败。
+
+严格性仍在：
+- 角色通过直接下标读取，未改成 get(..., [])；缺 fit 或 calibration 仍异常停止，不会用默认空值放过。
+- 比较的是完整列表；列表长度、群的先后次序以及每条字典内容都保留。生产记录包含 group_uid 和 domain，因此改变群 ID、域或顺序都会拒绝。
+- 没有转成集合、只比较长度、自动排序、截断或忽略记录字段。
+- pretrained_archive 仍作完整对象精确相等比较，没有降为仅比较一个摘要字段，也没有删除该条件。
+
+两边的生产语义有直接源码支持：
+- step28_continual_comparison_run.py::training_inputs，第 99—148 行：只读获准 train 输入，元数据按域/群序排列；第 145—148 行仅生成 fit/calibration 的有序记录。
+- step28_chinese_base.py::partition，第 52—79 行：旧模式包含 development；第 74—79 行保存 group_uid/domain，并检查各域角色数量。
+- step28_continual_expression_run.py::public_inputs，第 73—103 行：旧生产者同样按域/群序建立公共群顺序。
+- step28_continual_five_run.py::execute，第 244—255 行：将旧完整分区写入 H 完成记录。
+- 冻结 comparison_evaluate.py::full_gate，第 44—48 行也使用共同学习角色投影；这是接口语义的旁证，本裁决仍以修后实际代码为准。
+
+3.2 来源验证、真实完成门与 18 条记录没有被绕过
+
+complete_training 的真实顺序保持：
+1. 第 29—32 行先要求九条新训练完成、数量正确且均成功。
+2. 第 33 行调用真实 formal.verify_reference(allowed)。
+3. 第 35—38 行逐份核对旧 H 完成记录身份，读取其元数据，按 (order, seed) 建索引。
+4. 第 40—43 行遍历固定九路径，对每条新 FOREVER 调用真实 formal.validate_completion，并取对应 H。
+5. 第 46—48 行比较共同分区及预训练档案。
+6. 第 49—50 行每路径追加一条 FOREVER 与一条 H 记录，总计 18 条；名称、路径、order/seed 与各自完成记录一起保存。
+
+未变的真实直接调用仍有作用：
+- step28_forever_formal.py::verify_reference，第 41—62 行：要求九条唯一固定 H 路径、H_pos_tuned 名称、原完成状态、864 更新、原 source_files 与旧 gate 匹配、三端点、模型/校准文件身份及既有恢复标志。
+- 同文件 validate_completion，第 65—85 行：检查新来源、真实完成状态、current=864、fixture=0、回放范围、访问记录、三个阶段、当前域各 12 校准群、模型实物和成功校准映射。
+- evaluate.py 主入口第 239—243 行仍在 generate、confirmation、analyze 分支之前运行完整训练门。
+- confirmation 第 129—156 行根据每条记录选择 H 或 FOREVER 的真实恢复/评分函数；实际 stage/maps 与所记录值仍需一致。
+- step28_continual_five.py::Method.restore，第 253—259 行仍真实恢复、绑定模型元数据并恢复模式/RNG，没有被换成空函数。
+
+本次修复不改变 Learner、Supply、Adam、正则、回放、校准或端点清理；也没有改变生成器、确认 namespace、群数、统计抽样和主要门。旧资格无需为这一个元数据投影重新执行。
+
+3.3 development 信息的准确边界
+
+可以说“没有新增开发正文或标签读取”，不能笼统说“完全不读 development 信息”。旧 H 完成元数据本来包含旧开发群 ID；generate 第 62 行仍从记录内所有分区的 group_uid 建立新旧群防碰撞集合，其中包括 development 群 ID。该逻辑未变，是已批准元数据的用途，没有打开开发商品正文/标签，也没有把开发群加入新学习分区。
+
+3.4 cpu04 的实际支持与局限
+
+新增测试位于 workspace/tests/test_step28_formal_training.py::test_forever_metric_formulas_and_complete_blind_gate，第 136—166 行。
+
+它确实调用真实 complete_training。第 140—151 行创建临时 JSON 与真实文件身份记录，旧 H 样式元数据有额外 development，共同角色相同。第 152—153 行对 verify_reference 和 validate_completion 作限定替身，避免读取真实 H27 或不存在的新正式端点；被修复函数本身没有替换。第 154 行检查返回 18 条记录；第 155—163 行分别改动 fit、calibration 和预训练档案，要求目标拒绝错误。
+
+对测试是否可能在修复缺失时仍通过的判断：
+- 若恢复原整字典比较，合法正例第 154 行会因额外 development 而失败，不能得到 PASS。
+- 若删除整个比较，或只核对一个角色，负例会失败。
+- 旧记录经深复制并写成 JSON；后来修改 current 不会同步改掉旧记录，负例没有共享引用造成的虚假一致。
+
+本次动态证据没有单独覆盖群 ID 替换、域替换、两元素顺序颠倒、缺角色键，亦只断言 18 条数量而未逐项断言全部名称/路径绑定。当前代码直接比较列表/字典、遍历固定路径，足以静态支持这些属性；这些未测变体不妨碍关闭 F-R01，不必补完整模型或重复 864 步来验证。
+
+verify_reference/validate_completion 的真实成功路径没有在 cpu04 中重跑；不能把该夹具称为 H27 加载或新正式完成记录已经核验。此前真实小模型/来源拒绝证据继续按原范围使用，不能扩张为本轮已跑完整新确认。
+
+3.5 真实旧字段模式的补证
+
+evidence/h_partition_metadata.json 第 3—174 行记录九条旧 H 完成元数据，均含 fit=144、calibration=36、development=60。九条 completion 的路径、字节数、SHA256 与本包 FOREVER gate 的九条 h_reference_runs 逐项一致。这支持“旧 H 确实使用三角色模式”，使原问题不只是假设性的源码模式猜测。
+
+但该元数据没有提供完整群列表，不能证明尚未生成的新 FOREVER 完成记录已经逐 ID、逐域、逐顺序与 H 相等，也不证明外审者核算了 H27 权重 SHA 或完成了模型载入。真实完整门的这些职责仍须在以后获准执行时承担。
+
+四、V-R01：原二维数组缺陷 CLOSED
+
+4.1 精确一维检查已接入完整盲门
+
+位置：workspace/scripts/step29_vendorlink_evaluate.py::validate_blind，第 102—123 行，修复在第 118—122 行。
+
+对 n 个视图、m=n(n−1)/2 个分数，修后先 np.asarray(..., dtype=np.float64)，再要求 shape 恰为 (m,)，并检查有限性。
+
+具体拒绝效果：
+- [[], …] 共 m 个空列表：shape=(m,0)，拒绝。
+- [[0.], …] 共 m 个单列：shape=(m,1)，拒绝。
+- 少一个/多一个分数、标量、其他维度：shape 不等于 (m,)，拒绝。
+- NaN、正 Inf、负 Inf：有限性检查拒绝。
+- 不能转为 float64 的字符串/对象、不规则嵌套：在转换处异常停止，仍早于标签边界；不必为了关闭本缺陷把所有异常统一为同一异常类。
+- 生产链所给合法一维数值向量：形状、顺序与数值均不改变。
+
+二维空列、二维单列、NaN、短数组由 cpu08 实际覆盖；Inf、长数组、标量、不可解析值等拒绝是静态路径判断，不冒称本轮另有执行证据。
+
+4.2 真实 analyze 顺序保证这些错误在标签前失败
+
+同文件 analyze 的实际顺序为：
+- 第 217 行：训练完整验证。
+- 第 218—220 行：读取盲完成记录并核对来源。
+- 第 221 行：全批 validate_blind。
+- 第 222—228 行：依赖元数据来源、群集合、query 数核对。
+- 第 229 行：登记 heldout_qrels_joint_opening。
+- 第 230 行：读取三份 qrels。
+
+所以本次被新增 shape/finite 检查拒绝的数组，不会先登记或读取 qrels。标签开放未被挪到门前；来源、run/cell/group/view ID 检查也保留。
+
+4.3 合法生产值与研究定义未变
+
+step29_vendorlink_methods.py::vendor_scores 第 55—68 行返回上三角一维值；h_pool 第 71—85 行返回一维群对值；Model.score 第 201—213 行使用这两条真实分支。step29_vendorlink_run.py::evaluate 第 197—204 行将模型张量的 tolist() 保存为数值列表。
+
+本次没有重排序 view、改变分数、重新推理、改变 query 权重或指标公式。comparison_summary 第 204—213 行仍固定报告所有预定比较，primary_status=DESCRIPTIVE_FIXED_DATA_ONLY、passed=None、整体区间 None。这里的 None 输出到 JSON 即 null。没有暗中恢复整体 bootstrap 或统计确认。
+
+五、新增必修 V-R02：验证值与消费值不一致
+
+分类：REPRODUCIBILITY_DEFECT。
+严重度：MEDIUM。
+状态：OPEN。
+影响范围：VendorLink 集中开标签前的分数可用性保证；不是模型数学、方法公平性或统计定义错误。
+
+5.1 精确位置
+
+- workspace/scripts/step29_vendorlink_evaluate.py::validate_blind，第 118—121 行：只验证 float64 转换副本。
+- 同文件 analyze，第 229—230 行：先登记/读取 qrels；第 239 行重读原始分数文件；第 245 行把原 row['scores'] 交给 query_metrics。
+- 同文件 query_metrics，第 171—176 行，尤其第 172 行：未转换输入便调用 run.query_ap。
+- workspace/scripts/step29_vendorlink_run.py::query_ap，第 215—221 行，尤其第 219 行：np.isfinite 直接作用于原输入。
+
+5.2 可定位的静态触发与影响
+
+保持 run/cell/group/view ID、来源记录、文件身份与长度全部正确，仅让一个群的分数文件使用长度为 m 的可解析数字字符串列表，例如：
+  scores = ["0.1"] * m
+
+这是可以转成数字的字符串，与上一节“不能解析的分数”不同。
+
+其控制流为：
+1. validate_blind 第 118 行将该列表转换成有限的一维 float64 数组，shape 和 finite 都通过。
+2. 转换只存于局部 scores；它没有改变磁盘 JSON，也没有作为返回值提供给指标。该函数只返回 public 群。
+3. analyze 第 229—230 行先登记并读取 qrels。
+4. 第 239 行重新读取原始分数；第 245 行继续传递字符串列表。
+5. query_metrics 第 172 行调用 query_ap；后者第 219 行对字符串 dtype 做 np.isfinite，会抛 TypeError。
+
+结果是：新门接受一种后续指标不能处理的分数表示，错误发生在一次标签开放之后。一次 access 登记还会使本动作不具备静默重试资格。文件 SHA 一致不能修正这个表示语义差异：哈希可以完全正确地指向一个字符串分数文件。
+
+修前的门对原 row['scores'] 调用 np.isfinite，这种输入会在开标签之前失败。修后引入 float64 强制转换，扩大了门接受的表示集合，消费者却未同步。因而这是本次补丁引入的具体回归，属于原 V-R01 同一个盲门合同，不是泛化的安全加固要求。
+
+必须限定：正常 Model.score/tolist() 输出数值，不会主动产生这一字符串列表。本报告没有声称正常正式生产必然失败、已有坏分数或实际标签泄漏。该反例来自完整源码调用链的静态推断，外审者没有执行它。之所以列为必修，是用户要求该完整门在开放标签前排除实际消费者不能使用的分数，且此次补丁确实新放行了这一输入；修复只需局部一行左右。
+
+这也补充了前轮示例修法的一个遗漏：只给出“转换后检查 shape/finite”尚不足以保证验证与消费表示一致。本轮不能因代码采用了前轮示例就忽略这个下游差异。
+
+5.3 最小修法：选一即可
+
+推荐 A：保持原先合法数值输入的边界。
+保留 float64 转换副本和精确 shape 检查，同时把 finite 检查恢复为对原 row['scores'] 检查：
+  scores = np.asarray(row['scores'], dtype=np.float64)
+  if (...现有 ID 条件...
+      or scores.shape != (m,)
+      or not np.isfinite(row['scores']).all()):
+      raise ValueError(...)
+
+这是在原 finite 语义之上增加精确形状约束。数字字符串会在完整盲门内报类型错误，仍早于 access/read；正常数值列表不变。现有 CLI 已捕获失败并保留 failure.json，不必为这一修复新增通用异常框架。若希望将该类型错误规范为 ValueError，可局部处理，但不是必须再建一层机制。
+
+等价的最小替代 B：统一实际消费的数值表示。
+在 query_metrics 开头将 scores 实际转换为 np.asarray(scores, dtype=np.float64)，随后所有计算均用这个数组。这样消费者使用与盲门认可的同一解释；正常数值输入和指标数学不变，可解析字符串也按已验证的数值完成运算。
+
+A 更严格保持原输入类型范围；B 接受转换语义。只须选一个，不要求两者叠加。不要仅在 validate_blind 中给 row['scores'] 赋局部转换结果：analyze 第 239 行会重新 read，这种局部赋值不能保证后续使用转换结果。
+
+5.4 最小验证，不扩研究
+
+沿已有手写 public/score 夹具增加一个长度正确的数字字符串用例即可：
+- 选 A：直接 gate 拒绝；实际 analyze 前段也在 access 之前拒绝，并断言 qrels 的读取替身未被调用。允许捕获 TypeError/ValueError，不要求执行正式标签路径。
+- 选 B：用已有手算数值和对应数字字符串调用真实 query_metrics，确认均得到同一手算结果；同时保留现有二维/NaN/长度拒绝。
+
+不需要新增 GPU 资格、真实模型、正式 qrels、4104 前向或全仓回归。上述是后续最小修复的验证方法，不是外审者本轮已执行的验证，也不授予新增科研实验或训练许可。
+
+六、VendorLink cpu08 测试是否足以识别原缺陷
+
+位置：workspace/tests/test_step28_formal_training.py::test_vendor_query_metrics_and_cross_market_dependencies，第 70—102 行。
+
+6.1 真实执行到的边界
+
+第 71—84 行把 specifications 缩成一个 ABC 路径，使用三个手写公共群并构造全部六个 cell。fixture 的默认八视图对应 28 个分数；最后 3_3 格被破坏，因此不是只检验第一个格子就停止。read 被替换为返回手写 public/score 字典的函数。
+
+第 85 行直接调用真实 validate_blind，检查合法一维正例；第 88—91 行分别验证二维空列、二维单列、NaN、短数组拒绝。第 93—100 行写出临时盲完成 JSON，调用真实 analyze；complete_training 作限定替身，access 作 spy，坏空列路径断言 access 未被调用。
+
+对当前源码，坏数组没有 qrels 读取这一结论，由“动态证明 access 未被调用”与“静态证明 qrels read 紧随 access、坏数组在前置门抛出”共同支持。没有独立监控真实标签文件 I/O，也没有真实正式标签参与测试。
+
+6.2 不是原缺陷未修也能通过的无效测试
+
+若退回 before 的 len+finite，二维空列有正确外层长度且空数组 all() 为真，第 90 行 assertRaises(ValueError) 就失败；二维单列同理。
+
+实际 analyze 测试也不是任意后续报错都算通过：在现有夹具里，若旧门漏过坏数组，下一步访问未提供的 dependency_metadata 会产生 KeyError，不满足所期待的 ValueError。合法正例、源相等及群对齐条件又避免了一个无条件失败门伪装通过。
+
+因此 cpu08 对原 V-R01 有针对性。问题在覆盖范围：它没有数字字符串用例，V-R02 可以与当前 PASS 同时存在。现有执行仅选择了这个测试方法；测试文件还包含其他方法，不代表本轮全部重跑。
+
+6.3 不能从测试宣称的事项
+
+- forwards=4104 是结构字段，不是执行了 4104 次模型前向。
+- specifications 被缩为一条，未实跑 36 条/216 格。
+- read 替身不验证正式评分文件 SHA 或真实 qrels I/O；这些由未变真实 read 与调用顺序静态核对。
+- complete_training 替身不证明本轮 108 个端点已存在。
+- Inf、不可解析值、长度过长等只有本轮静态支持；数字字符串回归尚无测试证据。
+
+这些界限应明确保留，不因为证据受限就要求完整 BERT pilot；本轮唯一必要补核就是 V-R02 对应的小反例。
+
+七、研究、费用与停止边界未改变
+
+7.1 研究及统计合同
+
+VendorLink 仍是固定四方法、36 条、每市场 40 轮、216 格/4104 群前向的固定数据描述比较。query 加权、十指标、全部预定对手均未变；passed=null、整体区间=null，不能把代码或资格通过写成统计确认抗遗忘优势。没有为恢复显著性增加数据、改群或更换统计方案。
+
+FOREVER 仍为九条固定新路径、H27 复用、零 HPO、新 120 群、108 格/4320 前向及固定 H−FOREVER 比较。evaluate 第 189—230 行仍采用原定 raw MAP O/F 条件区间共同门与 N/Z 点值保护，其他指标与校准口径完整报告；原 H−S 共同门失败保持。锚点、训练预算和旧开发历史的比较限制未被本次元数据修复消除。
+
+两份计划不变、两评价文件非修复部分逐字节不变，足以界定本次变更范围；不必重开已闭合原方法或单路原生资格。
+
+7.2 费用核对
+
+VendorLink cpu08：
+- receipt.wall_seconds=6.994523536995985；向上取整收费 7 秒。
+- 原 CPU 103 + 7 = 110/600 秒，余额 490 秒。
+- preparation=25 秒保持；原单路资格 124 秒仍按原计划另列历史成本。
+
+FOREVER cpu04：
+- receipt.wall_seconds=7.137107321061194；向上取整收费 8 秒。
+- 原 CPU 125 + 8 = 133/600 秒，余额 467 秒。
+- native=1274/3600 秒保持；准备费 1 秒保留。
+- 原 GPU 失败账与累计调用不因本次复审清零；本次没有新增 GPU 运行。
+
+依据：两次 receipt 第 5—7 行、VendorLink gate 第 341—351 行、FOREVER gate 第 343—356 行；workspace/run_cpu.py 第 72—75 行按 ceil(elapsed) 计费。console 的 0.019s/0.025s 是测试体时间，不能替代包含启动/导入/监督的 wrapper 墙钟。
+
+提供的 CPU 峰值记录分别为 RSS 836227072/745304064 字节、产物 2355/2837 字节，未超过原 4GiB/64MiB 上限。这些是已给执行记录，不是外审者实时复测。run_cpu.py 第 75 行的 formal_data_reads=0、pretrained_model_loads=0、gpu=False 是 harness 写入的声明，不是系统级 I/O 拦截计数；具体无正式载模/数据调用应结合被选中的手写测试路径、替身与 offline/CUDA 设置判断。
+
+总预算仍为 VendorLink 296h、FOREVER 116h；两份 gate 的预算桶完全未改。复审、局部修复建议或 CPU 尚有余额都不产生新增运行授权；本次外审没有向科研账本写入费用。
+
+7.3 门保持关闭，观测不能变成许可
+
+两份 gate 第 2—3 行均为 approved=false、review_closed=false。queue.gate 第 42—58 行仍要求两者为 true、单 worker、授权/来源匹配等条件，才能进入正式动作。authorization.json 第 4、9—10 行最新要求禁止当前训练和资源等待器启动，优先于旧方案中满足条件后可启动的描述。
+
+evidence/hold_observation.json 记录 2026-10-30 20:15:21 +08:00 的只读快照：两门关闭、每门 63 来源匹配、无本批正式进程/等待进程、训练目录不存在、启动脚本不存在。这只是所提供时点的观察；外审没有访问服务器，也不把该显存数字当成当前可用资源。复审通过同样不能自动触发训练或等待。
+
+7.4 部署说明快照的一个范围差异
+
+evidence/deployment.json 第 10—12、20—22 行记录的两份 implementation.zh.txt 是较早说明版本：VendorLink 5518 字节、FOREVER 4791 字节；当前包分别为 5765、5043 字节。因此不应写成“deployment 四项文件均与当前包完全一致”。两个 gate 的记录与本包相符，较后 hold_observation 亦相符，63 份代码来源全部一致。
+
+这限制了部署快照能支持的说明文档版本，未显示代码或门来源漂移，不构成新的科研/运行必修，不要求为此访问服务器、改 gate 或制造新证据包。
+
+八、OPTIONAL 与 OUT_OF_SCOPE_OVERDESIGN
+
+OPTIONAL O-F01：后续维护手写测试时，可把 F 的共同角色夹具扩为两条记录，增加顺序颠倒、群 ID/域替换和缺角色键，并检查 18 条记录的名称/order/seed 配对。当前直接列表比较和固定循环已可静态核对；它不是关闭 F-R01 的必要条件，也不要求现在执行。
+
+OPTIONAL O-V01：可以在已有 V 测试参数表顺手列出正负 Inf、不可解析字符串和过长向量，让动态证据与静态拒绝范围更直观。当前代码对这些输入在标签前失败，缺少这些变体不另列必修。V-R02 的可解析数字字符串则必须单独处理，不能与这里的不可解析字符串混淆。
+
+OPTIONAL O-D01：引用 deployment.json 时标注它对应较早说明文档快照即可；不要把它作为当前两份 implementation 全字节相同的证据。没有必要仅为此重新部署或开启服务器检查。
+
+本轮明确排除：追加 HPO、方法、数据、种子、结果选择；恢复 VendorLink 整体显著性或新统计方案；重跑已闭合单路/三路资格；正式数据或完整大模型 pilot；全仓回归；改 FOREVER 参数集合/锚点口径/正则数学；通用 schema、异常、队列、锁、灾备或自动重试框架。V-R02 的一处表示一致性修正不能扩展成这些任务。
+
+九、实际阅读范围与证据局限
+
+完整阅读或完整文件对照：
+- package_manifest.json、request.zh.txt、authorization.json、changes.diff。
+- before/scripts/step28_forever_evaluate.py、before/scripts/step29_vendorlink_evaluate.py、before/tests/test_step28_formal_training.py。
+- 修后两个完整评价文件及完整 tests/test_step28_formal_training.py；workspace/run_cpu.py。
+- 两项 formal/plan.zh.txt、implementation.zh.txt；两份 gate 的完整配置对象与 sources 逐项身份核对。
+- VendorLink cpu08 与 FOREVER cpu04 的 console/evidence/receipt。
+- evidence/h_partition_metadata.json、deployment.json、hold_observation.json。
+- previous/report.zh.txt、audit_notes.json、primary_disposition.zh.txt；对上轮报告中的原缺陷、最小修法、证据边界作重点复阅。
+- step28_forever_formal.py，含真实 verify_reference、validate_completion 与正式后续调用。
+
+必要直接调用定向阅读：
+- step28_continual_comparison_run.training_inputs；step28_chinese_base.partition；step28_continual_expression_run.public_inputs；step28_continual_five_run.execute 的分区生产；冻结 comparison_evaluate.full_gate；five.Method.restore。
+- step29_vendorlink_methods.vendor_scores/h_pool/Model.score；step29_vendorlink_run.evaluate/query_ap；data.Group 的 validate/from_dict/blind/evaluation_order；手写 VendorLink/FOREVER 夹具。
+- step29_vendorlink_formal 的规格、完成验证及后续派发；queue 的来源核对与正式门。其余未变训练/保存/队列行为按前轮已读材料及逐字节一致范围复用。
+
+63 份来源全部作身份核验，不宣称 63 份所有行本轮重新逐行审完；本轮没有重新审查所有未变数学，也没有把旧报告的结论复制成修后行为证明。
+
+未执行/未独立验证：H27 实物加载及全文件 SHA、真实新 FOREVER 完成记录、全部 36/9 条训练、4104/4320 前向、正式标签开放、正式指标与 bootstrap、长程资源和当前服务器进程/显存。本包提供的旧 H 字段模式、CPU 记录和暂停快照各有明确范围，均不扩张为上述未完成事项。
+
+十、后续结论与授权边界
+
+可以正式记录 F-R01=CLOSED、V-R01=CLOSED；原二维形状缺陷和旧 H 分区模式拒绝均已解决。FOREVER 的这次修复没有发现新必修。
+
+VendorLink 不能记录为“本次修后没有新问题、全部必修闭合”：V-R02 仍需在现有评价文件内做一处最小表示一致性修正，并保留对应手写边界证据。无需修改研究方案、算法、数据、方法数或统计定义。除 V-R02 外，本轮没有发现其他必须修复的问题。
+
+用户的开始指令尚未给出。即使 V-R02 随后关闭，也只完成代码审查条件，不授权正式训练、自动资源等待、生成、确认或预算消耗。两项 gate 继续保持关闭；本报告不修改输入，不代签主审或启动门，不把任何 CPU/GPU 资格、源码哈希、退出 0 或任务完成状态当成抗遗忘效果。

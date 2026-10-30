@@ -1,0 +1,150 @@
+{
+  "review_date": "2026-10-30",
+  "timezone": "UTC+8",
+  "model_context": "当前会话标识 GPT-6 Astra Pro；未切换模型",
+  "scope": "F-R01/V-R01 修复及新回归的定向静态科研复审",
+  "input": {
+    "filename": "formal_repair_review.zip",
+    "bytes": 412846,
+    "sha256": "ab0165d3424183a6696468e3cd126c474add3075f41c6783df87a391609d787c",
+    "zip_members": 89,
+    "file_members": 89,
+    "directory_members": 0,
+    "manifest_payloads": 88,
+    "verified_payloads": 88,
+    "duplicates": 0,
+    "missing": 0,
+    "unlisted_excluding_manifest": 0,
+    "hash_mismatches": 0,
+    "baseline_sha256": "8dee9a952919a8215a1e83058e541db6a933f867548e91655a46ba951acbe731"
+  },
+  "verdict": "ORIGINAL_FINDINGS_CLOSED_WITH_ONE_NEW_REPRODUCIBILITY_DEFECT",
+  "original_findings": [
+    {
+      "id": "F-R01",
+      "status": "CLOSED",
+      "location": "workspace/scripts/step28_forever_evaluate.py::complete_training:28-51",
+      "basis": "46-47仅比较共同fit/calibration完整有序列表，缺键仍失败，pretrained_archive仍精确比较；来源及真实完成验证、18记录组装未改。",
+      "evidence": "cpu04实际调用complete_training；verify_reference/validate_completion为限定替身。旧H字段模式由绑定九份reference身份的h_partition_metadata另证。",
+      "limits": "未加载H27；群ID/域/顺序/缺键等具体变体及18记录逐项绑定主要由静态源码支持。"
+    },
+    {
+      "id": "V-R01",
+      "status": "CLOSED",
+      "location": "workspace/scripts/step29_vendorlink_evaluate.py::validate_blind:118-122",
+      "basis": "精确shape=(pair_count,)堵住二维空列/单列；analyze:221完整门在229-230登记/读取qrels之前。",
+      "evidence": "cpu08真实validate_blind正例及二维空列/单列、NaN、短数组负例；真实analyze前段access spy未调用。",
+      "limits": "specifications/read/complete_training为手写替身；4104为结构字段；未实际前向/读正式qrels；数字字符串新缺口见V-R02。"
+    }
+  ],
+  "new_mandatory_findings": [
+    {
+      "id": "V-R02",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "must_fix": true,
+      "locations": [
+        "workspace/scripts/step29_vendorlink_evaluate.py::validate_blind:118-121",
+        "workspace/scripts/step29_vendorlink_evaluate.py::analyze:229-245",
+        "workspace/scripts/step29_vendorlink_evaluate.py::query_metrics:171-176",
+        "workspace/scripts/step29_vendorlink_run.py::query_ap:215-221"
+      ],
+      "trigger": "一个群长度正确的JSON数字字符串列表，例如['0.1']*pair_count；其他来源/ID/长度均有效。",
+      "impact": "转换副本在盲门通过；qrels登记读取后，原文件重读的字符串列表被传给np.isfinite并报TypeError。原门会在标签前拒绝，属于此次coercion引入的表示不一致。",
+      "minimal_fix_preferred": "保留float64精确shape检查，但finite检查恢复针对原row['scores']，保持原数值输入类型边界。",
+      "minimal_alternative": "在query_metrics入口实际转float64，所有后续计算统一使用该数组；两种修法只选一。",
+      "insufficient_fix": "只在validate_blind局部给row['scores']赋转换结果不够；analyze随后重新read。",
+      "minimal_validation": "沿原手写夹具增加可解析数字字符串；按选择验证标签前拒绝/access及qrels-read未调用，或与对应手算数值结果等价。无需模型、正式数据、GPU或全仓回归。",
+      "evidence_type": "STATIC_CALL_CHAIN_INFERENCE_NOT_EXECUTED",
+      "qualification": "正常Model.score/tolist输出数值；未声称正常生产必失败、坏分数已出现或实际标签已泄漏。"
+    }
+  ],
+  "per_project": {
+    "FOREVER": {
+      "new_scientific_blockers": 0,
+      "new_reproducibility_defects": 0
+    },
+    "VendorLink": {
+      "new_scientific_blockers": 0,
+      "new_reproducibility_defects": 1,
+      "open_ids": [
+        "V-R02"
+      ]
+    },
+    "shared_queue": {
+      "new_mandatory_defects": 0,
+      "byte_identical_to_prior_review": true
+    }
+  },
+  "source_checks": {
+    "workspace_entries": 63,
+    "all_entries_match": true,
+    "both_cpu_receipts_match_current_sources": true,
+    "both_gate_source_lists_match": true,
+    "before_matches_previous": true,
+    "diff_reconstructs_current": true,
+    "changed_source_files": [
+      "scripts/step28_forever_evaluate.py",
+      "scripts/step29_vendorlink_evaluate.py",
+      "tests/test_step28_formal_training.py"
+    ],
+    "comparison_dependencies_unchanged": true,
+    "plans_unchanged": true,
+    "gate_changed_keys_only": [
+      "sources",
+      "prior_used_seconds"
+    ],
+    "metadata_note": "deployment的两份implementation说明为较早快照，不等于当前说明字节；gate和源码匹配。该范围差异不列必修。"
+  },
+  "existing_cpu_evidence": {
+    "vendorlink_cpu08": {
+      "wall_seconds": 6.994523536995985,
+      "charged_seconds": 7,
+      "cumulative_seconds": 110,
+      "limit_seconds": 600
+    },
+    "forever_cpu04": {
+      "wall_seconds": 7.137107321061194,
+      "charged_seconds": 8,
+      "cumulative_seconds": 133,
+      "limit_seconds": 600
+    },
+    "forever_native": {
+      "inherited_seconds": 1274,
+      "limit_seconds": 3600,
+      "new_gpu_run": false
+    },
+    "failed_attempt_costs_retained": true,
+    "caveat": "receipt零正式读取字段由harness写入，不是系统级I/O拦截计数；行为范围由选中测试及直接调用核定。"
+  },
+  "optional": [
+    "F手写两元素顺序/ID/域/缺键及18记录逐项配对负例；不阻止F-R01关闭。",
+    "V补列Inf、不可解析值、过长向量；现有静态拒绝充分，不另列必修。",
+    "引用deployment时限定较早说明文档快照。"
+  ],
+  "out_of_scope": [
+    "新增HPO/方法/数据/种子",
+    "恢复VendorLink整体显著性",
+    "重开GPU/三路资格",
+    "大模型或正式数据pilot",
+    "全仓回归/通用加固框架"
+  ],
+  "execution_boundary": {
+    "materials": "仅本包及本会话上一轮已提供材料",
+    "research_server_access": false,
+    "external_web_or_repository_access": false,
+    "project_code_import_or_execution": false,
+    "tests_executed_by_reviewer": false,
+    "formal_data_labels_models_opened": false,
+    "formal_metrics_or_bootstrap_executed": false,
+    "input_sources_modified": false,
+    "gates_modified": false,
+    "both_input_gates_approved": false,
+    "both_input_gates_review_closed": false,
+    "formal_training_authorized_now": false,
+    "automatic_resource_wait_authorized_now": false,
+    "review_expands_authorization": false
+  },
+  "next_condition": "关闭V-R02的小修复与对应手写证据后仍等待用户明确开始指令；复审不授权启动、等待、生成或正式确认。"
+}

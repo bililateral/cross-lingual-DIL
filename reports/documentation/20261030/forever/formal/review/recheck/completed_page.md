@@ -1,0 +1,10 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - link "跳转到内容" [ref=e119] [cursor=pointer]:
+      - /url: "#_r_0_"
+    - generic [ref=e4]:
+      - complementary [ref=e5]
+      - generic [ref=e438]
+  - status [ref=e3391]: 回答已完成
+  - status [ref=e3392]
+  - status [ref=e3393]

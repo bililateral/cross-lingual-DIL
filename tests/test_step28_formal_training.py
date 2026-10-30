@@ -79,9 +79,10 @@ class FormalTrainingTests(unittest.TestCase):
                 scores=[0.] * (len(group.views)*(len(group.views)-1)//2))}
             cells[key] = dict(domain=domain, scores=key)
         blind = dict(runs={'hand': cells}, forwards=4104, sources=[])
-        allowed = dict(heldout_sources={d: d for d in groups}, sources=[])
+        allowed = dict(heldout_sources={d: d for d in groups}, sources=[],
+                       qrels_sources={d: f'qrels-{d}' for d in groups})
         with patch.object(vendor, 'specifications', return_value=[spec]), \
-                patch.object(vendor_eval, 'read', side_effect=lambda rec: payloads[rec]):
+                patch.object(vendor_eval, 'read', side_effect=lambda rec: payloads[rec]) as reader:
             vendor_eval.validate_blind(blind, allowed)
             last = payloads['3_3'][groups['Agora'].uid]
             count = len(last['scores'])
@@ -89,17 +90,28 @@ class FormalTrainingTests(unittest.TestCase):
                 last['scores'] = invalid
                 with self.assertRaises(ValueError):
                     vendor_eval.validate_blind(blind, allowed)
-            last['scores'] = [[]] * count
+            # Numeric strings are coercible, but the unchanged metric consumes
+            # original JSON values and requires numeric scores before label opening.
+            last['scores'] = ['0.1'] * count
+            with self.assertRaises((TypeError, ValueError)):
+                vendor_eval.validate_blind(blind, allowed)
             with tempfile.TemporaryDirectory() as temp:
                 campaign = Path(temp)
                 (campaign/'scoring').mkdir()
                 queue.write(campaign/'scoring/all_blind_complete.json', blind)
-                with patch.object(vendor_eval, 'complete_training'), patch.object(vendor_eval, 'access') as opening:
-                    with self.assertRaises(ValueError):
-                        vendor_eval.analyze(campaign, campaign/'analysis', allowed, None)
-                    opening.assert_not_called()
+                for invalid in ([[]] * count, ['0.1'] * count):
+                    last['scores'] = invalid
+                    reader.reset_mock()
+                    with patch.object(vendor_eval, 'complete_training'), patch.object(vendor_eval, 'access') as opening:
+                        with self.assertRaises((TypeError, ValueError)):
+                            vendor_eval.analyze(campaign, campaign/'analysis', allowed, None)
+                        opening.assert_not_called()
+                        self.assertFalse(any(call.args[0] in allowed['qrels_sources'].values()
+                                             for call in reader.call_args_list))
         EVIDENCE['vendor_blind_shape'] = dict(flat_scores_accepted=True,
             empty_nested_column_nan_and_short_rejected=True, actual_analyze_did_not_open_qrels=True)
+        EVIDENCE['vendor_score_representation'] = dict(numeric_strings_rejected_before_labels=True,
+            actual_analyze_access_and_qrels_read_not_called=True)
 
     def test_forever_metric_formulas_and_complete_blind_gate(self):
         spec = forever.m.Spec('ABC', 4)

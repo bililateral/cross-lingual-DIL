@@ -9,6 +9,8 @@ CPU全部尝试、错误、实际收费及获准canonical依赖元数据已回Wi
 
 具体外审包926333字节/125载荷、SHA256 8dee9a952919a8215a1e83058e541db6a933f867548e91655a46ba951acbe731获用户明确批准后，19:36单次提交既有ChatGPT GPT-6 Pro会话。保留待审原包、完整清单、请求、具体许可、提交和页面回执；无正式商品文本/账号名/关系标签/owners/权重/密码。完整报告report.zh.txt、audit_notes.json与主审处置已回收保管，原包用于复核本轮实际输入及固定清单。原审查要求两项定向修复；修后经主审闭合，未冒称再次网页送审。cpu08/04及repair保存新增源码与原始证据，CPU账分别110/133秒；hold_observation保存两gate关闭/各63来源一致/无本批进程的只读现场。用户要求等待明确开始，不创建自动队列。根可变文档本轮只在Windows维护；本地Git交付不等于push或Linux根文档更新。
 
+第二轮与第三轮完整原文、audit及逐项主审分别保存在formal/review/recheck与closure；原提交身份、旧报告与修前来源保留，最新处置只看交接。cpu09新增一行VendorLink生产修复及手写反例，原始receipt/console/evidence与修后源码已保管；两个中转input.zip（15486字节）和evidence.zip（8837字节）逐成员与保留文件核对一致后在Windows删除，Linux中转不在本次删除范围。保留受审源码包用于已批准正式方案在用户开始指令后的实际来源核对，不复制模型或标签。旧部署记录按其时点解释，本轮收尾材料的实际同步另见closure/deployment.json；根文档仍只在Windows维护。未重置大清理周期，本轮只作范围明确的本地提交，不推送。
+
 ## 2026-10-30 H/S失败隔离监听切换
 
 [defaults_repair](../reports/documentation/20261030/defaults_repair/)保存用户范围、独立主审、CPU01/02、来源、正式门及switch/launch/observation。Linux新workspace从旧57份编排来源复制并覆盖H/S控制/测试及已核验共享控制文件，另保留共享测试，共58份资格来源；44科学来源不变，沿用原7个模型/数据链接（含已获准旧dev无标签items），没有解析正式数据。旧comparison_resume/defaults监听在无训练/子进程时结束，原gate/workspace/预算/记录保留；新监听唯一，不改活动L²R。

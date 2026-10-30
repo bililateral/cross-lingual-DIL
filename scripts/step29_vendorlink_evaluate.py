@@ -118,7 +118,7 @@ def validate_blind(result, allowed):
                 scores = np.asarray(row['scores'], dtype=np.float64)
                 if (row['view_ids'] != [v.uid for v in group.views]
                         or scores.shape != (len(group.views) * (len(group.views)-1)//2,)
-                        or not np.isfinite(scores).all()):
+                        or not np.isfinite(row['scores']).all()):
                     raise ValueError('Blind score shape, IDs or finite values differ')
     return public
 

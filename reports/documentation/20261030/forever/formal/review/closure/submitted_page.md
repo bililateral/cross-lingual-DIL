@@ -1,0 +1,16 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - link "跳转到内容" [ref=e119] [cursor=pointer]:
+      - /url: "#_r_0_"
+    - generic [ref=e4]:
+      - complementary [ref=e5]
+      - generic [ref=e438]
+  - status [ref=e3391]
+  - status [ref=e3392]
+  - status [ref=e3393]
+  - dialog [ref=e4113]:
+    - generic [ref=e4118]:
+      - banner [ref=e4119]
+      - button "子智能体 已使用 9 个" [ref=e4123] [cursor=pointer]
+      - banner [ref=e4133]
+      - generic [ref=e4139]

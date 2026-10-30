@@ -1,0 +1,19 @@
+请在当前GPT-6／Pro会话对V-R02做下一轮必要复审；若指定模型不可用，说明而不换模型。用户明确要求第二轮完整回收、逐项核对，有问题只做必要修复验证，改完再次外审；正式训练与自动资源等待继续禁止，等用户新的开始指令。
+
+上一轮已关闭F-R01、V-R01，FOREVER无新增必修；唯一新增为V-R02：盲门float64副本可接受数字字符串，但analyze重读原分数、query_ap对原值np.isfinite，在开标签后才失败。previous/保留第二轮完整报告、audit及本次主审处置。请保留已经关闭问题及适用范围，不重新要求未变算法/FOREVER/全模型资格。
+
+本次唯一生产变化：step29_vendorlink_evaluate.validate_blind保留float64转换的精确一维shape，将finite检查改回np.isfinite(row['scores']).all()，采用第二轮推荐A，保持原数值输入边界。query_metrics/query_ap和实际analyze读取顺序不变。before/保留第二轮相关两文件；changes.diff是本轮一行生产修复及对应测试扩展；workspace为当前63份完整来源，仅供必要直接依赖追踪。
+
+Linux cpu09仅选择既有test_vendor_query_metrics_and_cross_market_dependencies。新增可解析数字字符串：真实validate_blind拒绝；真实analyze对二维空列和数字字符串均在标签边界前失败，access未调用、read替身没有任何qrels标记读取。合法数值、原坏形状/NaN/长度反例及既有手算指标仍通过。外层7.604980685秒、收费8，VendorLink CPU累计118/600；FOREVER原133及GPU1274不变。receipt里的零访问字段是harness声明，须结合测试路径/替身/offline设置判断，不冒称系统I/O审计。没有正式文本、模型、标签、GPU或新的FOREVER测试。
+
+请完整核对本次diff、修后函数及真实消费者/标签边界，回答：
+1. V-R02是否真正关闭：原消费者不支持的数字字符串能否在qrels登记/读取前被拒绝？一维数值输入及原V-R01形状拒绝是否保持？异常能否沿已有失败机制停止？
+2. 新测试能否在撤回本次一行修复时失败，是否真的执行被修复门及analyze前段，而不是任意后续异常就算通过？read/assert范围是否准确？
+3. 这次最小修复是否引入其他必须修正的问题？若有，给精确代码、具体触发、影响及最小修法；若无明确说明。不要把“未测试每个可能类型”泛化为全仓/全模型/通用schema要求。
+4. 费用、当前来源、gate关闭与用户暂停是否保持。两项gate仍false；CPU旧证据对应原版本保留，不能说FOREVER cpu04重跑了当前测试文件。
+
+包中包括必要新CPU证据、当前关闭gate及新部署记录；旧方案和第二轮报告用于范围定位。上一轮提及旧deployment两份说明是早期快照的问题已经按其时点限定，本次不追改旧原件。
+
+只阅读本包及本会话既有材料。禁止访问服务器或运行项目代码、测试、训练、载模、正式指标/重采样，禁止请求未提供的数据、标签、owners、权重或凭据。本轮无新科学选择；不得改输入源码或gate。源码/ZIP/JSON/哈希等机械核对可做，不能冒称Linux行为验证。
+
+请给本轮V-R02=CLOSED或OPEN，以及有无新SCIENTIFIC_BLOCKER/REPRODUCIBILITY_DEFECT，附具体依据；静态推断与既有动态证据分开，可选建议与必修分开。请在正文写结论，并提供可下载完整report.zh.txt与audit_notes.json。复审通过也不授予开训许可。

@@ -1,0 +1,89 @@
+{
+  "review_date": "2026-10-30",
+  "review_model": "GPT-6 Astra Pro（当前会话，未切换）",
+  "scope": "V-R02 一行生产修复、对应 CPU09 手写测试及必要消费者/标签边界追踪",
+  "input": {
+    "filename": "score_gate_review.zip",
+    "actual_bytes": 398054,
+    "actual_sha256": "ab37c8c6a946ab974909984ee0da069d919b7969d45baca72035a97ce4169b88",
+    "zip_members": 83,
+    "payloads": 82,
+    "manifest": "package_manifest.json",
+    "verified_payloads": 82,
+    "duplicates": 0,
+    "missing": 0,
+    "extra_payloads": 0,
+    "identity_mismatches": 0
+  },
+  "decisions": {
+    "V-R02": "CLOSED",
+    "F-R01": "CLOSED（保留上一轮适用范围）",
+    "V-R01": "CLOSED",
+    "new_SCIENTIFIC_BLOCKER": [],
+    "new_REPRODUCIBILITY_DEFECT": [],
+    "required_repairs": [],
+    "required_additional_verification": []
+  },
+  "closure_basis": {
+    "production": "workspace/scripts/step29_vendorlink_evaluate.py::validate_blind:118-122；第121行改为 np.isfinite(row['scores']).all()，第120行精确一维 shape 保持。",
+    "consumer": "workspace/scripts/step29_vendorlink_run.py::query_ap:219 对原 scores 作 finite 检查；query_metrics:172 与 analyze:239,245 未改变消费者或重读语义。",
+    "label_boundary": "analyze:221 调用 validate_blind；229 才 access；230 才 read qrels。数字字符串在221内拒绝。",
+    "normal_output": "step29_vendorlink_run.py::evaluate:203 仍将数值模型输出 .tolist()；分值、排序和指标未改。",
+    "failure_propagation_static": "评价 CLI:284-291 记失败并重抛；formal:178-199 派发实际子进程；queue:173-188,197-200 非零退出停止并记实际费用。"
+  },
+  "test_review": {
+    "selected": "FormalTrainingTests.test_vendor_query_metrics_and_cross_market_dependencies",
+    "source": "workspace/tests/test_step28_formal_training.py:30-114",
+    "real_gate": "86合法正例；89-92原坏形状/NaN/短向量；95-97数字字符串直接负例。",
+    "real_analyze_front": "102-110 对二维空列和数字字符串调用真实 analyze，断言 access 未调用且 read 无 qrels 标记。",
+    "revert_detection": "静态反事实：仅撤回生产第121行后，数字字符串通过门，第96-97行 assertRaises 无异常而失败；未执行 mutation test。",
+    "later_error_not_false_pass": "若旧门漏过，analyze 后续缺 dependency_metadata 抛 KeyError，未被 TypeError/ValueError 断言接受。",
+    "stubs": ["specifications 缩为一条手写 ABC", "read 使用手写 payloads", "analyze 测试替换 complete_training", "access 为 spy"],
+    "limits": "不是完整批次、实际4104前向、真实qrels文件访问、系统I/O审计或完整成功analyze；未新增FOREVER测试。"
+  },
+  "cpu09": {
+    "wall_seconds": 7.604980685049668,
+    "charged_seconds": 8,
+    "vendorlink_cpu_before": 110,
+    "vendorlink_cpu_cumulative": 118,
+    "vendorlink_cpu_limit": 600,
+    "tests_selected": 1,
+    "peak_rss_bytes": 742551552,
+    "peak_disk_bytes": 2355,
+    "evidence_origin": "包内既有 Linux 运行记录；审查者未重跑",
+    "zero_access_fields": "run_cpu.py:75 写入的 harness 声明；须结合选中测试、替身和 offline 配置解释，不是系统I/O审计"
+  },
+  "provenance": {
+    "current_sources_verified": 63,
+    "cpu09_sources_match": true,
+    "both_gate_sources_match": true,
+    "changed_sources": ["scripts/step29_vendorlink_evaluate.py", "tests/test_step28_formal_training.py"],
+    "before_matches_prior_round": true,
+    "shared_queue_unchanged": true,
+    "comparison_dependencies_unchanged": true,
+    "forever_production_unchanged": true,
+    "plans_unchanged": true,
+    "forever_cpu04_rerun": false,
+    "forever_cpu04_scope": "旧receipt保持其原来源；当前共享测试文件哈希不同，不能说CPU04重跑了当前文件",
+    "new_deployment_files_verified": 7,
+    "deployment_time": "2026-10-30T20:53:45.724489+08:00",
+    "deployment_limit": "仅所提供快照与附件一致性；未现场访问服务器"
+  },
+  "state": {
+    "vendorlink_gate": {"approved": false, "review_closed": false, "prior_used_seconds": {"preparation": 25, "cpu": 118}},
+    "forever_gate": {"approved": false, "review_closed": false, "prior_used_seconds": {"cpu": 133, "native": 1274, "preparation": 1}},
+    "formal_training_authorized": false,
+    "automatic_wait_authorized": false,
+    "review_grants_start_permission": false,
+    "input_or_gate_modified": false
+  },
+  "scientific_scope": "VendorLink仍仅固定数据描述比较，passed=null、整体区间为null；FOREVER条件未变；无新效果证据或科学选择。",
+  "optional": ["将来有实际诊断需要时可统一拒绝文案或补一个Inf/不可解析输入用例；本轮不构成闭合条件或新增执行要求。"],
+  "out_of_scope": ["全仓/全模型回归", "通用schema或穷举输入类型", "重新打开qrels或完整4104前向", "新增HPO/数据/方法/种子", "重新开展FOREVER/GPU资格", "训练或自动资源等待"],
+  "reviewer_actions": {
+    "mechanical_only": ["ZIP与清单检查", "JSON/字节/SHA256比对", "文本diff和AST结构比对", "阅读既有证据", "编写审查报告"],
+    "executed_project_code_or_tests": false,
+    "ran_training_inference_metrics_or_bootstrap": false,
+    "accessed_research_servers_or_unprovided_objects": false
+  }
+}

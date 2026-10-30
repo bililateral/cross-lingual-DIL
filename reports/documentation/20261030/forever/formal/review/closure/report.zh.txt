@@ -1,0 +1,235 @@
+VendorLink V-R02 分数盲门修复定向复审报告
+日期：2026-10-30
+审查模型：当前会话 GPT-6 Astra Pro；未切换模型。
+
+一、输入身份与最终裁决
+
+实际输入：score_gate_review.zip
+实际字节数：398054
+实际 SHA256：ab37c8c6a946ab974909984ee0da069d919b7969d45baca72035a97ce4169b88
+实际 ZIP 成员：83 个文件，即 82 项载荷及 package_manifest.json 自身；无目录项、无重复路径。
+清单核对：82/82 项载荷的相对路径、字节数和 SHA256 全部一致；无缺项、额外载荷或哈希不符。以上是对实际附件执行的机械核验，不是转录用户提供的摘要。
+
+最终裁决：V-R02 = CLOSED。
+本次修复新增 SCIENTIFIC_BLOCKER：0 项。
+本次修复新增 REPRODUCIBILITY_DEFECT：0 项。
+本轮没有必须再修改的代码，也没有需要作为闭合前提追加的测试或实验。
+
+F-R01、V-R01 维持上一轮 CLOSED；FOREVER 无新增必修问题。本裁决限于本包的一行生产修复、相应手写测试及必要直接接线，不把已有闭合范围重新扩为算法、完整模型或正式效果复审。
+
+正式训练与自动资源等待继续禁止。两项 gate 的 approved、review_closed 均仍为 false；本报告没有修改它们。关闭 V-R02 不等于授予启动许可，也不代表真实正式批次、4104 次前向、H27 或效果统计已经运行。
+
+本报告代码行号以本包 workspace/ 下的当前文件为准；before/ 为修前原件。审查根目录为 /workspace/scratch/8f77b6332ab8/score_gate_review_input。相对路径可在该目录下定位。使用“动态证据”时，仅指包内已经提供的 Linux CPU09 记录；本审查者没有重新执行科研代码。
+
+二、版本边界：本轮确实只有所述最小生产改动
+
+核对 package_manifest.json、changes.diff、before/ 两份完整原文件、workspace/ 修后完整文件，并与本会话上一轮 formal_repair_review.zip 的相应文件比较后，结果如下：
+
+1. 63 份当前来源中，源码变化仅为 scripts/step29_vendorlink_evaluate.py 和 tests/test_step28_formal_training.py；cpu_sources.json 同步登记新来源。
+2. 唯一生产逻辑变化位于 step29_vendorlink_evaluate.py 第 121 行：
+   修前：or not np.isfinite(scores).all()
+   修后：or not np.isfinite(row['scores']).all()
+   第 118 行的 float64 转换、第 120 行的精确一维 shape 检查均保留。
+3. 测试变化只发生于 test_vendor_query_metrics_and_cross_market_dependencies。除该方法外，测试方法的语法结构未改变；后续方法的行号因新增 12 行而移动。没有将 FOREVER 测试改成另一套行为。
+4. before/ 两文件与上一轮相应来源同字节；差异块逐项对应修后文件，没有 diff 之外的生产改动。
+5. query_metrics、query_ap、analyze 的原处理顺序未改；共享 queue、FOREVER 生产来源、三份 comparison 依赖和两项计划保持此前字节。本轮没有用当前其他活动项目的同名文件替换包内依赖。
+
+关键来源身份：
+— 当前 step29_vendorlink_evaluate.py：15463 字节；SHA256 534885232ec9f1eae25fc897cb63bf9be733a9152a5e76ae17641198a07ae74a。
+— 修前同文件：15456 字节；SHA256 621ba0ca7bc311965958db34eb0ccde49525ed9db1e59508892050ba20c99d40。
+— 当前 test_step28_formal_training.py：22368 字节；SHA256 e21d72df26954fdb2349ce06475ede325b7e25b08285aebbba2120542ccdcbe9。
+— 修前同文件：21479 字节；SHA256 451b05e2cc83b3ec7603deb41373f571161390f64012871e1a3ca7c1a724705c。
+
+这些身份检查用于确认实际审的是哪一版。以下闭合结论来自输入表示、消费者和开标签次序的行为核对，不由哈希、退出码或 PASS 数推出。
+
+三、V-R02：具体触发、影响、修法及关闭依据
+
+原缺陷类别：REPRODUCIBILITY_DEFECT，涉及完整盲门与集中标签开放边界。
+原触发：长度正确、可解析为 float64 的数字字符串分数，例如 ['0.1'] * pair_count。
+原影响：validate_blind 只检验转换后临时数组的 finite，允许原始字符串通过；analyze 随后先登记并读取 qrels，再重新读取原分数；query_ap 对原字符串执行 np.isfinite 时失败。于是本可在盲门拒绝的表示错误拖到了标签开放之后。
+本次最小修法：保留转换后的精确 shape 检查，同时对原 row['scores'] 检查 finite。无需重写指标、修改分数文件或把临时转换误当成持久转换。
+
+3.1 修后门与真实消费者的输入边界一致
+
+step29_vendorlink_evaluate.py::validate_blind，第 118—122 行依次处理：
+— np.asarray(row['scores'], dtype=np.float64) 用于建立明确 shape；
+— view_ids 必须与公共群视图顺序一致；
+— shape 必须等于 (n*(n-1)//2,)；
+— np.isfinite(row['scores']).all() 对真实原输入进行有限值检查。
+
+数字字符串虽然能通过第一步转换和 shape，却不能通过原字符串上的 np.isfinite；当前路径在盲门中抛出 TypeError。下游 step29_vendorlink_run.py::query_ap 第 219 行原本就对传入的原 scores 执行同类检查。因此本修法在标签开放前排除了已知消费者不能处理的表示，没有继续扩大输入边界。
+
+正常生产路径仍是 step29_vendorlink_methods.py::Model.score（201—213 行及其 vendor_scores/h_pool 数值分支）→ step29_vendorlink_run.py::evaluate（197—204 行）→ 第 203 行 .tolist() 生成数值列表。没有字符串化。validate_blind 不修改分数，不重排序，不改变 query_metrics/query_ap 公式。
+
+3.2 沿真实 analyze 顺序追到标签登记与读取
+
+step29_vendorlink_evaluate.py::analyze 的完整相关顺序为：
+（1）217 行：complete_training，核验训练完整性。
+（2）218—220 行：读 all_blind_complete.json，核对 scoring sources。
+（3）221 行：validate_blind，遍历全部预定运行、cell、群和视图顺序，并检验分数。
+（4）222—228 行：读取依赖元数据，核对 canonical/partition、群集合与 query 数。
+（5）229 行：access(campaign, 'heldout_qrels_joint_opening')，登记标签开放尝试。
+（6）230 行：read 各域 qrels。
+（7）239、245 行：重读分数，再传原 row['scores'] 给 query_metrics。
+（8）query_metrics 第 172 行进入 query_ap；query_ap 第 219 行检验原分数。
+
+修后的数字字符串在第（3）步停止，不会到第（5）、（6）步。原 V-R01 的二维形状错误也在第（3）步停止。score 路径另外在第 167 行执行同一 validate_blind，成功后第 168 行才发布 all_blind_complete.json，因而未新增另一条绕过门的完成发布路径。
+
+read（25—29 行）对实际文件校验字节数与 SHA256 后才 JSON 解析。评分重读仍绑定到既有记录；本次没有将“局部转换过”错误地等同于“后续原文件内容已经改变”。上述实际 read 行为属于静态核对，CPU09 的 read 被限定替身替代，没有动态测试真实 score 文件身份校验。
+
+3.3 V-R01 与合法输入行为保持
+
+输入类别及拒绝位置如下：
+— 合法一维数值列表：精确 shape 与原值 finite 均通过；数值和顺序不变。CPU09 有直接正例。
+— 二维空列 (m,0)：shape 先拒绝，不再可能利用空数组 all() 的真值通过。CPU09 有直接门和 analyze 前段反例。
+— 二维单列 (m,1)：shape 拒绝。CPU09 有直接门反例。
+— 长度不足：shape 拒绝。CPU09 有直接门反例。
+— NaN：原值 finite 拒绝。CPU09 有直接门反例。
+— 可解析数字字符串：原值 finite 抛出 TypeError，在标签边界前拒绝。CPU09 有直接门和 analyze 前段反例。
+— Inf、长度过长、标量或不能解析为 float64 的内容：依据同一 shape/转换/finite 路径静态判断会失败；本轮未逐个动态执行这些变体。
+
+本次不需要把“未穷举每一种 Python/JSON 类型”提升为新缺陷。现实生产的一维数值输出、已发现的字符串边界及 V-R01 形状边界已有针对性支撑。把更多类型接纳为新输入协议反而超出所选最小修法。
+
+四、失败是否真正停止，是否引入普通运行缺陷
+
+数字字符串在 np.isfinite 原值调用处抛出 TypeError，而非统一走第 122 行 ValueError。这不构成新必修问题：
+
+— step29_vendorlink_evaluate.py 的 CLI 在 284—291 行以 except BaseException 记录 failure.json 并重新抛出，未将它吞成成功。
+— step29_vendorlink_formal.py 的 178—199 行将 score/analyze 作为后续子进程任务，183—186 行实际调用该评价入口。
+— step28_formal_queue.py 的 173—174 行见非零退出即失败，不继续下一项、不自动重试；177—188 行在 finally 中停止进程并保留实际费用；197—200 行写 STOP_NO_AUTOMATIC_RETRY 并抛出。
+
+因此本修复新增的早期 TypeError 有现成停止路径；不必为统一异常文案而增加生产改动。该判断是源码接线核对，结合未变 queue 来源及已有适用证据；CPU09 没有新跑真实 CLI 失败子进程、正式队列、计费故障或资源等待，不能写成这些行为本轮均已实测。
+
+没有发现这一行改动改变训练、生成、模型保存/恢复、预算桶或统计选择。它收紧的是此前误放行的原始分数表示，在既有完整门内前置失败；没有新的科学分支。
+
+五、测试本身审查：能否发现撤回修复，而不是任意异常就算通过
+
+5.1 实际被测对象
+
+tests/test_step28_formal_training.py::FormalTrainingTests.test_vendor_query_metrics_and_cross_market_dependencies，第 30—114 行，是 CPU09 唯一选中的测试方法。
+
+第 70—83 行构造一条 ABC 手写规格、六个 cell、三个公共手写群。每群默认 8 个视图、28 个成对分数，见 tests/test_step29_vendorlink.py::fixture 第 33—40 行。blind 中 forwards=4104 是用来满足结构门的夹具字段；该测试没有实际进行 4104 次前向。
+
+第 84—85 行替换 specifications 为单条手写规格，替换 read 为 payloads 查询，但没有替换 validate_blind。第 86 行对合法一维数值调用真实门。第 89—92 行用同一真实门拒绝二维空列、二维单列、NaN 和短向量。第 95—97 行新增可解析数字字符串，直接调用真实门并要求 TypeError 或 ValueError。
+
+被修改的坏行是最后 3_3 格的 Agora 群分数（87 行），其余视图顺序、群 ID、来源字段和 cell 结构维持有效。这降低了测试因无关结构错误提前失败而掩盖分数缺陷的可能；合法正例也排除了简单的“门无条件抛错”实现。
+
+5.2 撤回一行修复时的反事实
+
+若只把第 121 行撤回为 np.isfinite(scores).all()：
+— 数字字符串可被第 118 行转换为有限 float64 数组；
+— shape 正确、其余字段有效；
+— validate_blind 会返回；
+— 测试第 96—97 行 assertRaises 没有捕获到异常，立即失败。
+
+这是由当前源码和固定夹具得出的反事实静态判断，不是本审查者执行过一次撤回修复的 mutation test。它足以说明新增直接断言能够识别本次缺陷回退，不依赖开标签后的消费者失败。
+
+5.3 analyze 路径断言确实针对前置边界
+
+第 98—110 行写入真实临时 all_blind_complete.json，再对“二维空列”和“数字字符串”分别调用真实 analyze。只替换 complete_training 以绕过正式端点要求，并把 access 替换为观察调用的 spy。
+
+每个反例前，第 104 行 reader.reset_mock() 清空前一轮调用记录，但保留读取替身的既有行为。第 108 行断言 access 未调用；第 109—110 行断言 read 的本轮调用列表中没有任何 qrels-<domain> 标记。当前 blind 文件保存的是 score 引用；后续读取替身指向正在修改的 payload，因此并非“改了内存坏分数，实际 analyze 却仍读到此前合法值”。
+
+测试只接受 TypeError/ValueError，不接受任意 Exception。该 allowed 夹具没有 dependency_metadata；如果旧门漏过数字字符串，真实 analyze 下一步第 222 行会因缺字段抛 KeyError。KeyError 不属于允许异常，测试会报错，不能因这个后续错误假装通过。更直接的第 95—97 行门断言已经独立保证回退可检出。
+
+qrels 检查是本轮真正新增、可定位的读取调用断言，不只是 evidence 中写一个布尔值。其精确适用范围是“真实 analyze 前段，通过被替换的 read/access 接口，没有发生所设 qrels 标记读取或登记”。它不是真实 qrels 文件访问试验，也不是操作系统级或全进程 I/O 审计。
+
+5.4 动态证据可支持与不可支持的范围
+
+CPU09 可支持：被选方法中的真实 validate_blind 正负例、真实 analyze 前段的两类失败、读取/登记替身断言，以及同一方法内保留的手写指标与聚合断言。
+
+其中原手写 AP 参考为 [1/3,1/3,1,1]（31—37 行）；不等 query 数的聚合参考为 0.375（51—55 行）；即使有利点差也保持 passed=None 和区间 None 的断言在 56—66 行。它们用于防止本轮测试扩展破坏已有定义，不是正式效果观测。
+
+CPU09 不支持：36 条真实训练、108 个真实端点、216 格实际大模型评分、4104 次真实前向、真实 qrels 开放后的完整成功分析、真实 read 文件身份校验、完整队列失败计费重跑或任何 FOREVER 新测试。complete_training、specifications 和 read 的限定替身必须随证据一起说明。
+
+六、费用与 CPU 证据来源
+
+已阅读 vendorlink/formal/cpu09/console.txt、evidence.json、receipt.json，并对 receipt.sources 与当前 workspace/cpu_sources.json 逐项机械比对。63 项来源均与本包实际字节一致。证据不是单靠 console 的 OK 推定，具体断言与数据通路见第五节。
+
+CPU09：
+— 唯一选中方法：test_vendor_query_metrics_and_cross_market_dependencies。
+— 外层实际 wall_seconds：7.604980685049668 秒。
+— 按 ceil 收费：8 秒。
+— VendorLink CPU 原累计 110 秒，当前 118/600 秒，余 482 秒；本轮账目 110+8=118 一致。
+— receipt 记录 peak_rss_bytes=742551552，peak_disk_bytes=2355，exit_code=0，limit_reason=null。
+— console 的 Ran 1 test in 0.018s 是测试体计时，不代替外层实际收费时间。
+— FOREVER CPU 保持 133/600 秒，native/GPU 账保持 1274/3600 秒；没有新增 FOREVER CPU 或 GPU 运行，旧失败费用未被清零。
+
+workspace/run_cpu.py 第 24—28 行核对输入来源；37—40 行限定 --only；42—47 行设置单线程、隐藏 CUDA 和离线模式；48—53 行启动所选手写测试；60—66 行检查时间、4GiB RSS 与 64MiB 输出限额；72—75 行使用外层 elapsed 向上取整计账。
+
+receipt 中 formal_data_reads=0、pretrained_model_loads=0、gpu=false 是第 75 行由 harness 写入的声明字段，并非系统调用审计器。结合本次选中的测试、手写 fixture、读取替身与离线配置，可以限定其证据范围；不能把这些零字段本身说成“已在操作系统层证明没有任何文件访问”。本审查没有新启动该 wrapper。
+
+七、来源继承、两项关闭 gate 与部署记录
+
+7.1 当前来源和旧证据不能互相冒用
+
+workspace/cpu_sources.json、CPU09 receipt.sources 和两项 gate.sources 的 63 个相对来源均与包内当前字节对应。机械检查还确认，FOREVER 生产源码与此前版本相同。
+
+本会话上一轮 FOREVER cpu04/receipt.json 的来源集合，与当前集合相差的正是本轮 VendorLink 评价文件和共用测试文件。这是历史来源应当保留的正常差异。FOREVER 相关测试方法的内容未改，但共享测试文件的完整哈希已经改变。
+
+所以正确表述是：“FOREVER CPU04 的旧证据继续对它当时的来源生效；本轮仅 VendorLink CPU09 对当前来源执行了所选方法。”不能表述为“FOREVER CPU04 已在当前整个测试文件上重跑”。本轮也不因无关 VendorLink 方法扩展而要求重跑 FOREVER。
+
+7.2 gate、预算与暂停
+
+vendorlink/formal/gate.json 和 forever/formal/gate.json 的 approved=false、review_closed=false 保持。与上一轮比，VendorLink gate 只更新 sources、prior_used_seconds；FOREVER gate 只更新 sources。预算、运行规格、授权引用和研究定义没有变化。
+
+VendorLink prior_used_seconds：preparation=25、cpu=118。
+FOREVER prior_used_seconds：cpu=133、native=1274、preparation=1。
+
+step28_formal_queue.py::gate 第 42—58 行要求 approved 与 review_closed 都为 True，并继续要求正确实验、动作、单 worker、来源及授权引用；当前 false 状态不能通过该入口。根 authorization.json 第 3、8—9 行明确保留“先别训练，等我的开始指令”，formal_training_authorized=false、automatic_wait_authorized=false。
+
+此前计划预算仍为 VendorLink 296 小时、FOREVER 116 小时；这只是未变的计划额度身份，本轮没有增拨或消费正式实验预算。报告结论不应被写成启动命令或自动等待授权。
+
+7.3 新部署记录的确切含义
+
+evidence/deployment.json 提供 2026-10-30T20:53:45.724489+08:00 时点的观察。其七份记录经路径映射后全部与包内对应字节/哈希一致，包括两项当前 implementation、两份 gate 和上一轮报告/audit/主审处置。当前部署说明不再存在“拿早期 implementation 身份当当前同字节”的问题。
+
+该记录同时列出两项 gate 均 false、每项 63 来源、费用上述数值、training_exists=false、active=[]、formal_training_started=false、automatic_wait_started=false、cpu09_complete=true。
+
+我据此核对的是所提供部署快照与包内对象的一致性，没有连接服务器核实此刻状态。它不能证明现在有空闲资源，也不能替代新的开始指令。早期部署原件按其当时时点保留即可，本轮没有需要追改旧原件的必修项。
+
+八、既有问题与科学结论边界
+
+F-R01：维持 CLOSED。涉及的 FOREVER 生产修复未改变，上一轮完整报告及适用边界继续有效。本轮没有新读取开发集、加载 H27 或重跑 verify_reference/真实 completion；也没有把 CPU04 的限定替身扩大为真实 H27 动态验证。
+
+V-R01：维持 CLOSED。精确一维 shape 检查保留；本轮 CPU09 再次经过原二维空列/单列、NaN 和短向量的真实门负例，二维空列还经过真实 analyze 前段。
+
+V-R02：本轮 CLOSED。原始表示有限值检查与消费者一致，数字字符串在标签登记/读取前失败；直接回归断言能识别该行被撤回。
+
+VendorLink 科学定义未改。comparison_summary 第 204—213 行仍输出 primary_status='DESCRIPTIVE_FIXED_DATA_ONLY'、passed=None、conditional_95pct_interval=None；第 262—267 行的正式结果文案继续限定固定数据描述比较，不宣称整体区间或统计确认抗遗忘优势。测试中的人工有利点差仍不能产生通过结论。
+
+FOREVER 新 120 群及固定 H−FOREVER 条件未因本次修复改变。旧 H−S 的 O/F 共同门 false 不被本报告翻转。资格记录、源码哈希、测试通过、V-R02 关闭都不是方法效果证据，不能拼成新同批排名或宣布优势。
+
+九、分类处置：必修、可选与范围外
+
+SCIENTIFIC_BLOCKER：本次新增 0 项。
+REPRODUCIBILITY_DEFECT：本次新增 0 项；V-R02 的既有缺陷已关闭，F-R01/V-R01 保持已关闭。
+必要代码修改：无。
+必要追加验证：无。本包提供的针对性 CPU09 与静态通路核对足以关闭这一行修复的问题。
+
+OPTIONAL：可以在未来实际需要时统一分数拒绝的错误提示，或补一个 Inf/不可解析分数的手写用例以丰富诊断；它们当前已有明确失败路径，不是本轮闭合条件，不建议为“更稳妥”自动新增执行。当前没有必须采纳的可选建议。
+
+OUT_OF_SCOPE_OVERDESIGN：不要求全仓回归、逐类型穷举或通用 schema 框架；不要求完整大模型 pilot、重跑 4104 前向、重新开放 qrels、重开 FOREVER/GPU 资格、更多 HPO/数据/方法/种子或统计方案；不重写 queue/恢复框架，不为修复类型边界改变指标或正常输入。以上均不是这次最小修复的必要条件，也未获本轮执行授权。
+
+十、实际阅读范围与未执行事项
+
+完整阅读或逐项核对的本轮核心材料：
+— package_manifest.json、request.zh.txt、authorization.json、changes.diff。
+— previous/primary_disposition.zh.txt；previous/report.zh.txt 与 audit_notes.json 中本次缺陷、前两项闭合与测试范围的相关内容，并核对其与上一轮已交付原件的身份。
+— before/scripts/step29_vendorlink_evaluate.py、before/tests/test_step28_formal_training.py 两份原件，以及 workspace/ 对应修后完整文件。
+— vendorlink/formal/cpu09 的 console.txt、evidence.json、receipt.json；workspace/cpu_sources.json。
+— 两项 formal/plan.zh.txt、implementation.zh.txt、gate.json 的现行范围、预算、暂停和来源；evidence/deployment.json。
+
+必要直接代码追踪：
+— step29_vendorlink_evaluate：read、access、validate_blind、score 完成发布、query_metrics、aggregate、comparison_summary、analyze、CLI 失败处理。
+— step29_vendorlink_run：evaluate、query_ap；step29_vendorlink_methods：vendor_scores、h_pool、Model.score。
+— step29_vendorlink_data 的公共 Group 解析/去身份路径、test_step29_vendorlink.py 的手写 fixture。
+— step29_vendorlink_formal 的后续 score/analyze 派发与完成检查。
+— step28_formal_queue 的 gate、子进程失败停止及费用继承；run_cpu.py 的选测、环境、资源与 receipt 写入。
+— 本会话上一轮 FOREVER CPU04 receipt 仅用于旧版本来源归属检查。
+
+63 份来源均做身份机械核对；没有声称把全部未变算法重新逐行审完。对源码做了读取、文本/diff 比较和 AST 结构比对；这些操作不导入、不执行项目。
+
+本审查未运行项目代码、测试、训练、生成、模型推理、指标重算或 bootstrap；未访问科研服务器或外部科研网页；未打开未提供的正式数据、标签、owners、模型权重或凭据；未核实真实 36/9 条轨迹完成，未重新加载 H27，未作 GPU 或资源空闲测量；未修改输入源码、清单、gate 或旧证据。
+
+最终状态：V-R02 CLOSED；F-R01、V-R01 继续 CLOSED；无新增必修问题。本轮审查可以完成回收。正式训练、自动等待及后续数据/效果操作仍暂停，等待用户新的明确开始指令。
