@@ -1,5 +1,9 @@
 # 科研文件存储与恢复
 
+## 2026-10-30 VendorLink GPU校验进度查询
+
+仅通过SSH读取既有监听、资格账、进程、GPU/RAM/disk及七执行来源身份，未读取正式文本、标签、权重或效果指标。新增[现场原件](../reports/documentation/20261029/vendorlink/native/waiting/observation_20261030.json)在Linux/Windows两端保管，4750字节，SHA256 `ca0a2c29a272efe674d652b0003ef4454fdd996c2db8e45559dd9e11dbc41575`；SCP回传后与Linux实际大小/SHA一致。旧观察、配置、许可、启动及失败账不覆盖；无新监听或科研计算，SSH/SCP会话已关闭。根交接与本记录仅Windows更新，本轮只本地Git，未同步Linux可变文档或推送；不重置大清理周期。
+
 ## 2026-10-29 晚间接手核对与进度补齐
 
 复用已有一次性只读运行观测器，在Linux既有py310采集作业元数据和工期；不调用科研实现、载模、Memory载荷、正式正文或评价标签。两份新原件经SCP回传并与Linux实际大小/SHA256核对：[新对照及原版等待现场](../reports/documentation/20261026/continual_comparison/qualification/status_20261029_evening.json)224416字节／`82248ab47333a6d43c082842739d6b2074e818907411c304320cab40cadb955e`；[VendorLink等待现场](../reports/documentation/20261029/vendorlink/native/waiting/observation_evening.json)7356字节／`0d6a545a952852d9d494902d6642ffa3c37a334b90a854ae277bb55d1917102a`。保留旧观测，不覆盖原授权、配置、门、启动或失败记录。临时Linux采集脚本已删除；Windows中转文件移至各自已有qualification／waiting目录，无新增监听或状态系统。
