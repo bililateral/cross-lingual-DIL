@@ -1,6 +1,8 @@
 # 当前科研交接
 
 ## 当前工作
+接手进展核对（2026-10-30，服务器15:28—15:32，Asia/Shanghai，已知约快于客户端5分钟）：VendorLink当前7份资格来源、FOREVER44份来源与各自许可逐项大小/SHA一致；两项均无活动资格/正式进程，单路资格已完成，不重复G1或要求G2。VendorLink固定导出manifest与原账SHA一致；FOREVER拟复用H27端点全部存在、大小与完成记录相符、原校准元数据齐全，本轮未载模或重算指标，未重新散列27个大权重。正式训练缺口已按现有合同与实际CLI补入[计划](RESEARCH_PLAN.md)：VendorLink尚需E/统计/预算及整批入口，FOREVER尚需正式派发/新确认/收尾接线和按单路实测更新的正式合同；两者正式许可均未启用。现场另见已获后续授权的L²R恢复控制器2787646及CAB_s6/s4两worker2789106/2789115，S/H新监听2790518身份相符；详见[本次恢复范围](../reports/documentation/20261030/comparison_resume/scope.zh.txt)与[15:19启动原件说明](../reports/documentation/20261030/comparison_resume/execution.zh.txt)，下方“暂不重放/已停止”按较早时点解释。15:28 GPU空闲10670MiB、RAM约215GiB、磁盘约217GiB；旧作业未退出，不把表面10GiB空闲视为可新增VendorLink/FOREVER额度，仍需计入既有承诺及各自准入。本轮仅只读核对和可变文档维护，无正式文本/标签/Memory读取、科研计算或新启动。
+
 L²R校准中断排查与控制器修复已交付（2026-10-30）：服务器13:47:27复核原失败/文件/来源及无相关活跃进程。已证实单worker失败经Ledger→dispatch finally连带终止同伴，并由清理计费异常覆盖顶层原因；并非训练预算耗尽。旧入口在校准非PASS时尚未保存分数/拟合诊断/阶段模型，故具体数值失败项无法由原件确定。新控制器已改为单条失败/超时/启动失败停止新派发、让已运行同伴完成，最后整批报失败；共享预算/资源错误仍保留全局停机，失败整批不能进入确认。校准失败先保存原拟合诊断和分数，原公式/判据不改。Linux独立workspace的10项定向CPU证据通过，新增9秒，CPU累计54/1200；原训练及失败账保持。详见[排查、修复与独立主审](../reports/documentation/20261030/comparison_repair/report.zh.txt)和[CPU原件](../reports/documentation/20261030/comparison_repair/cpu01/receipt.json)。用户明确“暂不重放，先交付修复与现有证据”：不启动诊断重放/三条重训/剩余GCR或默认配置监听。修复来源仅部署新隔离目录，旧正式workspace/gate不覆盖；正式恢复与具体数值原因仍未完成。以下中断及其他任务状态分别按各自观测/授权解释。
 
 FOREVER新增实现外审修复及单路GPU资格已完成（2026-10-30）：完整审查R01—R05由[独立主审](../reports/documentation/20261030/forever/implementation/review/primary_disposition.zh.txt)修复闭合，专用页已关闭。用户先接受VendorLink单路结案，随后明确FOREVER只做单路，并反对重复的48次累计调用硬限；当前范围以[后续补充](../reports/documentation/20261030/forever/implementation/qualification/scope_update.zh.txt)为准。取消三槽前置与累计调用次数硬门，固定单路39步和原3600累计任务秒保持，不运行正式训练。

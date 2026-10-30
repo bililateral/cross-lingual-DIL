@@ -2,7 +2,9 @@
 
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md)，本页说明后续动作及其授权边界，不复制执行流水。
 
-VendorLink扩展已明确选择完整H迁移及原论文方法对照，四臂为VendorLink_SEQ、H_SEQ、H_ER、H_full。AlphaBay/Dream/Agora来源、固定划分导出与实施审查已经落实，详见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)；不再把“落实三市场文件”列为尚未开始的下一步。当前沿用唯一监听完成已批准2100累计秒的限定GPU资格，具体10GiB单次尝试及G2实测门见下方执行段。资格结束后依据实测提交正式epoch、评价/依赖口径和累计预算，确认后才能运行拟议36条。代理任务与原方法掩码平均补全假设保持；不增加第五臂或HPO，不借490/822/110小时预算，不把观察账号视图当真实潜在同控真值。首阶段未共享时按108阶段估算，不虚计共享节省。
+VendorLink扩展已明确选择完整H迁移及原论文方法对照，四臂为VendorLink_SEQ、H_SEQ、H_ER、H_full。AlphaBay/Dream/Agora来源、固定划分导出与实施审查已经落实，10月30日单路G1通过且已按用户决定结案，G2三路未通过，见[单路主审](../reports/documentation/20261030/vendorlink/native/primary_disposition.zh.txt)；不再等待旧监听或要求补三路资格。下一步是依据现有单路实测补正式合同：共同当前域epoch E及选择依据、拟36轨迹/108阶段/9252E当前更新、主比较与Q/O/F/N公式、query及域权重/依赖处理、完整盲评分后标签开放、单路累计训练/评分/保存/失败预算与资源门。现有单轨迹execute、盲评分和query AP可复用，整批派发/累计账、216格完整门、4104次留出群前向及固定统计还须接成正式入口并作受影响核验。代理任务与原方法掩码平均补全假设保持；不增加第五臂或HPO，不借490/822/110小时预算，不把观察账号视图当真实潜在同控真值。首阶段共享未实现，按108阶段估算。正式36条、E、预算和评价开放尚未获准，不把资格剩余额度转作训练。
+
+FOREVER的最小方法/阶段/安全点实现、增量外审主审及单路39调用原生资格也已完成，见[后续单路补充](../reports/documentation/20261030/forever/implementation/qualification/scope_update.zh.txt)及[最终资格](../reports/documentation/20261030/forever/implementation/qualification/final/gpu_summary.json)。现有[修订方案](../reports/documentation/20261030/forever/revision.zh.txt)拟9条FOREVER、复用H27端点、新120群/4320群前向和H−FOREVER固定O/F主比较，零新增HPO；这些定义不需重新选方法或超参数。正式CLI目前显式关闭，尚需在获准范围内接通train-only Supply、九轨迹派发/累计账/完整门、H端点与原校准绑定、新确认生成/盲评分/集中开放及统计、成功后full/anchor依赖清理。116h（108训练+6确认+2辅助）仍为提议，须按已测单路更新工期/资源和失败账继承；不能继续引用旧三路16—30h预计工期。额外全P锚点在资格中已批准，正式使用仍应在正式合同中明确接受，不宣称等总历史状态/算力/HPO。阶段末校准与失败留证沿用当前必要修复证据，不预先改变校准公式/门槛，也不因L²R失败要求FOREVER重跑完整阶段资格。用户“先不要启动正式训练”仍有效。
 
 原版S_default＋历史H（G_half）的补充范围也已批准：三顺序×三种子×两方法18条、最多三路、108h训练＋2h辅助=110h，单条6h；只训练、保存54端点及旧dev盲分数，不开放评价标签、不新增确认或HPO。[等待增量主审](../reports/documentation/20261026/continual_defaults/waiting/review/primary_disposition.zh.txt)及必要修复核验已完成，[唯一监听](../reports/documentation/20261026/continual_defaults/waiting/launch.json)已启用。下一步由现有监听等指定L²R／ER+GCR整批训练、生成、确认和分析全部成功、相关进程退出，再按实验所需剩余显存和RAM/disk门逐路派发；不要求整卡没有CUDA进程，禁止重复启动。失败停止且不自动重试，原失败和费用均承接。
 
@@ -14,7 +16,7 @@ VendorLink扩展已明确选择完整H迁移及原论文方法对照，四臂为
 
 L²R／ER+GCR的设计、实现和有限BGE资格复用[合并结案](../reports/documentation/20261024/continual_recovery/review/primary_disposition.zh.txt)，不重复资格；当前18条及新确认按上述822小时授权执行。原“新比较及独立预算尚待授权”是批准前历史，不再构成待办；资格及顺利运行仍不能代替最终效果或确认结论。
 
-VendorLink三市场AlphaBay/Dream/Agora的数据实现/划分/原生方案外审已[独立结案](../reports/documentation/20261029/vendorlink/three_market/review/primary_disposition.zh.txt)，新增实施外审也已[独立处置并最小修复结案](../reports/documentation/20261029/vendorlink/native/review/primary_disposition.zh.txt)。用户授权的一次固定导出和2100秒限定资格继续执行；最新资源决定见[10GiB一次尝试补充](../reports/documentation/20261029/vendorlink/native/waiting/scope.zh.txt)，有效[配置](../reports/documentation/20261029/vendorlink/native/waiting/config.json)和[许可](../reports/documentation/20261029/vendorlink/native/waiting/permit.json)承接原失败账及已完成导出。已有唯一监听等指定任务释放显存且资源达标，不重建、不要求空卡；失败不在低门槛循环重试，下次恢复17GiB并核对实际失败与余额。G2按实测三槽门继续，不能把G1成功当三路通过。资格后依据实测提出正式epoch、评价/依赖口径和累计预算，再获确认后正式运行36条。四臂/零新增HPO及代理任务边界保持。
+VendorLink三市场数据与原生方案的[外审主审](../reports/documentation/20261029/vendorlink/three_market/review/primary_disposition.zh.txt)、[实施修复闭合](../reports/documentation/20261029/vendorlink/native/review/primary_disposition.zh.txt)及后续[单路结案](../reports/documentation/20261030/vendorlink/native/primary_disposition.zh.txt)共同构成已有证据。10月29日10GiB/9GiB allocator一次尝试、旧等待门及G2提议为历史；后续用户取消allocator限制并接受单路范围，旧失败与读取账保留。后续正式合同及新增编排/评价只核验实际增量，按科研纪律第6节处理需要外审的新增范围；已闭合核心方法、数据导出和单路GPU资格不重复测试或再审，不将本次进展梳理当成新的实施/预算/正式运行许可。
 
 ## 已结束Optuna的授权与恢复历史
 
