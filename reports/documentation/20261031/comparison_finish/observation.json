@@ -1,0 +1,545 @@
+{
+  "observed": "2026-10-31T11:07:57.483765+08:00",
+  "campaigns": {
+    "repair": {
+      "process": {
+        "pid": 3145836,
+        "created": 1793415828.57,
+        "owner": "yongpeng",
+        "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace",
+        "command": [
+          "/home/yongpeng/miniconda3/envs/py310/bin/python",
+          "-B",
+          "scripts/step28_comparison_finish.py",
+          "--gate",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal_gate.json"
+        ]
+      },
+      "gate": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal_gate.json",
+        "bytes": 20318,
+        "sha256": "a94aa542eb24dcf85113b46413717550f8d8559e4fefb1739e7acac378ab6b3f"
+      },
+      "source_count": 47,
+      "source_mismatches": [],
+      "metadata": {
+        "budget.json": {
+          "active": {
+            "CAB_s6_L2R_text_fixed": {
+              "allowance": 259200,
+              "bucket": "training",
+              "deadline": 1106677.448285792,
+              "id": "CAB_s6_L2R_text_fixed",
+              "started": 847477.448285792
+            }
+          },
+          "budget_exceeded": false,
+          "completed": [],
+          "cumulative_seconds": 259.0616429178044,
+          "failed": false,
+          "limits": {
+            "analysis": 1800,
+            "confirmation": 64800,
+            "control": 3600,
+            "cpu": 1200,
+            "generation": 600,
+            "native": 3000,
+            "preparation": 4200,
+            "training": 2880000
+          },
+          "used": {
+            "analysis": 0.0,
+            "confirmation": 0.0,
+            "control": 60.727262676809914,
+            "cpu": 8.0,
+            "generation": 0.0,
+            "native": 0.0,
+            "preparation": 190.3343802409945,
+            "training": 0.0
+          }
+        },
+        "status.json": {
+          "epoch": 1793415900.641018,
+          "status": "ONE_REPAIRED_CAB_WAIT_OR_TRAIN"
+        },
+        "waiting.json": null,
+        "first_update.json": {
+          "event": {
+            "completed": 1,
+            "deadline_monotonic": 1106677.448285792,
+            "event": "updates",
+            "peak_disk_bytes": 20400,
+            "peak_rss_bytes": 3152961536,
+            "run_id": "CAB_s6_L2R_text_fixed",
+            "stage": 1,
+            "wall_seconds": 108.44287289795466
+          },
+          "launcher_deleted": true
+        },
+        "failure.json": null,
+        "completion.json": null
+      },
+      "workers": [
+        {
+          "id": "CAB_s6_L2R_text_fixed",
+          "pid": 3146505,
+          "created": 1793415900.44,
+          "owner": "yongpeng",
+          "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace",
+          "command": [
+            "/home/yongpeng/miniconda3/envs/py310/bin/python",
+            "-B",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace/scripts/step28_continual_comparison_run.py",
+            "--job",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/CAB_s6_L2R_text_fixed",
+            "--spec",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/dispatch/CAB_s6_L2R_text_fixed/spec.json",
+            "--gate",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal_gate.json",
+            "--deadline",
+            "1106677.448285792"
+          ],
+          "affinity": [
+            0
+          ],
+          "latest_update": {
+            "event": "updates",
+            "run_id": "CAB_s6_L2R_text_fixed",
+            "stage": 1,
+            "completed": 1,
+            "wall_seconds": 108.44287289795466,
+            "peak_rss_bytes": 3152961536,
+            "peak_disk_bytes": 20400,
+            "deadline_monotonic": 1106677.448285792
+          },
+          "failure": null
+        }
+      ]
+    },
+    "donor": {
+      "process": {
+        "pid": 2787646,
+        "created": 1793344342.69,
+        "owner": "yongpeng",
+        "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/workspace",
+        "command": [
+          "/home/yongpeng/miniconda3/envs/py310/bin/python",
+          "-B",
+          "scripts/step28_comparison_control.py",
+          "--gate",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal_gate.json"
+        ]
+      },
+      "gate": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal_gate.json",
+        "bytes": 21386,
+        "sha256": "384404df4e84568c4cdcde70bd6a9357e97508dde9a638b9931c60026a29dbf1"
+      },
+      "source_count": 47,
+      "source_mismatches": [],
+      "metadata": {
+        "budget.json": {
+          "active": {
+            "CAB_s4_L2R_text_fixed": {
+              "allowance": 259200,
+              "bucket": "training",
+              "deadline": 1035280.846755879,
+              "id": "CAB_s4_L2R_text_fixed",
+              "started": 776080.846755879
+            },
+            "CAB_s5_L2R_text_fixed": {
+              "allowance": 259200,
+              "bucket": "training",
+              "deadline": 1040169.855546188,
+              "id": "CAB_s5_L2R_text_fixed",
+              "started": 780969.855546188
+            }
+          },
+          "budget_exceeded": false,
+          "completed": [
+            {
+              "actual_seconds": 12949.076192542969,
+              "allowance": 43200,
+              "bucket": "training",
+              "deadline": 456349.098986622,
+              "id": "ABC_s4_ER_GCR_group_fixed",
+              "started": 413149.098986622,
+              "success": true
+            },
+            {
+              "actual_seconds": 13790.636864096974,
+              "allowance": 43200,
+              "bucket": "training",
+              "deadline": 469298.240786542,
+              "id": "ABC_s5_ER_GCR_group_fixed",
+              "started": 426098.240786542,
+              "success": true
+            },
+            {
+              "actual_seconds": 118228.85524877202,
+              "allowance": 259200,
+              "bucket": "training",
+              "deadline": 672349.027562453,
+              "id": "ABC_s4_L2R_text_fixed",
+              "started": 413149.027562453,
+              "success": true
+            },
+            {
+              "actual_seconds": 119523.33118742006,
+              "allowance": 259200,
+              "bucket": "training",
+              "deadline": 672349.176471035,
+              "id": "ABC_s5_L2R_text_fixed",
+              "started": 413149.176471035,
+              "success": true
+            },
+            {
+              "actual_seconds": 16195.604526247946,
+              "allowance": 43200,
+              "bucket": "training",
+              "deadline": 575872.586279331,
+              "id": "ABC_s6_ER_GCR_group_fixed",
+              "started": 532672.586279331,
+              "success": true
+            },
+            {
+              "actual_seconds": 124099.59177272697,
+              "allowance": 259200,
+              "bucket": "training",
+              "deadline": 699088.943793345,
+              "id": "ABC_s6_L2R_text_fixed",
+              "started": 439888.943793345,
+              "success": true
+            },
+            {
+              "actual_seconds": 16015.705307247,
+              "allowance": 43200,
+              "bucket": "training",
+              "deadline": 595560.098302725,
+              "id": "BCA_s4_ER_GCR_group_fixed",
+              "started": 552360.098302725,
+              "success": true
+            },
+            {
+              "actual_seconds": 16076.246733978973,
+              "allowance": 43200,
+              "bucket": "training",
+              "deadline": 611575.881508786,
+              "id": "BCA_s5_ER_GCR_group_fixed",
+              "started": 568375.881508786,
+              "success": true
+            },
+            {
+              "actual_seconds": 132289.04929315997,
+              "allowance": 259200,
+              "bucket": "training",
+              "deadline": 791872.638886706,
+              "id": "BCA_s4_L2R_text_fixed",
+              "started": 532672.638886706,
+              "success": true
+            },
+            {
+              "actual_seconds": 12591.015181594994,
+              "allowance": 43200,
+              "bucket": "training",
+              "deadline": 708161.763308781,
+              "id": "BCA_s6_ER_GCR_group_fixed",
+              "started": 664961.763308781,
+              "success": true
+            },
+            {
+              "actual_seconds": 123240.30021530495,
+              "allowance": 259200,
+              "bucket": "training",
+              "deadline": 823399.274762218,
+              "id": "BCA_s5_L2R_text_fixed",
+              "started": 564199.274762218,
+              "success": true
+            },
+            {
+              "actual_seconds": 14034.06567796506,
+              "allowance": 43200,
+              "bucket": "training",
+              "deadline": 730639.651574311,
+              "id": "CAB_s4_ER_GCR_group_fixed",
+              "started": 687439.651574311,
+              "success": true
+            },
+            {
+              "actual_seconds": 117857.95335755195,
+              "allowance": 259200,
+              "bucket": "training",
+              "deadline": 846662.684078025,
+              "id": "BCA_s6_L2R_text_fixed",
+              "started": 587462.684078025,
+              "success": true
+            },
+            {
+              "actual_seconds": 16771.08857248607,
+              "allowance": 43200,
+              "bucket": "training",
+              "deadline": 748520.707411391,
+              "id": "CAB_s5_ER_GCR_group_fixed",
+              "started": 705320.707411391,
+              "success": true
+            },
+            {
+              "actual_seconds": 37291.62166033103,
+              "allowance": 259200,
+              "allowance_exceeded": false,
+              "bucket": "training",
+              "deadline": 1035280.740720867,
+              "id": "CAB_s6_L2R_text_fixed",
+              "started": 776080.740720867,
+              "success": false
+            }
+          ],
+          "cumulative_seconds": 1090219.9325026919,
+          "failed": true,
+          "limits": {
+            "analysis": 1800,
+            "confirmation": 64800,
+            "control": 3600,
+            "cpu": 1200,
+            "generation": 600,
+            "native": 3000,
+            "preparation": 4200,
+            "training": 2880000
+          },
+          "used": {
+            "analysis": 0.0,
+            "confirmation": 0.0,
+            "control": 411.05320007604314,
+            "cpu": 98.0,
+            "generation": 0.0,
+            "native": 2479.0,
+            "preparation": 508.9155278530088,
+            "training": 1086722.9637747628
+          }
+        },
+        "status.json": {
+          "active": [
+            "CAB_s4_L2R_text_fixed",
+            "CAB_s5_L2R_text_fixed"
+          ],
+          "available_slots": [
+            1,
+            2
+          ],
+          "epoch": 1793416058.1035872,
+          "failed_workers": [
+            {
+              "allowance_exceeded": false,
+              "deadline_stopped": false,
+              "id": "CAB_s6_L2R_text_fixed",
+              "returncode": 1,
+              "worker_failure_path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s6_L2R_text_fixed/failure.json"
+            }
+          ],
+          "not_dispatched": [
+            "CAB_s6_ER_GCR_group_fixed"
+          ],
+          "status": "CONTINUING_HEALTHY_SLOTS"
+        },
+        "waiting.json": null,
+        "first_update.json": {
+          "epoch": 1793344655.0881956,
+          "event": {
+            "completed": 1,
+            "deadline_monotonic": 1035280.740720867,
+            "event": "updates",
+            "peak_disk_bytes": 20400,
+            "peak_rss_bytes": 3156078592,
+            "run_id": "CAB_s6_L2R_text_fixed",
+            "stage": 1,
+            "wall_seconds": 136.23191415995825
+          },
+          "launcher_deleted": true,
+          "log": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/dispatch/CAB_s6_L2R_text_fixed/console.txt"
+        },
+        "failure.json": null,
+        "completion.json": null
+      },
+      "workers": [
+        {
+          "id": "CAB_s4_L2R_text_fixed",
+          "pid": 2789115,
+          "created": 1793344503.84,
+          "owner": "yongpeng",
+          "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/workspace",
+          "command": [
+            "/home/yongpeng/miniconda3/envs/py310/bin/python",
+            "-B",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/workspace/scripts/step28_continual_comparison_run.py",
+            "--job",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s4_L2R_text_fixed",
+            "--spec",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/dispatch/CAB_s4_L2R_text_fixed/spec.json",
+            "--gate",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal_gate.json",
+            "--deadline",
+            "1035280.846755879"
+          ],
+          "affinity": [
+            1
+          ],
+          "latest_update": {
+            "event": "updates",
+            "run_id": "CAB_s4_L2R_text_fixed",
+            "stage": 2,
+            "completed": 240,
+            "wall_seconds": 71139.78368612309,
+            "peak_rss_bytes": 6964637696,
+            "peak_disk_bytes": 5201051079,
+            "deadline_monotonic": 1035280.846755879
+          },
+          "failure": null
+        },
+        {
+          "id": "CAB_s5_L2R_text_fixed",
+          "pid": 2823288,
+          "created": 1793349392.85,
+          "owner": "yongpeng",
+          "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/workspace",
+          "command": [
+            "/home/yongpeng/miniconda3/envs/py310/bin/python",
+            "-B",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/workspace/scripts/step28_continual_comparison_run.py",
+            "--job",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s5_L2R_text_fixed",
+            "--spec",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/dispatch/CAB_s5_L2R_text_fixed/spec.json",
+            "--gate",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal_gate.json",
+            "--deadline",
+            "1040169.855546188"
+          ],
+          "affinity": [
+            2
+          ],
+          "latest_update": {
+            "event": "updates",
+            "run_id": "CAB_s5_L2R_text_fixed",
+            "stage": 2,
+            "completed": 192,
+            "wall_seconds": 64577.33869224996,
+            "peak_rss_bytes": 6986575872,
+            "peak_disk_bytes": 5201054693,
+            "deadline_monotonic": 1040169.855546188
+          },
+          "failure": null
+        }
+      ]
+    },
+    "defaults": {
+      "process": {
+        "pid": 3146360,
+        "created": 1793415884.39,
+        "owner": "yongpeng",
+        "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+        "command": [
+          "/home/yongpeng/miniconda3/envs/py310/bin/python",
+          "-B",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/defaults/active_defaults_wait.py",
+          "--workspace",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+          "--gate",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/defaults/formal_gate.json"
+        ]
+      },
+      "gate": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/defaults/formal_gate.json",
+        "bytes": 21641,
+        "sha256": "70f4a4c53590b22f8f8ac6cc692eb5bf4ebac1bcb4a52a3a7f3656c287d8505c"
+      },
+      "source_count": 44,
+      "source_mismatches": [],
+      "metadata": {
+        "budget.json": {
+          "active": {},
+          "budget_exceeded": false,
+          "completed": [],
+          "cumulative_seconds": 1575.3754635290243,
+          "failed": false,
+          "limits": {
+            "control": 7200,
+            "training": 388800
+          },
+          "used": {
+            "control": 1575.3754635290243,
+            "training": 0.0
+          }
+        },
+        "status.json": null,
+        "waiting.json": {
+          "epoch": 1793416068.070245,
+          "predecessor": {
+            "processes": [
+              {
+                "command": [
+                  "/home/yongpeng/miniconda3/envs/py310/bin/python",
+                  "-B",
+                  "scripts/step28_comparison_finish.py",
+                  "--gate",
+                  "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal_gate.json"
+                ],
+                "created": 1793415828.57,
+                "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace",
+                "owner": "yongpeng",
+                "pid": 3145836
+              },
+              {
+                "command": [
+                  "/home/yongpeng/miniconda3/envs/py310/bin/python",
+                  "-B",
+                  "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace/scripts/step28_continual_comparison_run.py",
+                  "--job",
+                  "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/CAB_s6_L2R_text_fixed",
+                  "--spec",
+                  "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/dispatch/CAB_s6_L2R_text_fixed/spec.json",
+                  "--gate",
+                  "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal_gate.json",
+                  "--deadline",
+                  "1106677.448285792"
+                ],
+                "created": 1793415900.44,
+                "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace",
+                "owner": "yongpeng",
+                "pid": 3146505
+              }
+            ],
+            "ready": false,
+            "reason": "PREDECESSOR_STILL_RUNNING"
+          },
+          "resources": null,
+          "status": "WAITING"
+        },
+        "first_update.json": null,
+        "failure.json": null,
+        "completion.json": null
+      },
+      "workers": []
+    }
+  },
+  "gpu": "10114, 32607, 87",
+  "gpu_processes": "2789115, 7686\n2823288, 7648\n3146505, 6378",
+  "disk_free_bytes": 226165669888,
+  "host_available_bytes": 248667328512,
+  "defaults_listeners": [
+    {
+      "pid": 3146360,
+      "cmdline": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/defaults/active_defaults_wait.py",
+        "--workspace",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/defaults/formal_gate.json"
+      ],
+      "create_time": 1793415884.39,
+      "username": "yongpeng"
+    }
+  ],
+  "old_defaults_pid_still_exists": false
+}

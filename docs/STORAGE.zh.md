@@ -1,4 +1,12 @@
 # 科研文件存储与恢复
+## 2026-10-31 修复CAB_s6单路启动与H/S重新绑定
+
+[comparison_finish](../reports/documentation/20261031/comparison_finish/report.zh.txt)在两端保管本次明确授权、47科学＋7编排来源身份、4项手写CPU证据、正式门、部署、启动、11:07:57现场及H/S切换原件。Linux独立workspace从已冻结比较／H-S来源复制，只链接原五份train输入与BGE；新CAB从原起点完整补跑，未载入旧诊断模型作训练起点。旧comparison_resume及defaults_repair科学源码/gate/失败/费用均未覆盖；新H/S继续使用原defaults_repair科学workspace，只重新绑定新完整前序。
+
+11项小证据经27832字节ZIP回传，两端SHA256 `87733034950a77c36b83835ae8fc8c0e530312d9137ca93f57a32b3abffd7f8f`及[逐成员清单](../reports/documentation/20261031/comparison_finish/transfer_manifest.json)全部一致。没有模型、Memory、分数或标签回Windows。新launcher在实际首步后按约自删，保留Windows scripts源码、CPU来源身份和first_update；旧H/S等待进程在身份/训练0/无children核对后结束，保留旧记录及全部费用。两端本轮input/evidence中转包核验后删除；必要源码及原始小证据保留，不动活动载荷，不重置大清理周期。准备阶段遇旧launcher已自删的复制错误及修正见report，未误执行旧代码。
+
+当前交接两行原位替换、被替代的10:56—10:59状态移入历史；讨论/设计/存储入口在Windows维护，不同步覆盖Linux根可变文档。仅同步本轮独立目录的范围/核验与执行说明及必要来源，小证据按原件回传；本轮本地Git交付，不推送。
+
 ## 2026-10-31 CAB_s6诊断重放现场
 
 通过SSH只读核对已授权comparison_resume作业及defaults_repair监听，读取既有train-calibration拟合JSON和运行元数据，未加载模型/Memory/分数数组或正文/标签。新增[现场原件](../reports/documentation/20261030/comparison_resume/progress_20261031_100640.json)两端保管，32896字节／SHA256 f1408c2c451eeb66614ed9b935127a71f167406db2da8c6ea17b9382320d51da，SCP回传核对一致；其stage_points采集路径错误及不使用范围已在[诊断说明](../reports/documentation/20261030/comparison_resume/report.zh.txt)明确。校准前3898758217字节完整状态和原分数继续留Linux供后续诊断，未下载、加载或删除。原失败、预算、冻结入口及运行状态文件不改；新说明与交接仅Windows维护，本轮仅本地Git，不新增推送或正式执行。SSH/SCP已退出，无临时文件或新监听，不重置大清理周期。

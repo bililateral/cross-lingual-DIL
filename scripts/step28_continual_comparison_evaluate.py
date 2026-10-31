@@ -23,6 +23,14 @@ SECONDARY = (('H_pos_tuned', 'S_tuned'), ('S_tuned', 'L2R_text_fixed'), ('S_tune
 
 
 def trajectory_sources(allowed: dict, identity: str, completion: Path) -> list:
+    adopted = allowed.get('adoption', {}).get(identity)
+    if adopted is not None:
+        receipt = data.read_json(Path(allowed['campaign'])/'adoption.json')['runs'][identity]
+        if receipt['donor_completion'] != adopted['completion']:
+            raise ValueError('Adopted completion came from another trajectory')
+        data.verify(completion, receipt['completion'])
+        pinned = adopted['source_gate']
+        return data.read_json(data.verify(Path(pinned['path']), pinned))['sources']
     recovery = allowed.get('recovery')
     if not recovery or identity not in recovery['reused']:
         return allowed['sources']
