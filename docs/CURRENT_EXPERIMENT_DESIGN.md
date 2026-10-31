@@ -2,6 +2,8 @@
 
 ## 当前合同入口
 
+10月31日校准数值修复补充：用户已授权查因修复及一次同输入CPU验证，具体[范围、固定停止选项与主审证据](../reports/documentation/20261031/calibration_repair/report.zh.txt)限定为原NLL／初值／边界／验收不变，仅新比较入口启用ftol=0；其他调用默认保持，原活动冻结来源和成功校准不重写。验证不生成正式端点、不授权自动训练重试；后续运行需绑定新来源及实际恢复范围。
+
 L²R恢复与原队列交接（2026-10-30）：用户已批准诊断路及两条被连带停止的L²R重跑，并明确故障槽退出后正常两槽继续接任务。有效范围见[恢复补充](../reports/documentation/20261030/comparison_resume/scope.zh.txt)、[增量核验与主审](../reports/documentation/20261030/comparison_resume/report.zh.txt)和[新正式门](../reports/documentation/20261030/comparison_resume/formal_gate.json)。复用14成功、原seed重跑三条CAB L²R、继续末条GCR；诊断路第一阶段通过后完成原三阶段，不再人为截停。失败退休单槽、健康槽继续补位，但18条/108状态完整门与822h分桶保持，缺条目不进入确认。S/H当前按[失败隔离补充](../reports/documentation/20261030/defaults_repair/scope.zh.txt)与[正式门](../reports/documentation/20261030/defaults_repair/formal_gate.json)执行：其自身单worker失败退休单槽、健康槽继续补位，前序仍须本恢复批训练/生成/确认/统计全部成功且进程退出；原44科学来源、110h和盲分数边界不变。旧“暂不重放”已被本次明确决定取代，原失败账和冻结原件保留；动态进度仅见交接顶部。
 
 VendorLink／FOREVER正式合同（2026-10-30）：用户已接受[VendorLink36条/40轮/单路296h方案](../reports/documentation/20261030/vendorlink/formal/plan.zh.txt)和[FOREVER9条/复用H27/单路116h及新120群方案](../reports/documentation/20261030/forever/formal/plan.zh.txt)，分别见各formal/authorization.json。VendorLink依赖实查后另获明确决定：仅固定数据描述比较，不计算整体置信区间或统计验收；不改变36条/40轮/预算。两项实际正式入口、评价与清理见各formal/implementation.zh.txt；两项定向外审必修已由Linux定向CPU证据及[主审](../reports/documentation/20261030/forever/formal/review/primary_disposition.zh.txt)闭合，修后未再次网页送审；具体gate仍按用户暂停决定保持关闭。旧未授权措辞不恢复为预算或方案阻断；但用户最新明确“先别训练，等我的开始训练指令”，因此本批训练及自动等待均暂停，必须收到新开始指令，不能只凭审查闭合或资源满足启用。动态状态只见交接顶部。

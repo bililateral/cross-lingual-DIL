@@ -68,6 +68,20 @@ def passing_summary() -> dict:
 class CalibrationContracts(unittest.TestCase):
     pipeline_evidence: dict = {}
 
+    def test_gradient_stopping_does_not_accept_premature_optimizer_success(self):
+        from types import SimpleNamespace
+        stopped = SimpleNamespace(x=np.array([1., 0.]), success=True, nit=1,
+                                  message='controlled premature success')
+        with mock.patch('scipy.optimize.minimize', return_value=stopped) as solve:
+            result = method.fit(np.array([-1., 1.]), np.array([1, 0]),
+                                role='calibration', stop_on_gradient=True)
+        solve.assert_called_once()
+        self.assertEqual(solve.call_args.kwargs['options']['ftol'], 0.)
+        self.assertEqual(result['options']['ftol'], 0.)
+        self.assertEqual(method.OPTIONS['ftol'], 1e-12)
+        self.assertGreater(result['projected_gradient_max'], 1e-6)
+        self.assertEqual(result['status'], 'FAILED_CALIBRATION_FIT_NO_RETRY')
+
     def test_scalar_nll_gradient_and_finite_difference(self):
         x = np.array([-2.0, -0.4, .2, 1.7, 2.9])
         y = np.array([0., 0., 1., 0., 0.])

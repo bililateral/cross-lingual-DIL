@@ -1,0 +1,107 @@
+{
+  "observed_at": "2026-10-31T10:22:27.920952+08:00",
+  "active_sources": [
+    {
+      "path": "scripts/step28_alias_calibration.py",
+      "sha256": "d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca",
+      "expected": "d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca"
+    },
+    {
+      "path": "scripts/step28_continual_comparison_run.py",
+      "sha256": "6848af7109f3536417179e6ede76489f9b012aa8f2907c397ec0c3357b88b4ef",
+      "expected": "6848af7109f3536417179e6ede76489f9b012aa8f2907c397ec0c3357b88b4ef"
+    }
+  ],
+  "controller_status": {
+    "active": [
+      "CAB_s4_L2R_text_fixed",
+      "CAB_s5_L2R_text_fixed"
+    ],
+    "available_slots": [
+      1,
+      2
+    ],
+    "epoch": 1793413323.0039918,
+    "failed_workers": [
+      {
+        "allowance_exceeded": false,
+        "deadline_stopped": false,
+        "id": "CAB_s6_L2R_text_fixed",
+        "returncode": 1,
+        "worker_failure_path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s6_L2R_text_fixed/failure.json"
+      }
+    ],
+    "not_dispatched": [
+      "CAB_s6_ER_GCR_group_fixed"
+    ],
+    "status": "CONTINUING_HEALTHY_SLOTS"
+  },
+  "processes": [
+    {
+      "pid": 2787646,
+      "owner": "yongpeng",
+      "created": 1793344342.69,
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/workspace",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "scripts/step28_comparison_control.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal_gate.json"
+      ]
+    },
+    {
+      "pid": 2789115,
+      "owner": "yongpeng",
+      "created": 1793344503.84,
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/workspace",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/workspace/scripts/step28_continual_comparison_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s4_L2R_text_fixed",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/dispatch/CAB_s4_L2R_text_fixed/spec.json",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal_gate.json",
+        "--deadline",
+        "1035280.846755879"
+      ]
+    },
+    {
+      "pid": 2823288,
+      "owner": "yongpeng",
+      "created": 1793349392.85,
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/workspace",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/workspace/scripts/step28_continual_comparison_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s5_L2R_text_fixed",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/dispatch/CAB_s5_L2R_text_fixed/spec.json",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal_gate.json",
+        "--deadline",
+        "1040169.855546188"
+      ]
+    },
+    {
+      "pid": 2814827,
+      "owner": "yongpeng",
+      "created": 1793347278.93,
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/active_defaults_wait.py",
+        "--workspace",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/formal_gate.json"
+      ]
+    }
+  ]
+}

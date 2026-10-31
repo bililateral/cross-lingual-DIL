@@ -95,13 +95,20 @@ def preserve_order(original: np.ndarray, transformed: np.ndarray) -> dict:
 
 
 def fit(scores: np.ndarray, labels: np.ndarray, *, role: str,
-        check: Callable[[], None] = lambda: None) -> dict:
+        check: Callable[[], None] = lambda: None,
+        stop_on_gradient: bool = False) -> dict:
     """One deterministic real optimizer fit; no retry or alternative method selection."""
     from scipy.optimize import minimize
 
     if role != "calibration":
         raise ValueError("Only train-calibration labels may fit a probability map")
     x, y = aligned(scores, labels)
+    options = dict(OPTIONS)
+    if stop_on_gradient:
+        # A small positive loss decrease must not preempt the gradient gate.
+        # Exact floating-point stagnation may still stop L-BFGS-B; the unchanged
+        # post-fit gradient check rejects it. This is one solve, without retries.
+        options['ftol'] = 0.
     initial = np.array([1., 0.])
     initial_loss, _ = loss_gradient(initial, x, y)
     trajectory: list[dict] = []
@@ -123,13 +130,13 @@ def fit(scores: np.ndarray, labels: np.ndarray, *, role: str,
                            "projected_gradient_max": float(np.max(np.abs(projected_gradient(theta, grad))))})
 
     fitted = minimize(objective, initial, method="L-BFGS-B", jac=True,
-                      bounds=BOUNDS, options=dict(OPTIONS), callback=callback)
+                      bounds=BOUNDS, options=options, callback=callback)
     final_loss, gradient = loss_gradient(fitted.x, x, y)
     pg = float(np.max(np.abs(projected_gradient(fitted.x, gradient))))
     result = {"a": float(fitted.x[0]), "b": float(fitted.x[1]),
               "role": role, "objective": "unweighted_unclipped_bernoulli_nll",
               "initial_parameters": initial.tolist(), "bounds": [list(v) for v in BOUNDS],
-              "options": dict(OPTIONS), "initial_nll": initial_loss, "final_nll": final_loss,
+              "options": options, "initial_nll": initial_loss, "final_nll": final_loss,
               "optimizer_success": bool(fitted.success), "optimizer_message": str(fitted.message),
               "optimizer_iterations": int(fitted.nit), "objective_calls": calls,
               "projected_gradient_max": pg, "trajectory": trajectory,

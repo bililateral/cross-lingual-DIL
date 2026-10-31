@@ -78,6 +78,43 @@ def fixture(name):
 
 
 class ComparisonTests(unittest.TestCase):
+    def test_checkpoint_runs_gradient_stopping_calibration(self):
+        from scipy.optimize import minimize
+        method, model, optimizer, c = fixture('L2R_text_fixed')
+        calibration = [group(i) for i in range(60, 72)]
+        truth = np.asarray(calibration[0].labels)
+        low = np.r_[np.flatnonzero(truth)[:4], np.flatnonzero(1-truth)[:185]]
+        probabilities = np.full(378, 16/189)
+        probabilities[low] = 4/189
+        scores = np.tile((np.log(probabilities/(1-probabilities))+50)/.4, (12, 1))
+        stage = mock.Mock(stage=1)
+        stage.retain.side_effect = RuntimeError('stop after actual calibration passed')
+        fitted = []
+        original_fit = m.parent.calibration.fit
+
+        def capture(*args, **kwargs):
+            value = original_fit(*args, **kwargs)
+            fitted.append(value)
+            return value
+
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root/'scores').mkdir()
+            (root/'maps').mkdir()
+            with mock.patch.object(m.parent, 'adam_step', return_value=288), \
+                 mock.patch.object(method, 'score', return_value=scores), \
+                 mock.patch.object(m.parent.calibration, 'fit', side_effect=capture), \
+                 mock.patch('scipy.optimize.minimize', wraps=minimize) as solve:
+                with self.assertRaisesRegex(RuntimeError, 'stop after actual calibration passed'):
+                    run.checkpoint(root, method, model, optimizer, stage, calibration,
+                                   c, None, mock.Mock(check=lambda *a: None))
+            solve.assert_called_once()
+            self.assertEqual(solve.call_args.kwargs['options']['ftol'], 0.)
+        self.assertEqual(len(fitted), 1)
+        self.assertEqual(fitted[0]['status'], 'PASS_CALIBRATION_FIT')
+        self.assertLessEqual(fitted[0]['projected_gradient_max'], 1e-6)
+        np.testing.assert_allclose([fitted[0]['a'], fitted[0]['b']], [.4, -50.], atol=2e-5, rtol=0)
+
     def test_diagnostic_checkpoint_retains_failure_and_continues_success(self):
         _, model, optimizer, c = fixture('L2R_text_fixed')
         method = m.Method(m.Spec('L2R_text_fixed', 'CAB', 6))

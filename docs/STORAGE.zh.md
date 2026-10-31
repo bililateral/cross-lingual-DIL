@@ -1,4 +1,12 @@
 # 科研文件存储与恢复
+## 2026-10-31 CAB_s6诊断重放现场
+
+通过SSH只读核对已授权comparison_resume作业及defaults_repair监听，读取既有train-calibration拟合JSON和运行元数据，未加载模型/Memory/分数数组或正文/标签。新增[现场原件](../reports/documentation/20261030/comparison_resume/progress_20261031_100640.json)两端保管，32896字节／SHA256 f1408c2c451eeb66614ed9b935127a71f167406db2da8c6ea17b9382320d51da，SCP回传核对一致；其stage_points采集路径错误及不使用范围已在[诊断说明](../reports/documentation/20261030/comparison_resume/report.zh.txt)明确。校准前3898758217字节完整状态和原分数继续留Linux供后续诊断，未下载、加载或删除。原失败、预算、冻结入口及运行状态文件不改；新说明与交接仅Windows维护，本轮仅本地Git，不新增推送或正式执行。SSH/SCP已退出，无临时文件或新监听，不重置大清理周期。
+
+后续用户明确批准一次原失败输入的CPU修复核验。[calibration_repair](../reports/documentation/20261031/calibration_repair/report.zh.txt)保管独立数值几何诊断、一次train CSV解析的访问记录、单次ftol=0拟合及标量梯度核对、9项手写检查和49来源隔离部署；额外6秒CPU在此单列，后续恢复须与原98秒合并为104秒，不在线覆盖活动账。诊断加载了Linux既有分数，未回传矩阵/标签/模型；7份新增小证据经10714字节ZIP回传核对，5个部署增量/测试依赖与本机SHA一致。修复说明随后同步到Linux独立目录，根交接/讨论/存储/设计入口只Windows更新；原冻结workspace/gate/失败均未覆盖。
+
+修复说明6797字节已回读SHA一致：2cf5740ddfb95d2b97ffbd91fa3b51a8479da5607d1dbbf9a238772f70c46c61。两端本轮input.zip/evidence.zip已在源码及7项原件保管、身份核对后逐文件删除，必要来源和结果保留；SSH/SCP全部退出。未改活动来源或创建新训练／监听，不重置大清理周期。
+
 ## 2026-10-30 VendorLink与FOREVER正式准备、修复与外审证据
 
 开训前处理量留证增量：VendorLink cpu10四份原始小证据已SCP回传并逐项核对SHA，三阶段处理量、恢复继承及删除latest后保留行为均有手写证据。四份受影响源码版本追加到原source_archive.zip，原有成员保留；当前归档430947字节／SHA256 b6ef7ced3ba493545ed8cadbe763de7b3db6fde70589bf45a34df953549bf516，下文410142字节为初始归档身份。本次两gate继续关闭，仅重绑共用63来源并结转VendorLink CPU130秒，FOREVER133秒不变；实际部署见cpu10/deployment.json。实现说明与源码归档同步到Linux formal目录，根可变文档只在Windows维护。中转材料按本次用途清理，不触及旧回执中另有处置记录的远端包，不重置大清理周期。

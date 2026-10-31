@@ -177,7 +177,8 @@ def checkpoint(root, method, model, optimizer, stage, calibration, c, first_map,
         if diagnostic_path is not None:
             save_array(root/'scores'/'stage1_diagnostic.npy', scores, root)
         fitted = m.parent.calibration.fit(scores, np.asarray([g.labels for g in calibration], np.uint8),
-                                          role='calibration', check=budget.check)
+                                          role='calibration', check=budget.check,
+                                          stop_on_gradient=True)
         if diagnostic_path is not None:
             data.write_json(root/'maps'/'stage1_diagnostic.json', fitted)
             print(json.dumps(dict(event='diagnostic_calibration', run_id=method.spec.run_id,
