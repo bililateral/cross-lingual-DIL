@@ -1,4 +1,12 @@
 # 科研文件存储与恢复
+## 2026-10-31 成功槽接续纠正与原运行接管
+
+[comparison_continue](../reports/documentation/20261031/comparison_continue/report.zh.txt)两端保管纠正范围、47科学＋8编排来源、正式门、原预算/进程身份快照、接管就绪/激活、切换和11:54:20现场原件。只更换两个派发父控制器和唯一H/S等待进程，三条训练PID/创建时间/CPU核/原启动时刻/截止时间保持；原科学workspace、旧completion及失败不覆盖。新workspace仅补既有BGE链接供原确认入口使用，GCR仍从原workspace启动。原comparison_finish单条队列是执行偏差，原记录按历史保留，不追改成正确执行。
+
+CPU五次运行的全部输出/错误/收费、必要旧源码及一次未执行入口错误保留：本次47秒、原106累计153/1200。最终四项及未变共享两项支持当前行为，旧三次错误不隐藏；cpu01/02/03保留对应源码，cpu04复用cpu03版本。小证据ZIP共67874字节、SHA256 83d66bc1af2c80a82d931057ef91a5a8f272ca7213c56c27b57d2f1a831e1864，28份原件按[逐成员清单](../reports/documentation/20261031/comparison_continue/transfer_manifest.json)核对回传；未回传模型/Memory/分数/标签。
+
+本轮input/fix/identity/close/evidence五个中转ZIP的42个成员已逐项与保留文件按SHA核对，两端五包在确认精确路径和身份后删除。所有必要源码版本、原始证据及活动载荷保留，不重置大清理周期。执行报告6372字节、SHA256 5fbce65bd70371a440a199b6e9c66c3b395a163efc52d6c6a28bf2a4c8c6ef60已同步独立目录；根可变交接/设计/计划/讨论/存储仅Windows维护，本轮本地Git交付，不推送。当前交接只替换L²R/H-S两项，旧11:07状态移入历史并明确错误归属。
+
 ## 2026-10-31 修复CAB_s6单路启动与H/S重新绑定
 
 [comparison_finish](../reports/documentation/20261031/comparison_finish/report.zh.txt)在两端保管本次明确授权、47科学＋7编排来源身份、4项手写CPU证据、正式门、部署、启动、11:07:57现场及H/S切换原件。Linux独立workspace从已冻结比较／H-S来源复制，只链接原五份train输入与BGE；新CAB从原起点完整补跑，未载入旧诊断模型作训练起点。旧comparison_resume及defaults_repair科学源码/gate/失败/费用均未覆盖；新H/S继续使用原defaults_repair科学workspace，只重新绑定新完整前序。

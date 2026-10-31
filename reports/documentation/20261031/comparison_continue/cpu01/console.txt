@@ -1,0 +1,51 @@
+test_missing_completion_is_failure_without_fabricating_exit_code (test_step28_comparison_continue.ContinueTest) ... ok
+test_repaired_failed_slot_retires_healthy_slots_still_refill (test_step28_comparison_continue.ContinueTest) ... Attached-slot evidence: {'failed_repair': True, 'repair_cpu': [0], 'subsequent_gcr_cpu': [1], 'gcr_single_dispatch': True, 'original_fees_kept': True}
+ok
+test_repaired_successful_slot_receives_next_real_task (test_step28_comparison_continue.ContinueTest) ... ERROR
+test_failed_slot_retires_but_healthy_slots_refill (test_step28_comparison_control.ComparisonControlTest) ... Retired-slot evidence: {'outcomes': {'bad': False, 'other1': True, 'other2': True, 'next1': True, 'next2': True}, 'cpu_assignment': {'bad': [0], 'other1': [1], 'other2': [2], 'next1': [1], 'next2': [2]}, 'no_failed_slot_refill': True}
+ok
+test_all_failed_slots_leave_remaining_queue_unstarted (test_step28_comparison_control.ComparisonControlTest) ... ok
+
+======================================================================
+ERROR: test_repaired_successful_slot_receives_next_real_task (test_step28_comparison_continue.ContinueTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_control.py", line 267, in dispatch
+    if process.poll() is None and time.monotonic() >= ledger.active[identity]['deadline']-60:
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py", line 57, in poll
+    if exact_process(self.record) is not None:
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py", line 35, in exact_process
+    raise RuntimeError('Recorded process identity changed')
+RuntimeError: Recorded process identity changed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/tests/test_step28_comparison_continue.py", line 154, in test_repaired_successful_slot_receives_next_real_task
+    self.run_case(False)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/tests/test_step28_comparison_continue.py", line 121, in run_case
+    c.execute(root/'gate.json')
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py", line 229, in execute
+    shared.dispatch([row],campaign,ledger,'training',command,existing=attached,retire_failed_slots=True,
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1114, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1118, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1179, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/tests/test_step28_comparison_continue.py", line 103, in fast
+    return original_dispatch(*args,**kwargs,poll_seconds=.02)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_control.py", line 347, in dispatch
+    waited += prior.terminate_owned(process)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_continual_five_control.py", line 158, in terminate_owned
+    process.wait(timeout=5)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py", line 84, in wait
+    process = exact_process(self.record)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py", line 35, in exact_process
+    raise RuntimeError('Recorded process identity changed')
+RuntimeError: Recorded process identity changed
+
+----------------------------------------------------------------------
+Ran 5 tests in 5.951s
+
+FAILED (errors=1)

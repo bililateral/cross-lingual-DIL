@@ -196,7 +196,7 @@ def reference_check(gate):
         data.verify(Path(row['path']), row)
 
 
-def resources(campaign, startup=False, active_workers=None):
+def resources(campaign, startup=False, active_workers=None, owned_pids=()):
     free = int(subprocess.check_output(['nvidia-smi', '--id=0', '--query-gpu=memory.free',
                 '--format=csv,noheader,nounits'], text=True).strip())*2**20
     apps = subprocess.check_output(['nvidia-smi', '--id=0', '--query-compute-apps=pid,used_memory',
@@ -216,7 +216,7 @@ def resources(campaign, startup=False, active_workers=None):
                 pid, size = (part.strip() for part in line.split(','))
                 rows.append((int(pid), int(size)*2**20 if size.isdecimal() else 0))
             return rows
-        owned = set(prior.run.owned_processes(os.getpid()))
+        owned = set(prior.run.owned_processes(os.getpid())) | set(owned_pids)
         second_free = int(subprocess.check_output(['nvidia-smi', '--id=0', '--query-gpu=memory.free',
                           '--format=csv,noheader,nounits'], text=True).strip())*2**20
         second_apps = subprocess.check_output(['nvidia-smi', '--id=0', '--query-compute-apps=pid,used_memory',
@@ -248,13 +248,17 @@ def campaign_size(campaign, limits):
 
 def dispatch(queue, campaign, ledger, bucket, command, *, max_workers=3,
              admit=None, check=lambda: None, observe=lambda: None, poll_seconds=30.,
-             retire_failed_slots=False):
+             retire_failed_slots=False, existing=None):
     """On a child failure, stop admission and drain already running siblings."""
-    active, index, tick, failures = {}, 0, None, []
+    active, index, tick, failures = dict(existing or {}), 0, None, []
     slots = set(range(max_workers))
     cores = psutil.Process().cpu_affinity()[:max_workers]
     if len(cores) != max_workers:
         raise RuntimeError('Distinct worker CPU cores unavailable')
+    if existing and (set(active) != set(ledger.active)
+                     or len({v[2] for v in active.values()}) != len(active)
+                     or any(v[2] not in slots for v in active.values())):
+        raise ValueError('Attached workers/reservations/slots differ')
     try:
         while active or (index < len(queue) and slots and (not ledger.failed or retire_failed_slots)):
             tick = time.monotonic()
@@ -266,11 +270,14 @@ def dispatch(queue, campaign, ledger, bucket, command, *, max_workers=3,
                 if process.poll() is not None:
                     log.close()
                     del active[identity]
-                    settled = ledger.settle(identity, process.returncode == 0 and not timed_out)
+                    success = getattr(process, 'successful', process.returncode == 0)
+                    settled = ledger.settle(identity, success and not timed_out)
+                    if hasattr(process, 'completion_check'):
+                        write(campaign/'dispatch'/identity/'outcome.json', process.completion_check)
                     if not settled['success']:
                         failure = dict(id=identity, returncode=process.returncode,
                                        deadline_stopped=timed_out, allowance_exceeded=settled['allowance_exceeded'],
-                                       worker_failure_path=str(campaign/identity/'failure.json'))
+                                       worker_failure_path=str(getattr(process, 'job', campaign/identity)/'failure.json'))
                         failures.append(failure)
                         if retire_failed_slots:
                             slots.remove(slot)
@@ -298,9 +305,10 @@ def dispatch(queue, campaign, ledger, bucket, command, *, max_workers=3,
                 env = dict(os.environ, OMP_NUM_THREADS='1', MKL_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1',
                            TOKENIZERS_PARALLELISM='false', CUDA_VISIBLE_DEVICES='0',
                            CUBLAS_WORKSPACE_CONFIG=':4096:8', PYTHONDONTWRITEBYTECODE='1')
+                env.update(row.get('environment', {}))
                 try:
                     process = subprocess.Popen(line, stdout=log, stderr=subprocess.STDOUT,
-                                               env=env, start_new_session=True)
+                                               env=env, cwd=row.get('cwd'), start_new_session=True)
                 except OSError as error:
                     log.close()
                     ledger.settle(row['id'], False)

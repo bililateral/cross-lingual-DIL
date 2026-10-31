@@ -1,0 +1,40 @@
+test_repaired_successful_slot_receives_next_real_task (test_step28_comparison_continue.ContinueTest) ... Attached-slot evidence: {'failed_repair': False, 'repair_cpu': [0], 'subsequent_gcr_cpu': [0], 'gcr_single_dispatch': True, 'original_fees_kept': True}
+ok
+test_repaired_successful_slot_receives_next_real_task (test_step28_comparison_continue.ContinueTest) ... ERROR
+test_repaired_successful_slot_receives_next_real_task (test_step28_comparison_continue.ContinueTest) ... Attached-slot evidence: {'failed_repair': False, 'repair_cpu': [0], 'subsequent_gcr_cpu': [0], 'gcr_single_dispatch': True, 'original_fees_kept': True}
+ok
+test_repaired_successful_slot_receives_next_real_task (test_step28_comparison_continue.ContinueTest) ... Attached-slot evidence: {'failed_repair': False, 'repair_cpu': [0], 'subsequent_gcr_cpu': [0], 'gcr_single_dispatch': True, 'original_fees_kept': True}
+ok
+test_repaired_successful_slot_receives_next_real_task (test_step28_comparison_continue.ContinueTest) ... Attached-slot evidence: {'failed_repair': False, 'repair_cpu': [0], 'subsequent_gcr_cpu': [0], 'gcr_single_dispatch': True, 'original_fees_kept': True}
+ok
+
+======================================================================
+ERROR: test_repaired_successful_slot_receives_next_real_task (test_step28_comparison_continue.ContinueTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/tests/test_step28_comparison_continue.py", line 154, in test_repaired_successful_slot_receives_next_real_task
+    self.run_case(False)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/tests/test_step28_comparison_continue.py", line 121, in run_case
+    c.execute(root/'gate.json')
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py", line 233, in execute
+    shared.dispatch([row],campaign,ledger,'training',command,existing=attached,retire_failed_slots=True,
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1114, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1118, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1179, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/tests/test_step28_comparison_continue.py", line 103, in fast
+    return original_dispatch(*args,**kwargs,poll_seconds=.02)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_control.py", line 267, in dispatch
+    if process.poll() is None and time.monotonic() >= ledger.active[identity]['deadline']-60:
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py", line 61, in poll
+    if exact_process(self.record) is not None:
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py", line 38, in exact_process
+    raise RuntimeError(f'Recorded process identity changed: pid={process.pid}, observed={observed}, '
+RuntimeError: Recorded process identity changed: pid=3167552, observed={'owner': 'yongpeng', 'cwd': '/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace', 'command': []}, expected={'owner': 'yongpeng', 'cwd': '/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace', 'command': ['/home/yongpeng/miniconda3/envs/py310/bin/python', '-B', '/tmp/tmplnicyve0/orphan.py', '/tmp/tmplnicyve0', 'CAB_s5_L2R_text_fixed', '/tmp/tmplnicyve0/old/CAB_s5_L2R_text_fixed', '3.0', 'ok']}, status=running
+
+----------------------------------------------------------------------
+Ran 5 tests in 16.183s
+
+FAILED (errors=1)
