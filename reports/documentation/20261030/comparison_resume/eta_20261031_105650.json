@@ -1,0 +1,41 @@
+{
+  "observed_at": "2026-10-31T10:56:50.237286+08:00",
+  "observation_sha256": "c541acd267495657d18fa603f2b8d12808bf885a9590190855c2dcf21a702d42",
+  "scope": "Only two healthy L2R workers plus pending GCR. Full 18-run completion remains indeterminate while CAB_s6 L2R is missing.",
+  "assumptions": "Latest 72 stage2 steps per active worker; stage3 uses prior cross-order proxy, no new failure or extra waits; checkpoint77.97s twice; GCR mean actual completed GCR dispatch wall. Subtract log age from remaining stage2, including unseparated initialization overhead. Slow20 is scenario, not confidence interval.",
+  "active": [
+    {
+      "id": "CAB_s4_L2R_text_fixed",
+      "stage": 2,
+      "completed": 216,
+      "total_updates": 504,
+      "stage2_seconds_per_update": 135.2590818903053,
+      "log_age_seconds": 3046.7639242799487,
+      "remaining_hours": 14.304326447126979,
+      "finish_server": "2026-11-01T01:15:05.812496+08:00",
+      "slow20_remaining_hours": 17.33445639901237
+    },
+    {
+      "id": "CAB_s5_L2R_text_fixed",
+      "stage": 2,
+      "completed": 192,
+      "total_updates": 480,
+      "stage2_seconds_per_update": 138.49466205945808,
+      "log_age_seconds": 1439.6251324351178,
+      "remaining_hours": 15.738763239752208,
+      "finish_server": "2026-11-01T02:41:09.784949+08:00",
+      "slow20_remaining_hours": 18.96649506172682
+    }
+  ],
+  "stage3_seconds_per_update_proxy": 155.0268931869274,
+  "gcr_completed_reference_count": 8,
+  "gcr_dispatch_hours": 4.111924967227777,
+  "healthy_queue_remaining_hours": 18.416251414354758,
+  "healthy_queue_finish_server": "2026-11-01T05:21:48.742378+08:00",
+  "slow20_remaining_hours": 22.268766359685703,
+  "slow20_finish_server": "2026-11-01T09:12:57.796181+08:00",
+  "full_batch_remaining_hours": null,
+  "training_settled_hours": 301.86748993743413,
+  "training_active_elapsed_hours": 38.03414901102198,
+  "training_limit_hours": 800.0
+}
