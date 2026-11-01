@@ -1,0 +1,1816 @@
+{
+  "observed_at": "2026-11-01T12:22:09.382122+08:00",
+  "scope": "Read-only runtime metadata, source identities and train-calibration scalar status. No model loading, score arrays, raw data, held-out results, training, tests or remote writes.",
+  "processes": [
+    {
+      "pid": 3146505,
+      "owner": "yongpeng",
+      "created": 1793415900.44,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace/scripts/step28_continual_comparison_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/CAB_s6_L2R_text_fixed",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/dispatch/CAB_s6_L2R_text_fixed/spec.json",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal_gate.json",
+        "--deadline",
+        "1106677.448285792"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace",
+      "status": "running",
+      "cpu": {
+        "user": 90598.17,
+        "system": 353.85,
+        "children_user": 0.0,
+        "children_system": 0.0,
+        "iowait": 0.0
+      },
+      "rss": 5581692928,
+      "children": []
+    },
+    {
+      "pid": 3171756,
+      "owner": "yongpeng",
+      "created": 1793418749.28,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal_gate.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace",
+      "status": "sleeping",
+      "cpu": {
+        "user": 79.05,
+        "system": 92.98,
+        "children_user": 12399.08,
+        "children_system": 51.36,
+        "iowait": 0.0
+      },
+      "rss": 554848256,
+      "children": []
+    },
+    {
+      "pid": 3171792,
+      "owner": "yongpeng",
+      "created": 1793418753.77,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/active_defaults_wait.py",
+        "--workspace",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/formal_gate.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+      "status": "sleeping",
+      "cpu": {
+        "user": 64.36,
+        "system": 48.11,
+        "children_user": 0.0,
+        "children_system": 0.0,
+        "iowait": 0.0
+      },
+      "rss": 557371392,
+      "children": []
+    },
+    {
+      "pid": 3485029,
+      "owner": "yongpeng",
+      "created": 1793505217.8,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/active_formal_wait.py",
+        "--forever-gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/forever/formal_gate.json",
+        "--vendor-gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/vendorlink/formal_gate.json",
+        "--state",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/state"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace",
+      "status": "sleeping",
+      "cpu": {
+        "user": 2.44,
+        "system": 1.15,
+        "children_user": 0.0,
+        "children_system": 0.0,
+        "iowait": 0.0
+      },
+      "rss": 552181760,
+      "children": []
+    }
+  ],
+  "campaigns": {
+    "comparison": {
+      "gate": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal_gate.json",
+        "bytes": 20827,
+        "sha256": "f249d3b2394831da63838605a9ced236fec5b685761743c6eba0018b55ef2a2b"
+      },
+      "campaign": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal",
+      "exists": true,
+      "source_checks": {
+        "sources": {
+          "count": 47,
+          "mismatches": []
+        },
+        "orchestration_sources": {
+          "count": 8,
+          "mismatches": []
+        }
+      },
+      "status.json": {
+        "status": "THREE_HEALTHY_SLOTS_CONTINUE_ORIGINAL_QUEUE"
+      },
+      "budget.json": {
+        "active": {
+          "CAB_s6_L2R_text_fixed": {
+            "allowance": 259200,
+            "bucket": "training",
+            "deadline": 1106677.448285792,
+            "id": "CAB_s6_L2R_text_fixed",
+            "started": 847477.448285792
+          }
+        },
+        "budget_exceeded": false,
+        "completed": [
+          {
+            "actual_seconds": 12949.076192542969,
+            "allowance": 43200,
+            "bucket": "training",
+            "deadline": 456349.098986622,
+            "id": "ABC_s4_ER_GCR_group_fixed",
+            "started": 413149.098986622,
+            "success": true
+          },
+          {
+            "actual_seconds": 13790.636864096974,
+            "allowance": 43200,
+            "bucket": "training",
+            "deadline": 469298.240786542,
+            "id": "ABC_s5_ER_GCR_group_fixed",
+            "started": 426098.240786542,
+            "success": true
+          },
+          {
+            "actual_seconds": 118228.85524877202,
+            "allowance": 259200,
+            "bucket": "training",
+            "deadline": 672349.027562453,
+            "id": "ABC_s4_L2R_text_fixed",
+            "started": 413149.027562453,
+            "success": true
+          },
+          {
+            "actual_seconds": 119523.33118742006,
+            "allowance": 259200,
+            "bucket": "training",
+            "deadline": 672349.176471035,
+            "id": "ABC_s5_L2R_text_fixed",
+            "started": 413149.176471035,
+            "success": true
+          },
+          {
+            "actual_seconds": 16195.604526247946,
+            "allowance": 43200,
+            "bucket": "training",
+            "deadline": 575872.586279331,
+            "id": "ABC_s6_ER_GCR_group_fixed",
+            "started": 532672.586279331,
+            "success": true
+          },
+          {
+            "actual_seconds": 124099.59177272697,
+            "allowance": 259200,
+            "bucket": "training",
+            "deadline": 699088.943793345,
+            "id": "ABC_s6_L2R_text_fixed",
+            "started": 439888.943793345,
+            "success": true
+          },
+          {
+            "actual_seconds": 16015.705307247,
+            "allowance": 43200,
+            "bucket": "training",
+            "deadline": 595560.098302725,
+            "id": "BCA_s4_ER_GCR_group_fixed",
+            "started": 552360.098302725,
+            "success": true
+          },
+          {
+            "actual_seconds": 16076.246733978973,
+            "allowance": 43200,
+            "bucket": "training",
+            "deadline": 611575.881508786,
+            "id": "BCA_s5_ER_GCR_group_fixed",
+            "started": 568375.881508786,
+            "success": true
+          },
+          {
+            "actual_seconds": 132289.04929315997,
+            "allowance": 259200,
+            "bucket": "training",
+            "deadline": 791872.638886706,
+            "id": "BCA_s4_L2R_text_fixed",
+            "started": 532672.638886706,
+            "success": true
+          },
+          {
+            "actual_seconds": 12591.015181594994,
+            "allowance": 43200,
+            "bucket": "training",
+            "deadline": 708161.763308781,
+            "id": "BCA_s6_ER_GCR_group_fixed",
+            "started": 664961.763308781,
+            "success": true
+          },
+          {
+            "actual_seconds": 123240.30021530495,
+            "allowance": 259200,
+            "bucket": "training",
+            "deadline": 823399.274762218,
+            "id": "BCA_s5_L2R_text_fixed",
+            "started": 564199.274762218,
+            "success": true
+          },
+          {
+            "actual_seconds": 14034.06567796506,
+            "allowance": 43200,
+            "bucket": "training",
+            "deadline": 730639.651574311,
+            "id": "CAB_s4_ER_GCR_group_fixed",
+            "started": 687439.651574311,
+            "success": true
+          },
+          {
+            "actual_seconds": 117857.95335755195,
+            "allowance": 259200,
+            "bucket": "training",
+            "deadline": 846662.684078025,
+            "id": "BCA_s6_L2R_text_fixed",
+            "started": 587462.684078025,
+            "success": true
+          },
+          {
+            "actual_seconds": 16771.08857248607,
+            "allowance": 43200,
+            "bucket": "training",
+            "deadline": 748520.707411391,
+            "id": "CAB_s5_ER_GCR_group_fixed",
+            "started": 705320.707411391,
+            "success": true
+          },
+          {
+            "actual_seconds": 117556.96982986794,
+            "allowance": 259200,
+            "allowance_exceeded": false,
+            "bucket": "training",
+            "deadline": 1035280.846755879,
+            "id": "CAB_s4_L2R_text_fixed",
+            "started": 776080.846755879,
+            "success": true
+          },
+          {
+            "actual_seconds": 118865.327263362,
+            "allowance": 259200,
+            "allowance_exceeded": false,
+            "bucket": "training",
+            "deadline": 1040169.855546188,
+            "id": "CAB_s5_L2R_text_fixed",
+            "started": 780969.855546188,
+            "success": true
+          },
+          {
+            "actual_seconds": 12481.779734757962,
+            "allowance": 43200,
+            "allowance_exceeded": false,
+            "bucket": "training",
+            "deadline": 936838.039463837,
+            "id": "CAB_s6_ER_GCR_group_fixed",
+            "started": 893638.039463837,
+            "success": true
+          }
+        ],
+        "cumulative_seconds": 1339792.2048128361,
+        "failed": false,
+        "limits": {
+          "analysis": 1800,
+          "confirmation": 64800,
+          "control": 3600,
+          "cpu": 1200,
+          "generation": 600,
+          "native": 3000,
+          "preparation": 4200,
+          "training": 2880000
+        },
+        "used": {
+          "analysis": 0.0,
+          "confirmation": 0.0,
+          "control": 713.9143019914045,
+          "cpu": 153.0,
+          "generation": 0.0,
+          "native": 2479.0,
+          "preparation": 819.2499080940033,
+          "training": 1335627.0406027506
+        }
+      },
+      "waiting.json": null,
+      "failure.json": null,
+      "completion.json": null,
+      "training_complete.json": null,
+      "run_directories": []
+    },
+    "defaults": {
+      "gate": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/formal_gate.json",
+        "bytes": 21699,
+        "sha256": "bcece34e8e406d41312dbbb10c4b377d428db003063117755a647942a0509032"
+      },
+      "campaign": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/formal",
+      "exists": true,
+      "source_checks": {
+        "sources": {
+          "count": 44,
+          "mismatches": []
+        },
+        "orchestration_sources": {
+          "count": 57,
+          "mismatches": []
+        }
+      },
+      "status.json": null,
+      "budget.json": {
+        "active": {},
+        "budget_exceeded": false,
+        "completed": [],
+        "cumulative_seconds": 1869.7388475595508,
+        "failed": false,
+        "limits": {
+          "control": 7200,
+          "training": 388800
+        },
+        "used": {
+          "control": 1869.7388475595508,
+          "training": 0.0
+        }
+      },
+      "waiting.json": {
+        "epoch": 1793506895.4286046,
+        "predecessor": {
+          "processes": [
+            {
+              "command": [
+                "/home/yongpeng/miniconda3/envs/py310/bin/python",
+                "-B",
+                "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py",
+                "--gate",
+                "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal_gate.json"
+              ],
+              "created": 1793418749.28,
+              "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace",
+              "owner": "yongpeng",
+              "pid": 3171756
+            }
+          ],
+          "ready": false,
+          "reason": "PREDECESSOR_STILL_RUNNING"
+        },
+        "resources": null,
+        "status": "WAITING"
+      },
+      "failure.json": null,
+      "completion.json": null,
+      "training_complete.json": null,
+      "run_directories": []
+    },
+    "forever": {
+      "gate": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/forever/formal_gate.json",
+        "bytes": 23991,
+        "sha256": "5693341df90375dab94708845cb0c671fb244c706db782785dd38b5a368c1533"
+      },
+      "campaign": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/forever/training",
+      "exists": true,
+      "source_checks": {
+        "sources": {
+          "count": 65,
+          "mismatches": []
+        },
+        "orchestration_sources": {
+          "count": 0,
+          "mismatches": []
+        }
+      },
+      "status.json": null,
+      "budget.json": {
+        "status": "WAITING_OR_TRAINING",
+        "used": {
+          "cpu": 141,
+          "native": 1441,
+          "preparation": 181,
+          "control": 3.5512853601248935
+        },
+        "limits": {
+          "training": 388800,
+          "confirmation": 21600,
+          "cpu": 600,
+          "native": 3600,
+          "generation": 600,
+          "control": 600,
+          "analysis": 900,
+          "preparation": 900
+        },
+        "completed": [],
+        "active": {},
+        "retired_slots": [],
+        "sources": [
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/run_cpu.py",
+            "bytes": 4253,
+            "sha256": "3fad9d1f035bee5147b6c5cdf626ba0b4bcdeb066c1f83b8e9774d1c0d7f2651"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/schema/step28_alias_ranking_policy.json",
+            "bytes": 3489,
+            "sha256": "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/schema/step28_bge_continual_policy.json",
+            "bytes": 5123,
+            "sha256": "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/schema/step28_chinese_base_policy.json",
+            "bytes": 8439,
+            "sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/schema/step28_continual_expression_catalog.json",
+            "bytes": 10777,
+            "sha256": "3735c59f9e7d761dca3b4525190ffc2c487f6dc51823285988a1ce4903072daf"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/schema/step28_continual_expression_policy.json",
+            "bytes": 2935,
+            "sha256": "e1d489476ef40ad04c8d0b98a4718204d0e680543c2933e72dd045e8dedeadf6"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/schema/step28_record_replay_policy.json",
+            "bytes": 1680,
+            "sha256": "fbf82f180ed8e0e1140d1a11d137abc1ff3efb50ceac877d843d63e1e89a065f"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_alias_calibration.py",
+            "bytes": 8818,
+            "sha256": "d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_alias_ranking.py",
+            "bytes": 11658,
+            "sha256": "1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_balanced_pooling.py",
+            "bytes": 14383,
+            "sha256": "2a4b10aeca83d9a52a493a18cec8fe6e200058512a5db64e19a85c3f7e3fbc0c"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_balanced_pooling_run.py",
+            "bytes": 55111,
+            "sha256": "561b53c651e432c4ddb0480a1e216ffb187134074a68b3acbed418f093db52d1"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_bge_continual.py",
+            "bytes": 17275,
+            "sha256": "62a3c6d5eeb1180a9014f157c79c9ccf210df2f379946d345184d2b544869e0d"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_bge_continual_evaluate.py",
+            "bytes": 13765,
+            "sha256": "55e9bf419801ec57686898cf78d8237962fc5e5549849a2e0eac3e66318353f1"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_bge_continual_run.py",
+            "bytes": 34672,
+            "sha256": "4ab2840dfe7ee27912e8e6ed19d3dd3d9919e668f1cbc10998ade2843966d181"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_chinese_base.py",
+            "bytes": 51352,
+            "sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_comparison_gcr.py",
+            "bytes": 15068,
+            "sha256": "bb3bcd296cdc325ce2b4d7295da41c3bcfaaaf60f5ce83b17c0cf5db3c1b395b"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_comparison_l2r.py",
+            "bytes": 17712,
+            "sha256": "913cdf63e40d861fe2ab08dc5208dd88884ec1d4d8242f7bdf1aa8e78a861cb0"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_comparison_native.py",
+            "bytes": 16533,
+            "sha256": "da9fd3c5ce91bd2f6b20f205c6ea8047b1de334d774eff916799afe69b819835"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_comparison.py",
+            "bytes": 7533,
+            "sha256": "900b8888a869a8dcbc8506b9bbc38a8a92a1204a352cc0bb495364c38f1568a4"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_comparison_evaluate.py",
+            "bytes": 20107,
+            "sha256": "9992ef962169cfecb39e532234deb19d753a617f184d7c7622dae4c78a4346ca"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_comparison_run.py",
+            "bytes": 14837,
+            "sha256": "8bba9539ed713a904ff6ff884ad0311f3f6b075618326bdf4e5dc5401670422e"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_expression_data.py",
+            "bytes": 18179,
+            "sha256": "23608792b288891f9bf9d51c4765c1ad0d38b13acefb9e904f509ed93376f7ef"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_expression_data_verify.py",
+            "bytes": 22678,
+            "sha256": "28391e8c89c4cf9bd637dff8c5c7600c68c24d6bd9c72cf2b6684d9c082b45fe"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_expression_run.py",
+            "bytes": 26322,
+            "sha256": "3df878e3d78c07444cc0400b574adaf3a495b74fe193a14853706c7e9f67a760"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_five.py",
+            "bytes": 11302,
+            "sha256": "803f883b6b02705a52d5c4c0355f6810cc22577701ef80a65bea6ffbb02441d6"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_five_control.py",
+            "bytes": 17826,
+            "sha256": "95da8b50ab412efc4b81a9675eb9d9ab4b6ad3e85b2fe1e3263c03224575c3eb"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_five_evaluate.py",
+            "bytes": 19698,
+            "sha256": "a517b4d5923374cedb80c568942784909aad96795c21452bcceda97d161f9359"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_five_run.py",
+            "bytes": 15683,
+            "sha256": "1099a94cd2ac9ecd82a1255a8403d6065fbab0609eb4cedc48798b6874ce335a"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_population.py",
+            "bytes": 9699,
+            "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_population_data.py",
+            "bytes": 11587,
+            "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_population_evaluate.py",
+            "bytes": 20911,
+            "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_continual_population_run.py",
+            "bytes": 21310,
+            "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_crossfit_retention.py",
+            "bytes": 12471,
+            "sha256": "0e98c4229807182a88472364d771dd8345def09e4e0593eb920f2a240db70f8a"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_er_weight.py",
+            "bytes": 17560,
+            "sha256": "626d2e325166a18d995e1eb9dcb28d04349024455f54fe4b3b30d17df8e516c4"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_forever.py",
+            "bytes": 16551,
+            "sha256": "6fa4a55559ec31a6ebbda08cebdd67b0cf85f1b4085c93be9cbb317f5e660228"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_forever_evaluate.py",
+            "bytes": 15308,
+            "sha256": "60ab50a1952ab7b2dd256bccf1db51845a051e003f377a499d4a25d64517299e"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_forever_formal.py",
+            "bytes": 11619,
+            "sha256": "a4556e41e9fe856ef82922630fc122425f1e73270f1af703598085c0eec46c9d"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_forever_qualification.py",
+            "bytes": 23502,
+            "sha256": "f2da5ebe4cb30d8fedfa711a0941841e72199701dc53af83a0b125e8ab124a61"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_forever_run.py",
+            "bytes": 13168,
+            "sha256": "fba205225e35570a0f3a4acf74e7b9646cbfc0205a898f9e69556a539e6b1f96"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_formal_queue.py",
+            "bytes": 17132,
+            "sha256": "f928e91f6f0cb82860e2b4bbb202fd1788cac56457dacdf61f91d4671b6803ef"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_formal_wait.py",
+            "bytes": 8238,
+            "sha256": "8b8bb112bc25ef29eaa9cec181b70998f25ea81ac3392e91e16379bb9ef6c404"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_g_half.py",
+            "bytes": 6786,
+            "sha256": "350f7d057a786aa151073ac54f1f697f40d081ecb5b67c02d6ee456a785febcb"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_optuna.py",
+            "bytes": 11090,
+            "sha256": "0ff083717ee0f01720ddf21ef41cce61def85ab0eef28817386aecba66873336"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_positive_ranking.py",
+            "bytes": 7690,
+            "sha256": "182a0a73cf4f44c539e6fa8819746e37e74f37ffaee10fe75d5612ee1229e3e1"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_record_replay.py",
+            "bytes": 15543,
+            "sha256": "ca3a7aadaa16d51e78d65d6e25fe714dcf1495b9bab60f2dce3b3cb8893e7f0d"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_record_replay_run.py",
+            "bytes": 33426,
+            "sha256": "584ea874e50134e837613a664b531773797dad451be07b1d1ff06de4b3c38338"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_record_replay_verify.py",
+            "bytes": 11627,
+            "sha256": "c9b81490b83d9174ed4ee003ffe896dda20daf9fa4408bb8ca516b4cda38f2b9"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_replay_diagnostics.py",
+            "bytes": 11971,
+            "sha256": "8b09a00bcd973045d198e1ca305afe55030d21a953cc1334d457dde89974c2ea"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_risk_study.py",
+            "bytes": 4037,
+            "sha256": "1aa0a436aaf41d5db84d9ac401619b16e28a1f6a229e1ee2209b1c88b4271012"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step29_vendorlink_cpu.py",
+            "bytes": 3196,
+            "sha256": "4fc9b9a623bb002180dafdeb5467c05b3a91efc8d3d417726e890e70169c9b0a"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step29_vendorlink_data.py",
+            "bytes": 11636,
+            "sha256": "e0d2a10b9d6731967411f701e58ac2cc610d0ed7c9798640f485823954f16668"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step29_vendorlink_evaluate.py",
+            "bytes": 15463,
+            "sha256": "534885232ec9f1eae25fc897cb63bf9be733a9152a5e76ae17641198a07ae74a"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step29_vendorlink_export.py",
+            "bytes": 4642,
+            "sha256": "818d13006ef4a5b26df3cf23d84ba1d67b62cbe91e6a9aeee90ffa695f49ac17"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step29_vendorlink_formal.py",
+            "bytes": 10143,
+            "sha256": "3f9f0d394405600a5fac5891b98ca7bcc71dba4ccf51e22b2e3ced7bb9ff3d84"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step29_vendorlink_methods.py",
+            "bytes": 14393,
+            "sha256": "8d4657f270c7564bd753c9caad608a8692d4d22f7cde7dd2aa6292ceb69e8cc4"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step29_vendorlink_native.py",
+            "bytes": 17831,
+            "sha256": "103844c8e162f21089f94fd99f47e100b736c04d0dfc158a3bb41a67be8a20ce"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step29_vendorlink_native_control.py",
+            "bytes": 15434,
+            "sha256": "af3ca2140801a22994b5f6057f70ce8fc95581ce8c10f16547f2f2f5eb5d700c"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step29_vendorlink_prepare.py",
+            "bytes": 8239,
+            "sha256": "36438694953d1d580855282ec57c3b2e62715b7f26ad9409f239b10c4aa7d98a"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step29_vendorlink_run.py",
+            "bytes": 16396,
+            "sha256": "dd8bab7b07ea5a7417e4409873b02cb408a3892d9edea8e19e34f16c67376442"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step29_vendorlink_wait.py",
+            "bytes": 5973,
+            "sha256": "2500702f46a139ccfedc8837d337a274472cacdb15b33df109b0d639f3d3b59f"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/tests/test_step28_continual_comparison.py",
+            "bytes": 29925,
+            "sha256": "2805fb97d40897f08ac834e2761aeca8f9b755c4d0359380af5879844cddc00a"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/tests/test_step28_forever.py",
+            "bytes": 28214,
+            "sha256": "a7406eeaf9eb5597352fa61f4bd77013a982ea7423a5f1c6a4fe67ab2c45f3c6"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/tests/test_step28_formal_training.py",
+            "bytes": 27562,
+            "sha256": "ff60e6ae0e6a9e872e8a40d1cdc8b51634340f28fb4d60362f96d3aec83457c0"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/tests/test_step28_formal_wait.py",
+            "bytes": 16034,
+            "sha256": "9e43f10415214e97be4f0e6512f5f36ecdc7db7d37f906b77497d6bed9e9e0ca"
+          },
+          {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/tests/test_step29_vendorlink.py",
+            "bytes": 42488,
+            "sha256": "bca816000e38bfa1cac1274b9564d14d641975f4d6812011638b99a1e43cb4c2"
+          }
+        ]
+      },
+      "waiting.json": {
+        "epoch": 1793506903.0014977,
+        "status": "WAITING_PREDECESSOR",
+        "predecessor": {
+          "ready": false,
+          "reason": "PREDECESSOR_STILL_RUNNING",
+          "processes": [
+            {
+              "pid": 3171792,
+              "owner": "yongpeng",
+              "created": 1793418753.77,
+              "command": [
+                "/home/yongpeng/miniconda3/envs/py310/bin/python",
+                "-B",
+                "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/active_defaults_wait.py",
+                "--workspace",
+                "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+                "--gate",
+                "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/formal_gate.json"
+              ],
+              "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace"
+            }
+          ]
+        }
+      },
+      "failure.json": null,
+      "completion.json": null,
+      "training_complete.json": null,
+      "run_directories": []
+    },
+    "vendor": {
+      "gate": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/vendorlink/formal_gate.json",
+        "bytes": 26993,
+        "sha256": "e0355e5e3e86bf1d4c4dfe9e543742224e23cd9a9662cc3bec82ef916177e812"
+      },
+      "campaign": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/vendorlink/training",
+      "exists": false,
+      "source_checks": {
+        "sources": {
+          "count": 65,
+          "mismatches": []
+        },
+        "orchestration_sources": {
+          "count": 0,
+          "mismatches": []
+        }
+      },
+      "status.json": null,
+      "budget.json": null,
+      "waiting.json": null,
+      "failure.json": null,
+      "completion.json": null,
+      "training_complete.json": null,
+      "run_directories": []
+    },
+    "repair": {
+      "gate": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal_gate.json",
+        "bytes": 20318,
+        "sha256": "a94aa542eb24dcf85113b46413717550f8d8559e4fefb1739e7acac378ab6b3f"
+      },
+      "campaign": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal",
+      "exists": true,
+      "source_checks": {
+        "sources": {
+          "count": 47,
+          "mismatches": []
+        },
+        "orchestration_sources": {
+          "count": 7,
+          "mismatches": [
+            {
+              "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace/run_step28_comparison_linux_20261031.sh",
+              "error": "missing"
+            }
+          ]
+        }
+      },
+      "status.json": {
+        "epoch": 1793415900.641018,
+        "status": "ONE_REPAIRED_CAB_WAIT_OR_TRAIN"
+      },
+      "budget.json": {
+        "active": {
+          "CAB_s6_L2R_text_fixed": {
+            "allowance": 259200,
+            "bucket": "training",
+            "deadline": 1106677.448285792,
+            "id": "CAB_s6_L2R_text_fixed",
+            "started": 847477.448285792
+          }
+        },
+        "budget_exceeded": false,
+        "completed": [],
+        "cumulative_seconds": 268.0242686974816,
+        "failed": false,
+        "limits": {
+          "analysis": 1800,
+          "confirmation": 64800,
+          "control": 3600,
+          "cpu": 1200,
+          "generation": 600,
+          "native": 3000,
+          "preparation": 4200,
+          "training": 2880000
+        },
+        "used": {
+          "analysis": 0.0,
+          "confirmation": 0.0,
+          "control": 69.6898884564871,
+          "cpu": 8.0,
+          "generation": 0.0,
+          "native": 0.0,
+          "preparation": 190.3343802409945,
+          "training": 0.0
+        }
+      },
+      "waiting.json": null,
+      "failure.json": null,
+      "completion.json": null,
+      "training_complete.json": null,
+      "run_directories": [
+        "CAB_s6_L2R_text_fixed"
+      ]
+    }
+  },
+  "chain": {
+    "status.json": {
+      "status": "RUNNING_OR_WAITING",
+      "experiment": "FOREVER",
+      "epoch": 1793505218.2953298
+    },
+    "process.json": {
+      "pid": 3485029,
+      "created": 1793505217.8,
+      "owner": "yongpeng",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/active_formal_wait.py",
+        "--forever-gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/forever/formal_gate.json",
+        "--vendor-gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/vendorlink/formal_gate.json",
+        "--state",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/state"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace",
+      "forever_gate": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/forever/formal_gate.json",
+        "bytes": 23991,
+        "sha256": "5693341df90375dab94708845cb0c671fb244c706db782785dd38b5a368c1533"
+      },
+      "vendor_gate": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/vendorlink/formal_gate.json",
+        "bytes": 26993,
+        "sha256": "e0355e5e3e86bf1d4c4dfe9e543742224e23cd9a9662cc3bec82ef916177e812"
+      }
+    },
+    "failure.json": null,
+    "completion.json": null,
+    "first_update.json": null,
+    "active_listener_exists": true
+  },
+  "completed_trajectories": [
+    {
+      "id": "ABC_s4_ER_GCR_group_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/ABC_s4_ER_GCR_group_fixed/run/completion.json",
+        "bytes": 131047,
+        "sha256": "f17d56b552efea215943953a84f35f35496a80ac6befaa69412d5d179e2c3458"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "ABC_s4_L2R_text_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/ABC_s4_L2R_text_fixed/run/completion.json",
+        "bytes": 120904,
+        "sha256": "e5ff9d9f5ee6360ecbaa78a393a2dc5fe55054aa59045a6ec811be4dc311e86f"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "ABC_s5_ER_GCR_group_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/ABC_s5_ER_GCR_group_fixed/run/completion.json",
+        "bytes": 129345,
+        "sha256": "d02f327cedc645a8e685b7e895567239e9b42e1bb4a590d807c7b4cd6400fff6"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "ABC_s5_L2R_text_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/ABC_s5_L2R_text_fixed/run/completion.json",
+        "bytes": 120968,
+        "sha256": "2b29458446cf00c2a047550e146b8e9db7b267d24b2b9fdb6eaeaca093ff7518"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "ABC_s6_ER_GCR_group_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/ABC_s6_ER_GCR_group_fixed/run/completion.json",
+        "bytes": 130684,
+        "sha256": "b1bb56c681a0db56630c2ac8f7343acb61835e84f3f288d5e6061915a7b9edb8"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "ABC_s6_L2R_text_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/ABC_s6_L2R_text_fixed/run/completion.json",
+        "bytes": 121062,
+        "sha256": "f35c6f2c39de5d1223a26fb6b2f3ca1cf0198f81d554d9bb8f90109567fe53f3"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "BCA_s4_ER_GCR_group_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/BCA_s4_ER_GCR_group_fixed/run/completion.json",
+        "bytes": 130538,
+        "sha256": "44cec2bcabb2c7882dfde71b03d5f52e1da8c7eb00ced9d8ffe5293eece5cc2e"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "BCA_s4_L2R_text_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/BCA_s4_L2R_text_fixed/run/completion.json",
+        "bytes": 120840,
+        "sha256": "951d1fe31604946b8f4924a8d6e11543486f6c26cc391a6d68307e7c03bb49d1"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "BCA_s5_ER_GCR_group_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/BCA_s5_ER_GCR_group_fixed/run/completion.json",
+        "bytes": 130879,
+        "sha256": "63f91d664e4a2514f288472faa83b2b3dde16f2d93f1e92864f42d366c1f93da"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "BCA_s5_L2R_text_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/BCA_s5_L2R_text_fixed/run/completion.json",
+        "bytes": 120909,
+        "sha256": "dec295093e26e27ca1c494a87fbcfd3205170d26d2677733a823e150c2f45caf"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "BCA_s6_ER_GCR_group_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/BCA_s6_ER_GCR_group_fixed/run/completion.json",
+        "bytes": 130928,
+        "sha256": "8d5bab30c6f655ce726b1cb95d9e610f2c6e416f213f0f0659606fe85fa8a55e"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "BCA_s6_L2R_text_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/BCA_s6_L2R_text_fixed/run/completion.json",
+        "bytes": 120983,
+        "sha256": "ce713c0f414ca2e12d7e6f404803c95664d9b92f46d95ccf745533c7dd5b3ad1"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "CAB_s4_ER_GCR_group_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s4_ER_GCR_group_fixed/run/completion.json",
+        "bytes": 130930,
+        "sha256": "a82cbcccb897e12f947fdf64303028dfe5b98666037667e2dfdc36a4222f5ea4"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "CAB_s4_L2R_text_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s4_L2R_text_fixed/run/completion.json",
+        "bytes": 120917,
+        "sha256": "9ffda7497b2c5beaf32ebeaca4c738e217503fd15d2ed263cb9c15edcad84a70"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "CAB_s5_ER_GCR_group_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s5_ER_GCR_group_fixed/run/completion.json",
+        "bytes": 130850,
+        "sha256": "2216240c0410a2966f4ab10669c7bc1452401a62d28c72f520607445c6b2587a"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "CAB_s5_L2R_text_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s5_L2R_text_fixed/run/completion.json",
+        "bytes": 120903,
+        "sha256": "5054ddbbf11dce57b0166188ef5520de89b52f911605a3931861d98a7f757b9b"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "CAB_s6_ER_GCR_group_fixed",
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s6_ER_GCR_group_fixed/run/completion.json",
+        "bytes": 130641,
+        "sha256": "f54d16e2e644089d064e8c2375b6a8688daedc3ca3d3d16b034ffcd620f5dea1"
+      },
+      "status": "COMPLETE_COMPARISON_864_UPDATES_3_ENDPOINTS_BLIND",
+      "updates": 864,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "sources_match": true
+    },
+    {
+      "id": "CAB_s6_L2R_text_fixed",
+      "completion": null
+    }
+  ],
+  "cab": {
+    "progress": {
+      "status": "RUNNING",
+      "updates": 576,
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      }
+    },
+    "access": {
+      "heldout": 0,
+      "owners": 0,
+      "train": 1,
+      "valid": 0,
+      "worker_train_reads": 1
+    },
+    "console": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/dispatch/CAB_s6_L2R_text_fixed/console.txt",
+      "bytes": 7632,
+      "sha256": "3f18101a0f6e8ff3f3da49576f630d09e6625bedc820c264bdc19a4ec92d33af"
+    },
+    "console_modified": 1793503836.2467315,
+    "latest_updates": [
+      {
+        "event": "updates",
+        "run_id": "CAB_s6_L2R_text_fixed",
+        "stage": 3,
+        "completed": 48,
+        "wall_seconds": 75429.09705568396,
+        "peak_rss_bytes": 6974836736,
+        "peak_disk_bytes": 6503817272,
+        "deadline_monotonic": 1106677.448285792
+      },
+      {
+        "event": "updates",
+        "run_id": "CAB_s6_L2R_text_fixed",
+        "stage": 3,
+        "completed": 72,
+        "wall_seconds": 78515.80240277795,
+        "peak_rss_bytes": 6974836736,
+        "peak_disk_bytes": 6503817272,
+        "deadline_monotonic": 1106677.448285792
+      },
+      {
+        "event": "updates",
+        "run_id": "CAB_s6_L2R_text_fixed",
+        "stage": 3,
+        "completed": 96,
+        "wall_seconds": 81591.52753138496,
+        "peak_rss_bytes": 6974836736,
+        "peak_disk_bytes": 6503817272,
+        "deadline_monotonic": 1106677.448285792
+      },
+      {
+        "event": "updates",
+        "run_id": "CAB_s6_L2R_text_fixed",
+        "stage": 3,
+        "completed": 120,
+        "wall_seconds": 84708.79620612296,
+        "peak_rss_bytes": 6974836736,
+        "peak_disk_bytes": 6503817272,
+        "deadline_monotonic": 1106677.448285792
+      },
+      {
+        "event": "updates",
+        "run_id": "CAB_s6_L2R_text_fixed",
+        "stage": 3,
+        "completed": 144,
+        "wall_seconds": 87933.31835215597,
+        "peak_rss_bytes": 6974836736,
+        "peak_disk_bytes": 6503817272,
+        "deadline_monotonic": 1106677.448285792
+      }
+    ],
+    "last_line_is_latest_update": true,
+    "maps": {
+      "stage1.json": {
+        "status": "PASS_CALIBRATION_FIT",
+        "optimizer_success": true,
+        "optimizer_iterations": 17,
+        "projected_gradient_max": 1.8110687693796724e-09,
+        "options": {
+          "ftol": 0.0,
+          "gtol": 1e-08,
+          "maxcor": 10,
+          "maxfun": 2000,
+          "maxiter": 200,
+          "maxls": 40
+        }
+      },
+      "stage2.json": {
+        "status": "PASS_CALIBRATION_FIT",
+        "optimizer_success": true,
+        "optimizer_iterations": 16,
+        "projected_gradient_max": 4.466251080512692e-11,
+        "options": {
+          "ftol": 0.0,
+          "gtol": 1e-08,
+          "maxcor": 10,
+          "maxfun": 2000,
+          "maxiter": 200,
+          "maxls": 40
+        }
+      }
+    },
+    "points": {
+      "stage1.json": {
+        "stage": 1,
+        "adam_step": 288,
+        "full_restore_verified": true,
+        "inference_restore_verified": true
+      },
+      "stage2.json": {
+        "stage": 2,
+        "adam_step": 576,
+        "full_restore_verified": true,
+        "inference_restore_verified": true
+      }
+    }
+  },
+  "gcr_dispatch": {
+    "command": [
+      "taskset",
+      "-c",
+      "1",
+      "/home/yongpeng/miniconda3/envs/py310/bin/python",
+      "-B",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/workspace/scripts/step28_continual_comparison_run.py",
+      "--job",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s6_ER_GCR_group_fixed",
+      "--spec",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal/dispatch/CAB_s6_ER_GCR_group_fixed/spec.json",
+      "--gate",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal_gate.json",
+      "--deadline",
+      "936838.039463837"
+    ],
+    "reservation": {
+      "allowance": 43200,
+      "bucket": "training",
+      "deadline": 936838.039463837,
+      "id": "CAB_s6_ER_GCR_group_fixed",
+      "started": 893638.039463837
+    }
+  },
+  "gcr_process": {
+    "created": 1793462061.04,
+    "owner": "yongpeng",
+    "pid": 3350845
+  },
+  "resources": {
+    "gpu": "32607, 7924, 24152, 18, 55",
+    "gpu_processes": "3146505, 7684",
+    "ram_available_bytes": 255210205184,
+    "disk_free_bytes": 213877428224
+  },
+  "process_recheck": [
+    {
+      "pid": 3146505,
+      "owner": "yongpeng",
+      "created": 1793415900.44,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace/scripts/step28_continual_comparison_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/CAB_s6_L2R_text_fixed",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/dispatch/CAB_s6_L2R_text_fixed/spec.json",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal_gate.json",
+        "--deadline",
+        "1106677.448285792"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace",
+      "status": "running",
+      "cpu": {
+        "user": 90598.35,
+        "system": 353.86,
+        "children_user": 0.0,
+        "children_system": 0.0,
+        "iowait": 0.0
+      },
+      "rss": 5581692928,
+      "children": []
+    },
+    {
+      "pid": 3171756,
+      "owner": "yongpeng",
+      "created": 1793418749.28,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal_gate.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace",
+      "status": "sleeping",
+      "cpu": {
+        "user": 79.05,
+        "system": 92.98,
+        "children_user": 12399.08,
+        "children_system": 51.36,
+        "iowait": 0.0
+      },
+      "rss": 554848256,
+      "children": []
+    },
+    {
+      "pid": 3171792,
+      "owner": "yongpeng",
+      "created": 1793418753.77,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/active_defaults_wait.py",
+        "--workspace",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/formal_gate.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+      "status": "sleeping",
+      "cpu": {
+        "user": 64.36,
+        "system": 48.11,
+        "children_user": 0.0,
+        "children_system": 0.0,
+        "iowait": 0.0
+      },
+      "rss": 557371392,
+      "children": []
+    },
+    {
+      "pid": 3485029,
+      "owner": "yongpeng",
+      "created": 1793505217.8,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/active_formal_wait.py",
+        "--forever-gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/forever/formal_gate.json",
+        "--vendor-gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/vendorlink/formal_gate.json",
+        "--state",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/state"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace",
+      "status": "sleeping",
+      "cpu": {
+        "user": 2.44,
+        "system": 1.15,
+        "children_user": 0.0,
+        "children_system": 0.0,
+        "iowait": 0.0
+      },
+      "rss": 552181760,
+      "children": []
+    }
+  ],
+  "input_records": [
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal_gate.json",
+      "bytes": 20827,
+      "sha256": "f249d3b2394831da63838605a9ced236fec5b685761743c6eba0018b55ef2a2b"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal/status.json",
+      "bytes": 57,
+      "sha256": "1d7332b39abdb3dbfee278a66515a82f82a03fa301eb6170bc1c23ba4d4e13f0"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal/budget.json",
+      "bytes": 3672,
+      "sha256": "531a36dfaea18012087bdeacc0b448ddc3fbb5480c8814ece69c44d27bb6fc46"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/formal_gate.json",
+      "bytes": 21699,
+      "sha256": "bcece34e8e406d41312dbbb10c4b377d428db003063117755a647942a0509032"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/formal/budget.json",
+      "bytes": 205,
+      "sha256": "86e49d80b9cf77e11cca82a63c075fa77da46af8c32348a957bc898d0d315827"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/formal/waiting.json",
+      "bytes": 608,
+      "sha256": "4a637475ad2040cf74bc1693a1ad58948f41f505b6d52fbe0a1ebc31ff4e4ad0"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/forever/formal_gate.json",
+      "bytes": 23991,
+      "sha256": "5693341df90375dab94708845cb0c671fb244c706db782785dd38b5a368c1533"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/forever/training/budget.json",
+      "bytes": 16935,
+      "sha256": "635dd6ea9097ebabfe4a37e81c4ca47a0e93a6e2bde1f1edb9901eacf018b0d0"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/forever/training/waiting.json",
+      "bytes": 884,
+      "sha256": "d579f0680608b094f309942018bb0d88b998c622ea4b047e875756d6de5b1fb7"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/vendorlink/formal_gate.json",
+      "bytes": 26993,
+      "sha256": "e0355e5e3e86bf1d4c4dfe9e543742224e23cd9a9662cc3bec82ef916177e812"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal_gate.json",
+      "bytes": 20318,
+      "sha256": "a94aa542eb24dcf85113b46413717550f8d8559e4fefb1739e7acac378ab6b3f"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/status.json",
+      "bytes": 70,
+      "sha256": "5c1db154846618d14d3f0a34388814f22e6edcc6ca55852c49fded9772b764c1"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/budget.json",
+      "bytes": 556,
+      "sha256": "46b725ebfd441777a4d846f0360d3a13ee488389fb6e6c42f7e67cfad4abad83"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/state/status.json",
+      "bytes": 95,
+      "sha256": "f88bac0509f6e28b33bd6be04b33d3fcd45998c92b9956e72932ec4661b2cc40"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/state/process.json",
+      "bytes": 1189,
+      "sha256": "50e7f7bfa53fc38faf83ce8a7c4e9a28f3fcad753fa42836fdbc0702ffde582d"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/ABC_s4_ER_GCR_group_fixed/run/completion.json",
+      "bytes": 131047,
+      "sha256": "f17d56b552efea215943953a84f35f35496a80ac6befaa69412d5d179e2c3458"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/ABC_s4_L2R_text_fixed/run/completion.json",
+      "bytes": 120904,
+      "sha256": "e5ff9d9f5ee6360ecbaa78a393a2dc5fe55054aa59045a6ec811be4dc311e86f"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/ABC_s5_ER_GCR_group_fixed/run/completion.json",
+      "bytes": 129345,
+      "sha256": "d02f327cedc645a8e685b7e895567239e9b42e1bb4a590d807c7b4cd6400fff6"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/ABC_s5_L2R_text_fixed/run/completion.json",
+      "bytes": 120968,
+      "sha256": "2b29458446cf00c2a047550e146b8e9db7b267d24b2b9fdb6eaeaca093ff7518"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/ABC_s6_ER_GCR_group_fixed/run/completion.json",
+      "bytes": 130684,
+      "sha256": "b1bb56c681a0db56630c2ac8f7343acb61835e84f3f288d5e6061915a7b9edb8"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/ABC_s6_L2R_text_fixed/run/completion.json",
+      "bytes": 121062,
+      "sha256": "f35c6f2c39de5d1223a26fb6b2f3ca1cf0198f81d554d9bb8f90109567fe53f3"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/BCA_s4_ER_GCR_group_fixed/run/completion.json",
+      "bytes": 130538,
+      "sha256": "44cec2bcabb2c7882dfde71b03d5f52e1da8c7eb00ced9d8ffe5293eece5cc2e"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/BCA_s4_L2R_text_fixed/run/completion.json",
+      "bytes": 120840,
+      "sha256": "951d1fe31604946b8f4924a8d6e11543486f6c26cc391a6d68307e7c03bb49d1"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/BCA_s5_ER_GCR_group_fixed/run/completion.json",
+      "bytes": 130879,
+      "sha256": "63f91d664e4a2514f288472faa83b2b3dde16f2d93f1e92864f42d366c1f93da"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/BCA_s5_L2R_text_fixed/run/completion.json",
+      "bytes": 120909,
+      "sha256": "dec295093e26e27ca1c494a87fbcfd3205170d26d2677733a823e150c2f45caf"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/BCA_s6_ER_GCR_group_fixed/run/completion.json",
+      "bytes": 130928,
+      "sha256": "8d5bab30c6f655ce726b1cb95d9e610f2c6e416f213f0f0659606fe85fa8a55e"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/BCA_s6_L2R_text_fixed/run/completion.json",
+      "bytes": 120983,
+      "sha256": "ce713c0f414ca2e12d7e6f404803c95664d9b92f46d95ccf745533c7dd5b3ad1"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s4_ER_GCR_group_fixed/run/completion.json",
+      "bytes": 130930,
+      "sha256": "a82cbcccb897e12f947fdf64303028dfe5b98666037667e2dfdc36a4222f5ea4"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s4_L2R_text_fixed/run/completion.json",
+      "bytes": 120917,
+      "sha256": "9ffda7497b2c5beaf32ebeaca4c738e217503fd15d2ed263cb9c15edcad84a70"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal_gate.json",
+      "bytes": 21386,
+      "sha256": "384404df4e84568c4cdcde70bd6a9357e97508dde9a638b9931c60026a29dbf1"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s5_ER_GCR_group_fixed/run/completion.json",
+      "bytes": 130850,
+      "sha256": "2216240c0410a2966f4ab10669c7bc1452401a62d28c72f520607445c6b2587a"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s5_L2R_text_fixed/run/completion.json",
+      "bytes": 120903,
+      "sha256": "5054ddbbf11dce57b0166188ef5520de89b52f911605a3931861d98a7f757b9b"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal_gate.json",
+      "bytes": 21386,
+      "sha256": "384404df4e84568c4cdcde70bd6a9357e97508dde9a638b9931c60026a29dbf1"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal/CAB_s6_ER_GCR_group_fixed/run/completion.json",
+      "bytes": 130641,
+      "sha256": "f54d16e2e644089d064e8c2375b6a8688daedc3ca3d3d16b034ffcd620f5dea1"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261030/comparison_resume/formal_gate.json",
+      "bytes": 21386,
+      "sha256": "384404df4e84568c4cdcde70bd6a9357e97508dde9a638b9931c60026a29dbf1"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/CAB_s6_L2R_text_fixed/run/progress.json",
+      "bytes": 87939,
+      "sha256": "00da920053584c4c41e874eb35ffd0e51f5f2d17425182c12152afc88782be68"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/CAB_s6_L2R_text_fixed/access.json",
+      "bytes": 68,
+      "sha256": "ee6c327a7476b91069b106ac7fd839d0c797993f9aa314dfce9cd866cdb9ce69"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/CAB_s6_L2R_text_fixed/run/maps/stage1.json",
+      "bytes": 2921,
+      "sha256": "7018d1ea1a9b76ea12e103bbbc4198e7d096335bdaba49ec95de6bbf8524e3c1"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/CAB_s6_L2R_text_fixed/run/maps/stage2.json",
+      "bytes": 2774,
+      "sha256": "69f384e8a1209427e710fa17dabfe46767c0a4bfb43f44f691e494bf217d4d73"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/CAB_s6_L2R_text_fixed/run/points/stage1.json",
+      "bytes": 33747,
+      "sha256": "123a91280a7953a3ee654a04be528b339341568f48cf943e18d391393b890bda"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/CAB_s6_L2R_text_fixed/run/points/stage2.json",
+      "bytes": 33851,
+      "sha256": "7d61c4cb3bdd9345298e507435554f56101cd2a8fcb0cf05b896a2972febccab"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal/dispatch/CAB_s6_ER_GCR_group_fixed/dispatch.json",
+      "bytes": 765,
+      "sha256": "e0e2993d8cf83db29c49188d69f22add3f5659713a01f7279225f66065f0c357"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal/dispatch/CAB_s6_ER_GCR_group_fixed/process.json",
+      "bytes": 59,
+      "sha256": "144e6d464ac3d3fc96991b899cbb184baaabb7f3b9221b7e8c3b17b7af5d3390"
+    }
+  ],
+  "finished_at": "2026-11-01T12:22:09.609789+08:00",
+  "collection_wall_seconds": 0.22768473625183105,
+  "eta": {
+    "basis": "Latest 72 same-stage updates; subtract log age only with last console line confirmed as that update. One 77.97s endpoint proxy and prior 2.5-4h postprocessing proxy. No new failure or resource wait. Slow20 is a scenario, not a confidence interval or upper bound.",
+    "seconds_per_update": 130.79883263025033,
+    "log_age_seconds": 3093.363091468811,
+    "training_remaining_hours": 4.394344113135343,
+    "training_finish_server": "2026-11-01T16:45:49.248651+08:00",
+    "full_remaining_hours": [
+      6.894344113135343,
+      8.394344113135343
+    ],
+    "full_finish_server": [
+      "2026-11-01T19:15:49.248651+08:00",
+      "2026-11-01T20:45:49.248651+08:00"
+    ],
+    "elapsed_since_repair_start_hours": 25.285880512222224,
+    "total_since_repair_start_hours": [
+      32.18022462535757,
+      33.68022462535757
+    ],
+    "slow20_full_finish_server": [
+      "2026-11-01T20:38:33.176413+08:00",
+      "2026-11-01T22:26:33.176413+08:00"
+    ]
+  }
+}

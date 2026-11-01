@@ -1,4 +1,12 @@
 # 科研文件存储与恢复
+## 2026-11-01 进度只读核对与本地记录交付
+
+按本次明确确认，仅通过SSH读取既有作业元数据、实际代码身份及train-calibration标量状态，在Windows保存[progress_20261101_122209.json](../reports/documentation/20261101/formal_chain/progress_20261101_122209.json)：72658字节，SHA256 `a9ddaaff67c2e2df9a122f26917a65b497676ddce87c7e1cd99b7fbd352fde80`，返回原字节与Linux输出摘要一致。文件记录服务器UTC+8观测时点、输入元数据身份、进程归属/创建时刻/命令/cwd、实际来源核对、运行/等待账、校准状态及工期算术；不含模型、正式正文、分数矩阵、关系标签或新确认结果。该证据只保存在Windows，不宣称已同步Linux。
+
+比较控制器47科学+8编排、H/S44科学+57编排、FOREVER/Vendor共用65来源均与各自正式门一致；修复CAB的47科学来源也一致。旧comparison_finish编排清单中的一次性launcher已按[首步原件](../reports/documentation/20261031/comparison_finish/formal/first_update.json)自删，实查缺少该文件属于已发生的正常自删，不重建、不记成科学来源损坏。旧comparison_finish预算快照已被接管，费用与活动reservation只按comparison_continue现账解释，不能再次相加。
+
+工具自动审批拒绝了最初采集命令末尾在Linux新建进度JSON的动作，理由是本次确认仅允许远端只读；该混合读写命令未执行。随后采用无远端写入的采集并将输出保存在本地，未绕过拒绝或修改活动作业。两份本轮本地一次性采集/接收助手在证据保管后删除，交互SSH与接收连接均退出；没有新服务器脚本、监听、训练或清理操作，不重置大清理周期。根交接/计划/讨论/存储只更新Windows并本地提交，本次不推送。
+
 ## 2026-11-01 三槽FOREVER与完整顺序等待链
 
 [formal_chain](../reports/documentation/20261101/formal_chain/report.zh.txt)在Linux独立目录继承原冻结63来源，仅替换queue/forever_formal并新增wait/test，共65项；实际comparison冻结字节保持。六个链接仅BGE及原五份获准train输入，未复制或下载正式文本、关系标签、owners或模型。正式门新建为forever/formal_gate.json与vendorlink/formal_gate.json，旧候选/repair gate及旧批次原件保留；Vendor精确引用最终FOREVER门，不在线覆盖原CAB/H-S来源或作业。
