@@ -1,4 +1,12 @@
 # 科研文件存储与恢复
+## 2026-11-01 FOREVER单worker显存实测与测试权重清理
+
+用户明确确认单worker、最大形状手写输入的限定显存试跑，并要求“测试产生的权重文件要删掉”；首轮测量包装单位错误后，又单独批准一次237秒内补测。两次实际来源/启动/测量、失败原件、单位修复CPU证据、费用与用户决定保存在[forever_memory](../reports/documentation/20261101/forever_memory/report.zh.txt)。Windows scripts/tests保留修后入口和CPU检查；原未提交的失败源码另保存在该目录source下，修后字节可按本次Git版本和回执身份恢复，不复制完整科学workspace。
+
+在确认测试父/子进程均退出后，先保存本次state文件路径/大小/SHA，再于服务器10:50:29完成删除：完整模型/优化器3913191053字节、锚点1304330258字节、手写Memory765307字节及latest元数据99779字节，共4文件5218386397字节（约4.86GiB）。首轮落盘前失败，没有产生权重，只清理空state目录。两个state目录均不存在，本任务.pt/.bin/.safetensors残留为0；[删除前身份](../reports/documentation/20261101/forever_memory/measurement_repair/cleanup_before.json)及[删除后回执](../reports/documentation/20261101/forever_memory/measurement_repair/cleanup.json)保留。原BGE、已有训练资产及CAB/H-S作业未动，不重置项目大清理周期。
+
+31份小证据通过31495字节ZIP回传，SHA256为0c4017ec1d74905c2cc2387923302c6ecdfa8f057785292f8d0e8aa4606b542f，逐项一致见[接收](../reports/documentation/20261101/forever_memory/receive.json)；没有测试权重或正式数据回Windows。两端中转ZIP在身份核对后删除，必要原始证据留存。累计native1441/3600秒（含新63秒失败及104秒成功）、CPU134/600、准备61/900；旧冻结gate不覆盖，后续正式门需承接增量。交接仅替换相应当前项，原状态移入历史；本地Git交付，不扩展上次特定批次push许可。
+
 ## 2026-10-31 成功槽接续纠正与原运行接管
 
 [comparison_continue](../reports/documentation/20261031/comparison_continue/report.zh.txt)两端保管纠正范围、47科学＋8编排来源、正式门、原预算/进程身份快照、接管就绪/激活、切换和11:54:20现场原件。只更换两个派发父控制器和唯一H/S等待进程，三条训练PID/创建时间/CPU核/原启动时刻/截止时间保持；原科学workspace、旧completion及失败不覆盖。新workspace仅补既有BGE链接供原确认入口使用，GCR仍从原workspace启动。原comparison_finish单条队列是执行偏差，原记录按历史保留，不追改成正确执行。

@@ -1,0 +1,97 @@
+{
+  "updates": [
+    {
+      "role": "fixture",
+      "objective": {
+        "supervised": 4.3391804695129395,
+        "mse0": 0.0,
+        "mse1": null,
+        "distillation": 0.0,
+        "weighted": 4.3391804695129395,
+        "record_gradient_norm": 0.011921639554202557
+      },
+      "regularizer": null,
+      "displacement": null,
+      "materialized_zero_task_gradients": [
+        "encoder.0.model.pooler.dense.bias",
+        "encoder.0.model.pooler.dense.weight"
+      ],
+      "compute_interval": {
+        "started": 932833.550075845,
+        "ended": 932851.184674957
+      },
+      "gradient_norm": 0.4863719344139099,
+      "encoder_lr": 1e-05,
+      "head_lr": 0.001,
+      "adam_step": 1
+    },
+    {
+      "role": "current",
+      "objective": {
+        "supervised": 4.309182167053223,
+        "mse0": 0.0,
+        "mse1": null,
+        "distillation": 0.0,
+        "weighted": 4.309182167053223,
+        "record_gradient_norm": 0.01585935801267624
+      },
+      "regularizer": null,
+      "displacement": {
+        "total": 0.5244109019430607,
+        "encoder": 0.004387113885079513,
+        "head": 0.5243925507751743
+      },
+      "materialized_zero_task_gradients": [
+        "encoder.0.model.pooler.dense.bias",
+        "encoder.0.model.pooler.dense.weight"
+      ],
+      "compute_interval": {
+        "started": 932852.5394221,
+        "ended": 932871.977245953
+      },
+      "gradient_norm": 0.5684877634048462,
+      "encoder_lr": 3.4482758620689656e-07,
+      "head_lr": 0.001,
+      "adam_step": 2
+    },
+    {
+      "role": "replay",
+      "objective": {
+        "supervised": 4.282467842102051,
+        "mse0": 0.0,
+        "mse1": null,
+        "distillation": 0.0,
+        "weighted": 4.282467842102051,
+        "record_gradient_norm": 0.02193506807088852
+      },
+      "regularizer": {
+        "beta": 0.001,
+        "distance_sq": 0.27500679407673445,
+        "penalty": 0.00027500679407673444,
+        "norms": {
+          "encoder": {
+            "task": 0.5477638128800968,
+            "regularizer": 8.77422817927103e-06
+          },
+          "head": {
+            "task": 0.4865284354743543,
+            "regularizer": 0.0010487851512660633
+          }
+        }
+      },
+      "displacement": null,
+      "materialized_zero_task_gradients": [
+        "encoder.0.model.pooler.dense.bias",
+        "encoder.0.model.pooler.dense.weight"
+      ],
+      "compute_interval": {
+        "started": 932871.994213573,
+        "ended": 932890.182268102
+      },
+      "gradient_norm": 0.732560396194458,
+      "encoder_lr": 1e-05,
+      "head_lr": 0.001,
+      "adam_step": 3
+    }
+  ]
+}

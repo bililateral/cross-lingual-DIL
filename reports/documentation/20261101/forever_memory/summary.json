@@ -1,0 +1,187 @@
+{
+  "time": "2026-11-01T10:50:29.185436+08:00",
+  "phases": [
+    {
+      "phase": "load",
+      "seconds": 3.073431023978628,
+      "allocated_peak_bytes": 1304196608,
+      "reserved_peak_bytes": 1314914304,
+      "allocated_end_bytes": 1304196608,
+      "reserved_end_bytes": 1314914304,
+      "sampled_process_peak_bytes": 1923088384,
+      "sample_count": 7
+    },
+    {
+      "phase": "prepare_update",
+      "seconds": 17.63811372697819,
+      "allocated_peak_bytes": 5455113728,
+      "reserved_peak_bytes": 5494538240,
+      "allocated_end_bytes": 5286230016,
+      "reserved_end_bytes": 5494538240,
+      "sampled_process_peak_bytes": 4250927104,
+      "sample_count": 32
+    },
+    {
+      "phase": "anchor_snapshot",
+      "seconds": 1.3300204629777,
+      "allocated_peak_bytes": 5286230016,
+      "reserved_peak_bytes": 5494538240,
+      "allocated_end_bytes": 5286230016,
+      "reserved_end_bytes": 5494538240,
+      "sampled_process_peak_bytes": 6176112640,
+      "sample_count": 2
+    },
+    {
+      "phase": "current_update",
+      "seconds": 19.453872482990846,
+      "allocated_peak_bytes": 6031358976,
+      "reserved_peak_bytes": 6184501248,
+      "allocated_end_bytes": 5286230016,
+      "reserved_end_bytes": 6184501248,
+      "sampled_process_peak_bytes": 6866075648,
+      "sample_count": 35
+    },
+    {
+      "phase": "replay_update",
+      "seconds": 18.191216659964994,
+      "allocated_peak_bytes": 6031358976,
+      "reserved_peak_bytes": 6184501248,
+      "allocated_end_bytes": 5286230016,
+      "reserved_end_bytes": 6184501248,
+      "sampled_process_peak_bytes": 6866075648,
+      "sample_count": 33
+    },
+    {
+      "phase": "save",
+      "seconds": 20.110822057002224,
+      "allocated_peak_bytes": 5286230016,
+      "reserved_peak_bytes": 6184501248,
+      "allocated_end_bytes": 3982041600,
+      "reserved_end_bytes": 6184501248,
+      "sampled_process_peak_bytes": 6866075648,
+      "sample_count": 37
+    },
+    {
+      "phase": "restore",
+      "seconds": 18.805430327076465,
+      "allocated_peak_bytes": 6590418432,
+      "reserved_peak_bytes": 6620708864,
+      "allocated_end_bytes": 6590418432,
+      "reserved_end_bytes": 6620708864,
+      "sampled_process_peak_bytes": 7302283264,
+      "sample_count": 36
+    }
+  ],
+  "sampled_process_peak_bytes": 7302283264,
+  "samples": 188,
+  "min_interval_seconds": 0.5454103946685791,
+  "max_interval_seconds": 0.5707645416259766,
+  "actual_current_displacement": {
+    "total": 0.5244109019430607,
+    "encoder": 0.004387113885079513,
+    "head": 0.5243925507751743
+  },
+  "replay_regularizer": {
+    "beta": 0.001,
+    "distance_sq": 0.27500679407673445,
+    "penalty": 0.00027500679407673444,
+    "norms": {
+      "encoder": {
+        "task": 0.5477638128800968,
+        "regularizer": 8.77422817927103e-06
+      },
+      "head": {
+        "task": 0.4865284354743543,
+        "regularizer": 0.0010487851512660633
+      }
+    }
+  },
+  "sources_count": 63,
+  "source_mismatch": [],
+  "unchanged_jobs_after": [
+    {
+      "pid": 3146505,
+      "created": 1793415900.44,
+      "owner": "yongpeng",
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace/scripts/step28_continual_comparison_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/CAB_s6_L2R_text_fixed",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/dispatch/CAB_s6_L2R_text_fixed/spec.json",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal_gate.json",
+        "--deadline",
+        "1106677.448285792"
+      ],
+      "cpu_seconds": 85456.59
+    },
+    {
+      "pid": 3171756,
+      "created": 1793418749.28,
+      "owner": "yongpeng",
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal_gate.json"
+      ],
+      "cpu_seconds": 163.79
+    },
+    {
+      "pid": 3171792,
+      "created": 1793418753.77,
+      "owner": "yongpeng",
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/active_defaults_wait.py",
+        "--workspace",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/formal_gate.json"
+      ],
+      "cpu_seconds": 105.81
+    }
+  ],
+  "after_gpu": "3146505, 7684",
+  "formal_gate_flags": {
+    "approved": false,
+    "review_closed": false
+  },
+  "formal_campaign_exists": false,
+  "cleanup": {
+    "status": "COMPLETE",
+    "time": "2026-11-01T10:50:29.181238+08:00",
+    "state_exists": false,
+    "deleted_files": 4,
+    "deleted_bytes": 5218386397,
+    "remaining_model_files": [],
+    "active_cleanup_seconds": 4.04041574394796
+  },
+  "native_seconds": {
+    "prior": 1274,
+    "failed_attempt": 63,
+    "successful_attempt": 104,
+    "cumulative": 1441,
+    "limit": 3600
+  },
+  "cpu_seconds": {
+    "prior": 133,
+    "callback_check": 1,
+    "cumulative": 134,
+    "limit": 600
+  },
+  "preparation_seconds": {
+    "prior": 1,
+    "conservative_this_task": 60,
+    "cumulative": 61,
+    "limit": 900
+  }
+}
