@@ -1,4 +1,14 @@
 # 科研文件存储与恢复
+## 2026-11-01 三槽FOREVER与完整顺序等待链
+
+[formal_chain](../reports/documentation/20261101/formal_chain/report.zh.txt)在Linux独立目录继承原冻结63来源，仅替换queue/forever_formal并新增wait/test，共65项；实际comparison冻结字节保持。六个链接仅BGE及原五份获准train输入，未复制或下载正式文本、关系标签、owners或模型。正式门新建为forever/formal_gate.json与vendorlink/formal_gate.json，旧候选/repair gate及旧批次原件保留；Vendor精确引用最终FOREVER门，不在线覆盖原CAB/H-S来源或作业。
+
+两轮完整审查输入ZIP、原文/audit、请求/提交/菜单观察、主审及修前来源保管在review；首轮CHAIN-R01 OPEN与修后CLOSED分别保留。四组CPU原始receipt/console/evidence及NVML只读记录均回传核对；CPU累计FOREVER141/600、Vendor132/600，native1441/3600及失败账保持。准备181/900和145/3900为明确保守结转，不将网页等待计为计算。
+
+9份部署/启动/观测/最终门/清理小证据经31639字节ZIP回传，SHA256 865388ac11a17d05059ee79f964445457350b16dde112aeed420c0e4e336e1fb；逐项身份见[接收记录](../reports/documentation/20261101/formal_chain/receive.json)。服务器11:53:38启动唯一新链3485029，11:53:52实查仅等待H/S，无新训练子进程。active_formal_wait.py只在首个真实FOREVER更新后自删，workspace源文件、持久state及首步/进程回执保留，不能据此再建第二份监听。
+
+本轮纯中转包、incoming重复副本和新workspace生成pycache在核对必要载荷后清理，完整审查输入包和全部必要原件继续保管。机械清理的manifest落盘/格式核对中断及后续正确处置见[Linux清理记录](../reports/documentation/20261101/formal_chain/transport_cleanup_linux.json)；未重启科研计算或删除科学资产。当前交接每线原位更新，旧上游状态移历史；根可变文档仅Windows维护，独立实施/审查说明同步Linux。本轮本地提交，不扩大旧特定push许可，不重置大清理周期。
+
 ## 2026-11-01 FOREVER单worker显存实测与测试权重清理
 
 用户明确确认单worker、最大形状手写输入的限定显存试跑，并要求“测试产生的权重文件要删掉”；首轮测量包装单位错误后，又单独批准一次237秒内补测。两次实际来源/启动/测量、失败原件、单位修复CPU证据、费用与用户决定保存在[forever_memory](../reports/documentation/20261101/forever_memory/report.zh.txt)。Windows scripts/tests保留修后入口和CPU检查；原未提交的失败源码另保存在该目录source下，修后字节可按本次Git版本和回执身份恢复，不复制完整科学workspace。

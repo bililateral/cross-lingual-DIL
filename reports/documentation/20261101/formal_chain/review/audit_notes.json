@@ -1,0 +1,98 @@
+{
+  "review_date": "2026-11-01",
+  "review_model": "GPT-6 Astra Pro（本会话，未切换）",
+  "input": {
+    "filename": "formal_chain_review.zip",
+    "actual_bytes": 397167,
+    "actual_sha256": "3a49a22a3367d0495e811b17706961f71be3fa5955556ca8cd6e07b94065018c",
+    "members": 87,
+    "payloads": 86,
+    "verified_payloads": 86,
+    "manifest": "package_manifest.json",
+    "duplicates_missing_extra_or_mismatches": 0,
+    "current_workspace_sources": 65,
+    "both_gates_and_both_cpu_receipts_match": true
+  },
+  "verdict": "ONE_LOCAL_REPRODUCIBILITY_DEFECT_OPEN",
+  "new_scientific_blockers": [],
+  "mandatory_findings": [
+    {
+      "id": "CHAIN-R01",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "summary": "真实FOREVER worker的共同campaign预算扫描未容忍其他槽正常文件退役，可把健康轨迹误判失败。",
+      "locations": [
+        "workspace/scripts/step28_forever_formal.py:20,118",
+        "workspace/scripts/step28_continual_comparison_run.py::Budget.check:72-92，尤其86",
+        "workspace/scripts/step28_forever_run.py::Store.retire_unreferenced:95-102; Store.commit:136-141",
+        "workspace/scripts/step28_forever_formal.py::retire_completed:105-107",
+        "workspace/scripts/step28_formal_queue.py::campaign_size:139-147"
+      ],
+      "trigger": "槽A在is_file后、stat前，槽B正常rename/unlink已枚举文件，A的Budget抛FileNotFoundError。",
+      "impact": "A按非零退出失败并永久退槽；固定九条不完整，确认与VendorLink被阻断。",
+      "evidence_type": "静态可达交错反例，未动态复现；现有小进程测试未调用该真实Budget。",
+      "minimal_fix": "FOREVER本地等价预算适配逐文件容忍FileNotFoundError，继续真实deadline/RSS/shared-disk/small/reserve检查；保持冻结comparison原件。",
+      "repair_trap": "不能吞整个异常放行；原check先更新self.last，立即重试可能因2秒节流跳过实际计量。",
+      "minimal_verification": "原受限CPU额度内一个调用真实最终Budget的确定性枚举后删除/改名用例，同时断言存续文件真实超额仍拒绝；无GPU或正式数据。"
+    }
+  ],
+  "preserved_closed_findings": ["F-R01", "V-R01", "V-R02"],
+  "supported_behavior": {
+    "healthy_refill": "queue:259-320；小进程证据9项、1失败槽退休、8成功，后续由健康槽领取。",
+    "training_gate": "queue:321-326 全部训练成功才发布，后处理逐项单槽，全部完成才写总completion。",
+    "gpu_admission": "queue:101-104；10GiB + sum(max(0,10GiB-owned_PID_usage))。",
+    "resource_units": {"forever_allocator_gib": 9, "forever_pid_and_slot_gib": 10, "vendorlink_single_slot_admission_gib": 17},
+    "sequence": "wait.run:138-146 顺序调用两真实main；H/S完整且退出后FOREVER，九条及三后处理有效后VendorLink。",
+    "negative_science": "交接判断运行完整status与成功记录，不要求FOREVER passed=true；VendorLink仍passed=null。",
+    "reference": "FOREVER旧H_pos_tuned27引用与等待的H/S默认模型分开。",
+    "claim_and_delete": "wait:133持久claim；103-119读真实current日志后删除独立listener，保留source与控制进程。"
+  },
+  "evidence_limits": [
+    "真实小Python子进程和dispatch；NVML资源为Memory/Over/Growing替身，没有模型/GPU计算。",
+    "actual_parent测试真实formal.main，但gate/dispatch替换；没有执行真实worker Budget。",
+    "H/S测试为18/54手写元数据和一字节载荷；相关进程检测替身。",
+    "自删测试人工写current日志；真实optimizer到日志先后仅静态追踪。",
+    "未动态运行顶层完整两线run/唯一claim，未逐种实测所有故障。",
+    "NVML一次只读记录不是当前空闲保证、系统I/O审计或三路原生资格。",
+    "原H/S专属gate/控制器和memory报告引用的原始GPU对象未提供；保留实际部署核对边界。"
+  ],
+  "accounting": {
+    "forever_cpu_test_wall_seconds": 2.7030355599708855,
+    "forever_cpu_test_charged_seconds": 3,
+    "nvml_readonly_wall_seconds": 0.04491968301590532,
+    "nvml_readonly_charged_seconds": 1,
+    "forever_cpu_cumulative_seconds": 138,
+    "vendor_cpu_test_wall_seconds": 0.8822178900009021,
+    "vendor_cpu_test_charged_seconds": 1,
+    "vendor_cpu_cumulative_seconds": 131,
+    "cpu_limit_per_line_seconds": 600,
+    "forever_native_cumulative_seconds": 1441,
+    "forever_native_limit_seconds": 3600,
+    "preparation_seconds": {"forever": 121, "vendorlink": 85},
+    "preparation_note": "每线新60秒为保守记账，最终转移部署费用须对齐；非精确测时。",
+    "total_plan_hours": {"forever": 116, "vendorlink": 296},
+    "per_trajectory_hours": {"forever": 12, "vendorlink": 8},
+    "parallel_child_elapsed_adds": true
+  },
+  "version_boundary": "本轮prior63快照不同于上一网页包；当前另有已存在VendorLink workload计数增量，本轮八项测试未重跑该用例，不把旧CPU证据改绑当前全来源。",
+  "authorization_and_deployment": {
+    "controlling_scope": "increment/scope.zh.txt",
+    "old_pause_and_forever_single_slot_superseded": true,
+    "forever_gate": {"approved": false, "review_closed": false, "workers": 3},
+    "vendor_gate": {"approved": false, "review_closed": false, "workers": 1},
+    "current_code_unconditionally_cleared": false,
+    "next_condition": "局部修复及限定CPU证据闭合后，按新scope完成主审与实际部署核对；晋升FOREVER gate时同步更新Vendor predecessor pin。",
+    "review_replaces_deployment_or_authorization": false
+  },
+  "optional": ["精确标注本地prior63与上一网页包的版本边界", "部署记录列明最终gate引用、listener/source/state路径，不另建框架"],
+  "out_of_scope": ["修改冻结comparison原件", "全仓回归或通用调度/灾备/攻击加固", "新增GPU资格/三路大模型pilot", "新增HPO/方法/数据/种子/标签权限", "以统计结果为交接成败条件"],
+  "reviewer_actions": {
+    "mechanical_checks_and_static_reading_only": true,
+    "executed_project_or_tests": false,
+    "accessed_research_servers_or_unprovided_objects": false,
+    "ran_training_inference_metrics_or_bootstrap": false,
+    "started_listener_or_resource_wait": false,
+    "modified_input_or_gate": false
+  }
+}

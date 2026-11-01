@@ -1,0 +1,307 @@
+H/S → FOREVER → VendorLink 调度、资源与等待接线定向独立外审
+审查日期：2026-11-01（用户时区 UTC+8）
+审查模型：本会话 GPT-6 Astra Pro；未切换模型。
+
+一、实际输入身份与结论
+
+输入文件：formal_chain_review.zip
+实际字节数：397167
+实际 SHA256：3a49a22a3367d0495e811b17706961f71be3fa5955556ca8cd6e07b94065018c
+实际 ZIP 成员数：87，即 86 项载荷＋package_manifest.json 自身。
+清单结果：86/86 项载荷的路径、大小、SHA256 一致；无重复路径、缺项、额外载荷或不符项，无目录项。
+workspace 实际来源：65 份；两项候选 gate 和两份本轮 CPU receipt 的 65 项来源均与这些实际字节对应。
+
+最终裁决：本轮存在 1 项需要最小修复的 REPRODUCIBILITY_DEFECT，编号 CHAIN-R01，状态 OPEN；未发现新增 SCIENTIFIC_BLOCKER。
+
+CHAIN-R01：父队列已采用容忍正常文件消失的磁盘扫描，但实际 FOREVER worker 仍通过冻结 comparison 的 Budget 扫描整个共同 campaign。另一个槽正常原子替换或退役 checkpoint 时，当前健康 worker 可以因 FileNotFoundError 被误判为轨迹失败并永久退槽。这会使九条固定训练不完整，阻断后处理和 VendorLink。现有小进程测试没有调用这条真实模型预算路径，不能用它们的 PASS 排除该缺口。
+
+除这一项外，未发现等待链、健康槽继续领取剩余任务、失败计费、9＋1 GiB 接线、负结果交接或 VendorLink 单槽后处理的其他必修问题。最小所需工作是修复 FOREVER 实际预算接线，并用一个确定性手写 CPU 用例验证；不需要新增 GPU 资格、正式 pilot、全仓回归或科研选择。
+
+现版尚不能记录为“本轮全部必修闭合、可按原样部署”。修复与对应受限核验闭合后，可进入本次 scope 规定的主审和实际部署核对。新 scope 已替代旧暂停、FOREVER 单槽及相关失败处置决定；本报告不恢复旧的“等待新的开始指令”要求，也不代替主审、部署核对或执行授权。本审查没有启动监听、训练或资源等待，没有修改输入与 gate。
+
+F-R01、V-R01、V-R02 的原 CLOSED 结论按未变适用范围保留；本轮不重开算法、数学、原模型资格或效果审查。
+
+定位说明：下文行号均为本包 workspace/ 当前文件行号；before/ 单独标注。本次审查输入根目录为 /workspace/scratch/8f77b6332ab8/formal_chain_review_input。全文“动态证据”仅指包内已有 Linux 执行记录，审查者没有运行这些项目程序。
+
+二、采用的当前合同与版本边界
+
+2.1 当前范围以 increment/scope.zh.txt 为准
+
+scope 第 5、7—15 行定义：H/S 原 18 条、54 端点完整有效且相关进程退出后，启动 FOREVER 固定九条、最多三槽；九条和生成／确认／分析全部有效完成后，再启动 VendorLink 36 条及其评分／固定描述分析，VendorLink 保持单槽。
+
+FOREVER 每槽 allocator 为 9 GiB，整个 worker PID 监测阈值及准入预留为 10 GiB。三槽是上限；资源只能支持一槽或两槽时先启动较少槽，再补空槽。单轨迹失败、OOM、超时或 PID 超限使该槽退休，失败轨迹不回队列；健康槽继续接原固定队列的剩余任务。共享预算、磁盘或监控等依赖故障停止相应批次。完整有效的科学负结果可以交接，缺项和运行失败不能交接。
+
+旧 original/plan 与 authorization、previous/ 和 memory/report 中较早的暂停、单槽或待确认说法按其形成时点解释。当前两份候选 gate 的 approved/review_closed=false 表示本次审查与部署前状态，不是旧用户决定仍覆盖新 scope 的依据。
+
+2.2 新旧来源核对
+
+before/step28_formal_queue.py 与 before/step28_forever_formal.py 均与本会话上一 score_gate_review 包相应原件同字节。当前 FOREVER formal 对 before 的唯一文本变化是第一行说明由 one worker 改为 bounded independent slots；实际 execute、Budget 引用和科学流程没有改。因此下文发现的真实 Budget 漏接不能由说明文字变化自动修好。
+
+本轮新 queue 为 354 行，新增 wait 为 160 行；新定向测试 test_step28_formal_wait.py 为 230 行。两项 gate 的科学字段、固定运行列表、预算总额、每条限额、数据记录，以及 FOREVER 旧 H 引用保持原定范围。V-R02 所在 step29_vendorlink_evaluate.py 保持已关闭版本，SHA256 为 534885232ec9f1eae25fc897cb63bf9be733a9152a5e76ae17641198a07ae74a。
+
+需要限定“变化仅限本轮”的比较起点：increment/preparation.json 的 prior_sources=63 和四项 source_delta 对应主执行者的本地起点；相对本会话上一 score_gate_review 包，当前还已有 VendorLink workload 计数增量，以及相应共享测试和旧 CPU 选测列表变化。实际 diff 显示，Memory.retain 新回调记录完成的 teacher 调用，run.execute 记录 current/history/teacher 的群与文本曝光并保存到状态／日志，没有更换采样、损失、评分或指标。本轮 CPU 没选这个 workload 用例，本包也没有给出该增量先前的执行 receipt。不能把旧网页包的 CPU 或本轮八项测试宣称为当前所有源码的动态重跑。这是证据归属说明，不据此重开未变科学审查。
+
+三、唯一必修 CHAIN-R01：真实 worker 的共享目录扫描存在正常并发竞态
+
+分类：REPRODUCIBILITY_DEFECT。
+严重度：MEDIUM。
+状态：OPEN。
+影响对象：FOREVER 三槽实际训练及依赖其完整完成的后处理／VendorLink 交接。
+证据类型：明确可达的静态交错反例；本审查未动态复现，不能声称已发生或给出发生概率。
+
+3.1 精确来源与实际接线
+
+（a）workspace/scripts/step28_forever_formal.py 第 20 行：
+    from step28_continual_comparison_run import Budget
+
+（b）同文件 execute 第 118 行：
+    Budget(Path(allowed['campaign']), deadline, allowed['limits'])
+因此每个 worker 的 Budget 根目录是整个共同 campaign，而不是只属于自己的 run。
+
+（c）workspace/scripts/step28_continual_comparison_run.py::Budget.check 第 86 行：
+    files = [(p.suffix, p.stat().st_size) for p in self.root.rglob('*')
+             if p.is_file() and not p.is_symlink()]
+这里枚举、is_file 和 stat 是分开的文件系统操作，未处理期间消失的路径。
+
+（d）正常并发写删来源：
+— step28_forever_run.py::Store.commit 第 136—141 行：临时 latest 原子改名，并退役旧代；
+— Store.retire_unreferenced 第 95—102 行：删除不再被 latest 引用的 work、anchor、memory 等文件；
+— step28_forever_formal.py::retire_completed 第 105—107 行：完整成功后删除恢复载荷及 latest。
+
+（e）step28_formal_queue.py::campaign_size 第 139—147 行已经捕获 FileNotFoundError，能容忍父控制器扫描时的正常文件退役。但实际 worker 的 Budget 没有调用该安全扫描，父队列的修复不会覆盖它。
+
+3.2 无需异常环境即可构造的触发顺序
+
+1. 槽 A 正常执行 Budget.check，枚举到槽 B 的某个旧恢复文件；A 的 is_file() 返回真。
+2. 槽 B 完成安全点发布或整条轨迹的正常清理，删除／改名该文件。
+3. 槽 A 随后 p.stat() 抛出 FileNotFoundError。
+4. A 经 forever_formal 第 173—177 行的 worker 异常路径退出。
+5. queue 将其记为失败，永久退休 A 的槽；其余健康槽继续，最终固定九条因 A 这次伪失败不能完整成功。
+
+这不是文件损坏、标签问题或攻击场景。多槽共享 campaign 下，其他槽的安全点更新和完成清理属于计划内正常操作。风险是一个本来健康的轨迹被计为失败；它不会伪造科研成功，但会浪费已做计算并阻断用户要求的完整顺序链。
+
+3.3 最小修法
+
+在 FOREVER 本地实际采用的 Budget 接线中，提供对正常消失路径容忍的等价文件计量：对单个文件的枚举／取大小操作捕获 FileNotFoundError 后跳过该已不存在项，或完成一次受限重新采样；随后继续检查仍存在文件的总量。保留原 deadline、RSS、共同 campaign 的 disk_bytes、非 .pt 的 small_bytes、保存 reserve 与 free_reserve_bytes 判据。
+
+不修改被冻结的 comparison 原件，不将 root 简单缩为单个 job 从而丢掉共享容量检查，不捕获所有 Budget 异常后直接放行。可在 FOREVER 本地建立小的预算适配并复用相同字段语义；不需要通用调度或存储框架。
+
+另一个实现陷阱需要明确：原 Budget.check 在第 78 行已提前更新 self.last。若只在外层捕获 FileNotFoundError 后立即再次调用原 check，第二次可能被第 76—77 行的两秒节流直接跳过。因此“异常后再调用一次”并不自动等于重新计量成功。逐文件容忍消失并完成本轮检查更直接。
+
+3.4 必要且足够的限定验证
+
+只需在本轮已有受限 CPU 范围内，补一个调用真实 FOREVER 最终预算实现的确定性用例：在枚举／is_file 后、stat 前删除或原子改名一个同伴文件；确认预算检查不因此误报轨迹失败，同时对仍存在且确实超额的文件保留拒绝断言，并保留 reserve 字节语义。
+
+该测试应在原缺陷实现上失败、在修后实现上通过；不要把 Budget 整体替换成无条件成功替身。无需读取正式目录、真实权重或启动 GPU，也不需要完整模型／阶段试跑。当前 cpu_forever01 的六项测试没有经过此 Budget.check 路径，所以不能关闭此项。
+
+四、三槽主体调度与完整成功门：已成立的部分
+
+4.1 formal.main 真正接入固定训练与后处理
+
+step28_forever_formal.py::main 第 179—198 行构造固定九条完整轨迹，worker 命令包含 order、seed、deadline 和同一 gate；训练结果由第 190—192 行调用真实 validate_completion。第 180—183 行明确列出 generation、confirmation、analysis，随后进入实际 queue.dispatch，并保留 verify_reference preflight。
+
+validate_completion 第 65—85 行继续要求固定 spec／sources、三个端点、864 current、fixture=0、replay≤228、访问记录、阶段 current 计数、校准 ID 与参数，以及实际模型／校准文件身份。并发没有把这些检查变成日志占位。
+
+VendorLink formal.main 第 178—199 行仍构造 36 条固定轨迹，调用实际 worker 和 validate_completion，然后依次 score、analyze。gate 的 workers=1，queue.gate 对非 FOREVER 也只接受单槽。
+
+4.2 健康槽确实继续取剩余任务
+
+queue.dispatch 第 259—320 行把训练作为一个 phase；width=workers，pending 是固定任务列表。启动成功后第 314 行从 pending 移除该轨迹。finish 第 222—223 行将失败槽放入 retired_slots；第 282—284 行跳过已退槽与正在运行的槽，其他空槽仍领取 pending[0]。因此不是只让出错时的当前同伴跑完，而是健康槽能继续执行剩下的未启动轨迹。
+
+真实小进程证据：test_step28_formal_wait.py 第 59—76 行，9 个任务中第 0 个以退出码 2 失败；receipt 实际含 9 项、8 成功、retired_slots=[0]，后续 id≥3 全部由 slot 1／2 执行；没有 analysis 目录和 training_complete.json。这个用例能识别“一个槽失败后不再派发剩余任务”的错误实现。
+
+4.3 失败、超时、验证不通过与共享故障
+
+finish 第 199—227 行先停止／收尾对应进程；非零退出或真实 validate 的普通异常形成失败 receipt。第 268—281 行将 PID 显存超限和到达单条 shutdown reserve 的超时送入同一路径。训练 phase 的 isolate 策略允许健康槽继续；后处理失败、VendorLink 单槽失败则停止该批，不自动重试。
+
+第 316—318 行在所有槽退休且仍有 pending 时记录未派发项并停止。第 322—326 行要求整批 completed 数量等于固定 rows 且每项 success，才发布 training_complete；所以继续健康槽不会被误写为整批成功，也不会越过缺轨迹进入评价。
+
+每项后处理在第 259—261 行单独作为宽度 1 的 phase。只有全部完成、监测器关闭、控制额度检查通过后，第 330—332 行才发布 ALL_FORMAL_ACTIONS_COMPLETE。
+
+共享 RSS、campaign 磁盘、空闲保留空间或监控不可用等异常由外层第 334—348 行停止本批自有子进程，逐项收尾记账。没有停止原 H/S 或 L²R 进程的代码。上述未逐项动态覆盖的异常属于静态接线判断，不将一个 PASS 泛化为所有故障实测。
+
+五、资源单位、预留与费用执行
+
+5.1 NVML 直接接口与实际路径
+
+queue.GpuMemory 第 65—98 行直接加载已有 libnvidia-ml.so.1，使用 nvmlInit_v2、设备句柄、MemoryInfo、ComputeRunningProcesses_v2 和 Shutdown。内存值使用 64 位字段；Process 结构保留 PID、used 及 v2 的 GPU/compute instance 字段。返回值不再经过 MiB 文本解析。
+
+正式 dispatch 第 251 行建立监测器，第 263、289 行取得 snapshot 并传给 resources。因此 resources 第 111—113 行保留的 nvidia-smi fallback 不会成为本正式链的高频轮询实现。没有引入 pynvml 安装、驱动或环境修改。
+
+increment/nvml_readonly.json 绑定当前 queue 来源，提供一次 0.04491968301590532 秒的实际只读查询：total=34190917632、free=25325142016，进程使用量为原始字节值。这支持当前机器已有接口曾成功返回，不是本审查者的新查询，也不是当前空闲资源保证、CUDA 分配试验或三路模型资格。未对未提供的其他驱动／设备配置作兼容性背书。
+
+5.2 9 GiB allocator、10 GiB 整个 PID、尚未体现的预留
+
+当前 FOREVER gate 使用：
+— allocator_bytes=9663676416=9×2^30；
+— process_gpu_bytes=10737418240=10×2^30；
+— free_gpu_bytes=10737418240=10×2^30。
+
+真实 execute 第 123—124 行将 allocator_bytes 除以设备总显存，传入 torch.cuda.set_per_process_memory_fraction；confirmation 第 119—120 行读取同一限额。queue 第 271—275 行比较 NVML 对整个 worker PID 的观测值，不只比较 PyTorch allocator 统计。
+
+admission 第 101—104 行的准入要求为：
+    新槽所需空闲 = 10 GiB + Σ_owned_PID max(0, 10 GiB − 当前 PID 占用)
+
+例如两个已启动 PID 各只体现 2 GiB，尚需各预留 8 GiB；再启一个槽需要实际空闲 26 GiB，20 GiB 不够。尚未初始化 CUDA、snapshot 中还没有 PID 的 worker 按 0 占用预留完整 10 GiB。它没有重复消费已承诺但未体现的空闲容量。
+
+每个新槽前都会刷新 snapshot；不足时 break 本轮填槽，已运行任务继续，之后再检查可用资源。测试第 100—120 行以手写 snapshot 覆盖上述 26 GiB 算术与从少量运行补到三槽的实际小进程调度。
+
+这仍是 allocator 上限加离散 PID 监测／超限处置，不是瞬时硬隔离。默认轮询为 5 秒，读数及停止之间可以存在时间差，scope 已如实限定。不能将 memory/report 中早先短路径单 worker 显存值写成完整三路上限，也不需要因此追加一轮三路原生资格。
+
+VendorLink 保持单槽 17 GiB 准入，未加入 FOREVER allocator 限制。
+
+5.3 CPU、RAM、磁盘、控制额度与累计费用
+
+queue 第 252—254 行要求可用 affinity 至少有 workers 个核，第 301 行按 slot 使用不同核；255—257 行保持单线程环境。resources 第 115—126 行按实际可用 RAM／磁盘和已经使用的共享额度决定准入；check_running 第 150—164 行检查控制进程及全部子孙进程的总 RSS、共同 campaign 磁盘和保留空间。64 GiB RSS 与 96 GiB campaign 容量是本批共享限额，不是为三个 worker 各分一份；64 GiB 空闲磁盘保留仍存在。
+
+第 174—178 行预先要求固定全部任务的上限与旧用量能放入原预算。FOREVER 九条×12h=108h 训练额度，VendorLink 36条×8h=288h；分别加原确认及辅助桶后仍为116h与296h。
+
+finish 第 212—226 行按每个子进程从启动到停止／验证结束的实际 elapsed 独立相加，失败不清零、不裁剪。三个并发进程各运行一小时，对应三小时训练费用。charge_control 第 185—198 行累计控制器实际工作段并剔除 sleep；preflight 第 238—250 行另计准备费用。控制、准备或共享实际预算耗尽会停止，不自动扩额，也没有以并行数承诺工期或保证全部完成。
+
+CHAIN-R01 正是本节资源控制中的剩余漏接：父进程扫描安全不等于每个真实 worker 的 Budget 扫描也安全。
+
+六、等待门、唯一 claim、自删与跨研究线交接
+
+6.1 H/S 前序门的实际内容
+
+step28_formal_wait.py::predecessor_state 第 51 行先按 bytes/SHA256 校验绑定的原 gate。第 54—60 行遇 failure.json 直接阻断；没有 completion 且仍有相关进程则等待，没有 completion 且无相关进程则视为未完成退出，不启动下游。
+
+H/S 分支第 63—70 行要求原 gate 派生的 18 个唯一 run ID、指定完成 status、同源、54 端点、评价标签未开放、未生成新确认，以及完整 18 条完成记录与有效预算。第 72—84 行逐个验证轨迹 completion 的文件身份，检查 864 更新、三个阶段和 full/inference 恢复标记，并检查各 model、mapping、score 实物存在和字节数。
+
+valid_budget 第 40—47 行检查无 active、failed、budget_exceeded，完成 ID 集合与数量一致、全部 success，used 有限且落在完成记录自带的 limits 内。此处是读取既有预算记录，不是重新计算 H/S 费用或重新执行恢复；报告不把这一点扩写成独立现场复核全部账目。
+
+relevant_processes 第 23—37 行按 owner、gate 参数或 campaign 子路径识别相关进程，排除自身与 zombie。即使 completion 完整，只要相关进程仍存在，第 99—100 行仍返回 PREDECESSOR_EXIT_PENDING。它不要求全卡无 CUDA，也不操作原 H/S／L²R 进程。
+
+证据边界：本包只有 H/S 原 gate 的绑定身份，不含该专属 gate／生产控制器原件及真实现场命令。能确认的是新门的读取逻辑和手写 18／54 测试；不能声称已经在服务器上核实真实 54 模型、恢复事实、原预算限额生成或进程退出。实际部署核对仍需在主执行者原环境按现有对象确认这些绑定，不需要向本审查上传模型或标签。
+
+6.2 FOREVER 完整负结果可以交接
+
+FOREVER 分支第 86—96 行要求九个 run 加 generation／confirmation／analysis 共 12 个完成 ID，ALL_FORMAL_ACTIONS_COMPLETE、同源、无 active／失败／超预算，且 confirmation 与 analysis 状态有效。它不要求 passed=True。
+
+实际链中，VendorLink 只在 FOREVER main 正常返回后进入；前者的 queue 已逐条验证训练和三个后处理。FOREVER evaluate 的 complete_training 第 28—50 行继续核验九条及旧 H；validate_cells 第 95—110 行继续要求 18 条配对记录、108 格、120 群与4320群前向；完整生成／确认／分析路径没有因调度新增而删减。
+
+FOREVER analyze 第 225—230 行会在运行完整时写固定完成 status，并另存科学 passed；passed=false 不等于运行失败。VendorLink 第 204—213、262—267 行仍是固定数据描述结果，passed=None、整体区间 None。将这两种有效结果允许交接符合最新 scope，不涉及追好看结果或结果选择。
+
+6.3 旧 H_pos_tuned 与正在等待的 H/S 没有混用
+
+FOREVER gate 第 451—519 行仍固定旧 H_pos_tuned 九条27模型；第 536—543 行的等待前序是另一份 20261031 comparison_continue/defaults gate。
+
+formal.verify_reference 第 41—62 行明确要求 identity.name 为 H_pos_tuned、九个 order/seed 唯一完整、864 更新、三端点、旧来源和恢复标记，并校验 model／mapping 身份。evaluate.complete_training 第 33—50 行继续配对旧 H 与新 FOREVER，精确比较有序 fit/calibration 和 pretrained_archive。等待 H/S 完成只是执行先后条件，没有把它的默认权重改成研究对照。
+
+6.4 唯一顺序链与监听文件删除
+
+wait.run 第 124—132 行验证两实验类型、前序关系、FOREVER gate 精确引用、相同独立 workspace 和 listener 身份。第 133 行以 state.mkdir() 建立持久 claim；queue 第 171 行另以 campaign.mkdir() 防止同批重入。第 138—146 行在同一控制进程内顺序调用两个真实 formal.main；任一异常写链 failure 并重抛，不继续下一研究线。全部正常返回才写链完成。
+
+observe_first_update 第 103—119 行只在读取到 role=current 的首行后核验 listener 副本身份、记录 first_update，再 unlink 指定 active listener；空行或不完整 JSON 继续等待。真实日志的前置顺序可追到 step28_forever.step 第 239—248 行实际 optimizer.step、位移计算和同步，Learner.update 第 280—285 行计数／Adam 一致性检查，advance 第 315 行才调用 log，最后 formal 第 141—145 行写 updates.jsonl。正常路径不会仅因 worker 启动或准备阶段就自删。
+
+删除的是独立 active listener 副本；workspace 源文件、持久 claim 和运行中的控制进程保留。同一控制进程在 Vendor 前序检查时被 relevant_processes 排除，避免把自身误当 FOREVER 未退出而自锁。
+
+部署时将 FOREVER gate 的 approved/review_closed 晋升或更新费用后，它的大小／哈希会变化；VendorLink predecessor.gate 必须同步绑定最终 FOREVER gate，否则 wait.run 第 128 行会正确拒绝。listener 副本、最终来源、实际调用入口／PYTHONPATH 与持久 state 路径也应按已定部署流程核对。这些是正常部署前提，不另列源码缺陷或索要新权限。
+
+七、包内 CPU／NVML 证据逐项解释与费用核对
+
+7.1 测试分层，不能把替身写成原生三路资格
+
+完整读过 tests/test_step28_formal_wait.py 和两组 console、evidence、receipt。八个用例的实际覆盖如下：
+
+（1）test_forever_actual_parent_passes_three_slots_and_all_followups，38—57 行。
+真实执行 formal.main，但 q.gate 与 q.dispatch 被替换。它检查九条 rows、workers=3、三个后处理以及真实 factory 构造的 worker argv。没有执行这条正式 worker 命令，也没有调用实际 FOREVER execute/Budget。因而可以与 CHAIN-R01 同时 PASS。
+
+（2）test_failure_retires_slot_and_healthy_slots_take_remaining_queue，59—76 行。
+真实 q.dispatch＋真实小 Python 子进程，检查一次非零退出后健康槽执行全部剩余任务、失败槽不复用、费用大于继承值、未发布完整训练或后处理。它直接支持健康槽持续领取，而不仅支持同伴收尾。
+
+（3）test_process_limit_stops_only_offender_then_refills，78—98 行。
+真实终止一个睡眠 Python 子进程，其他任务继续；11 GiB 数值由 Over 监测替身提供。不能说真实 GPU 曾分配11 GiB、发生过显存超限或 OOM。
+
+（4）test_reservations_and_resource_wait_then_three_admissions，100—120 行。
+真实 admission 算术和真实小进程调度；Memory/Growing 替身给资源值。它覆盖20 GiB不够而26 GiB足够的承诺余额例子，以及可用资源增长后使用三个槽；不是现场显存波动和模型吞吐验证。
+
+（5）test_single_vendor_slot_and_serial_followups_preserved，122—141 行。
+真实小进程依序完成两条手写训练和一个后处理，所有记录在slot 0；另一个反例证明单槽失败后不启动下一任务。不是36条VendorLink正式训练。
+
+（6）test_chain_gate_missing_failed_and_valid_negative_science，143—171 行。
+真实 predecessor_state 读取手写 FOREVER完成／结果记录，relevant_processes 为替身。动态确认缺完成、缺项、failure 阻断，以及 passed=false 的完整记录允许交接。没有运行新120群、4320前向或完整分析。
+
+（7）test_hs_full_gate_checks_all_endpoints，173—201 行。
+真实JSON／哈希／路径读取，构造18条／54点；每点实物重复引用一字节payload，恢复标记为手写字段，相关进程列表为替身。删除最后一份payload后实际门拒绝。不能写成已加载54个真实模型或独立重做恢复。
+
+（8）test_wait_integrated_and_listener_deletes_only_after_update，203—221 行。
+真实 dispatch 接入一个被设为阻断的前序函数，证明不会创建训练任务；再人工写 current 日志调用真实 observer，证明写首步证据和unlink接线。真实更新到日志的先后由源码支持，不是这个用例实际执行了 optimizer.step。
+
+顶层 wait.run 的完整两研究线调用和唯一 claim 没有在本轮动态跑通；其正常接线由静态分析支持。超时、验证失败、共享预算／存储硬故障也并非每种都有新动态负例。没有具体缺口的部分不因缺少类型穷举而要求新增试验；CHAIN-R01 则因已找到真实缺陷，只补它对应的限定 CPU 用例。
+
+7.2 Wrapper 边界
+
+increment/run_cpu.py 第 21 行限定 Linux、每线至多60秒、累计不越过600；22—25 行核对实际来源；27—40 行固定本轮6／2项测试；35—38 行设置单线程、隐藏 CUDA、离线；45—55 行启动真实测试子进程，并监测外层时间、RSS4GiB及小产物64MiB。费用按61—64行的外层elapsed向上取整。
+
+该 wrapper 第64行写入 gpu_training=False、formal_data_reads=0、pretrained_model_loads=0，是 harness 的声明字段。结合所选手写用例、模型入口／资源替身、离线配置可以限定运行内容，不能称为系统 I/O 审计。小子进程实际运行与退出的证据也不等于真实大模型三路训练。
+
+7.3 本轮实际费用与当前余额
+
+FOREVER CPU：
+— 本轮六项 wrapper 实际2.7030355599708855秒，收费3秒；
+— NVML只读查询0.04491968301590532秒，收费1秒；
+— scope承接134秒，134＋1＋3＝138/600秒，剩462秒；
+— receipt峰值RSS600866816字节，小产物36316字节。
+
+VendorLink CPU：
+— 本轮两项 wrapper 实际0.8822178900009021秒，收费1秒；
+— scope承接130秒，130＋1＝131/600秒，剩469秒；
+— receipt峰值RSS35942400字节，小产物3604字节。
+
+console中的六项2.366秒／两项0.757秒是unittest测试体时间，不代替上述外层收费。两组receipt均为exit_code=0、limit_reason=null，但结论依据前述实际断言和源码路径，而非退出码本身。
+
+FOREVER native保持1441/3600秒。memory/report 说明此前1274＋63失败＋104补测＝1441，CPU133＋1＝134、准备1＋60＝61。本包提供的是该历史测量说明，没有附它引用的全部原始GPU测量记录；本轮按既定范围承接费用，不冒称重新核对过那些未附对象或重做了资格。VendorLink承接130秒同理按最新scope／候选门记录，不以更早118秒的网页包覆盖它。
+
+准备费用：FOREVER61＋60＝121/900秒；VendorLink25＋60＝85/3900秒。increment/preparation.json 明说每线新60秒是保守计费而非精确测时，最终传输／部署费用还须在启动前对齐实际账目。原116h／296h总额与12h／8h单条限额未改变，本轮没有新增预算。
+
+八、分类处置与最小闭合路径
+
+SCIENTIFIC_BLOCKER：0项。
+
+REPRODUCIBILITY_DEFECT：1项，即 CHAIN-R01（OPEN，MEDIUM）。真实 FOREVER Budget 对共同目录正常消失文件不兼容，可能误杀健康槽；来源、触发、影响、最小修法和限定CPU验证见第三节。
+
+其余部分：未发现新的必修。VendorLink 调度仍单槽，未发现本轮新链改动给其新增独立阻断；但它按合同依赖 FOREVER 完整成功，因此也会被 CHAIN-R01 导致的不完整训练挡住。
+
+OPTIONAL：
+— 报告或主审记载source_delta时，明确它的本地prior63比较起点；相对上一网页包已有VendorLink workload计数增量，不声称本轮八项测试重跑了该增量。
+— 部署记录可以明确列出最终两gate的引用关系、listener副本／source路径及state路径，便于当前状态定位。scope已要求实际部署核对，这不需要另建管理框架。
+以上不增加实验，不作为第二个必修问题，也不要求追改历史原件。
+
+OUT_OF_SCOPE_OVERDESIGN：
+— 不改FOREVER数学、参数集合、锚点合同、样本Memory、H27来源或评价定义；不重开F-R01/V-R01/V-R02。
+— 不增加方法、HPO、数据、种子、评价／标签权限，或为显著性改变VendorLink固定描述范围。
+— 不重开三路大模型资格、全阶段GPU pilot或全部旧CPU回归；不要求向本审查提供实际文本、标签、模型、owners或凭据。
+— 不要求通用调度、锁、灾备、攻击加固、自动重试、每步checkpoint或全卡无CUDA。
+— 不直接修改被冻结comparison来源来图省事；必要本地预算适配限于FOREVER实际接线，保留原资源判据。
+
+建议的最小闭合顺序：修复CHAIN-R01 → 在现有受限CPU额度内验证真实预算路径的确定性消失反例及真实超额拒绝 → 更新实际来源／费用并做定向回收 → 完成本次scope的主审与部署核对。此前不把现版标记为全部必修闭合。上述不扩展为新训练或GPU验证请求。
+
+九、实际阅读与未执行事项
+
+完整或逐项阅读／核对：
+— package_manifest.json、increment/scope.zh.txt、preparation.json、nvml_readonly.json；
+— 两项increment gate及两组CPU console/evidence/receipt；
+— 当前与before完整step28_formal_queue.py、当前与before step28_forever_formal.py，新增step28_formal_wait.py及完整test_step28_formal_wait.py；
+— increment/run_cpu.py，workspace/run_cpu.py与共享formal-training测试的相关变化；
+— original两项plan/authorization、previous报告和主审的相关范围、memory/report；
+— 当前65来源与gate／receipt的逐项字节和哈希，before与上一已审来源，以及未变科学字段／引用的机械比较。
+
+直接调用追踪：
+— step28_continual_comparison_run.py::Budget；
+— step28_forever_run.py::Store、stage、endpoint及正常退役；
+— step28_forever.py 的step/update/advance到实际current日志顺序；
+— FOREVER formal真实worker、validate_completion、verify_reference、retire_completed；
+— FOREVER evaluate的complete_training、完整确认门、allocator、分析完成status与passed；
+— VendorLink formal的固定rows、worker、完整验证、后处理；VendorLink evaluate的原盲门／固定描述status；
+— 相对上一网页包的VendorLink workload计数相关diff，确认本轮证据归属，不重新展开全部未变算法。
+
+65份来源都核了身份，不等于重新逐行审查全部65份算法。未提供的H/S专属原gate、控制器、现场模型／进程与memory报告引用的原始测量对象，没有作为本次已核验实物引用。
+
+本审查只做ZIP／JSON／SHA256／文本diff等机械检查与静态阅读；没有导入或运行项目、测试、训练、生成、模型推理、正式指标或bootstrap；没有访问科研服务器、外部科研网页或未提供数据／标签／模型／凭据；没有安装依赖、查询现场GPU、启动监听、自动等待或改动输入源码／gate。
+
+十、最终条件结论
+
+最新H/S→FOREVER三槽→完整后处理→VendorLink单槽目标在主体调度与顺序门上已得到真实接线；健康槽继续领剩余队列也有实际小进程证据。唯一剩余必修是实际FOREVER worker的共享目录预算扫描竞态。当前判定为CHAIN-R01 OPEN，无新增科学阻断，不给现版无条件部署通过结论。
+
+修复这一局部问题并完成对应限定CPU核验后，可按最新scope继续主审和实际部署核对；不需要恢复旧单槽或旧暂停决定，也不需要扩研究。本报告不是正式运行／效果结果，不承诺三路模型已验证或预算内一定完成，不代替主执行者的部署核对。

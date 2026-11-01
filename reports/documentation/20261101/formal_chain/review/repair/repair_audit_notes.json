@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-01",
+  "model": "GPT-6 Astra Pro（当前会话，未切换）",
+  "input": {
+    "filename": "repair_review.zip",
+    "actual_bytes": 53305,
+    "actual_sha256": "286526ee7f6a18f2517e45ccd5b3a59a10e6317655249be1935885fb81d9131b",
+    "members": 17,
+    "payloads": 16,
+    "verified_payloads": 16,
+    "identity_mismatches": 0,
+    "before_three_files_match_prior": true,
+    "logical_current_sources": 65,
+    "both_repair_gates_and_both_cpu_receipts_match": true
+  },
+  "decisions": {
+    "CHAIN-R01": "CLOSED",
+    "new_SCIENTIFIC_BLOCKER": [],
+    "new_REPRODUCIBILITY_DEFECT": [],
+    "required_repairs": [],
+    "required_additional_verification": [],
+    "preserved_closed": ["F-R01", "V-R01", "V-R02"]
+  },
+  "closure_basis": {
+    "actual_training": "after/step28_forever_formal.py:23,30-52,146,165；本地Budget继承ComparisonBudget，execute和Store使用实际修后check。",
+    "evaluation": "前包未变step28_forever_evaluate.py:248仍构造formal.Budget；新增测试67-68核对类引用身份。",
+    "safe_collection": "after/step28_formal_queue.py:139-147仅逐文件捕FileNotFoundError；150-151父campaign_size复用同一helper。",
+    "limits_preserved": "check除files赋值外与冻结基类AST一致；deadline-60、2秒节流、非零reserve、RSS、共享disk/small/free与peak保持；__init__/summary继承。",
+    "no_false_retry": "未捕获整个Budget异常后调用旧check重试，不存在self.last更新后的节流伪放行。"
+  },
+  "regression_test": {
+    "location": "after/test_step28_formal_wait.py:38-71",
+    "actual_classes": "直接调用真实ComparisonBudget与修后Budget，helper未替换。",
+    "fault_model": "Retired路径替身is_file为真、stat抛FileNotFoundError；Path.rglob返回可重复遍历列表；kept.txt真实3字节。",
+    "assertions": ["原类抛错", "修后类继续且peak_disk=3", "父campaign_size=3", "disk/small/RSS/reserve/free/deadline具体反例仍拒绝"],
+    "revert_detection": "恢复失败采集或删除逐文件容忍会令actual.check抛错；整次吞异常不计量不能满足3字节及超额断言。",
+    "limitations": "未实际并发unlink/rename检查点；未执行真实模型或完整评价CLI；节流及全部reserve/free组合主要由静态等价支持。"
+  },
+  "linux_evidence": {
+    "forever_selected_tests": ["test_actual_forever_budget_tolerates_peer_retirement_preserves_caps", "test_failure_retires_slot_and_healthy_slots_take_remaining_queue"],
+    "vendor_selected_tests": ["test_single_vendor_slot_and_serial_followups_preserved"],
+    "real_process_scope": "真实小Python子进程与dispatch；资源为既有替身，不是三路原生训练。",
+    "prior_eight_tests": "按具体未变行为复用，本次未全部重跑。",
+    "zero_access_fields": "wrapper声明，须结合手写测试/替身/offline配置；不是系统I/O审计。"
+  },
+  "provenance": {
+    "comparison_sha256": "8bba9539ed713a904ff6ff884ad0311f3f6b075618326bdf4e5dc5401670422e",
+    "wait_sha256": "8b8bb112bc25ef29eaa9cec181b70998f25ea81ac3392e91e16379bb9ef6c404",
+    "scope_unchanged": true,
+    "science_and_budget_fields_unchanged": true,
+    "vendor_candidate_pin_matches_forever_repair_gate": true,
+    "candidate_forever_gate_bytes": 23761,
+    "candidate_forever_gate_sha256": "d1d682ef868d1a5e2420f42bd201d8407143c567131985925c48b7591132d91d"
+  },
+  "accounting": {
+    "forever_cpu02_wall_seconds": 2.748513022903353,
+    "forever_cpu02_charged_seconds": 3,
+    "forever_cpu_cumulative_seconds": 141,
+    "vendor_cpu02_wall_seconds": 0.9547400560695678,
+    "vendor_cpu02_charged_seconds": 1,
+    "vendor_cpu_cumulative_seconds": 132,
+    "chain_increment_cpu_seconds": {"forever_including_prior_nvml": 7, "vendorlink": 2},
+    "increment_limit_per_line_seconds": 60,
+    "cpu_limit_per_line_seconds": 600,
+    "forever_native_cumulative_seconds": 1441,
+    "forever_native_limit_seconds": 3600,
+    "preparation_seconds": {"forever": 181, "vendorlink": 145},
+    "preparation_note": "每线本次再保守计60秒，不是精确测时，不计网页等待。",
+    "total_plan_hours": {"forever": 116, "vendorlink": 296},
+    "per_trajectory_hours": {"forever": 12, "vendorlink": 8}
+  },
+  "deployment_boundary": {
+    "repair_gate_flags": {"approved": false, "review_closed": false},
+    "new_wait_chain_started": false,
+    "startup_state_basis": "用户当前说明与候选门状态；未现场查询服务器。",
+    "required_existing_step": "主执行者按当前scope另建正式gate，现场核对H/S gate/进程/最终来源/独立入口，更新Vendor对最终FOREVER gate的bytes/SHA引用。",
+    "old_pause_or_single_slot_restored": false,
+    "review_replaces_deployment_check": false,
+    "real_hs_54_endpoints_verified_here": false,
+    "three_model_workers_qualified_here": false
+  },
+  "optional": [],
+  "out_of_scope": ["全仓回归", "新GPU或三路模型资格", "正式数据/模型/标签读取", "通用文件系统或调度加固", "修改冻结comparison或科学合同"],
+  "reviewer_execution": {
+    "project_or_tests_run": false,
+    "research_computation_run": false,
+    "research_servers_or_unprovided_objects_accessed": false,
+    "input_or_gate_modified": false,
+    "mechanical_checks_only": ["ZIP", "JSON", "SHA256", "文本diff", "AST结构比较"]
+  }
+}

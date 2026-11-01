@@ -1,4 +1,4 @@
-"""Nine FOREVER trajectories, one worker, existing stage mathematics unchanged.
+"""Nine FOREVER trajectories, bounded independent slots, stage mathematics unchanged.
 
 Training and new-confirmation access are distinct. This entry produces all 27
 inference endpoints; it does not open old or new evaluation labels.
@@ -9,19 +9,47 @@ import argparse
 import gc
 import json
 from pathlib import Path
+import shutil
 import sys
 import time
 import traceback
+
+import psutil
 
 ENTRY_STARTED = time.monotonic()
 
 import step28_forever_run as run
 import step28_formal_queue as queue
-from step28_continual_comparison_run import Budget
+from step28_continual_comparison_run import Budget as ComparisonBudget
 from step28_continual_five_run import COMPLETE as H_COMPLETE
 
 m, data = run.m, run.m.data
 COMPLETE = 'COMPLETE_FOREVER_864_CURRENT_3_ENDPOINTS_BLIND'
+
+
+class Budget(ComparisonBudget):
+    """Same limits/timing as the frozen budget; tolerate peers retiring files."""
+    def check(self, reserve: int = 0):
+        now = time.monotonic()
+        if now >= self.deadline-60:
+            raise TimeoutError('Allocated deadline reached with shutdown reserve')
+        if now-self.last < 2 and not reserve:
+            return
+        self.last = now
+        process = psutil.Process()
+        rss = 0
+        for p in [process, *process.children(recursive=True)]:
+            try:
+                rss += p.memory_info().rss
+            except psutil.NoSuchProcess:
+                pass
+        files = queue.campaign_files(self.root)
+        used, small = sum(size for _, size in files), sum(size for suffix, size in files if suffix != '.pt')
+        self.peak_rss, self.peak_disk = max(self.peak_rss, rss), max(self.peak_disk, used)
+        if (rss > self.limits['rss_bytes'] or used+reserve > self.limits['disk_bytes']
+                or small > self.limits['small_bytes']
+                or shutil.disk_usage(self.root).free < self.limits['free_reserve_bytes']+reserve):
+            raise RuntimeError('Independent comparison resource allowance exceeded')
 
 
 def specs():

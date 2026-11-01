@@ -1,0 +1,42 @@
+H/S → FOREVER → VendorLink 等待链与三槽实施记录
+日期：2026-11-01；运行观测用服务器UTC+8，已知服务器比客户端约快5分钟。
+
+一、需求与范围
+本轮按 scope.zh.txt 中用户已确认的完整要求实施。FOREVER最多三个独立槽，共享原固定九条完整三阶段轨迹；每槽成功后继续领取下一条。单条失败/OOM/超时/观测整个PID显存超过10GiB，失败槽退出，不重试该轨迹，健康槽继续处理剩余队列。共享预算、RAM/磁盘或监控失败按实际依赖停止本批。失败隔离不放宽九条完整门，也不使失败任务重新入队。
+显存采用前文GiB口径：PyTorch allocator9GiB，每槽整个PID监控阈值和调度预留10GiB。扣除自有已启动PID尚未实际体现的预留，再判断是否可开新槽。允许先一/两槽，资源具备再补至三槽；轮询默认5秒，无法保证瞬间绝不超10GiB。VendorLink继续单槽17GiB准入，不添加FOREVER allocator限制。
+H/S原18条54端点完整有效、相关进程退出后，FOREVER才进入原H27核验及资源准入；FOREVER九条、generation、confirmation、analysis全部完整有效且相关进程退出后，VendorLink才运行36条及原score/analyze。科学主门false不等于运行失败。旧H_pos_tuned九条27模型仍是FOREVER对照，H/S本次默认配置训练只是前序执行条件。
+原方法、划分、种子、数据/标签权限、统计判据、单条12h/8h和116h/296h总额保持。并行按每个child实际elapsed相加，不承诺工期除3；旧失败费用保留。用户没有授权跳过外审，本轮无新GPU试跑或正式数据读取。
+
+二、实现与实际路径
+scripts/step28_formal_queue.py接入有界槽调度、直接读取已有NVML、PID超限处置、尚未体现的显存预留、健康槽续领、串行后处理及完整成功门。单槽故障与共享故障分开；保留原异常及cleanup异常。实际入口为step28_forever_formal.py、step29_vendorlink_formal.py，队列不是另一个未接入的模拟实现。
+scripts/step28_formal_wait.py顺序调用上述两个真实main；独立state.mkdir持久claim和各campaign.mkdir防止重复启动。准确绑定H/S gate及最终FOREVER gate，读取原完成/预算/逐run端点元数据，不提前打开评价标签。FOREVER第一条真实current更新写出后，删除active_formal_wait.py副本，保留workspace源码、first_update和继续运行的控制进程。
+Linux独立根：/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain。workspace继承10月30日vendorlink/formal已冻结63来源，其中只改queue和forever_formal，新增wait和定向测试，共65来源。现有comparison科学源码SHA256 8bba9539ed713a904ff6ff884ad0311f3f6b075618326bdf4e5dc5401670422e保持；未用当前根目录另一版本覆盖。六个链接仅原BGE和五个获准train输入，不链接整个dev/test/owners。
+
+三、定向核验、实际发现与修复
+首轮Linux py310 CPU：FOREVER六项、Vendor两项，分别见cpu_forever01、cpu_vendor01。真实小Python子进程验证一槽失败后八个任务由健康槽继续处理、失败槽不复用、无完整批次成功、无后处理；另覆盖模拟PID超限后的实际子进程停止、预留算术/少槽补三槽、单槽后处理、完整前序门及自删接线。资源数值和H/S端点是手写替身；真实formal.main接线用例替换dispatch，不冒称执行过正式大模型。NVML另有一次只读实物查询，未分配CUDA。
+外审CHAIN-R01指出真实worker仍引用冻结ComparisonBudget：它扫描共同campaign时，另一槽正常退役checkpoint可能使is_file之后的stat抛FileNotFoundError，误退健康槽。父队列安全扫描不等于真实worker已修复，首轮八项未覆盖这个路径。
+修复限FOREVER本地Budget子类：保留冻结构造/summary及原deadline、60秒退出预留、2秒节流、RSS、共同campaign disk/small、checkpoint reserve/free规则，只将计量接到queue.campaign_files，逐文件仅容忍FileNotFoundError并继续检查存续文件。不缩小root、不吞整个预算异常，不立即重试已更新self.last的旧check；冻结comparison未动。训练和confirmation均解析到该实际类。
+cpu_forever02新增确定性消失反例，直接调用原/修后Budget：通过Path.rglob返回的手写对象注入is_file=True、stat抛FileNotFoundError，原失败、新实现继续计入真实3字节存续文件；disk/small/RSS/reserve/free/deadline超额仍拒绝。此为真实Budget调用加确定性文件替身，不宣称真实双进程unlink竞态已复现。同时复核真实小进程健康续领；cpu_vendor02复核共享queue单槽/串行后处理。新增两项+一项均通过，无失败测试尝试。原八项按未变行为复用，修前源码保存在review/before_repair，不改绑旧receipt。
+相对本地prior63只有上述两改两新；相对更早网页包另有已存在VendorLink workload计数增量，它的原证据见20261030/vendorlink/formal/cpu10。不能把本轮测试写成重跑该增量或全部算法。
+
+四、费用
+FOREVER原CPU134秒＋NVML只读1秒＋cpu_forever01收费3秒＋cpu_forever02收费3秒＝141/600秒；本轮新增7秒在60秒许可内。原native1441/3600秒保持，其中63秒失败不清零。
+VendorLink原CPU130秒＋cpu_vendor01收费1秒＋cpu_vendor02收费1秒＝132/600秒；本轮新增2秒在60秒许可内。
+准备在原61/25秒上各保守结转两段60秒，用于独立workspace、同步、修复材料和部署收尾，最终门181/900及145/3900；是明确保守记账，不是精确测时，不把网页等待算进计算费用。正式运行后preflight/控制实际活动时间及每child elapsed由队列继续累加，睡眠等待排除。仅CPU资格账不足以说明正式队列已开训。
+
+五、外审与主审
+首次查看菜单出现锁定/额度提示，我据此过早判断无法外审并提出例外。用户明确“哪里锁定了，你会用吗，重新试，必须外审”；实际上传和提交在原会话成功，没有得到免外审许可。原菜单观察、纠正、真实提交分开留存。
+同一ChatGPT会话：https://chatgpt.com/c/6ae406c1-160c-83ea-a5a1-3b22ccac18fc；请求GPT-6 Pro、可见思考强度Pro、审查者自述GPT-6 Astra Pro，未独立验证后台身份。首包397167字节/86载荷，完整report.zh.txt与audit_notes.json保存review；唯一必修CHAIN-R01按上述修复后，补包53305字节/16载荷已送同一会话定向复核。
+修后完整报告与audit已回收并逐段读完：CHAIN-R01=CLOSED，无新增科学阻断/实现必修，不要求额外核验。主执行者独立处置见review/primary_disposition.zh.txt，接受具体缺陷与最小修法，核对真实入口、确定性反例、旧证据适用范围和费用；本轮实现/限定核验结案。两轮原件及修前源码保留，不以新结论覆盖首轮OPEN事实。确认网页没有待发送请求或仍在执行的回答后，本轮专用页已关闭。
+
+六、部署核对与收尾
+11:45:29部署前只读核对65新来源及H/S44科学来源一致；原CAB3146505、比较控制器3171756、H/S监听3171792的属主/启动时刻/命令/cwd相符。H/S训练0、无failure、完整门未达，新chain claim和正式campaign均不存在。实际H/S控制源码的18/54 status、相对completion、points/model/mapping/scores与新等待门一致。初次机械来源核对误按cwd解析H/S相对路径而报FileNotFoundError，发生在变更前；随后按其冻结workspace修正核对，不是科研测试/训练失败或重试。
+11:53:15最终部署：另建forever/formal_gate.json和vendorlink/formal_gate.json，approved/review_closed均true，绑定review_ready及65份当前来源。Vendor前序重新引用最终FOREVER门的实际bytes/SHA，不沿用repair_gate身份。原候选和旧冻结门不覆盖。保留workspace/scripts/step28_formal_wait.py，将同字节副本部署为base/active_formal_wait.py；持久claim为base/state。实际源检查、六链接、门及前序绑定见deployment.json。
+11:53:38启动唯一新控制进程3485029，属主yongpeng、创建时刻1793505217.8、cwd为新workspace，参数精确绑定上述两正式门和state；launch.json及state/process.json留证。启动前核对没有既有本链进程/claim/campaign，原CAB3146505、比较3171756、H/S3171792身份不变。
+11:53:52实际observation.json：新父进程及claim吻合，FOREVER状态WAITING_PREDECESSOR，原因PREDECESSOR_STILL_RUNNING，识别原H/S PID3171792；无子进程、无FOREVER轨迹目录、无failure，Vendor campaign尚不存在。FOREVER当前CPU141/native1441/preparation181，control1.4888575240038335秒；H/S训练0、control1867.657790843281/7200秒。原比较17条完成，仅CAB_s6_L2R_text_fixed活动，GPU仍只有原CAB7684MiB。等待链已实际生效，不等于FOREVER/Vendor正式训练已开始。
+新链在H/S完整成功且退出之前持续等待；以后FOREVER首个真实current更新后自删active副本，现阶段尚无更新所以副本仍存在。现有H/S自删规则/成功门/失败槽逻辑均未改。任一前序最终不完整则按约停止下游，不自动重试或绕过。完整工期依前序、资源和正式吞吐，尚无依据将旧单路58—87h除3给出新的确定日期。
+
+七、证据保管与交付
+两轮完整输入ZIP、报告/audit/请求/提交、修前来源、四组CPU原件、实际NVML记录、候选/正式门、部署/启动/观测及费用保留；没有测试/正式权重或文本/标签回Windows。9份部署小证据经31639字节ZIP回传，SHA256 865388ac11a17d05059ee79f964445457350b16dde112aeed420c0e4e336e1fb，逐项核对见receive.json和deployment_transfer_manifest.json。
+核对保留载荷后清理本轮纯中转包、incoming重复副本和新workspace的生成pycache，保留活动代码、唯一监听、claim和全部科学资产。机械清理曾因ZIP内部manifest未单独落盘、以及同JSON不同格式而在核对环节停止，随后恢复原manifest字节再逐项核对清理；未丢证据、未重启任何科学作业，细节见transport_cleanup_linux.json。完整审查输入包继续保留供恢复/复核，不清理旧批次或大资产，不重置大清理周期。
+当前交接原位替换每线唯一当前项，必要旧状态移历史；讨论/设计/存储在Windows更新，不覆盖Linux根可变文档。本次只作本地Git提交，不沿用旧特定八commit的推送许可。结案后保留的远端工作仅已授权新等待链及原作业，交互SSH退出不影响它们。

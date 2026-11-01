@@ -1,5 +1,15 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-01 三路FOREVER与完整成功顺序等待链
+
+用户原要求：“写Forever以及Vendor-link的等待训练脚本，在H/S训练完后接上，先Forever后Vendor-link，想清楚等待逻辑以及woker的逻辑”。实测完成后，用户要求最多三路；在完整方案中明确选择“前批必须完整成功：H/S不完整则不启Forever，Forever不完整则不启Vendor-link”。显存方案经历澄清后最终原话为：“分配器给9GB显存，剩下的额外给1G显存，总共 单个worker 10GB显存就行”。承接前文GiB单位，最终allocator9GiB、进程监控阈值及每槽预留10GiB；此前allocator8GiB/进程9GiB提议作废，不混为当前设置。
+
+按已呈现完整方案和这两项明确选择实施：三槽共享固定九条，成功继续接续；失败/OOM/超时/观测超10GiB只退出该槽，健康槽继续领取，不重试失败轨迹；资源不足先少槽、具备资源再补三槽，扣除已承诺但未实际占用的余量。原单条12h/116h及Vendor单槽8h/296h、方法/数据/评价保持。H/S18条54端点完整有效及进程退出后才启动；FOREVER九条及规定确认分析全部有效完成才交接Vendor36条及评分分析，科研主门false不等于运行失败。独立部署、唯一等待链、限定CPU各最多60秒，无新增GPU试跑。具体范围及来源见[本轮补充](../reports/documentation/20261101/formal_chain/scope.zh.txt)。
+
+Agent首次仅看到原外审会话菜单“已锁定／已达到使用限额”就过早判断无法外审，并提出主审例外。用户纠正：“哪里锁定了，你会用吗，重新试，必须外审”。该纠正保持本轮必须网页外审，无主审免外审许可。重新在原GPT-6／Pro会话上传并实际提交后成功，审查者开始核对输入并自述GPT-6 Astra Pro。初始菜单观察原件和[实际提交／纠正](../reports/documentation/20261101/formal_chain/review/submission.json)分别保留，不能再将菜单提示当成当前阻断或将旧报告当作新审查。
+
+首轮独立外审发现CHAIN-R01：父queue虽然容忍同伴文件正常退役，真实FOREVER worker仍采用冻结Budget的非安全扫描。按最小修法在FOREVER本地实际Budget中保留所有原判据，只对逐文件FileNotFoundError容忍；Linux真实Budget反例及健康槽续领/单槽后处理复核通过。修后回到同一Pro会话[定向外审](../reports/documentation/20261101/formal_chain/review/repair/repair_report.zh.txt)，关闭CHAIN-R01、无新增必修；[独立主审](../reports/documentation/20261101/formal_chain/review/primary_disposition.zh.txt)核对并结案，不追加GPU试跑。11月1日按既有完整确认范围启动唯一下游链3485029，实际等待原H/S监听3171792；原CAB、比较及H/S进程保持。完整行为、部署/等待证据和费用见[实施记录](../reports/documentation/20261101/formal_chain/report.zh.txt)，当前状态仅在交接顶部维护。
+
 ## 2026-11-01 H/S后顺序接续需求与FOREVER显存实测
 
 用户要求“写Forever以及Vendor-link的等待训练脚本，在H/S训练完后接上，先Forever后Vendor-link，想清楚等待逻辑以及woker的逻辑”。执行者只读核对现行方案、实际入口及服务器，呈现完整等待/worker/失败/预算与部署方案；用户追问为何单worker，继而要求“去看看实际每个woker要占用多少显存？现在就去试”，并限定“Forever的”。原自动交接目标继续保留，不能被显存支线替换；并发及跨批失败交接方案尚待确认，本次不据此前序请求擅自启用正式队列。

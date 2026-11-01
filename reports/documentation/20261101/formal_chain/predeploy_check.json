@@ -1,0 +1,101 @@
+{
+  "server_time": "2026-11-01 11:45:29 +0800",
+  "sources_verified": 65,
+  "hs_sources_verified": 44,
+  "hs_gate": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/formal_gate.json",
+    "bytes": 21699,
+    "sha256": "bcece34e8e406d41312dbbb10c4b377d428db003063117755a647942a0509032"
+  },
+  "hs_campaign": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/formal",
+  "hs_run_ids": [
+    "ABC_s4_S_default",
+    "ABC_s4_H_default",
+    "ABC_s5_S_default",
+    "ABC_s5_H_default",
+    "ABC_s6_S_default",
+    "ABC_s6_H_default",
+    "BCA_s4_S_default",
+    "BCA_s4_H_default",
+    "BCA_s5_S_default",
+    "BCA_s5_H_default",
+    "BCA_s6_S_default",
+    "BCA_s6_H_default",
+    "CAB_s4_S_default",
+    "CAB_s4_H_default",
+    "CAB_s5_S_default",
+    "CAB_s5_H_default",
+    "CAB_s6_S_default",
+    "CAB_s6_H_default"
+  ],
+  "hs_completion": false,
+  "hs_failure": false,
+  "hs_budget": {
+    "active": {},
+    "budget_exceeded": false,
+    "completed": [],
+    "cumulative_seconds": 1866.9739895940293,
+    "failed": false,
+    "limits": {
+      "control": 7200,
+      "training": 388800
+    },
+    "used": {
+      "control": 1866.9739895940293,
+      "training": 0.0
+    }
+  },
+  "processes": [
+    {
+      "pid": 3146505,
+      "username": "yongpeng",
+      "create_time": 1793415900.44,
+      "cmdline": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace/scripts/step28_continual_comparison_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/CAB_s6_L2R_text_fixed",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal/dispatch/CAB_s6_L2R_text_fixed/spec.json",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/formal_gate.json",
+        "--deadline",
+        "1106677.448285792"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_finish/workspace"
+    },
+    {
+      "pid": 3171756,
+      "username": "yongpeng",
+      "create_time": 1793418749.28,
+      "cmdline": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace/scripts/step28_comparison_continue.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/formal_gate.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/workspace"
+    },
+    {
+      "pid": 3171792,
+      "username": "yongpeng",
+      "create_time": 1793418753.77,
+      "cmdline": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/active_defaults_wait.py",
+        "--workspace",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261031/comparison_continue/defaults/formal_gate.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261030/defaults_repair/workspace"
+    }
+  ],
+  "new_chain_claim_exists": false,
+  "new_campaign_exists": false,
+  "gpu": "NVIDIA GeForce RTX 5090, 32607 MiB, 24152 MiB",
+  "precheck_note": "Initial mechanical source check used cwd for relative H/S source paths and failed before mutation; corrected to its frozen workspace. No scientific test/train retry."
+}

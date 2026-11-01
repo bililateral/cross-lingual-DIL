@@ -1,0 +1,13 @@
+请对刚才唯一必修 CHAIN-R01 做定向修复复核，仍使用本会话 GPT-6 Pro，不重开已闭合科学方案。用户明确要求必须外审；本次尚未启用新等待链。
+
+附件 repair_review.zip，53305 字节，SHA256 286526ee7f6a18f2517e45ccd5b3a59a10e6317655249be1935885fb81d9131b；17 项含清单自身，16 项载荷。先核对实际文件与清单，沿用前包及刚才审查原件。只静态阅读和机械核对附件，不执行项目、测试或科研计算，不访问服务器、数据或模型。
+
+本次差异：FOREVER formal 采用本地 Budget 子类，继承冻结 ComparisonBudget 的初始化与 summary；实际 check 保留原 deadline、60 秒 shutdown reserve、2 秒节流、RSS、共同 campaign disk/small、checkpoint reserve 和 free_reserve 判据，只复用 queue.campaign_files 的逐文件 FileNotFoundError 容忍。父 queue 同一 helper 计总量。没有捕获整个预算异常或在已更新 self.last 后立即重试原 check。冻结 comparison 原件 SHA256 8bba9539ed713a904ff6ff884ad0311f3f6b075618326bdf4e5dc5401670422e 保持；evaluate 仍使用实际 formal.Budget。wait 及其完整成功门不变。
+
+新增 CPU 手写用例调用实际最终 Budget：同伴文件在 is_file 后、stat 前消失，原 Budget 抛 FileNotFoundError，修后继续检查存续 3 字节文件；同时验证 disk/small/RSS/reserve/free/deadline 仍拒绝真实超额。没有模型/GPU/正式文本标签。FOREVER cpu_forever02 运行该用例及真实小子进程健康补位用例，两项通过，外层2.748513022903353秒，收费3秒；Vendor cpu_vendor02 复核共享 queue 的单槽顺序，一项通过，外层0.9547400560695678秒，收费1秒。原八项证据按具体未变行为复用，未宣称全来源重跑。新测试不是三路原生训练资格。
+
+当前累计 FOREVER CPU141/600，native1441/3600；Vendor CPU132/600。本轮新增 CPU 分别7秒（含NVML只读1秒）与2秒，均低于各60秒许可。修复同步及后续部署准备按每线再保守计60秒，最终候选 preparation=FOREVER181/900、Vendor145/3900；这不是精确测时，不计网页等待，原116h/296h和单条12h/8h不变。
+
+repair_gate 仍 approved/review_closed=false，仅是修后审查候选。闭合后另建正式 gate；主执行者必须在 Linux 核对真实 H/S gate、现有进程、全部来源及独立入口，更新 Vendor predecessor 对最终 FOREVER gate 的字节/SHA绑定，才启用唯一等待链。尚无正式训练结果，不声称真实54端点已经完成。旧暂停与单槽决定已由当前 scope 替代。
+
+请逐项判断 CHAIN-R01 是否 CLOSED，是否引入与该修复直接相关的新必修，并给出具体证据及适用边界。保留未变科学审查和首轮证据，不增加无关回归、GPU试跑或流程。请提供完整 repair_report.zh.txt 与 repair_audit_notes.json；区分外审静态判断、已有 Linux 动态证据及仍需现场部署核对。

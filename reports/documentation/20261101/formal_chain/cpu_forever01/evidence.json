@@ -1,0 +1,178 @@
+{
+  "tests_run": 6,
+  "failures": 0,
+  "errors": 0,
+  "evidence": {
+    "actual_forever_entry": {
+      "rows": 9,
+      "workers": 3,
+      "followups": [
+        {
+          "id": "generation",
+          "action": "generate",
+          "bucket": "generation",
+          "gpu": false,
+          "seconds": 600
+        },
+        {
+          "id": "confirmation",
+          "action": "confirmation",
+          "bucket": "confirmation",
+          "gpu": true,
+          "seconds": 21600
+        },
+        {
+          "id": "analysis",
+          "action": "analyze",
+          "bucket": "analysis",
+          "gpu": false,
+          "seconds": 900
+        }
+      ],
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/workspace/scripts/step28_forever_formal.py",
+        "worker",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/cpu_forever01/tmp31casj_z/gate.json",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/cpu_forever01/tmp31casj_z/job",
+        "--order",
+        "ABC",
+        "--seed",
+        "4",
+        "--deadline",
+        "123.0"
+      ]
+    },
+    "healthy_refill": [
+      {
+        "id": "0",
+        "slot": 0,
+        "bucket": "training",
+        "actual_seconds": 0.17451488005463034,
+        "success": false,
+        "error": "RuntimeError('Worker failed with exit 2')"
+      },
+      {
+        "id": "1",
+        "slot": 1,
+        "bucket": "training",
+        "actual_seconds": 0.1661071099806577,
+        "success": true,
+        "error": null
+      },
+      {
+        "id": "2",
+        "slot": 2,
+        "bucket": "training",
+        "actual_seconds": 0.15781883907038718,
+        "success": true,
+        "error": null
+      },
+      {
+        "id": "3",
+        "slot": 1,
+        "bucket": "training",
+        "actual_seconds": 0.16774446598719805,
+        "success": true,
+        "error": null
+      },
+      {
+        "id": "4",
+        "slot": 2,
+        "bucket": "training",
+        "actual_seconds": 0.15895400696899742,
+        "success": true,
+        "error": null
+      },
+      {
+        "id": "5",
+        "slot": 1,
+        "bucket": "training",
+        "actual_seconds": 0.1665363849606365,
+        "success": true,
+        "error": null
+      },
+      {
+        "id": "6",
+        "slot": 2,
+        "bucket": "training",
+        "actual_seconds": 0.15790765499696136,
+        "success": true,
+        "error": null
+      },
+      {
+        "id": "7",
+        "slot": 1,
+        "bucket": "training",
+        "actual_seconds": 0.16608086903579533,
+        "success": true,
+        "error": null
+      },
+      {
+        "id": "8",
+        "slot": 2,
+        "bucket": "training",
+        "actual_seconds": 0.15754927694797516,
+        "success": true,
+        "error": null
+      }
+    ],
+    "total_process_limit": [
+      {
+        "id": "0",
+        "slot": 0,
+        "bucket": "training",
+        "actual_seconds": 0.05979136598762125,
+        "success": false,
+        "error": "PROCESS_GPU_LIMIT_EXCEEDED"
+      },
+      {
+        "id": "1",
+        "slot": 1,
+        "bucket": "training",
+        "actual_seconds": 0.16701083607040346,
+        "success": true,
+        "error": null
+      },
+      {
+        "id": "2",
+        "slot": 2,
+        "bucket": "training",
+        "actual_seconds": 0.15823339601047337,
+        "success": true,
+        "error": null
+      },
+      {
+        "id": "3",
+        "slot": 1,
+        "bucket": "training",
+        "actual_seconds": 0.16672713996376842,
+        "success": true,
+        "error": null
+      },
+      {
+        "id": "4",
+        "slot": 2,
+        "bucket": "training",
+        "actual_seconds": 0.1582072409801185,
+        "success": true,
+        "error": null
+      }
+    ],
+    "pending_reservations": {
+      "free_gpu_bytes": 21474836480,
+      "pending_gpu_bytes": 17179869184,
+      "required_gpu_bytes": 27917287424,
+      "ready": false
+    },
+    "hs_full_gate": {
+      "handwritten_runs": 18,
+      "points": 54,
+      "missing_payload_rejected": true
+    },
+    "predecessor_entry_and_self_delete": true
+  }
+}

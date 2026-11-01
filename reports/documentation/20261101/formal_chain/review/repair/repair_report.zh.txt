@@ -1,0 +1,194 @@
+CHAIN-R01 定向修复复核报告
+日期：2026-11-01（UTC+8）
+模型：本会话 GPT-6 Astra Pro；未切换模型。
+
+一、实际输入身份与裁决
+
+实际附件：repair_review.zip
+实际字节数：53305
+实际 SHA256：286526ee7f6a18f2517e45ccd5b3a59a10e6317655249be1935885fb81d9131b
+ZIP 实际成员：17 个文件，即16项载荷＋package_manifest.json自身。
+清单核验：16/16项载荷的路径、字节数和SHA256一致；无重复路径、缺项、额外载荷或身份不符。
+before三文件均与上一formal_chain_review包对应来源同字节。以前包65份来源为基础、用本包after三文件替换相应项后，两份repair_gate及两份新CPU receipt各65项来源全部一致。
+
+最终裁决：CHAIN-R01 = CLOSED。
+与本修复直接相关的新增 SCIENTIFIC_BLOCKER：0项。
+与本修复直接相关的新增 REPRODUCIBILITY_DEFECT：0项。
+本轮没有剩余必须修改的代码，也没有需要作为闭合前提追加的测试、GPU试跑或科研计算。
+
+关闭依据：真实FOREVER worker现已构造本地Budget子类；该类仅将原文件采集替换为逐文件容忍FileNotFoundError的共同helper，原时间、RSS、共同campaign磁盘、小文件和保存预留判据保持。新增用例实际调用冻结原类和修后类，在确定性的同一失效位置证明旧类抛错、修后类继续计量存续3字节文件，并检查具体超额仍拒绝。
+
+这项结论关闭的是代码缺陷，不是三路原生训练或正式效果结论。首轮未变科学审查及F-R01、V-R01、V-R02的CLOSED状态保持；首轮证据按具体未变行为继承，没有把八项测试或全部来源宣称为本次重跑。
+
+两份repair_gate仍为approved=false、review_closed=false，属于修后审查候选。按用户当前安排，闭合后另建正式gate，由主执行者在Linux核对真实H/S gate、进程、最终来源、独立入口及最终predecessor引用，随后依当前scope启用唯一链。本报告不代替这些现场核对，也不恢复已经被当前scope替代的旧暂停或单槽决定。本审查未启用监听、等待或训练。
+
+定位约定：本轮行号以 /workspace/scratch/8f77b6332ab8/formal_chain_repair_input/after/ 下文件为准；未变直接依赖沿用 /workspace/scratch/8f77b6332ab8/formal_chain_review_input/workspace/。下文“动态证据”仅指包内已存在的Linux CPU02记录，审查者没有执行项目或测试。
+
+二、修复来源与差异的实际边界
+
+本包三个before/after对象为：
+1. step28_forever_formal.py：新增必要导入，将冻结Budget别名为ComparisonBudget，新增本地Budget(ComparisonBudget)。
+2. step28_formal_queue.py：将原campaign_size的逐文件采集提取为campaign_files，campaign_size再求和。
+3. test_step28_formal_wait.py：新增一个预算退役用例；原八个测试方法内容保持。
+
+另有本包run_cpu.py增加受现有列表约束的--only选择，候选门更新来源与实际费用，以及新CPU证据。这些不是算法或预算扩张。
+
+关键身份：
+— 修后FOREVER formal：11619字节，SHA256 a4556e41e9fe856ef82922630fc122425f1e73270f1af703598085c0eec46c9d。
+— 修后queue：17132字节，SHA256 f928e91f6f0cb82860e2b4bbb202fd1788cac56457dacdf61f91d4671b6803ef。
+— 修后定向测试：16034字节，SHA256 9e43f10415214e97be4f0e6512f5f36ecdc7db7d37f906b77497d6bed9e9e0ca。
+— 冻结step28_continual_comparison_run.py：14837字节，SHA256 8bba9539ed713a904ff6ff884ad0311f3f6b075618326bdf4e5dc5401670422e，保持。
+— step28_formal_wait.py：8238字节，SHA256 8b8bb112bc25ef29eaa9cec181b70998f25ea81ac3392e91e16379bb9ef6c404，保持。
+— scope.zh.txt与首轮increment/scope.zh.txt同字节。
+
+这些核对确定审查对象和证据归属；闭合判断仍依据以下实际运算、调用位置和断言，不由源码哈希或PASS数量推出。
+
+三、CHAIN-R01逐项复核
+
+3.1 实际worker采用修后类，扫描范围没有缩小
+
+after/step28_forever_formal.py第23行将原类导入为ComparisonBudget，第30—52行定义本地Budget。真实execute第146行调用的是本地Budget(Path(allowed['campaign']), deadline, allowed['limits'])，根目录仍为整个共同campaign。第165行把budget.check传入run.Store，后续训练／保存检查会使用这条实际路径。
+
+未变step28_forever_evaluate.py第248行仍构造formal.Budget(campaign, deadline, limits)，因此生成、确认和分析也解析到修后类。没有只修父控制器而漏掉真实worker，也没有通过缩成单个job来丢掉共享磁盘约束。
+
+3.2 原判据逐项保留
+
+本地Budget只覆盖check。语法结构比对显示：除“files = ...”这一次赋值外，新check函数体与冻结ComparisonBudget.check一致。继承的__init__和summary未覆盖，原正数限额校验、started、last、peak字段初始化和summary输出继续使用基类。
+
+具体对应如下：
+— 修后33—35行：now与deadline−60比较，保留60秒shutdown reserve；
+— 36—38行：保留两秒节流；非零reserve仍绕过普通节流；
+— 39—45行：保留自身及子孙进程RSS求和与NoSuchProcess处理；
+— 46行：仅文件采集改为queue.campaign_files(self.root)；
+— 47行：used为全部文件大小之和，small仍为后缀非.pt的大小之和；
+— 48行：继续更新真实peak_rss、peak_disk；
+— 49—52行：RSS、used+reserve、small和磁盘free相对free_reserve_bytes+reserve的拒绝条件保持。
+
+checkpoint reserve仍以字节进入磁盘检查，没有被当成秒数；磁盘总额与小文件额仍在共同campaign范围计算。初始化与summary继承和两秒节流的完整性主要来自静态／AST等价核对，而非本轮动态穷举每种时间组合。
+
+3.3 逐文件容忍，未吞掉整次预算检查
+
+after/step28_formal_queue.py::campaign_files，第139—147行，对每个路径的is_file、is_symlink和stat单独包围try，只捕获FileNotFoundError。正常消失的那一项不加入结果，其他存续文件继续被采集。第150—151行父campaign_size也使用同一helper求和。
+
+真实worker在helper返回后继续计算used/small并执行原限额检查。没有捕获整个Budget.check的异常后直接返回成功，也没有调用旧check、捕获异常后立即重试旧check。因此首轮指出的“self.last已经更新，立即重试被两秒节流跳过”的伪修复路径不存在。
+
+其他异常没有被广泛吞掉。总量、非.pt小文件量、保存reserve和真正超额的拒绝行为仍在。父queue原先的总量语义不变，新增列表只为同时提供suffix与size给worker；没有发现会影响本次既定规模的普通运行缺陷。
+
+3.4 修复针对了原触发点
+
+首轮原反例是：A预算扫描已确认某文件存在，B正常退役／改名该文件，A随后的stat失败，导致健康A被当成轨迹失败。修后同一stat失败在逐文件helper内被处理，A仍会检查余下实际文件和全部原限额。它没有重试失败轨迹、改变共享队列、弱化整批成功门或更改scientific passed含义。
+
+因此CHAIN-R01的具体原因、实际调用和错误影响已被最小修法覆盖。该问题可关闭。
+
+四、新测试有效性及其精确证据范围
+
+4.1 直接调用真实新旧Budget，能够识别修复回退
+
+after/test_step28_formal_wait.py::test_actual_forever_budget_tolerates_peer_retirement_preserves_caps，第38—71行：
+— 40—44行定义Retired路径替身：is_file返回True，is_symlink返回False，stat确定性抛FileNotFoundError。
+— 47—48行实际写入kept.txt，内容abc，共3字节。
+— 51—52行分别实例化真实冻结ComparisonBudget和真实本地Budget。
+— 53行仅替换Path.rglob，返回可重复遍历的列表[Retired(), kept]。
+— 54行要求旧预算抛FileNotFoundError；55行要求新预算直接继续成功；56—57行断言新预算peak_disk和父campaign_size均为3。
+
+这里没有将Budget或campaign_files替换成成功替身。rglob返回的是列表，旧类第一次遍历抛错不会把它消耗成一个只剩合法文件的共享迭代器；新类仍会遇到同一个Retired反例。
+
+若恢复原失败采集表达式或撤掉helper中的FileNotFoundError处理，actual.check将抛错，测试失败。若简单捕获整次检查后直接返回，peak_disk通常保持0，不能满足3字节断言；若完全不计存续文件，后续disk/small超额断言也不能通过。这是对该修复行为的实际检验，不是只验证出现任意异常或只写一个PASS标志。
+
+上述“撤回后会失败”由当前测试结构和已提供旧类对照支持；审查者没有另行执行修改源码后的mutation test。
+
+4.2 限额没有因为容忍消失项而变成放行
+
+同一用例第58—66行分别设置明确的反例：
+— disk_bytes=1，存续文件3字节，应拒绝；
+— small_bytes=1，kept.txt是非.pt文件，应拒绝；
+— rss_bytes=1，真实测试进程RSS大于1字节，应拒绝；
+— reserve=100，存续3字节与100字节disk上限组合应拒绝；
+— deadline设置为now+30，进入60秒关闭预留，应拒绝；
+— disk_usage替身返回free=0，低于free_reserve_bytes，应拒绝。
+
+动态证据覆盖这些具体分支。free与reserve的全部组合边界、两秒节流的每种调用时间并未逐个动态穷举；相应表达式与基类一致已由静态核对支持。没有必要为关闭本缺陷追加组合测试矩阵。
+
+4.3 evaluate接线证据不是完整评价执行
+
+第67—68行导入evaluation并断言evaluation.formal.Budget is formal.Budget，证明模块引用解析到同一类。它没有执行评价CLI、构造真实模型或开放标签。真实execute第146行与evaluate第248行的构造位置另经静态追踪，二者结合足以确认修复作用于实际入口。
+
+4.4 确定性故障注入与真实并发必须分开
+
+“同伴文件消失”在本测试中由Retired.stat抛错确定性模拟，没有另一个真实进程在并发unlink或rename检查点。真实的是新旧预算类、helper、实际3字节存续文件和各超额检查；生产中正常并发退役能到达该stat失败点的关系来自首轮源码分析。
+
+这一证据足以关闭已定位的局部竞态，不应冒称真实三路模型运行，也不需要再以GPU或实际检查点制造同一错误。
+
+五、已有Linux动态证据及首轮证据复用
+
+cpu_forever02实际仅选择两项：
+1. 新增实际Budget退役／限额用例；
+2. test_failure_retires_slot_and_healthy_slots_take_remaining_queue（修后94—111行）。
+
+第二项使用真实小Python子进程和真实queue.dispatch，NVML资源由既有Memory替身提供。新evidence再次记录九任务中1失败、8成功、失败槽0退休，剩余任务由槽1／2继续领取，且analysis和training_complete未发布。它复核了共享helper改动后健康补位行为，没有执行真实FOREVER模型。
+
+cpu_vendor02仅选择test_single_vendor_slot_and_serial_followups_preserved（157—176行）。真实小进程按单槽训练／后处理顺序执行，另检查失败后不启动下一任务。没有执行VendorLink36条正式训练。
+
+首轮八项测试的其余行为按未变源码和原证据复用。修后测试文件新增一个方法、原八个方法内容未改；本轮只重跑其中两个相关旧用例及一个新增用例。receipt列出65份来源用于确定所选测试版本，不代表65份代码或全部九个测试均被动态覆盖。
+
+run_cpu.py第20、37—39行新增--only并检查选择属于该研究线列表。22行仍限定Linux、每线最多60秒且不越累计600秒；23—26行核对来源；40—43行单线程、隐藏CUDA、offline；50—60行运行实际测试子进程并检查时间、RSS4GiB和小产物64MiB。
+
+第69行的gpu_training=False、formal_data_reads=0、pretrained_model_loads=0是harness写入的声明，须结合实际所选手写用例和替身解释，不能称系统I/O审计。本审查没有重新运行该wrapper。
+
+六、来源、费用与候选门核对
+
+6.1 来源与科学范围
+
+以前包65来源加本包after三个文件形成逻辑修后来源集，两repair_gate、两CPU receipt均逐项匹配，无缺项、多项或身份不符。该机械核验不修改输入，也不需要复制或执行整个workspace。
+
+FOREVER repair_gate相对首轮只更新sources和prior_used_seconds；VendorLink另更新predecessor。固定运行列表、科学参数、数据／模型绑定、H27引用、资源阈值、budget_seconds和per_run_seconds保持。wait文件与完整成功门未改，旧F-R01/V-R01/V-R02的适用边界不变。
+
+VendorLink当前候选predecessor已经精确引用本包FOREVER repair_gate：23761字节、SHA256 d1d682ef868d1a5e2420f42bd201d8407143c567131985925c48b7591132d91d，路径以forever/repair_gate.json结尾。本候选内部没有过时引用。以后另建正式gate仍需同步绑定最终对象，不能继续把候选身份当最终身份。
+
+6.2 实际CPU计费
+
+FOREVER cpu_forever02：外层2.748513022903353秒，ceil收费3秒，138＋3＝141/600秒；peak_rss_bytes=611856384，peak_disk_bytes=7958。
+VendorLink cpu_vendor02：外层0.9547400560695678秒，ceil收费1秒，131＋1＝132/600秒；peak_rss_bytes=36118528，peak_disk_bytes=3601。
+
+两份receipt均exit_code=0、limit_reason=null。console的2.365秒／0.771秒是测试体时间，不替代外层收费。闭合判断使用了实际代码／测试断言及证据范围，不以退出码单独推定正确。
+
+从本轮链任务原始起点累计：
+— FOREVER：134＋NVML只读1＋首轮CPU3＋本次CPU3＝141，新增7秒，低于60秒许可；
+— VendorLink：130＋首轮CPU1＋本次CPU1＝132，新增2秒，低于60秒许可。
+
+本次没有再做NVML查询；其中1秒沿用首轮只读记录，不能重复计成新的GPU操作。FOREVER native保持1441/3600秒，旧失败费用未被清零。
+
+准备费用分别从121／85再加60，当前FOREVER为181/900、VendorLink为145/3900。按用户说明，这是修复同步及后续部署准备的保守记账，不是精确测时，不计网页等待；实际部署时仍按既定流程对齐最终账目。
+
+总计划继续是FOREVER116h、单条12h；VendorLink296h、单条8h。并行费用相加不变，本轮无预算扩张。
+
+七、分类裁决与部署适用边界
+
+CHAIN-R01：CLOSED。原问题的必要最小修复及针对性CPU证据齐备。
+新增SCIENTIFIC_BLOCKER：0。
+新增REPRODUCIBILITY_DEFECT：0。
+必要追加修改：无。
+必要追加验证：无。
+
+OPTIONAL：本轮没有需要转化为新增执行要求的建议。原已列的版本归属、部署引用说明继续按现有记录处理，不新增检查框架。
+
+OUT_OF_SCOPE_OVERDESIGN：不要求完整仓库回归、三路GPU资格、全阶段大模型pilot、正式数据／权重／标签读取、通用文件系统或调度加固；不改冻结comparison，不改科学方法、种子、HPO、评价权限、预算或完整负结果可交接的条件。
+
+外审闭合与实际部署核对分开：两份repair_gate仍false／false；主执行者按当前scope另建正式gate，确认真实H/S gate及现场进程、所有最终来源、独立workspace入口／listener和持久claim路径，更新Vendor predecessor对最终FOREVER gate的bytes/SHA引用。这个流程已由用户明确，不是本报告新增授权门。
+
+本包未证明真实H/S54端点已经完成，本审查未验证服务器当前资源空闲、进程退出或正式数据状态；不能以代码闭合或CPU通过代替这些事实。此前scope已替代旧暂停和单槽要求，本报告不恢复它们，也不要求重新批准已明确的范围。
+
+八、实际已读与未执行事项
+
+实际阅读／机械核对包括：
+— 本包清单、scope、before/after三个文件的完整差异；修后完整FOREVER formal与定向测试，queue helper及相邻资源／调用路径；
+— 本包run_cpu.py、两份完整console/evidence、receipt正文与全部来源记录、两份repair_gate；
+— 前包冻结ComparisonBudget的初始化、check和summary，未变FOREVER evaluate实际Budget构造位置、此前已审wait及相关完整成功门；
+— 前包与刚才外审报告中CHAIN-R01、首轮CPU证据、范围和费用边界；before原件与前包相应字节；
+— 以前包为基础的65来源一致性、三文件差异／AST结构、未变scope与候选gate字段变化。
+
+未把65来源的身份核对写成全部源码重新逐行审查，也未将首轮或其他历史资格改称本次全来源重跑。
+
+本审查未导入或执行项目、测试、训练、生成、推理、正式指标、重采样或其他科研计算；未访问科研服务器、未提供数据／模型／标签／凭据；未启动监听、等待或GPU查询；未修改输入源码、冻结comparison、gate或原证据。允许范围内执行的仅为ZIP／JSON／哈希／文本diff／AST等机械核验及报告生成。
+
+最终结论：CHAIN-R01可以关闭，未发现该修复引入新的必修问题。保留未变科学审查和首轮证据，接下来按当前scope完成主审与真实部署核对即可，无需扩展本轮核验范围。
