@@ -1,4 +1,14 @@
 # 科研文件存储与恢复
+
+## 2026-11-01 L²R／ER+GCR结果回传、审查及权重清理
+
+[结果目录](../reports/seller_alias_continual/20261101/comparison_result/)通过SFTP回传2393文件、162211873字节；[逐项清单](../reports/seller_alias_continual/20261101/comparison_result/receive_manifest.json)与[接收回执](../reports/seller_alias_continual/20261101/comparison_result/receive.json)记录两端实际大小/SHA全匹配。包括正式分数/指标/日志/校准/来源及完成账，不含正式正文、关系标签、owners、Memory载荷或模型。另回收核对7项其他实际冻结源码版本；不会用当前源码冒充全部旧轨迹来源。本轮保存结果核对在Linux py310单数值线程进行，无标签/载模/重采样，外层计2秒旁记，不覆盖原正式账。
+
+结果外审输入包11681119字节、1097成员（1096载荷+清单），SHA256 `e5a6ee7a5243104e1f25fcbfc94af23f0e1ed9bb442f2fffd7b474ec27ac5c72`，逐成员核对一致。包含完整结果分析及必要静态来源/证据，不含分数二进制或正式私有载荷；最初自动审批拒绝后已获用户具体包/目的地许可，客户端19:36单次上传并发送、19:47[完整回收](../reports/seller_alias_continual/20261101/comparison_result/review/external/recovery.json)，[外审原文](../reports/seller_alias_continual/20261101/comparison_result/review/external/report.zh.txt)及[独立处置](../reports/seller_alias_continual/20261101/comparison_result/review/primary_disposition.zh.txt)均已保管，无新增必修。全部1096载荷与独立保留文件逐项核对大小/SHA和ZIP字节一致后，已删除本地重复上传包，保留输入清单、请求、原包身份与完整审查原件；专用网页已关闭。原拒绝、新许可及当前处置见[提交索引](../reports/seller_alias_continual/20261101/comparison_result/review/submission.json)。
+
+[清理预盘点](../reports/seller_alias_continual/20261101/comparison_result/cleanup_inventory.json)在四个本批已结束campaign定位157权重路径、58个底层文件、78184901449唯一逻辑字节（约72.82GiB）；逐文件实际SHA/最终路径/uid/inode/nlink已核对，全部硬链接均在这四目录。含54个新有效端点、3个旧失败阶段端点、1个旧校准诊断完整状态。3093份非权重记录继续保留，其中封存生成/Memory的162项只stat，另2931项按字节SHA核对；54份旧H/S模型元数据列为保留例外，H27仍为FOREVER依赖。删除前重新核对157路径及58份内容SHA/身份、完成退出状态和保留对象，服务器20:02:45—20:02:49逐文件unlink完成；[实际回执](../reports/seller_alias_continual/20261101/comparison_result/cleanup_receipt.json)确认157路径全不存在，3093非权重材料按原2931项SHA/162项元数据口径未变，54旧H/S模型元数据未变。已删除78184901449唯一逻辑字节（72.8154GiB）；共享磁盘空闲由200940343296增至279125569536字节，净变化78185226240字节，不能把共享磁盘净变化当成本任务精确物理释放量。Linux原件位于reports/maintenance/20261101/comparison_weights/{inventory,receipt}.json；预训练及其他活动模型不在四个删除根目录。SHA无法恢复已删除模型，原失败和有效正负结果保留。
+
+首次盘点错误地尝试散列封存owners，OS权限拒绝、未读取该文件；未改权限或绕过。见[错误与收窄处置](../reports/seller_alias_continual/20261101/comparison_result/custody_attempt.zh.txt)。第二次仅对授权权重/非封存结果散列，对正式正文/关系/owners及Memory只保留元数据，盘点完成。原始运行、有效正负结果和失败账不变。根可变文档只Windows维护；本轮只本地提交，不推送，不重置大清理周期。
 ## 2026-11-01 进度只读核对与本地记录交付
 
 按本次明确确认，仅通过SSH读取既有作业元数据、实际代码身份及train-calibration标量状态，在Windows保存[progress_20261101_122209.json](../reports/documentation/20261101/formal_chain/progress_20261101_122209.json)：72658字节，SHA256 `a9ddaaff67c2e2df9a122f26917a65b497676ddce87c7e1cd99b7fbd352fde80`，返回原字节与Linux输出摘要一致。文件记录服务器UTC+8观测时点、输入元数据身份、进程归属/创建时刻/命令/cwd、实际来源核对、运行/等待账、校准状态及工期算术；不含模型、正式正文、分数矩阵、关系标签或新确认结果。该证据只保存在Windows，不宣称已同步Linux。

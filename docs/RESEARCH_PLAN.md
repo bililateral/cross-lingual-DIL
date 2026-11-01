@@ -2,9 +2,9 @@
 
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)，本页仅列后续动作和授权边界。有效合同及增量修复从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)进入，不复制PID、计数或过期工期。
 
-L²R／ER+GCR按[822小时原执行范围](../reports/documentation/20261026/continual_comparison/execution.zh.txt)、[恢复补充](../reports/documentation/20261030/comparison_resume/scope.zh.txt)和[成功槽接续纠正](../reports/documentation/20261031/comparison_continue/scope.zh.txt)继续。统一控制器接管三条已在运行的L²R，任一健康槽成功后可接唯一原待派CAB_s6_GCR；不重启三条训练，不把“单独启动补跑”限制成成功槽不再接任务。原14成功及所有失败费用保留，原启动时刻/截止时间/资源限额不重置；失败槽退休，健康槽继续补位，无自动再试。全部18条按精确来源合并并过108状态完整门后，再执行原新120群生成、确认和统计；缺项不发整批成功。未变算法/校准/恢复资格复用既有证据，不为调度修正新增模型资格或科学尝试；主审闭合见[执行报告](../reports/documentation/20261031/comparison_continue/report.zh.txt)。
+L²R／ER+GCR的[结果分析与审查处置](../reports/seller_alias_continual/20261101/comparison_result/review/primary_disposition.zh.txt)已完成，[本批符合条件的权重清理](../reports/seller_alias_continual/20261101/comparison_result/cleanup_receipt.json)已实际执行；本范围无剩余科研动作。保留完整指标/分数/日志/实际来源、逐文件清单、旧失败与费用；H−S额外抗遗忘仍未确认，不为翻转原结论追加训练、调参、标签解析或重采样。H/S54基线、供FOREVER加载的原H27及预训练模型继续保留；已删除的新对照权重不能由SHA恢复，若需新实验另按范围确认。
 
-S_default＋历史H（G_half）继续用[失败隔离补充](../reports/documentation/20261030/defaults_repair/scope.zh.txt)的原科学workspace及[重新绑定的唯一监听](../reports/documentation/20261031/comparison_continue/defaults/formal_gate.json)，等待comparison_continue完整训练、108状态、生成、确认、分析全部成功和相关进程退出，再检查共享资源。原18条/54端点、108h+2h、单条6h和最多三路保持，只训练并保存旧dev盲分数；自身失败槽退休、健康槽接续，不放宽完整性、不自动再试或重复监听。补跑单条成功不等于前序整批成功。
+S_default＋历史H（G_half）继续用[失败隔离补充](../reports/documentation/20261030/defaults_repair/scope.zh.txt)的原科学workspace及[重新绑定的唯一监听](../reports/documentation/20261031/comparison_continue/defaults/formal_gate.json)；其原完整前序/资源条件已由既有链处理，继续按同一队列执行。原18条/54端点、108h+2h、单条6h和最多三路保持，只训练并保存旧dev盲分数；自身失败槽退休、健康槽接续，不放宽完整性、不自动再试或重复监听。补跑单条成功不等于前序整批成功。
 
 VendorLink和FOREVER沿用[VendorLink四臂36条/每市场40轮/单路296h](../reports/documentation/20261030/vendorlink/formal/plan.zh.txt)及[FOREVER新增9条/复用H27/116h和新120群/4320前向](../reports/documentation/20261030/forever/formal/plan.zh.txt)的科学范围，调度以[11月1日完整确认的补充](../reports/documentation/20261101/formal_chain/scope.zh.txt)为准：H/S18条54端点完整有效且相关进程退出后，既有唯一下游链自动进入FOREVER；FOREVER九条及生成、确认、分析完整有效且相关进程退出后，自动接VendorLink。该具体决定已替代10月30日“等新开始指令、不建自动等待”的限制，不再重复索要同范围开始许可或创建第二份监听。FOREVER最多三槽、allocator9GiB、整个PID监控阈值及每槽预留10GiB，可先少槽后补足，扣除已承诺而尚未反映的占用；成功槽续领，失败槽退出、健康槽继续，无自动重试。VendorLink保持单槽17GiB准入。缺项或运行失败阻断下游，完整有效的科学负结果允许交接；原116h/296h及单条12h/8h不变，累计任务费用不能当作实际工期。FOREVER对照仍为原H_pos_tuned的27模型，本次H/S默认模型只是前序执行条件。启动时由实际入口核对原H27、部署及共享资源。
 
@@ -12,7 +12,7 @@ VendorLink和FOREVER沿用[VendorLink四臂36条/每市场40轮/单路296h](../r
 
 VendorLink依赖扫描发现57群中48群相连且包含Dream全部8群，用户接受固定数据描述比较：保存完整排序/遗忘差值，不计算整体置信区间、不作统计验收，不宣称真实潜在同控识别或统计确认抗遗忘。不得为获得区间重分群、选账号、加数据或改统计模型。FOREVER保留额外全参数锚点、原O/F主比较及N/Z点值保护，不重训H、不追加HPO；不将两线预算或评价权限互借。
 
-原五方法45条及其新确认/统计、结果外审和[主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)均已结束。H相对S最终MAP正向，但原O/F共同主门未过、额外抗遗忘未确认，不重复旧恢复或为翻转结果重训。H/S54端点继续服务新对照；其余三方法81份独立权重已按用户选择删除，非权重证据和原490h/失败账保留，见[存储记录](STORAGE.zh.md#2026-10-26-五臂中的三臂权重清理)。
+原五方法45条及其新确认/统计、结果外审和[主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)均已结束。H相对S最终MAP正向，但原O/F共同主门未过、额外抗遗忘未确认，不重复旧恢复或为翻转结果重训。H/S54端点继续保留，其中H27供FOREVER后续比较；其余三方法81份独立权重已按用户选择删除，非权重证据和原490h/失败账保留，见[存储记录](STORAGE.zh.md#2026-10-26-五臂中的三臂权重清理)。
 ## 已结束Optuna的授权与恢复历史
 
 已按[S/S_pos/H_pos有限Optuna合同](SELLER_ALIAS_OPTUNA.zh.md)、[272小时预算补充](../reports/documentation/20261019/optuna_budget/proposal.zh.txt)及[自动执行授权](../reports/documentation/20261019/optuna_budget/authorization.json)完成三臂36次搜索、9次新seed复验与集中评价/独立分析；审查与实际执行状态只看[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。既有18次原生调用复用，不增加资格尝试，不重复启动已派发的控制器或已自删监听。已发生资源停止的恢复仅按[具体补充](../reports/documentation/20261019/optuna_recovery/scope.zh.txt)及最新用户决定：9GiB空闲/允许其他CUDA、从S_pos第2次搜索原参数继续，三个已完成实验不重跑；保留失败收费，本轮明确免审、独立主审及恢复门通过后已于10月19日18:58恢复，实际状态只看交接。

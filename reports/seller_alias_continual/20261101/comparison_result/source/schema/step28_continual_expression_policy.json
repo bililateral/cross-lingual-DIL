@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "study": "seller_alias_continual_expression_shift",
+  "root_seed": 20260910,
+  "domains": {
+    "A": [
+      0.6,
+      0.2,
+      0.2
+    ],
+    "B": [
+      0.2,
+      0.6,
+      0.2
+    ],
+    "C": [
+      0.2,
+      0.2,
+      0.6
+    ]
+  },
+  "groups_per_domain": {
+    "train": 60,
+    "development": 20,
+    "heldout": 40
+  },
+  "controllers_per_group": 12,
+  "controller_alias_counts": {
+    "2": 8,
+    "3": 4
+  },
+  "preference_inheritance": 0.75,
+  "preferred_item_probability": 0.7,
+  "style_axis_sizes": [
+    12,
+    12,
+    12
+  ],
+  "style_sampling": "independent_uniform_controller_and_redraw",
+  "redraw_may_equal_parent": true,
+  "item_count_pmf": {
+    "2": 0.563609467456,
+    "3": 0.102071005917,
+    "4": 0.068047337278,
+    "5": 0.044378698225,
+    "6": 0.038461538462,
+    "7": 0.023668639053,
+    "8": 0.159763313609
+  },
+  "item_count_reference": {
+    "path": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v1_20260727/reference/chinese_train_style_profile.json",
+    "sha256": "5537f59fd558521d47a27702ba23e8a56620c4e14f2579e2658436f2729a3a34",
+    "seller_count": 676,
+    "scope": "Published aggregate clipped item counts only; no original seller rows or labels."
+  },
+  "text_limits": {
+    "title": 48,
+    "description": 720
+  },
+  "output_budget_bytes": 268435456,
+  "small_records_budget_bytes": 4194304,
+  "model_text_fields": [
+    "title",
+    "description"
+  ],
+  "public_item_fields": [
+    "group_uid",
+    "seller_uid",
+    "item_uid",
+    "title",
+    "description"
+  ],
+  "id_format": "32 lowercase ASCII hex; independently shuffled account pool; metadata only",
+  "contact_projection": "Generate C directly under projection(C,L)=C; L has no effect on C, styles, counts or lengths.",
+  "generation_label_access": "New synthetic ownership and pair labels for all three splits only.",
+  "training_authorized": false,
+  "limitations": [
+    "Artificial content and dependence mechanisms, not fitted real Chinese market distributions.",
+    "Three mixtures over shared categories, not unseen-category arrival or real chronology.",
+    "Independent heldout controllers; not new aliases of a previously seen controller.",
+    "One or two positives among 27 candidates per query; no market-wide/open-set retrieval.",
+    "No guarantee of learning, forgetting, replay benefit, novelty, or real-market effectiveness.",
+    "Public-template rates and cyclic reliability are controlled assumptions, not measured real-market frequencies."
+  ],
+  "public_style_indices": [
+    [
+      0,
+      1,
+      2
+    ],
+    [
+      0,
+      1,
+      2
+    ],
+    [
+      0,
+      1,
+      2
+    ]
+  ],
+  "public_style_probability": {
+    "A": [
+      0.1,
+      0.6,
+      0.3
+    ],
+    "B": [
+      0.3,
+      0.1,
+      0.6
+    ],
+    "C": [
+      0.6,
+      0.3,
+      0.1
+    ]
+  },
+  "public_style_sampling": "independent_account_axis_override_uniform_public_subset"
+}
