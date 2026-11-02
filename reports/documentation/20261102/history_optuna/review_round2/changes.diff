@@ -1,0 +1,195 @@
+diff --git a/scripts/run_step28_history_optuna_cpu.py b/scripts/run_step28_history_optuna_cpu.py
+index 3895b937..3b73ae3f 100644
+--- a/scripts/run_step28_history_optuna_cpu.py
++++ b/scripts/run_step28_history_optuna_cpu.py
+@@ -17,6 +17,7 @@ def main():
+     parser = argparse.ArgumentParser()
+     parser.add_argument("--output", type=Path, required=True)
+     parser.add_argument("--prior-seconds", type=int, required=True)
++    parser.add_argument("--tests", nargs="+", default=[])
+     args = parser.parse_args()
+     if (sys.platform != "linux" or os.environ.get("CUDA_VISIBLE_DEVICES") != ""
+             or args.output.exists() or not 0 <= args.prior_seconds < 1200):
+@@ -28,7 +29,7 @@ def main():
+         "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+         "OPENBLAS_NUM_THREADS": "1", "PYTHONPATH": str(run.data.ROOT/"scripts")+":"+str(run.data.ROOT/"tests"),
+         "HISTORY_TEST_ROOT": str(args.output)}
+-    command = [sys.executable, "-B", str(run.data.ROOT/"tests/test_step28_history_optuna.py"), "-v"]
++    command = [sys.executable, "-B", str(run.data.ROOT/"tests/test_step28_history_optuna.py"), "-v", *args.tests]
+     peak, stopped, child = 0, None, None
+     with (args.output/"stdout.txt").open("x") as stream:
+         child = subprocess.Popen(command, env=env, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
+diff --git a/scripts/step28_history_optuna_control.py b/scripts/step28_history_optuna_control.py
+index 26949fc3..ee38e395 100644
+--- a/scripts/step28_history_optuna_control.py
++++ b/scripts/step28_history_optuna_control.py
+@@ -15,6 +15,7 @@ import step28_history_optuna_run as run
+ import step28_history_optuna_evaluate as evaluate
+ 
+ m, data, queue = run.m, run.data, run.queue
++FINAL_TAIL_SECONDS = 30
+ 
+ 
+ def chain_complete(binding):
+@@ -85,7 +86,11 @@ class Ledger:
+         if set(self.used) != set(caps) or any(v < 0 or v >= caps[k] for k, v in self.used.items()):
+             raise ValueError("Finite cumulative prior fees required")
+         self.tick = time.monotonic()
+-        self.events = []
++        # One finite conservative charge covers the final save/check/receipt/exit.
++        # It is inside the existing auxiliary cap, never an additional allowance.
++        self.used["auxiliary"] += FINAL_TAIL_SECONDS
++        self.events = [dict(id="final_tail", bucket="auxiliary",
++            conservative_seconds=FINAL_TAIL_SECONDS)]
+ 
+     def control(self):
+         now = time.monotonic()
+@@ -116,9 +121,29 @@ class Ledger:
+         self.save()
+ 
+ 
++def close_and_settle(monitor, ledger):
++    try:
++        if monitor is not None:
++            monitor.close()
++    finally:
++        ledger.control()
++
++
++def slot_admission(allowed, snapshot, capacity, occupied):
++    # Capacity is frozen only while all owned process groups are released.
++    # Never refund slot credit using non-atomic per-PID usage observations.
++    slot_bytes = run.LIMITS["process_gpu_bytes"]
++    observation = queue.resources(allowed, Path(allowed["campaign"]), snapshot, ())
++    reserved = occupied*slot_bytes
++    return dict(**{k: v for k, v in observation.items() if k != "ready"},
++        cohort_capacity_bytes=capacity, reserved_slot_bytes=reserved,
++        ready=observation["ready"] and capacity-reserved >= slot_bytes)
++
++
+ def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, poll_seconds=2):
+     """Failed slots retire; healthy slots continue to claim pending trajectories."""
+     active, pending, retired, receipts = {}, list(enumerate(rows)), set(), []
++    capacity = None
+     width = allowed["workers"] if rows[0]["bucket"] == "training" else 1
+     cores = psutil.Process().cpu_affinity()
+     if len(cores) < width:
+@@ -180,7 +205,11 @@ def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, po
+                 if row.get("gpu", True):
+                     if monitor is None:
+                         raise ValueError("Real GPU admission observation required")
+-                    observation = queue.resources(allowed, Path(allowed["campaign"]), monitor.snapshot(), [v["process"].pid for v in active.values()])
++                    current = monitor.snapshot()
++                    if not active:
++                        capacity = current["free"]
++                    occupied = sum(item["row"].get("gpu", True) for item in active.values())
++                    observation = slot_admission(allowed, current, capacity, occupied)
+                     data.write_json(root/"admission.json", dict(id=row["id"], **observation))
+                     if not observation["ready"]:
+                         break
+@@ -294,6 +323,7 @@ def execute(gate_path):
+         local_allowed = {**allowed, "dispatch_index": str(action_container)}
+         dispatch(action_root, rows, command, lambda row, job: data.read_json(job/("feedback.json" if name == "search-evaluate" else "result.json")), local_allowed, ledger, monitor=monitor)
+     try:
++        ledger.control()  # Enforce the tail reservation before reading old inputs.
+         run.references(allowed)  # Full old weight/restore/source check before any new training.
+         ledger.control()
+         monitor = queue.GpuMemory()
+@@ -336,9 +366,7 @@ def execute(gate_path):
+         raise
+     finally:
+         try:
+-            if monitor is not None:
+-                monitor.close()
+-            ledger.control()
++            close_and_settle(monitor, ledger)
+         except BaseException as exc:
+             path = campaign/"failure.json"
+             previous = data.read_json(path) if path.exists() else {}
+diff --git a/tests/test_step28_history_optuna.py b/tests/test_step28_history_optuna.py
+index 7022df04..8c0fb26c 100644
+--- a/tests/test_step28_history_optuna.py
++++ b/tests/test_step28_history_optuna.py
+@@ -49,6 +49,82 @@ class HistoryTests(unittest.TestCase):
+     def evidence(self, name, value):
+         m.data.write_json(Path(os.environ["HISTORY_TEST_ROOT"])/(name+".json"), value)
+ 
++    def test_slot_credit_counterexamples_and_actual_dispatch(self):
++        outcomes = []
++        with tempfile.TemporaryDirectory(dir=os.environ["HISTORY_TEST_ROOT"]) as temp:
++            root = Path(temp)
++            limits = {**run.LIMITS, "rss_bytes": 4*2**30, "disk_bytes": 2**30, "free_reserve_bytes": 0}
++            allowed = dict(workers=3, sources=[], campaign=str(root), workspace=str(root), limits=limits)
++            s = run.LIMITS["process_gpu_bytes"]
++            mixed = dict(free=16*2**30, processes={123: 8*2**30})
++            self.assertTrue(run.queue.admission(mixed, [123], s)["ready"])
++            self.assertFalse(control.slot_admission(allowed, mixed, 16*2**30, 1)["ready"])
++            # A larger observed free/zero usage cannot return credit while a group lives.
++            self.assertFalse(control.slot_admission(allowed, dict(free=32*2**30, processes={}), 16*2**30, 1)["ready"])
++            self.assertTrue(control.slot_admission(allowed, mixed, 16*2**30, 0)["ready"])
++            # The frozen credit does not replace the latest free-space requirement.
++            self.assertFalse(control.slot_admission(allowed, dict(free=8*2**30, processes={}), 32*2**30, 0)["ready"])
++            for occupied in range(3):
++                self.assertTrue(control.slot_admission(allowed, mixed, 32*2**30, occupied)["ready"])
++            self.assertFalse(control.slot_admission(allowed, mixed, 32*2**30, 3)["ready"])
++            for capacity, expected_peak in ((16*2**30, 1), (32*2**30, 3)):
++                campaign = root/str(expected_peak)
++                campaign.mkdir()
++                local = {**allowed, "campaign": str(campaign)}
++                ledger = control.Ledger(campaign, dict(training=0., auxiliary=0.), dict(training=100., auxiliary=100.))
++                rows = [dict(id=f"r{i}", bucket="training", seconds=10., shutdown_reserve=.1, gpu=True) for i in range(4)]
++                released = []
++                actual_release = control.release
++                def release(process):
++                    time.sleep(.02)
++                    result = actual_release(process)
++                    released.append(dict(pid=process.pid, at=time.monotonic()))
++                    return result
++                class HandwrittenMonitor:
++                    def snapshot(self):
++                        return dict(free=capacity, processes={p.pid: 8*2**30 for p in control.psutil.Process().children()})
++                def command(row, job, deadline):
++                    code = "import json,time; from pathlib import Path; start=time.monotonic(); time.sleep(.2); Path('"+str(job/"result.json")+"').write_text(json.dumps(dict(start=start,end=time.monotonic())))"
++                    return [sys.executable, "-c", code]
++                with mock.patch.object(control, "release", side_effect=release):
++                    result = control.dispatch(campaign, rows, command, lambda row, job: m.data.read_json(job/"result.json"),
++                        local, ledger, monitor=HandwrittenMonitor(), poll_seconds=.01)
++                intervals = [m.data.read_json(campaign/f"r{i}/result.json") for i in range(4)]
++                peak = max(sum(p["start"] <= r["start"] < p["end"] for p in intervals) for r in intervals)
++                self.assertEqual(peak, expected_peak)
++                self.assertGreaterEqual(intervals[expected_peak]["start"], released[0]["at"])
++                self.assertEqual(control.group_members(released[-1]["pid"]), [])
++                outcomes.append(dict(capacity=capacity, peak=peak, intervals=intervals, released=released, dispatch=result))
++        self.evidence("slot_credit", dict(mixed_observation_old_ready_new_rejected=True,
++            live_group_credit_never_refunded=True, latest_free_still_required=True,
++            actual_cpu_dispatch=outcomes, gpu_calls=0))
++
++    def test_close_failure_settles_and_finite_tail_is_precharged(self):
++        with tempfile.TemporaryDirectory(dir=os.environ["HISTORY_TEST_ROOT"]) as temp:
++            root = Path(temp)
++            with mock.patch.object(control.time, "monotonic", side_effect=[100., 107., 109.]):
++                ledger = control.Ledger(root, dict(training=0., auxiliary=89.), dict(training=100., auxiliary=200.))
++                self.assertEqual(ledger.used["auxiliary"], 119.)
++                monitor = mock.Mock()
++                monitor.close.side_effect = RuntimeError("handwritten close failure")
++                with self.assertRaisesRegex(RuntimeError, "handwritten close failure"):
++                    control.close_and_settle(monitor, ledger)
++                self.assertEqual(ledger.used["auxiliary"], 126.)
++                control.close_and_settle(None, ledger)
++                self.assertEqual(ledger.used["auxiliary"], 128.)
++            saved = m.data.read_json(root/"budget.json")
++            self.assertEqual(saved["used_seconds"]["auxiliary"], 89.+9.+30.)
++            self.assertEqual(len(saved["events"]), 1)
++            self.assertEqual(saved["events"][0]["conservative_seconds"], 30)
++            # A handwritten 12-second terminal write fits the already charged 30.
++            self.assertGreaterEqual(saved["used_seconds"]["auxiliary"], 89.+9.+12.)
++            short = control.Ledger(root, dict(training=0., auxiliary=89.), dict(training=100., auxiliary=110.))
++            with self.assertRaises(TimeoutError):
++                short.control()
++        self.evidence("final_accounting", dict(close_exception_preserved=True, failed_close_still_settles=True,
++            one_conservative_tail_seconds=30, existing_auxiliary_cap_enforced=True,
++            handwritten_elapsed_seconds=9, handwritten_terminal_seconds=12, saved=saved))
++
+     def test_real_coefficients_and_anchor_equivalence(self):
+         group = handmade_group("current")
+         target = (np.sin(np.arange(1540)/7)*3).astype(np.float32)

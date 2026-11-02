@@ -1,0 +1,18 @@
+H_pos_history正式预算、输入绑定与费用承接
+2026-11-02；授权原话：“确认，按此完成准备，继续保持训练关闭”。另按用户“把你修改后的版本继续提交外审”准备第二轮定向网页复审。
+
+正式预算已确认：训练270小时（最多36搜索+9复验，每条6小时）、确认评分6小时、辅助4小时，共280累计任务小时。并行任务墙钟相加；候选、方法、三worker行为、评价和原判据按scope及第一轮主审澄清保持。确认预算不等于允许现在执行。
+
+在Linux既有独立workspace执行bind_inputs.py，一次300秒范围的机械核对，不导入项目科研模块、torch或模型。通过回执见run01/receipt.json：实际28.53661700594239秒，向上取整29秒，加一次保守收尾5秒，共34秒。继承CPU01—06及失败补记101秒后，本轮辅助累计135秒，原4小时剩14265秒（3小时57分45秒）；正式控制器将来启动时仍须在同桶再一次预提其30秒尾部，当前没有将其记为实际消耗。失败账不清零，未增加预算。
+
+实际核对58项代码/配置来源与修后清单一致。输入逐字节核对共83项：数据manifest/validation 2份，群目录和train/development的items/pairs共5份，冻结BGE档案12份，原H gate 1份、九轨迹completion 9份、27份模型及27份校准文件。原H模型共35218028616字节，约32.80GiB，全部与原完成记录大小/SHA一致；九条仍为原H_pos_tuned、ABC/BCA/CAB×seed4/5/6、864更新、三端点及原来源，既有full/inference restore通过字段齐备。这里只核对既有恢复证据和实际文件身份，没有重新加载模型验证可运行性。
+
+既有数据总清单按元数据读取；groups.csv作为原公共群目录仅作不解释内容的字节校验。train/development的正文和pairs同样仅流式SHA，不解析文本、账号或关系标签。没有读取heldout/test正文与标签、任何owners或private_custody；没有打开原H保存评分或计算新指标。BGE12文件按原规范路径排序、大小和逐文件SHA形成档案hash，与冻结模型身份一致；不构造模型或执行推理。
+
+所有输入核对通过后，在本轮workspace按实际入口路径建立19个逐文件符号链接：7个数据文件（两份元数据+五份必要输入）和12个BGE档案文件。没有链接整个原数据目录，没有引入heldout、owners，也没有覆盖已有输入或活动旧链来源。旧H27继续由明确原路径读取，不复制、不移动、不删除。原始正文、标签、预训练和H模型未回传Windows；本地仅保存本轮脚本、配置、文件身份与费用回执。
+
+当前准备配置为preparation/formal_gate.json，input_metadata已绑定实际manifest/validation，authorization绑定用户此次准备许可，prior_used_seconds.auxiliary=135。approved=false、actions=[]、train_data/new_confirmation_data/retire_search_weights=false保持；用户要求再次网页外审，所以当前配置review_closed=false，第一轮已处置的修复/CPU原件不改。当前authorization记录明确formal_execution_approved=false，不能用来替代将来的开始指令。
+
+本轮没有训练、正式搜索、生成新确认群、GPU测试、监听、删除或额外科研测试。原FOREVER/VendorLink链只作进程身份观察，未干预；实际完成退出与资源条件留到开训时重新核对。本轮只新增机械绑定脚本及配置，不改变4215c066对应的58项科学来源；第二轮外审包将提供修后代码、差异、原意见、CPU06和必要准备记录，不包含输入载荷。
+
+SFTP的实际接收/同步身份见final_sync.json；后续费用与当前正式门从本目录承接，旧repair/budget.json与旧关闭门保留形成时点。根docs在Windows原位更新，本地提交、不推送。

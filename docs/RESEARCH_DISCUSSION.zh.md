@@ -8,6 +8,8 @@
 
 具体新包history_optuna_review.zip为514462字节、132载荷，SHA256 39952612d10e561014d0de8586fbf9bff55ba98396d17616976e28fcfafc1118。用户明确确认：“批准此具体包在 GPT-6 Pro 可用后上传该会话外审”，目的地为既有 https://chatgpt.com/c/6adc2cf8-61b8-83ea-90d2-0a79dd218a72。许可仅覆盖本包/本轮实现审查，不扩大到训练或新材料；实际送审、回收与独立处置见[索引](../reports/documentation/20261102/history_optuna/review/submission.json)。
 
+用户随后选中“落实正式预算与输入绑定、承接已有费用”，要求“先完成这些”；对完整准备范围确认：“确认，按此完成准备，继续保持训练关闭”。具体包括280累计任务小时、继承101秒、本次最多300秒机械核对原输入/BGE/H27文件身份并建立必要路径、不得解析正文标签/载模/GPU/启动训练或监听、本地提交不推送，见[准备授权](../reports/documentation/20261102/history_optuna/preparation/authorization.json)。另明确“把你修改后的版本继续提交外审”，本轮按此对修后4215c066及必要核验证据作第二轮定向网页审查；这是新指令覆盖修后版本的送审，不沿用旧具体包许可扩大上传，也不构成开训许可。见[第二轮材料与提交身份](../reports/documentation/20261102/history_optuna/review_round2/submission.json)。
+
 ## 2026-11-02 H/S 旧开发集完整评价（方案 A）
 
 用户要求：“那就补齐H/S的评价，把结果同步回来仔细分析，各项指标都给我完整汇报，及时更新项目文件里的进度记录。”执行者先说明原许可只有训练和盲分数保存，给出方案A（现有60群旧dev、四系统、2小时CPU）与方案B（另加120新群独立检验、GPU评分）的完整选择，并明确22指标、未定义覆盖率/合并分类计数、配对区间、结果回传和外审、唯一当前项原位更新及本地提交。用户确认：“采用方案A”。具体范围见[评价补充](../reports/seller_alias_continual/20261102/defaults_result/scope.zh.txt)。不将方案B或独立确认解释为本次批准，也不恢复旧训练待授权；既有FOREVER/VendorLink自动链继续。
