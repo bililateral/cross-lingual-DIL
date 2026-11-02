@@ -1,0 +1,193 @@
+{
+  "review": "H_pos_history two historical coefficients / three-worker repair, round 2 targeted static review",
+  "date": "2026-11-02",
+  "input_sha256": "4890b5620eed60c34e8d3c67a503071d14a51fd5fb0d97d07922924e4c94df9a",
+  "source_commit_as_supplied": "4215c066",
+  "prior_commit_as_supplied": "ed84688f",
+  "scientific_blockers_found": 0,
+  "new_confirmed_reproducibility_defects": 0,
+  "remaining_open_review_defects": 0,
+  "formal_execution_authorized_by_this_review": false,
+  "reviewer_modified_project_sources_or_gates": false,
+  "findings": [
+    {
+      "id": "HOPT-R01",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "original_severity": "MEDIUM",
+      "status": "CLOSED_BY_INDEPENDENT_ROUND2_REVIEW",
+      "blocking_now": false,
+      "files": [
+        {
+          "path": "scripts/step28_history_optuna_control.py",
+          "lines": [
+            132,
+            136,
+            140,
+            162,
+            166,
+            209,
+            210,
+            211,
+            212,
+            230
+          ]
+        },
+        {
+          "path": "tests/test_step28_history_optuna.py",
+          "lines": [
+            52,
+            60,
+            61,
+            63,
+            66,
+            75,
+            90,
+            93,
+            95
+          ]
+        }
+      ],
+      "confirmed": "空闲时冻结容量，未完整释放工作占整额10.25GiB；最新资源检查与生产dispatch接通；release先于active.pop。",
+      "counterexample_closed": "C=16GiB,n=1时剩余5.75GiB，不能以另时点自家usage返还信用而接纳下一槽。",
+      "provided_behavior_evidence": [
+        "repair/cpu06/slot_credit.json:16GiB peak=1,32GiB peak=3; actual CPU children, handwritten NVML",
+        "repair/cpu06/three_workers.json:失败槽退休、健康槽续领、孤儿进程组清理"
+      ],
+      "minimum_disposition": "无需进一步代码修法或新增测试；保留共享GPU和真实CUDA未测边界。"
+    },
+    {
+      "id": "HOPT-R02",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "original_severity": "LOW",
+      "status": "CLOSED_BY_INDEPENDENT_ROUND2_REVIEW",
+      "blocking_now": false,
+      "files": [
+        {
+          "path": "scripts/step28_history_optuna_control.py",
+          "lines": [
+            18,
+            91,
+            92,
+            124,
+            128,
+            129,
+            298,
+            311,
+            326,
+            369,
+            370,
+            373,
+            377
+          ]
+        },
+        {
+          "path": "tests/test_step28_history_optuna.py",
+          "lines": [
+            102,
+            105,
+            111,
+            113,
+            115,
+            117,
+            120,
+            121,
+            123
+          ]
+        }
+      ],
+      "confirmed": "真实execute的finally调用close_and_settle；关闭异常仍尝试结算并保留失败；成功回执在其后。同一Ledger一次30秒保守预提占既有辅助桶，新训练前检查余额。",
+      "provided_behavior_evidence": [
+        "repair/cpu06/final_accounting.json:89+30=119,close失败后126,再次结算128,单尾部事件",
+        "不足辅助额度在生产Ledger.control被拒"
+      ],
+      "minimum_disposition": "无需进一步代码修法或新增测试；30秒保守预提、12秒手写比较常量不得写成精确末尾耗时。"
+    },
+    {
+      "id": "HOPT2-P01",
+      "classification": "准备与来源核对",
+      "status": "CONSISTENT_WITH_PROVIDED_RECORDS",
+      "blocking_now": false,
+      "files": [
+        {
+          "path": "reports/documentation/20261102/history_optuna/preparation/bind_inputs.py",
+          "lines": [
+            29,
+            79,
+            85,
+            95,
+            99,
+            111,
+            121,
+            125,
+            132,
+            136,
+            143,
+            155,
+            156
+          ]
+        },
+        {
+          "path": "scripts/step28_history_optuna_run.py",
+          "lines": [
+            55,
+            60,
+            67,
+            70,
+            72,
+            75,
+            76
+          ]
+        }
+      ],
+      "confirmed": "58来源、83身份记录、19链接、27权重记录及四份gate引用相符；费用101+34=135；预算280h已批准，正式动作全部关闭。",
+      "minimum_disposition": "正常记录本轮外审及主执行者处置并承接审查引用，保持训练关闭。本审查不代改gate。"
+    },
+    {
+      "id": "HOPT2-B01",
+      "classification": "合理资格与证据边界",
+      "status": "UNVERIFIED_NOT_A_CONFIRMED_DEFECT",
+      "blocking_now": false,
+      "text": "没有真实三H BGE/CUDA并发、现场NVML/峰值/吞吐或正式运行结果；CPU06使用实际CPU子进程及手写显存，不能升级解释。"
+    },
+    {
+      "id": "HOPT2-B02",
+      "classification": "合理资格与证据边界",
+      "status": "UNVERIFIED_NOT_A_CONFIRMED_DEFECT",
+      "blocking_now": false,
+      "text": "未独立访问83份正式载荷、H27/BGE模型和19链接；preparation/final_sync.json本包未提供，不能将repair同步声明扩大到准备部署字节。包内回执与配置对应成立。"
+    },
+    {
+      "id": "HOPT2-S01",
+      "classification": "仅建议",
+      "status": "OPTIONAL_WORDING",
+      "blocking_now": false,
+      "text": "后续摘要明确helper故障注入加execute静态接线、12秒手写常量、30秒有限保守预提；不需为此重复运行。"
+    },
+    {
+      "id": "HOPT2-O01",
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "status": "NOT_REQUIRED",
+      "blocking_now": false,
+      "text": "不要求新候选/维度/seed/GPU组合/全历史回归/新数据/平台/事后门/递归末尾记账。"
+    }
+  ],
+  "reused_boundaries": [
+    "旧dev点值/差值，新确认5000配对区间",
+    "合并Precision/MCC按轨迹×实际域/阶段×角色",
+    "当前目标系数1不表示共享裁剪后位移独立",
+    "最终RAW MAP不自动等于抗遗忘、逐域非劣或真实市场有效",
+    "旧H-S共同门失败保留"
+  ],
+  "not_executed": [
+    "项目导入/运行",
+    "tests",
+    "模型加载/推理",
+    "科研指标",
+    "bootstrap",
+    "生成器",
+    "训练",
+    "SSH或Linux连接",
+    "正式载荷/标签/owners/Memory读取",
+    "项目源码或gate修改"
+  ]
+}
