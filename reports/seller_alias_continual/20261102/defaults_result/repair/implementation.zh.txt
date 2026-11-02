@@ -1,0 +1,18 @@
+H/S方案A实现外审：两处定向修复
+2026-11-02
+
+本文件是对原已送审实现的补充，原source/、cpu01/02、preflight01、上传ZIP与原清单不覆盖。实际修后来源与测试在repair/source，输入清单为repair/input_manifest.json；Linux实际独立workspace已部署这三份增量源码，运行清单是远端当前input_manifest.json，送审原清单另外留input_manifest.submitted.json。
+
+1. 数据清单绑定
+step28_defaults_evaluate.preflight现在校验原冻结数据policy的manifest SHA，读取该manifest元数据并校验字节身份。dataset_binding要求study/root_seed与原数据相符，全部公共输入记录（含dev items与groups）与36完成轨迹共同public_inputs逐项相等，并要求development_pairs路径/字节/SHA恰是该manifest下的development/supervision/pairs.csv成员。比较发生在正式标签读取之前，不解析正文或标签来做预检。
+CPU03构造手写manifest，核对正确关系可通过、不同pairs SHA/字节/heldout路径及不同dev items身份均拒绝。实际preflight02在原36轨迹/108端点/60群上通过，label reads=0。原完整378边排序/重复检查和指标计算未改。
+
+2. 正式调用预算和线程
+新增小入口step28_defaults_evaluate_launch.py只负责本轮单次CPU评价。读同一budget.json，检查7200上限与累计明细相加一致、无active/既有evaluation/已存在正式目录。正式计算allowance=min(5400,7200-已用-600)，不足即拒绝；剩余预留用于核对、导出和回传。启动前记active，固定既有py310、nice15、CUDA_VISIBLE_DEVICES空、OMP/OPENBLAS/MKL/NUMEXPR线程1、实际独立workspace/PYTHONPATH，外层timeout同allowance；成功、非零退出或异常都结算向上取整实际时间，失败不自动再次开标签。正式评价自身另核对环境/低优先级和0<seconds<=7200。
+CPU03第二项通过该实际launch函数启动真实手写CPU子进程，读取子进程真实nice/线程/GPU屏蔽环境，核对费用增加、active清除及第二次启动被拒绝；不是模拟返回PASS。该临时测试无模型、正式数据或GPU。
+
+核验与费用：仅新增两项针对性测试，CPU03 outer收费2秒，preflight02收费3秒；原已通过5项的科学计算部分未改，引用cpu02及原字节。当前准备180+CPU01 2+preflight01 3+CPU02 5+元数据回传8+CPU03 2+preflight02 3=203/7200秒。所有原证据与失败账保持；没有已发生标签错配、超支或GPU访问的证据。
+
+后续必须完整回收外审并逐项主审；本补充本身不宣称外审已结束或修后源码已获第二轮网页复审。两处修复均落实原已批准的相同行为，不改变科学问题、统计公式、比较或数据/预算范围。评价结果还需本轮结果外审。
+
+完整外审已回收并逐项处置，见 ../review/primary_disposition.zh.txt。CPU04 补齐余额不足、失败费用保留及无效正式审查门在开标签前拒绝三个实际分支，连同已有两项共三个测试通过，收费2秒、总205/7200秒。生产代码与preflight02相同；最终清单仅随增补测试身份更新。修复在原已审范围内由主执行者关闭，结果仍须另行外审。

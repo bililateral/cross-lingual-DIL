@@ -1,5 +1,7 @@
 # 当前实验设计入口
 
+H/S评价补充（2026-11-02）：用户选择[方案A](../reports/seller_alias_continual/20261102/defaults_result/scope.zh.txt)，在既有四种配置的共同60群旧开发集保存分数上计算全22指标、配对条件区间及未定义覆盖/合并分类指标。新增2小时CPU，无GPU/新确认/重训；实现与结果按本次增量外审，不改旧训练与独立确认原件。实际进度仍见交接顶部。
+
 ## 当前合同入口
 
 L²R修复补跑及成功槽接续（2026-10-31）：按[纠正范围](../reports/documentation/20261031/comparison_continue/scope.zh.txt)、[实际入口与主审核验](../reports/documentation/20261031/comparison_continue/report.zh.txt)和[统一正式门](../reports/documentation/20261031/comparison_continue/formal_gate.json)执行。用户原本已经要求补跑成功后继续交接；此前comparison_finish将“单独启动”缩成单条队列是Agent执行偏差，其原scope/gate/启动原件保留为历史，错误限制不再有效。本次只替换派发父控制器，接管三条原worker及其原启动时刻/截止时间/费用，统一领取唯一原待派CAB_s6_GCR；成功槽继续接任务，失败槽退休，健康槽继续补位。三条训练未重启；GCR仍用comparison_resume原科学workspace和原ftol，新修复CAB原864更新及ftol=0显式调用不变。原14成功加当前3条及GCR仍为18条，按各自来源合并、保留全部失败费用，再过108状态完整门与生成→确认→分析；原822h分桶、最多三路、单条72h或12h及无自动再试不变。

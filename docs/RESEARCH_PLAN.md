@@ -4,7 +4,7 @@
 
 L²R／ER+GCR的[结果分析与审查处置](../reports/seller_alias_continual/20261101/comparison_result/review/primary_disposition.zh.txt)已完成，[本批符合条件的权重清理](../reports/seller_alias_continual/20261101/comparison_result/cleanup_receipt.json)已实际执行；本范围无剩余科研动作。保留完整指标/分数/日志/实际来源、逐文件清单、旧失败与费用；H−S额外抗遗忘仍未确认，不为翻转原结论追加训练、调参、标签解析或重采样。H/S54基线、供FOREVER加载的原H27及预训练模型继续保留；已删除的新对照权重不能由SHA恢复，若需新实验另按范围确认。
 
-S_default＋历史H（G_half）继续用[失败隔离补充](../reports/documentation/20261030/defaults_repair/scope.zh.txt)的原科学workspace及[重新绑定的唯一监听](../reports/documentation/20261031/comparison_continue/defaults/formal_gate.json)；其原完整前序/资源条件已由既有链处理，继续按同一队列执行。原18条/54端点、108h+2h、单条6h和最多三路保持，只训练并保存旧dev盲分数；自身失败槽退休、健康槽接续，不放宽完整性、不自动再试或重复监听。补跑单条成功不等于前序整批成功。
+S_default＋历史H（G_half）按用户11月2日选择的[方案A](../reports/seller_alias_continual/20261102/defaults_result/scope.zh.txt)开展旧开发集回顾评价：四固定配置共同60群、全22指标/分层明细/配对条件区间、未定义覆盖率与合并分类计数，新增2小时CPU，方案实现及结果外审。仅消费保存分数，不新增训练/GPU/确认数据，不依据结果选轮调参；原110h和失败账保持。按[分析入口](../reports/seller_alias_continual/20261102/defaults_result/report.zh.txt)与结果外审处置完成交付；已保存结果不重复计算，及时原位更新交接并本地提交，本轮保留相关权重。
 
 VendorLink和FOREVER沿用[VendorLink四臂36条/每市场40轮/单路296h](../reports/documentation/20261030/vendorlink/formal/plan.zh.txt)及[FOREVER新增9条/复用H27/116h和新120群/4320前向](../reports/documentation/20261030/forever/formal/plan.zh.txt)的科学范围，调度以[11月1日完整确认的补充](../reports/documentation/20261101/formal_chain/scope.zh.txt)为准：H/S18条54端点完整有效且相关进程退出后，既有唯一下游链自动进入FOREVER；FOREVER九条及生成、确认、分析完整有效且相关进程退出后，自动接VendorLink。该具体决定已替代10月30日“等新开始指令、不建自动等待”的限制，不再重复索要同范围开始许可或创建第二份监听。FOREVER最多三槽、allocator9GiB、整个PID监控阈值及每槽预留10GiB，可先少槽后补足，扣除已承诺而尚未反映的占用；成功槽续领，失败槽退出、健康槽继续，无自动重试。VendorLink保持单槽17GiB准入。缺项或运行失败阻断下游，完整有效的科学负结果允许交接；原116h/296h及单条12h/8h不变，累计任务费用不能当作实际工期。FOREVER对照仍为原H_pos_tuned的27模型，本次H/S默认模型只是前序执行条件。启动时由实际入口核对原H27、部署及共享资源。
 

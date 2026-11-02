@@ -1,0 +1,503 @@
+H/S 方案 A：开发集评价方案与 CPU 入口定向外审
+一、结论
+
+评价方案和计算主体可以接受；当前包还有两项应在正式开标签前补齐的复现接线缺口。没有发现新的指标公式、轨迹加权、实际域配对或 N/A 处理方面的科学阻断。
+
+两项缺口分别是：
+
+A-R01：数据来源绑定缺一环。 入口固定了 dev pairs 的独立大小/SHA，也检查了四系统的 dev items 来源一致，但没有消费已经列入清单的 dataset manifest，因而尚未实际核对“这份 pairs 与保存分数所用的 dev items 属于同一份固定数据清单”。这是来源证据缺口，不是发现当前标签已经错配。
+A-R02：累计预算和启动条件没有绑定到实际调用。 当前入口只接受自由的 --seconds 参数，没有读取累计账本，也没有包内固定启动调用来落实剩余预算、数值单线程、nice 15 和外层结算。没有证据表明已经超支或实际多线程运行；问题是正式启动承诺还缺具体接线。
+
+因此，不宜直接依据现有 CPU PASS 签发“当前包可无条件开标签”的结论。两项窄幅处置闭合、主执行者独立核对并绑定实际执行版本后，可以在既有方案 A 授权内执行；无需增加训练、模型加载、GPU 资格、独立确认数据或新的研究比较。
+
+分类	本轮判断	处置
+SCIENTIFIC_BLOCKER	未发现已证实的新增科学计算错误	不重开已关闭方法设计或历史训练
+REPRODUCIBILITY_DEFECT：A-R01	dataset manifest 与 pairs／dev items 的关系尚未被实际核对	开标签前补元数据等式或提供已有精确绑定原件
+REPRODUCIBILITY_DEFECT：A-R02	累计余额、单线程和费用结算未绑定正式调用	补冻结的一次性启动约定或小包装程序
+合理后续边界	尚无正式评价结果、尚无正式执行峰值和完整回执	执行后按已批准范围核对，不提前声称通过
+OUT_OF_SCOPE_OVERDESIGN	新数据、HPO、GPU、模型重载、通用调度及全历史回归	均非本轮必要修法
+
+以下结论来自源码、清单、已有原始日志及静态算术核对；本轮没有执行项目代码、测试、指标或 bootstrap。
+
+二、两项需要先补齐的问题
+A-R01：固定 pairs 与固定 dev items 之间缺少实际元数据绑定
+
+分类：REPRODUCIBILITY_DEFECT。必须在开标签前闭合，但不应称为已证实错标签。
+
+具体位置：
+
+implementation.zh.txt
+，第 8 行；
+step28_defaults_evaluate.py
+，`preflight()` 第 70 行、`labels_from_bytes()` 第 118 行、正式读取第 256 行；
+评价 input_manifest.json
+，`dataset_manifest`、`development_pairs` 两个字段。
+已证实的缺口是什么
+
+说明文档称，正式读取的是“已固定 dataset manifest 中的 development/supervision/pairs.csv”；`labels_from_bytes()` 的说明也写着：
+
+纯文本
+Dataset hash fixes the pair source
+
+但实际入口全文没有读取 manifest["dataset_manifest"]。
+
+现有检查分别证明了：
+
+36 条轨迹的 partition 和 public_inputs 彼此一致；
+正式读取的 pairs 字节符合 manifest["development_pairs"] 单独列出的大小/SHA；
+pairs 的群集合、28 个账号、378 条完整规范边和正例数符合要求。
+
+它们尚未实际核对下面这层关系：
+
+纯文本
+保存分数使用的 development/items.jsonl
+                 与
+本次准备读取的 development/supervision/pairs.csv
+
+确实同时属于已固定的同一份 dataset manifest。
+
+上一包中可直接读取的 tuned 完成记录，其 public_inputs 包括 groups.csv、`train/items.jsonl`、`development/items.jsonl`，不包括 pairs。因此不能把“36 条记录的 public_inputs 相同”直接解释成“本次 pairs 的来源也已经与它们核对”。
+
+本轮列出的 dataset manifest SHA 与既有固定数据 policy 一致，没有证据显示它指向了另一数据集。问题只在于：该 manifest 的原件没有随本包提供，而新入口也没有消费它；上述文件间的字段关系目前没有闭合。
+
+为什么完整 378 边检查不能替代这一层
+
+完整边集检查解决的是内部结构与排序：有没有漏边、重复边、错误群、非规范账号顺序等。
+
+来源绑定解决的是这套结构是否属于保存分数的那批账号数据。两份文件各自有固定 SHA，并不自动证明它们原来属于同一个已验证数据版本。这里不需要假设现有 pairs 已错，也不需要重新读取正文才能补证。
+
+最小修法
+
+只读已获准的 dataset manifest 元数据，先用现有 checked() 核验其大小/SHA，再比较以下三组身份。这里的 identity 仅指规范化后的 (bytes, sha256)：
+
+纯文本
+identity(dm["files"]["development/items.jsonl"])
+    == identity(common_public_inputs["development/items.jsonl"])
+
+identity(dm["files"]["groups.csv"])
+    == identity(common_public_inputs["groups.csv"])
+
+identity(dm["files"]["development/supervision/pairs.csv"])
+    == identity(manifest["development_pairs"])
+
+这一步应位于开标签之前，不打开或哈希 pairs 内容，不读取 items 正文，不访问 owners，也不加载模型。
+
+也可以用已经存在、能绑定同一 manifest SHA 的原件及字段核对回执关闭本项；不一定非要改写完整 loader。由于正式门已经绑定输入清单 SHA，精确的静态绑定证据同样有用。
+
+若修改代码，补一个手写元数据反例即可：让共同 public_inputs 一致，但 manifest 中的 dev items 或 pairs 身份不符，要求在标签访问之前拒绝。无需重跑全部指标测试。
+
+A-R02：累计 7200 秒和单线程启动条件尚未落实到实际调用
+
+分类：REPRODUCIBILITY_DEFECT。属于执行范围落实问题，不是指标算法错误。
+
+具体位置：
+
+scope.zh.txt
+，第 19 行；
+budget.json
+；
+step28_defaults_evaluate.py 的 execute() 第 240 行、时间检查第 244 行、CLI 参数第 292 行。
+已证实的缺口是什么
+
+合同是累计任务墙钟 7200 秒，包括准备、核验、正式评价、统计、核对和失败。目前账本为：
+
+纯文本
+180 + 2 + 3 + 5 = 190 秒
+
+但入口只检查：
+
+Python
+time.monotonic() - started > args.seconds
+
+它没有读取累计账本，也没有限制 args.seconds 不得超过本轮剩余预算。
+
+因此，在同一输入清单和合格 review_ready 下，传入 --seconds 7200 会被接受；若用满，则累计为：
+
+纯文本
+190 + 7200 = 7390 秒
+
+传入更大的整数也不会在准入时被拒绝。这证明自由的进程时限参数尚不能代表累计两小时限制已经落实。
+
+另外，包内没有实际正式启动命令或包装程序来设置／核验数值单线程、nice 15、CUDA 不可见。相关要求出现在说明文档中；旧训练入口里的线程设置没有被新评价入口调用，不能据此认定已经生效。
+
+当前 completion.json／`failure.json` 记录的是本次 execute() 段费用，不会自动并入 evaluation/budget.json。Python 导入、启动及外层收尾如何计入，也需要由具体调用闭合。
+
+最小处置
+
+提供一个冻结的一次性启动命令及结算约定，或一个很小的包装程序即可，不需要通用预算平台：
+
+从实际累计账本取得剩余额度，再扣除此后已经发生的准备、修复、核验费用；本包时点的余额是 7010 秒，它不是永久不变的启动额度。
+在导入数值库之前落实单线程环境、CUDA 不可见，并通过既有 py310、nice 15 启动。
+将实际 --seconds 限定在可用余额内，为后续核对／回传留出所需费用。
+用外层实际墙钟结算成功和失败，加入同一本账本；避免漏计启动／导入，也避免内外层重复收费。
+留存具体命令、版本、环境和结算记录。
+
+当前 4 GiB RSS、2 GiB 输出限制是检查点检测和报错规则，不是操作系统硬隔离。没有正式运行证据时，不能称已经测得实际峰值；也没有理由为这一点另建复杂资源控制平台。
+
+本项不要求重跑既有科学测试。 若新增包装逻辑，只需针对余额不足拒绝、正常／失败外层结算等新增分支做少量无标签手写核验。
+
+三、四配置、端点、校准及正常调用链：可以接受的部分
+1. 36 条身份与参数不是只靠计数判断
+
+preflight() 实际要求四配置 × 三顺序 × 三 seed 的精确集合，并逐条核对配置名、参数、864 更新、完成状态、访问账、科学来源和三个阶段。
+
+入口冻结的参数为：
+
+配置	lambda_rank	lr_multiplier
+S_default	1	1
+H_default	1	1
+S_tuned	1.3572393683805832	1.295036258870551
+H_pos_tuned	1.3051794547562026	1.2832655111666686
+
+H_default 对应历史 G_half，沿用原 rank；它没有被冒充为 H_pos_default。此对应与包内
+原默认配置实现说明
+一致。
+
+逐阶段还检查：
+
+同一 60 个 dev 群及固定顺序；
+Adam 步数 288、576、864；
+已有完整恢复及推理恢复标记；
+108 个阶段端点的校准文件身份；
+324 份评分矩阵的大小/SHA、`60×378` 形状与有限性。
+
+本轮清单的 18 条 tuned 完成记录还与本会话上一包的对应完成元数据逐文件核对，大小/SHA 和来源列表全部一致。本包没有附入 18 条 default 完成记录及所有实际评分数组，所以对这部分实物检查的依据是已执行 preflight 原件及其对应源码，不是本轮重新读取 Linux 文件。
+
+2. raw／stage-cal／first-cal 的实际接线正确
+
+预检实际核对：
+
+纯文本
+mapping 文件中的 a、b = 当前阶段保存的 stage map
+当前阶段 first map = 第一阶段 stage map
+
+transform(raw, stage map) = 保存的 stage-cal
+transform(raw, first map) = 保存的 first-cal
+
+随后分别调用 preserve_order()，核查每群排序和精确 ties。它不是仅导入函数或只核对映射文件名；也没有调用 fit() 重新拟合校准。
+校准源码
+的 transform() 与 preserve_order() 支持这条解释。
+
+本轮没有重新逐项检查历史校准生成过程的全部字段，但原 checkpoint 的合格生成路径和冻结端点可复用；未见具体矛盾，不应据此重开旧校准资格。
+
+3. 正常执行链确实是先盲门、后一次标签读取
+
+execute() 的顺序是：
+
+创建不允许复用的新输出目录；
+检查 review_ready 状态及输入清单 SHA；
+调用完整 preflight()；
+写盲输入预检记录；
+先写标签读取尝试记录；
+通过一次 checked(development_pairs) 读取并校验同一份原始字节，再解析；
+评价并保存所有矩阵、计数、query 指标和评分副本；
+调用实际 analyze()；
+成功写完成记录，异常写失败诊断并抛出。
+
+没有发现失败后自动再次解析标签、先看效果再选入口、或绕过 analyze() 的分支。
+
+同目录重跑会被 mkdir(exist_ok=False) 拒绝。操作者另换目录重新调用仍可能违反“一次读取”规则，但当前没有这种自动重试链路；没有必要为防止人为违令另建全局标签审批平台。正式失败后应按既定 scope 保留现场，不自动重开。
+
+四、不读正文重建 378 边：方法成立，缺的是上一节的来源绑定
+
+原评分链的顺序可以静态追到：
+
+step28_continual_expression_run.py 的 public_inputs()：对卖家 ID 使用 sorted(sellers)，按同一顺序构造账号记录；
+step28_continual_population_data.py 的 Group.validate()：要求账号元组为已排序的唯一 ID；
+同文件 align_labels()：按 itertools.combinations(group.sellers, 2) 排列标签；
+step28_record_replay.py 的自然 assignment() 保持该账号顺序，`account_logits()` 最终用上三角索引返回 378 条边；
+新入口从完整 pairs 恢复 28 个账号，排序后同样使用 itertools.combinations(accounts, 2)。
+
+因此，来源关系绑定成立后，不需要重新读取商品正文，也不需要 owners 才能完成对齐。CSV 原行顺序可以任意；新入口会重建规范顺序。
+
+当前手写测试
+确实验证了倒序 CSV 得到相同标签向量，并拒绝重复边、错误群和缺边。这些测试有实际区分力。
+
+A-R01 不要求替换这一算法，只要求补齐它所依赖的固定来源关系。
+
+五、22 指标、N/A 和辅助分类统计：未发现新增错误
+1. 全 22 指标和 query 对应已真实调用
+
+evaluate_matrix() 实际调用既有 group_metrics()、`query_metrics()`、`undefined_metrics()`，并检查：
+
+纯文本
+query 指标形状 = 群数 × 28 × 10
+query 维均值 = 22 指标中的最后 10 列
+TP + FN = 20
+TN + FP = 358
+
+复用的指标为：
+
+边级：AP、梯形 PR-AUC、ROC-AUC、Recall@FPR1%、Brier、Log-loss；
+阈值分类：Precision、Recall、F1、Specificity、Balanced Accuracy、MCC；
+query 排序：MAP、MRR、Recall@1/3/5/10、NDCG@1/3/5/10。
+
+两条 query／群级检索路径均以相同上三角边序构造对称邻接表，排除自身，稳定处理 ties，要求每个 query 有 1—2 个正例。没有发现 query 平均错位或将自身加入候选的错误。依据是
+指标核心
+和
+query／未定义处理实现
+。
+
+2. Precision／MCC 的 N/A 没有被填零或筛掉
+
+旧 confusion_metrics() 对零分母有返回零的底层约定，但新入口随后调用 undefined_metrics()，把对应 Precision／MCC 设为 NaN。
+
+后续使用普通 mean、相减和 quantile，没有 nanmean，也没有按方法分别丢掉未定义群。保存时非有限值转成 JSON null。
+
+辅助 pooled 分类也重新检查合并后的分母。因此可以同时出现：
+
+群平均 Precision 为 N/A；
+pooled Precision 有定义。
+
+这不是矛盾：前者是按群计算后的主统计量，后者是合并计数后的另一个描述量。当前实现保留了这种区别，没有用 pooled 结果替换主表。
+
+3. 合并分类计数的正负两侧处理正确
+
+对于 F 等带正负系数的端点，当前代码先分别收集正侧、负侧的真实计数，分别计算指标，再作差：
+
+纯文本
+pooled_difference
+  = metric(sum_positive_counts)
+  - metric(sum_negative_counts)
+
+没有先把 TP/FP/FN/TN 相减后送入混淆矩阵公式。
+
+当前 TERMS 的每个端点，同一符号一侧的系数相同，而且该侧绝对系数和为 1；群数和轨迹数也相同。因此省略同侧共同的计数缩放，不改变六个分类率，包括 MCC。这一结论适用于当前冻结定义，不是对任意不等权端点的通用保证。
+
+CPU02 的实际 analyze() 测试有可手算辨别力：
+
+纯文本
+F 的 pooled Precision
+  = (10+8)/(12+10) - 5/8
+  = 18/22 - 5/8
+  = 17/88
+
+它确实不同于“各群 Precision 平均后相减”，测试没有混淆两个口径。
+
+另一手写例合并两群后得到：
+
+纯文本
+TP=10, FP=2, FN=30, TN=714
+
+Precision = 10/12
+Recall    = 10/40
+F1        = 20/52
+MCC       = (10*714 - 2*30) / sqrt(12*40*716*744)
+
+这些是手写测试的核对值，不是本项目正式效果。
+
+4. 覆盖率没有把非参与域的补零算成有效群
+
+contribution() 用固定三域张量存放贡献，未参与域初始化为零；但覆盖率没有从该补零张量计算，而是重新收集端点真正使用的群指标。
+
+因此当前参与实例数为：
+
+端点	参与群评价实例数
+O	9×2×20 = 360
+F	9×4×20 = 720
+Z	9×1×20 = 180
+最终三域均值	9×3×20 = 540
+
+CPU02 人为令 H_default 的 stage 3／实际 A 域一个群的 Precision 未定义，实际 analyze() 返回 O 的 6/360 未定义，且主平均为 N/A。这个测试能区分“真实参与实例覆盖”与“把补零域计入分母”的错误实现。
+
+这些数字是参与评价实例数，不是独立样本量。
+
+六、端点公式和配对区间：当前实现与回顾分析定义一致
+
+令 x[s,p] 表示某固定轨迹在阶段 s、该轨迹学习顺序第 p 个域上的某项指标。当前定义为：
+
+纯文本
+O          = (x[3,1] + x[3,2]) / 2
+N          = (x[2,2] + x[3,3]) / 2
+Z          = x[3,3]
+A_acq      = (x[1,1] + x[2,2]) / 2
+F          = A_acq - O
+F_first    = x[1,1] - x[3,1]
+D2         = x[1,1] - x[2,1]
+D3         = (x[2,1] - x[3,1] + x[2,2] - x[3,2]) / 2
+final_mean = (x[3,1] + x[3,2] + x[3,3]) / 3
+
+contribution() 实际通过 order[position-1] 映射到 A/B/C，未把 BCA 或 CAB 的“第一域”误当实际 A。
+
+对方法 m、端点 f、实际域 d、群 i，代码可写成：
+
+纯文本
+C[m,f,d,i]
+  = (1/9) * sum_over_fixed_runs(
+      sum_of_terms_assigned_to_actual_domain_d(
+          coefficient * metric
+      )
+    )
+
+point[m,f] = sum_d mean_i C[m,f,d,i]
+
+然后一次生成：
+
+纯文本
+PCG64(2026110202)
+draws.shape = (5000, 3, 20)
+
+所有方法、阶段、顺序、seed、评分角色和端点共享这组实际域索引。每个实际域从原 20 群有放回抽取 20 群。方法差是先构造：
+
+纯文本
+C[method_A] - C[method_B]
+
+再用同一抽样计算区间；不是两个独立区间相减。`F=A_acq-O` 还有实际数组级恒等检查。
+
+本次全部报告双侧 95% 条件区间，与方案 A 一致。 不应把上一轮新确认比较的 97.5% 主区间机械移入本次旧 dev 回顾分析。
+
+六格核心端点与九格保存也没有冲突：原已有九格均保留，核心公式只消费已学域；ABC 第二阶段 A 可从明确的 cells 条目及单轨迹记录中取得，没有遗漏。
+
+解释限制已经充分写入方案，结果报告仍须落实
+
+以下限制是实质性的：
+
+同一 60 群曾用于选参，区间没有覆盖这种选择过程；
+九条训练轨迹是固定的，群 bootstrap 不代表重新训练的不确定性；
+36 轨迹、108 端点、324 评分矩阵及 19440 群评价实例，不能扩张成独立样本量；
+多指标区间用于回顾描述，不构成新的共同成功门或多指标显著优势宣告；
+新结果不能覆盖旧确认 H−S 主门失败。
+
+比较的归因也应维持当前限定：
+
+比较	可以讨论	不应升级为
+H_default−S_default	默认参数下历史混合池化配置的差异	H_pos_tuned 全部收益的解释
+S_tuned−S_default	两项已选参数组成的整体差异	单独某一个参数的因果贡献
+H_pos_tuned−H_default	排序损失与参数一起改变后的系统差异	纯 HPO 或纯排序模块收益
+H_pos_tuned−S_tuned	两个已选系统在旧 dev 上的回顾差异	新的独立确认
+
+还需注意指标方向：MAP 等排序指标中，`F=A_acq-O` 越大通常表示遗忘越多；Brier／Log-loss 是越低越好，若最终损失升高，按同一公式 F 会变负。保持公式不变，但必须明确方向，不能对 22 指标统一套用“F 越小越好”。 这是结果解释要求，不是当前代码错误。
+
+七、CPU 与 preflight 原件证明了什么
+
+已读取原始 stdout 与对应 JSON，而非只读 PASS 摘要：
+
+证据	实际内容	外层秒数	收费
+CPU01	4 项手写测试	1.4421707859728485	2 秒
+preflight01	PREFLIGHT_OK 36 108 60，`labels_read=0`	2.322989657986909	3 秒
+CPU02	5 项测试，新增实际 analyze() 汇总测试	4.923877932829782	5 秒
+准备	明示保守费用	—	180 秒
+累计	与账本一致	—	190/7200 秒
+
+原件分别为 
+CPU01
+、
+CPU02
+、
+preflight01
+。
+
+CPU02 的生产入口 SHA 与 CPU01 相同。旧 preflight manifest 与当前 manifest 的实际差异仅为测试文件的大小/SHA；36 个输入及生产入口未变。因此目前复用 preflight01 有明确字节依据，不是拿同名文件冒认同版。
+
+这些证据支持：
+
+完美排序但无正预测时，排序与阈值分类分离；
+Precision／MCC 零分母保留 N/A；
+pooled 分类与群平均区分；
+CSV 行序无关及重复／缺失／错群拒绝；
+实际域映射和共享配对；
+实际 analyze() 的 F、正负 pooled 差与覆盖率。
+
+它们不支持以下扩大说法：
+
+CPU01 加 CPU02 等于九项不同测试——实际是四项后增加一项；
+已对 22 个旧公式逐个独立重写验证——没有；
+已动态验证整个 execute()——五项测试没有调用它；
+已动态验证累计预算、review-ready 拒绝、失败外层结算——没有；
+正式 dev 指标已经计算或资源峰值已测——没有。
+
+当前还没有 review_ready、正式结果和本轮标签访问记录，这与送审阶段相符，不是隐瞒或失败。A-R01、A-R02 补齐后，只需保留原证据身份，并针对新增边界补证；不需要反复全量回归。
+
+八、实际读取范围与未验证范围
+本包身份
+
+本轮实际读取的附件为 defaults_evaluation_review.zip：
+
+纯文本
+179063 字节
+39 个成员：38 份载荷 + 根 input_manifest.json
+SHA256:
+a6006d3557b1a0741a370464c3e95c1108ef73cff9af46fec8ffd3f4697f56d9
+
+根清单的 38 份载荷均逐项通过大小/SHA 核对；未发现重复成员、路径越界或符号链接。内层评价清单的 20 份执行／测试来源与包内字节相符。
+
+完整读取／核对的材料
+
+本轮完整读取了 scope、implementation、request、preparation、budget、CPU01／CPU02／preflight01 的 JSON 和 stdout、新入口、当前测试、CPU01 测试原版，以及旧 preflight 清单；对两层 manifest 做了完整解析、来源结构和逐项身份核对。
+
+18 个直接依赖均全文读取，包括其中未被本次入口调用的定义，以确认导入与实际调用边界：
+
+依赖	依赖	依赖
+
+step28_alias_calibration.py
+	
+step28_alias_ranking.py
+	
+step28_balanced_pooling.py
+
+
+step28_balanced_pooling_run.py
+	
+step28_bge_continual.py
+	
+step28_bge_continual_evaluate.py
+
+
+step28_bge_continual_run.py
+	
+step28_chinese_base.py
+	
+step28_continual_expression_run.py
+
+
+step28_continual_population.py
+	
+step28_continual_population_data.py
+	
+step28_continual_population_evaluate.py
+
+
+step28_continual_population_run.py
+	
+step28_crossfit_retention.py
+	
+step28_record_replay.py
+
+
+step28_record_replay_run.py
+	
+step28_record_replay_verify.py
+	
+step28_replay_diagnostics.py
+
+这些文件中存在训练、模型和 Memory 函数，但新入口没有调用这些路径；未发现导入即读取正文／标签、加载 BGE 或启动训练的副作用。导入 torch 模块本身不能被误报为已经加载真实模型或使用 GPU。
+
+上下文方面，读取了原 H/S 默认实现说明、等待编排主审处置、上一轮正式比较结果主审处置；定向核对了上一包 18 条 tuned completion 元数据及固定数据 policy。未重新筛选论文，未递归重审旧 45 条实验。
+
+本轮没有直接验证的材料或行为
+未直接读取本轮 18 条 default completion 原件及 324 个实际评分二进制；
+未读取原 dataset manifest 的 3790 字节原件，这也是 A-R01 的证据缺口；
+未读取正式 pairs、商品正文、owners、模型或 Memory；
+未连接项目 Linux；
+未运行项目代码、测试、模型、指标、NNLS 或重采样；
+未验证尚未发生的正式一次评价及其实际资源峰值。
+
+对真实 preflight 的解释来自其原始回执、绑定版本和实际代码，不是本轮重新执行的结果。
+
+九、允许推进的范围与不需要增加的工作
+
+**可接受并保持不变的部分：**四固定配置、九轨迹等权、同一旧 dev 60 群、三个评分角色、全 22 指标、query 明细、N/A 传播、正负侧 pooled 分类、5000 次实际域配对抽样、95% 回顾条件区间、无新成功门。
+
+正式执行前只需关闭 A-R01 和 A-R02。 更新受影响的来源／清单绑定时，应保留 CPU01、CPU02、preflight01 的原始版本身份，不把旧回执追写成新版本已通过。主执行者独立处置后，可以按现有授权进行一次联合评价；本报告本身不执行、不上传，也不另授予数据访问权限。
+
+本轮不需要新增 HPO、seed、独立确认群、算法臂、GPU 资格、模型重载、正文／owners 检查、通用调度或审批系统，也不需要重跑旧 45 条实验及全部历史测试。既有 FOREVER→VendorLink 链和相关权重保管保持原约定。
+
+最终结果只能作为既有开发选择之后、四个固定系统在同一旧开发集上的回顾分析。无论结果方向如何，都应保留旧确认结论、未定义指标、分层例外和上述归因限制。
+
+implementation.zh.txt
+文档
+step28_defaults_evaluate.py
+代码
+input_manifest.json
+代码
+另有 25 个

@@ -1,0 +1,18 @@
+方案 A：实际入口与增量资格
+2026-11-02
+
+入口 scripts/step28_defaults_evaluate.py，手写测试 tests/test_step28_defaults_evaluate.py。在独立 Linux reports/seller_alias_continual/20261102/defaults_result/workspace 运行，18 个已有依赖模块从 H/S 冻结科学 workspace 按 AST 本地模块导入闭包逐文件复制；未改活动来源。20 份执行/测试来源在 input_manifest.json 固定，并回传 source/ 原字节。指标 group_metrics、query_metrics、undefined_metrics、正斜率校准 transform/preserve_order 复用原实现，不重写其科学公式。
+
+已查 36 完成轨迹分别来自 defaults/formal 和 continual_retry/formal，四种配置参数按原值明确匹配；全部分区、public_inputs、60 个 development_ids 一致。逐评分字节 SHA、形状/有限性、保存校准映射及转换一致性、阶段 Adam 步数/既有恢复标记在实际 preflight 检查。preflight01 真实读保存分数通过 36/108/60，没有打开标签。CPU01 四项手写反例覆盖完美排序但无正预测、合并混淆计数与零分母、CSV 乱序/重复/漏边/错群、实际域映射和共享配对 bootstrap；outer 向上收费 2 秒，正式输入预检收费 3 秒。
+
+标签对齐不调用旧 public_inputs（它会解析 train 与 dev 正文）。只在完整盲门与本轮方案实现审查闭合后，先记录一次读取尝试，再读已固定 dataset manifest 中的 development/supervision/pairs.csv 原字节一次，同时校验大小/SHA；不在预检阶段哈希或读取 pairs。该固定表含每群全部378规范无向边；按原评分器相同的账号字典序重建28账号的组合，检查60群、20正例、完整唯一边与公开分区顺序。原 trainer 公共载入器明确 sorted(seller_ids)，训练完成记录固定相同 dev items SHA；无需重新解析商品正文。不会导出 pair 标签、账号名或 owners。
+
+正式计算324份60×22指标、324份60×28×10 query指标，并保存对应324份分数副本，计19440个群评价实例；同一群跨方法/阶段出现，不能当19440独立群。九格完整保存，核心O/N/Z/A/F等只消费已学域。每方法9轨迹等权后按实际域共同抽样，seed2026110202/5000，所有区间为开发集回顾条件区间，无新的pass门。旧独立确认主门不修改。
+
+原NaN传播在主表保持；覆盖率按每个端点真正参与的群评价实例统计，不把填入贡献张量的非参与域零计为有效群。辅助分类对正/负项分别合并计数，再做时点差；不得先把差值计数送入混淆矩阵公式。对这些端点，同一侧的各项系数相同，合并计数率与按该侧等权合并一致。只做描述，不把合并Precision/MCC替代主群平均指标。
+
+单进程CPU、数值库单线程、CUDA_VISIBLE_DEVICES为空；不载模型或Memory，不调用训练函数。主入口需本轮 input manifest SHA 对应的 review_ready，独立 output mkdir 拒绝复用；失败先留诊断与计费，不自动再次开标签。现阶段未签发 review_ready，未执行正式评价，评价标签未读。新增总上限7200秒，目前准备180+CPU2+预检3=185秒；来源回传包含在准备保守收费。后续核对和传输另实记，旧110小时不挪用。
+
+后续仍需：方案/实现网页外审并独立处置，必要修复仅补受影响证据；一次完整评价、核对旧tuned开发结果与新独立重算、完整分层汇报、结果外审、回传/更新/本地提交。既有训练链及权重保管不变。
+
+追加CPU02：补一项调用实际analyze的完整36轨迹手写汇总反例，独立核对F、正/负时点合并分类差值及H的N/A覆盖6/360；共5项通过，收费5秒。生产入口未变，原preflight01可复用；原测试与输入清单字节另留source_variants并核对原SHA。累计180+2+3+5=190/7200秒，尚未开标签。

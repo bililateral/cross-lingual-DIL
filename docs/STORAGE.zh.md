@@ -1,5 +1,15 @@
 # 科研文件存储与恢复
 
+## 2026-11-02 H/S方案A评价、结果回传与外审保管
+
+用户确认方案A后，在Linux独立 reports/seller_alias_continual/20261102/defaults_result 部署CPU评价，未改活动训练来源。原20份送审源码/测试在source/，最终22份执行来源由[修后清单](../reports/seller_alias_continual/20261102/defaults_result/repair/input_manifest.json)绑定；三份修后增量及对应CPU03/04、preflight02原件在repair/，CPU01/02与旧清单/测试版本仍可按原SHA恢复。36完成记录、原门、dataset manifest等元数据在inputs/；原40项回传见metadata_receive.json，后续dataset manifest仅元数据，无标签正文。
+
+一次评价形成324份群指标、324份query指标、324份分数及完整分析/计数/日志。[982份载荷104222515字节](../reports/seller_alias_continual/20261102/defaults_result/receive_manifest.json)通过SFTP回传，[实际接收](../reports/seller_alias_continual/20261102/defaults_result/receive.json)逐项大小/SHA全匹配。分数/query二进制仅项目保管，不进入外审包；原关系表、商品正文、owners、模型、Memory均未回传。评价标签一次、模型/GPU零，旧tuned162矩阵核对相同；新增CPU预算与原训练58.857975h分账。
+
+原179063字节实现包已完整回收，A-R01/A-R02按[独立处置](../reports/seller_alias_continual/20261102/defaults_result/review/primary_disposition.zh.txt)最小修复关闭。38项送审字节与独立保管原件核对后删除重复ZIP；提交时190秒预算与现账不同，原字节单独保留review/submitted_budget.json并登记在submission.json。原文/DOM/回收身份继续保留，重复工具JSON与未采用的proposed输入清单删除；结果中转ZIP在全部载荷核验后清理，见[本地清理](../reports/seller_alias_continual/20261102/defaults_result/local_transport_cleanup.json)。Linux亦重新核对982份保留载荷后删除同一中转ZIP和未采用清单，见[远端清理](../reports/seller_alias_continual/20261102/defaults_result/remote_transport_cleanup.json)。没有删除权重或唯一科研证据。
+
+新[结果包](../reports/seller_alias_continual/20261102/defaults_result/result_review/package.json)5964975字节、431载荷，用户具体批准后客户端20:06上传原ChatGPT会话并单次提交。包含报告、全22指标、324群指标JSON、36完成记录和必要实际来源/修复证据；不含分数/query二进制、标签源、正文、owners、权重或密码。在审包保留，审查回收与处置从result_review/submission.json进入；实时进度仅在交接H/S行维护。根可变文档只Windows维护，本轮本地提交，不推送；既有FOREVER→VendorLink自动链及权重保管保持，不重置大清理周期。
+
 ## 2026-11-01 L²R／ER+GCR结果回传、审查及权重清理
 
 [结果目录](../reports/seller_alias_continual/20261101/comparison_result/)通过SFTP回传2393文件、162211873字节；[逐项清单](../reports/seller_alias_continual/20261101/comparison_result/receive_manifest.json)与[接收回执](../reports/seller_alias_continual/20261101/comparison_result/receive.json)记录两端实际大小/SHA全匹配。包括正式分数/指标/日志/校准/来源及完成账，不含正式正文、关系标签、owners、Memory载荷或模型。另回收核对7项其他实际冻结源码版本；不会用当前源码冒充全部旧轨迹来源。本轮保存结果核对在Linux py310单数值线程进行，无标签/载模/重采样，外层计2秒旁记，不覆盖原正式账。
