@@ -217,7 +217,7 @@ def train_stage(method, model, optimizer, current, memory, c, stage, root, budge
 
 
 def execute(job: Path, spec: m.Spec, deadline: float, gate_path: Path, *,
-            implementation=m, source_files=None) -> dict:
+            implementation=m, source_files=None, budget_factory=Budget) -> dict:
     import torch
     torch.set_num_threads(1)
     torch.set_num_interop_threads(1)
@@ -227,7 +227,7 @@ def execute(job: Path, spec: m.Spec, deadline: float, gate_path: Path, *,
     if (gate.get("status") != "APPROVED_IMPLEMENTATION_AND_RESOURCES" or gate["sources"] != expected_sources
             or gate["runs"] != expected_runs or spec.identity() not in expected_runs):
         raise ValueError("Exact implementation/qualification/run-list gate missing")
-    budget = Budget(job.parent, deadline)
+    budget = budget_factory(job.parent, deadline)
     budget.check()
     c, method = implementation.config(spec), implementation.Method(spec)
     parent.configure_numerics()

@@ -4,6 +4,8 @@ H/S评价补充（2026-11-02）：用户选择[方案A](../reports/seller_alias_
 
 ## 当前合同入口
 
+H_pos_tuned历史两系数开发（2026-11-02）：按[实现范围与待开训方案](../reports/documentation/20261102/history_optuna/scope.zh.txt)，只调旧群监督alpha与旧评分保持beta，保留原正例排序权重、学习率倍率、H汇聚、6群Memory及三阶段。用户指定3-worker：同候选三个顺序并行、完整反馈后才提出下一候选；选后九复验由健康槽续领。当前仅实现/手写CPU核验/定向实现外审；[正式门](../reports/documentation/20261102/history_optuna/formal_gate.json)关闭，预算与新确认是准备方案，未开训。原Optuna及五方法结论不变，动态进度见交接唯一当前项。
+
 L²R修复补跑及成功槽接续（2026-10-31）：按[纠正范围](../reports/documentation/20261031/comparison_continue/scope.zh.txt)、[实际入口与主审核验](../reports/documentation/20261031/comparison_continue/report.zh.txt)和[统一正式门](../reports/documentation/20261031/comparison_continue/formal_gate.json)执行。用户原本已经要求补跑成功后继续交接；此前comparison_finish将“单独启动”缩成单条队列是Agent执行偏差，其原scope/gate/启动原件保留为历史，错误限制不再有效。本次只替换派发父控制器，接管三条原worker及其原启动时刻/截止时间/费用，统一领取唯一原待派CAB_s6_GCR；成功槽继续接任务，失败槽退休，健康槽继续补位。三条训练未重启；GCR仍用comparison_resume原科学workspace和原ftol，新修复CAB原864更新及ftol=0显式调用不变。原14成功加当前3条及GCR仍为18条，按各自来源合并、保留全部失败费用，再过108状态完整门与生成→确认→分析；原822h分桶、最多三路、单条72h或12h及无自动再试不变。
 
 H/S继续采用[10月30日失败隔离补充](../reports/documentation/20261030/defaults_repair/scope.zh.txt)和原冻结科学workspace；[新监听门](../reports/documentation/20261031/comparison_continue/defaults/formal_gate.json)只更新完整前序绑定、独立路径与承接费用。须comparison_continue全部21项成功且相关进程退出，随后按原资源门开始18条/54端点；自身失败槽退出、健康槽继续接续，原44科学来源/108h+2h/盲分数权限不变。旧监听启动原件保留为历史，不重复启动。实际状态只见交接顶部。

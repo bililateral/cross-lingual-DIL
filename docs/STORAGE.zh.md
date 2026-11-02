@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-02 H_pos_tuned两项历史系数实现与CPU证据
+
+本轮只将源码、直接依赖、配置及手写测试经SFTP部署至Linux独立 reports/documentation/20261102/history_optuna/workspace，入口不覆盖活动FOREVER/VendorLink或旧五方法冻结workspace。[58来源清单](../reports/documentation/20261102/history_optuna/cpu_upload_manifest.json)逐项大小/SHA与远端核对后才执行手写CPU；CPU原件、旧版发生变化的源文件与费用账在[本轮目录](../reports/documentation/20261102/history_optuna/)保管。临时TinyEncoder状态和虚构分数由测试独立临时目录自动回收，未产生正式模型、读取正式数据或删除既有模型。正式门关闭，当前没有新监听。
+
+具体实现外审包514462字节、132载荷（另含清单），SHA256 39952612d10e561014d0de8586fbf9bff55ba98396d17616976e28fcfafc1118，已获用户本包/目的地许可并于客户端22:28:20单次上传GPT-6 Pro。输入ZIP、清单、完整请求、状态勘误和[提交回执](../reports/documentation/20261102/history_optuna/review/submission.json)保留，待完整回收外审。送审implementation原文保留形成时点，不追改字节；当前状态由提交索引承接。本轮项目记录在Windows维护，实际同步范围及最终核验见[实施记录](../reports/documentation/20261102/history_optuna/implementation.zh.txt)；不把独立源码SFTP同步写成Git推送或全部根docs同步。本地提交、不推送，不重置既有大清理周期。
+
 ## 2026-11-02 H/S方案A评价、结果回传、外审保管与默认权重清理
 
 用户确认方案A后，在Linux独立 reports/seller_alias_continual/20261102/defaults_result 部署CPU评价，未改活动训练来源。原20份送审源码/测试在source/，最终22份执行来源由[修后清单](../reports/seller_alias_continual/20261102/defaults_result/repair/input_manifest.json)绑定；三份修后增量及对应CPU03/04、preflight02原件在repair/，CPU01/02与旧清单/测试版本仍可按原SHA恢复。36完成记录、原门、dataset manifest等元数据在inputs/；原40项回传见metadata_receive.json，后续dataset manifest仅元数据，无标签正文。

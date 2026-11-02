@@ -1,0 +1,42 @@
+{
+  "prior_attempts": [
+    {
+      "attempt": "cpu01",
+      "measured_seconds": 10.979473043931648,
+      "tail_bound_seconds": 3,
+      "charged_seconds": 14
+    },
+    {
+      "attempt": "cpu02",
+      "measured_seconds": 10.941624049795792,
+      "tail_bound_seconds": 3,
+      "charged_seconds": 14
+    }
+  ],
+  "prior_seconds": 28,
+  "reason": "CPU01/02 timing stopped before final source/version capture; conservative tail bound uses receipt mtime minus last stdout mtime plus two seconds for filesystem timestamp resolution. Original receipts retained.",
+  "final_cpu_seconds": 89,
+  "cpu_limit_seconds": 1200,
+  "attempts": [
+    {
+      "attempt": "cpu01",
+      "status": "PASS"
+    },
+    {
+      "attempt": "cpu02",
+      "status": "FAIL"
+    },
+    {
+      "attempt": "cpu03",
+      "status": "PASS"
+    },
+    {
+      "attempt": "cpu04",
+      "status": "FAIL"
+    },
+    {
+      "attempt": "cpu05",
+      "status": "PASS"
+    }
+  ]
+}

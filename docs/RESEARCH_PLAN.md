@@ -2,6 +2,8 @@
 
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)，本页仅列后续动作和授权边界。有效合同及增量修复从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)进入，不复制PID、计数或过期工期。
 
+H_pos_tuned历史两系数的[实现方案](../reports/documentation/20261102/history_optuna/scope.zh.txt)按用户“先完整实现”“要3-worker”推进：完成真实计算与并行调度、限定手写CPU核验，具体包已按用户许可提交，下一步完整回收定向实现外审并作必要处置。本轮不启动训练、Optuna正式搜索、确认生成或自动监听；开训仍等用户明确指令和旧链完整退出。有限候选/三顺序/九复验、完整性门与结论边界不因并发而缩减，既有失败账和旧H−S原验收保留。
+
 L²R／ER+GCR的[结果分析与审查处置](../reports/seller_alias_continual/20261101/comparison_result/review/primary_disposition.zh.txt)已完成，[本批符合条件的权重清理](../reports/seller_alias_continual/20261101/comparison_result/cleanup_receipt.json)已实际执行；本范围无剩余科研动作。保留完整指标/分数/日志/实际来源、逐文件清单、旧失败与费用；H−S额外抗遗忘仍未确认，不为翻转原结论追加训练、调参、标签解析或重采样。H/S54基线、供FOREVER加载的原H27及预训练模型继续保留；已删除的新对照权重不能由SHA恢复，若需新实验另按范围确认。
 
 S_default＋历史H（G_half）的[方案A](../reports/seller_alias_continual/20261102/defaults_result/scope.zh.txt)结果从[分析及审查](../reports/seller_alias_continual/20261102/defaults_result/report.zh.txt)使用：四固定配置共同60旧dev群、全22指标与回顾条件区间、未定义覆盖及合并分类均保留，不把开发集结论变成独立确认或依据其追加训练/选参。代码/评价/分析审查按本轮证据结案，无必要补跑；按用户后续具体确认，[默认54份权重已留证删除](../reports/seller_alias_continual/20261102/defaults_result/cleanup_receipt.json)，结果、分数、日志和Memory继续保留；旧S_tuned/H_pos_tuned的54份基线保留，其中H27仍供FOREVER加载。已删模型不能凭SHA恢复，未来重新训练或载模评价须另定范围；旧训练及失败账不改，后续仍原位维护唯一交接项。
