@@ -49,6 +49,82 @@ class HistoryTests(unittest.TestCase):
     def evidence(self, name, value):
         m.data.write_json(Path(os.environ["HISTORY_TEST_ROOT"])/(name+".json"), value)
 
+    def test_slot_credit_counterexamples_and_actual_dispatch(self):
+        outcomes = []
+        with tempfile.TemporaryDirectory(dir=os.environ["HISTORY_TEST_ROOT"]) as temp:
+            root = Path(temp)
+            limits = {**run.LIMITS, "rss_bytes": 4*2**30, "disk_bytes": 2**30, "free_reserve_bytes": 0}
+            allowed = dict(workers=3, sources=[], campaign=str(root), workspace=str(root), limits=limits)
+            s = run.LIMITS["process_gpu_bytes"]
+            mixed = dict(free=16*2**30, processes={123: 8*2**30})
+            self.assertTrue(run.queue.admission(mixed, [123], s)["ready"])
+            self.assertFalse(control.slot_admission(allowed, mixed, 16*2**30, 1)["ready"])
+            # A larger observed free/zero usage cannot return credit while a group lives.
+            self.assertFalse(control.slot_admission(allowed, dict(free=32*2**30, processes={}), 16*2**30, 1)["ready"])
+            self.assertTrue(control.slot_admission(allowed, mixed, 16*2**30, 0)["ready"])
+            # The frozen credit does not replace the latest free-space requirement.
+            self.assertFalse(control.slot_admission(allowed, dict(free=8*2**30, processes={}), 32*2**30, 0)["ready"])
+            for occupied in range(3):
+                self.assertTrue(control.slot_admission(allowed, mixed, 32*2**30, occupied)["ready"])
+            self.assertFalse(control.slot_admission(allowed, mixed, 32*2**30, 3)["ready"])
+            for capacity, expected_peak in ((16*2**30, 1), (32*2**30, 3)):
+                campaign = root/str(expected_peak)
+                campaign.mkdir()
+                local = {**allowed, "campaign": str(campaign)}
+                ledger = control.Ledger(campaign, dict(training=0., auxiliary=0.), dict(training=100., auxiliary=100.))
+                rows = [dict(id=f"r{i}", bucket="training", seconds=10., shutdown_reserve=.1, gpu=True) for i in range(4)]
+                released = []
+                actual_release = control.release
+                def release(process):
+                    time.sleep(.02)
+                    result = actual_release(process)
+                    released.append(dict(pid=process.pid, at=time.monotonic()))
+                    return result
+                class HandwrittenMonitor:
+                    def snapshot(self):
+                        return dict(free=capacity, processes={p.pid: 8*2**30 for p in control.psutil.Process().children()})
+                def command(row, job, deadline):
+                    code = "import json,time; from pathlib import Path; start=time.monotonic(); time.sleep(.2); Path('"+str(job/"result.json")+"').write_text(json.dumps(dict(start=start,end=time.monotonic())))"
+                    return [sys.executable, "-c", code]
+                with mock.patch.object(control, "release", side_effect=release):
+                    result = control.dispatch(campaign, rows, command, lambda row, job: m.data.read_json(job/"result.json"),
+                        local, ledger, monitor=HandwrittenMonitor(), poll_seconds=.01)
+                intervals = [m.data.read_json(campaign/f"r{i}/result.json") for i in range(4)]
+                peak = max(sum(p["start"] <= r["start"] < p["end"] for p in intervals) for r in intervals)
+                self.assertEqual(peak, expected_peak)
+                self.assertGreaterEqual(intervals[expected_peak]["start"], released[0]["at"])
+                self.assertEqual(control.group_members(released[-1]["pid"]), [])
+                outcomes.append(dict(capacity=capacity, peak=peak, intervals=intervals, released=released, dispatch=result))
+        self.evidence("slot_credit", dict(mixed_observation_old_ready_new_rejected=True,
+            live_group_credit_never_refunded=True, latest_free_still_required=True,
+            actual_cpu_dispatch=outcomes, gpu_calls=0))
+
+    def test_close_failure_settles_and_finite_tail_is_precharged(self):
+        with tempfile.TemporaryDirectory(dir=os.environ["HISTORY_TEST_ROOT"]) as temp:
+            root = Path(temp)
+            with mock.patch.object(control.time, "monotonic", side_effect=[100., 107., 109.]):
+                ledger = control.Ledger(root, dict(training=0., auxiliary=89.), dict(training=100., auxiliary=200.))
+                self.assertEqual(ledger.used["auxiliary"], 119.)
+                monitor = mock.Mock()
+                monitor.close.side_effect = RuntimeError("handwritten close failure")
+                with self.assertRaisesRegex(RuntimeError, "handwritten close failure"):
+                    control.close_and_settle(monitor, ledger)
+                self.assertEqual(ledger.used["auxiliary"], 126.)
+                control.close_and_settle(None, ledger)
+                self.assertEqual(ledger.used["auxiliary"], 128.)
+            saved = m.data.read_json(root/"budget.json")
+            self.assertEqual(saved["used_seconds"]["auxiliary"], 89.+9.+30.)
+            self.assertEqual(len(saved["events"]), 1)
+            self.assertEqual(saved["events"][0]["conservative_seconds"], 30)
+            # A handwritten 12-second terminal write fits the already charged 30.
+            self.assertGreaterEqual(saved["used_seconds"]["auxiliary"], 89.+9.+12.)
+            short = control.Ledger(root, dict(training=0., auxiliary=89.), dict(training=100., auxiliary=110.))
+            with self.assertRaises(TimeoutError):
+                short.control()
+        self.evidence("final_accounting", dict(close_exception_preserved=True, failed_close_still_settles=True,
+            one_conservative_tail_seconds=30, existing_auxiliary_cap_enforced=True,
+            handwritten_elapsed_seconds=9, handwritten_terminal_seconds=12, saved=saved))
+
     def test_real_coefficients_and_anchor_equivalence(self):
         group = handmade_group("current")
         target = (np.sin(np.arange(1540)/7)*3).astype(np.float32)

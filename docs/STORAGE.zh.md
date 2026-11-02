@@ -2,9 +2,9 @@
 
 ## 2026-11-02 H_pos_tuned两项历史系数实现与CPU证据
 
-本轮只将源码、直接依赖、配置及手写测试经SFTP部署至Linux独立 reports/documentation/20261102/history_optuna/workspace，入口不覆盖活动FOREVER/VendorLink或旧五方法冻结workspace。[58来源清单](../reports/documentation/20261102/history_optuna/cpu_upload_manifest.json)逐项大小/SHA与远端核对后才执行手写CPU；CPU原件、旧版发生变化的源文件与费用账在[本轮目录](../reports/documentation/20261102/history_optuna/)保管。临时TinyEncoder状态和虚构分数由测试独立临时目录自动回收，未产生正式模型、读取正式数据或删除既有模型。正式门关闭，当前没有新监听。
+本轮只将源码、直接依赖、配置及手写测试经SFTP部署至Linux独立 reports/documentation/20261102/history_optuna/workspace，入口不覆盖活动FOREVER/VendorLink或旧五方法冻结workspace。[修后58来源清单](../reports/documentation/20261102/history_optuna/repair/sources.json)逐项大小/SHA与远端核对后才执行手写CPU；CPU原件、旧版发生变化的源文件与费用账在[本轮目录](../reports/documentation/20261102/history_optuna/)保管。临时TinyEncoder状态和虚构分数由测试独立临时目录自动回收，未产生正式模型、读取正式数据或删除既有模型。正式门关闭，当前没有新监听。
 
-具体实现外审包514462字节、132载荷（另含清单），SHA256 39952612d10e561014d0de8586fbf9bff55ba98396d17616976e28fcfafc1118，已获用户本包/目的地许可并于客户端22:28:20单次上传GPT-6 Pro。输入ZIP、清单、完整请求、状态勘误和[提交回执](../reports/documentation/20261102/history_optuna/review/submission.json)保留，待完整回收外审。送审implementation原文保留形成时点，不追改字节；当前状态由提交索引承接。本轮项目记录在Windows维护，实际同步范围及最终核验见[实施记录](../reports/documentation/20261102/history_optuna/implementation.zh.txt)；不把独立源码SFTP同步写成Git推送或全部根docs同步。本地提交、不推送，不重置既有大清理周期。
+具体实现外审包514462字节、132载荷（另含清单），SHA256 39952612d10e561014d0de8586fbf9bff55ba98396d17616976e28fcfafc1118，已获用户本包/目的地许可并于客户端22:28:20单次上传GPT-6 Pro。输入ZIP、清单、完整请求、状态勘误和[提交回执](../reports/documentation/20261102/history_optuna/review/submission.json)保留；[完整返回包与六载荷核验](../reports/documentation/20261102/history_optuna/review/recovery.json)已回收，原文保留。修后由[独立主审](../reports/documentation/20261102/history_optuna/review/primary_disposition.zh.txt)逐项关闭，CPU06四项通过和101秒累计账另存repair/；原送审132载荷及CPU05未追改。送审implementation原文保留形成时点，不追改字节；当前状态由提交索引承接。本轮项目记录在Windows维护，实际同步范围及最终核验见[修后同步回执](../reports/documentation/20261102/history_optuna/repair/final_sync.json)与[独立处置](../reports/documentation/20261102/history_optuna/review/primary_disposition.zh.txt)；不把独立源码SFTP同步写成Git推送或全部根docs同步。本地提交、不推送，不重置既有大清理周期。
 
 ## 2026-11-02 H/S方案A评价、结果回传、外审保管与默认权重清理
 

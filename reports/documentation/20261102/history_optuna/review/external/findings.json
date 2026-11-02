@@ -1,0 +1,165 @@
+{
+  "review": "history_optuna_review.zip 定向静态外审",
+  "date": "2026-11-02",
+  "scientific_blockers_found": 0,
+  "formal_execution_authorized_by_this_review": false,
+  "findings": [
+    {
+      "id": "HOPT-R01",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "MEDIUM",
+      "status": "OPEN_CONFIRMED_STATIC_COUNTEREXAMPLE",
+      "blocks": "当前GPU准入实现正式放行",
+      "files": [
+        {
+          "path": "scripts/step28_formal_queue.py",
+          "lines": [
+            87,
+            90,
+            102,
+            104
+          ]
+        },
+        {
+          "path": "scripts/step28_history_optuna_control.py",
+          "lines": [
+            183,
+            195
+          ]
+        }
+      ],
+      "evidence": "S=10.25GiB，先free16，自家随后alloc8，后usage8，现代码required12.5并ready；真实free8。无需外部变化。",
+      "impact": "自家预留重复抵扣，可能超准入、OOM、浪费预算或候选不完整；本轮没有观测到实际GPU事故。",
+      "minimum_disposition": "本轮独立调度以空闲时冻结容量C、整槽预留R、不按自家当前usage返还信用，或等价可证明保守方法；保留共享GPU观测边界。既有手写CPU中覆盖交错、释放、三槽和返还。",
+      "implemented_by_reviewer": false
+    },
+    {
+      "id": "HOPT-R02",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "LOW",
+      "status": "OPEN_CONFIRMED_STATIC_PATH",
+      "blocks": "正式记账封板；不独立否定科学方案",
+      "files": [
+        {
+          "path": "scripts/step28_history_optuna_control.py",
+          "lines": [
+            90,
+            94,
+            340,
+            341,
+            345,
+            349
+          ]
+        }
+      ],
+      "evidence": "monitor.close异常跳过最终control；正常最后control自身落盘及completion没有下一tick或独立尾部预提。",
+      "minimum_disposition": "局部嵌套finally确保关闭异常也尝试结算，保留异常；在原auxiliary4小时内一次登记有限保守尾部，不扩预算。",
+      "implemented_by_reviewer": false
+    },
+    {
+      "id": "CPU02",
+      "classification": "CLOSED_REPRODUCIBILITY_DEFECT",
+      "status": "CLOSED_WITH_PROVIDED_EVIDENCE",
+      "files": [
+        {
+          "path": "tests/test_step28_history_optuna.py",
+          "lines": [
+            361
+          ]
+        }
+      ],
+      "evidence": "修前fixture写顶层，修后写saved['runs']；CPU03及CPU05通过，原FAIL与费用保留。"
+    },
+    {
+      "id": "CPU04",
+      "classification": "CLOSED_REPRODUCIBILITY_DEFECT",
+      "status": "CLOSED_WITH_PROVIDED_EVIDENCE",
+      "files": [
+        {
+          "path": "scripts/run_step28_history_optuna_cpu.py",
+          "lines": [
+            28
+          ]
+        }
+      ],
+      "evidence": "CPU包装补CUBLAS_WORKSPACE_CONFIG，与原数值门匹配；CPU05实际确认入口通过，原FAIL与费用保留。"
+    },
+    {
+      "id": "HOPT-S01",
+      "classification": "合理建议",
+      "severity": "NON_BLOCKING",
+      "files": [
+        {
+          "path": "scripts/step28_history_optuna_evaluate.py",
+          "lines": [
+            95,
+            294,
+            297
+          ]
+        }
+      ],
+      "text": "写清旧dev回顾为点值/差值，新确认才生成5000配对区间；不自动增旧dev bootstrap。"
+    },
+    {
+      "id": "HOPT-S02",
+      "classification": "合理建议",
+      "severity": "NON_BLOCKING",
+      "files": [
+        {
+          "path": "scripts/step28_history_optuna_evaluate.py",
+          "lines": [
+            270,
+            273,
+            275,
+            276
+          ]
+        }
+      ],
+      "text": "写清当前逐格四计数和pooled Precision/MCC；未输出其他分类率/所有O-F合并层级，不泛称已经全部生成。"
+    },
+    {
+      "id": "HOPT-B01",
+      "classification": "合理解释与资格边界",
+      "severity": "NON_BLOCKING",
+      "text": "CPU05 TinyEncoder真实入口不是本轮三H完整BGE/GPU资格；原H27、实际数据/前序链/吞吐与资源仍待获准现场核对。"
+    },
+    {
+      "id": "HOPT-B02",
+      "classification": "合理解释边界",
+      "severity": "NON_BLOCKING",
+      "text": "最终RAW MAP主门不等于遗忘改善；F须伴A_acq/O。旧dev与seed已见、同机制合成、固定轨迹条件区间、旧H-S失败保持。"
+    },
+    {
+      "id": "HOPT-O01",
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "NOT_REQUIRED",
+      "text": "无须新增候选/HPO维度/seed/全六顺序/GPU科研运行/新数据/平台/全历史回归/新成功门。"
+    }
+  ],
+  "accepted_paths": [
+    "alpha/beta真实目标→完整记录表梯度→真实head分块反传→encoder反传→Adam",
+    "当前监督系数1、原H池化/正例排序/固定lambda/LR/全参数/6群Memory与出生教师",
+    "系数进入模型及Memory恢复身份；CPU错系数恢复被拒",
+    "同候选三顺序完整释放后一次tell；九复验健康槽续领、失败槽退休",
+    "实际最终RAW群/query来源重求U，绑定实际域/群/score SHA",
+    "12候选、真实anchor、精确平局规则、无pruning、失败不补、anchor胜出无九复训",
+    "原H27前置核对、配对partition/archive、新120群身份机制",
+    "54恢复/108盲格/4320前向/324指标矩阵后一次pairs",
+    "22指标/N-A/计数、实际域配对5000、新配置减原H最终RAW MAP95下界",
+    "共享保存锁及扫描竞态、完整前序链门、条件搜索权重退役、正式门关闭"
+  ],
+  "not_executed": [
+    "项目导入或代码",
+    "tests",
+    "科研指标",
+    "bootstrap",
+    "训练",
+    "模型推理",
+    "NNLS",
+    "生成器",
+    "SSH/Linux连接",
+    "正式数据读取",
+    "任何源码或gate修改"
+  ],
+  "input_correction": "接受用户2026-11-02 22:25勘误，不以隐藏限额辅助标签断言Pro不可用；完整包外发许可已给出。"
+}

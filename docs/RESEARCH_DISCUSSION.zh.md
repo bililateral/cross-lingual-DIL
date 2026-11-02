@@ -6,7 +6,7 @@
 
 本轮依此完成实现及必要手写CPU核验/定向外审，不将实现许可扩成开训许可。并发安排采用同一候选ABC/BCA/CAB三顺序并行，三条齐备后再反馈Optuna；选定后九复验三个槽成功续领，失败槽退休、健康槽继续当前批余项，缺项阻断后续，不自动重试。准备方案及具体边界见[范围](../reports/documentation/20261102/history_optuna/scope.zh.txt)。不启动新等待链，不影响现行FOREVER→VendorLink作业，原H27仍保留。旧开发结果已接触、seed4/5/6已用及原H−S共同门失败的事实保持。
 
-具体新包history_optuna_review.zip为514462字节、132载荷，SHA256 39952612d10e561014d0de8586fbf9bff55ba98396d17616976e28fcfafc1118。用户明确确认：“批准此具体包在 GPT-6 Pro 可用后上传该会话外审”，目的地为既有 https://chatgpt.com/c/6adc2cf8-61b8-83ea-90d2-0a79dd218a72。许可仅覆盖本包/本轮实现审查，不扩大到训练或新材料；实际提交/等待状态见[索引](../reports/documentation/20261102/history_optuna/review/submission.json)。
+具体新包history_optuna_review.zip为514462字节、132载荷，SHA256 39952612d10e561014d0de8586fbf9bff55ba98396d17616976e28fcfafc1118。用户明确确认：“批准此具体包在 GPT-6 Pro 可用后上传该会话外审”，目的地为既有 https://chatgpt.com/c/6adc2cf8-61b8-83ea-90d2-0a79dd218a72。许可仅覆盖本包/本轮实现审查，不扩大到训练或新材料；实际送审、回收与独立处置见[索引](../reports/documentation/20261102/history_optuna/review/submission.json)。
 
 ## 2026-11-02 H/S 旧开发集完整评价（方案 A）
 

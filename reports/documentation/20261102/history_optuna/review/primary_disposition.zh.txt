@@ -1,0 +1,38 @@
+H_pos_history 两项历史系数、3-worker实现：外审回收与独立处置
+2026-11-02，Asia/Shanghai。实现审查结案；正式执行保持关闭。
+
+一、审查身份与结案含义
+用户批准的history_optuna_review.zip为514462字节、132载荷，SHA256=39952612d10e561014d0de8586fbf9bff55ba98396d17616976e28fcfafc1118；客户端22:28:20向既有会话单次提交，GPT-6 Pro完整回复已回收。输入包、ed84688f源码、原CPU01—05和原scope/implementation/formal_gate保持原字节，不以修后状态改写原件。
+external_review.zip为35117字节，SHA256=cc48eb99bfdc30589d16f61db3b5579821e9c14cfad4330b78a02b57764a82c0。完整页面保存于response_dom.json，返回包7成员、清单6载荷的大小/SHA全部核验。原文见external/report.zh.md、findings.json、reading_scope.zh.txt及逐文件阅读清单；recovery.json记录回收身份。
+外审未发现新的已证科学错误，但确认HOPT-R01/R02两项实现缺陷。主执行者独立核对反例、实际调用及修后证据，按科研纪律第6节对已审范围内明确实现错误作最小修复和关闭。本次没有再上传修后新包，不能写成“网页复审了修后代码”；闭合依据为原网页审查＋主执行者修复＋Linux定向CPU06。
+
+二、HOPT-R01：CLOSED_BY_PRIMARY_WITH_CPU06
+问题：旧通用GPU观察先读free、后读各PID占用。每槽10.25GiB，较早free=16GiB，自家随后分配8GiB，再读usage=8GiB；旧式按未兑现预留2.25加新槽10.25=12.5GiB准入，会对真实仅8GiB的余量误放行。这是可达静态反例，本轮没有发生正式GPU事故。
+修复仅在本轮step28_history_optuna_control.py：active为空且此前完整进程组已释放时冻结容量C；每个已派发未释放GPU槽完整占用10.25GiB额度，新增须C−已预留>=10.25GiB，同时最新free、原RAM/disk/期限门通过。active非空时不随自家当前usage返还信用；release实际完成后才从active移除。原通用step28_formal_queue.py和活动旧链文件未改。
+CPU06/slot_credit.json用手写观测证实原反例旧函数放行、新入口拒绝；对称释放/较大free但进程仍存活不能返还额度，最新free不足仍拒绝。实际dispatch另跑两批各4个真实CPU子进程：冻结16GiB只允许峰值1，32GiB允许峰值3，第4条须等完整release返回后启动；无实际NVML或GPU调用。旧九任务正常/失败队列也重核，失败槽退休、健康槽续领和孤儿组清理均保持。
+此方法在外部占用不增加、单槽实际不超过阈值、已释放组不再持有GPU的条件下避免自身重复记账；共享GPU没有原子占用锁，外部抢占、NVML延迟或瞬时超限仍按既有资源/失败规则处理。没有新增GPU资格或放宽资源量。
+
+三、HOPT-R02：CLOSED_BY_PRIMARY_WITH_CPU06
+问题：旧末尾monitor.close抛错会跳过ledger.control；最终control自身保存及成功回执没有下一次tick。正常子任务计至释放、验证计辅助和轮询睡眠规则原已成立，未推翻整个账。
+修复：实际execute调用close_and_settle，以嵌套finally确保关闭失败也尝试最终结算，异常保留；成功回执仍只在清理和费用检查通过后出现。每次正式控制器的同一个Ledger在初始化时一次预提30秒，并记录conservative_seconds，涵盖最后save/check/receipt/exit，属于原辅助4小时、不增加280小时；开始读取旧输入前即检查该预留是否已耗尽预算。活动子任务和后续tick仍沿原方法实计，保守预提不伪装成精确耗时。
+CPU06/final_accounting.json故意令close抛错，证实最后7秒仍进账、原异常仍抛出；后续2秒结算不会重复预提，账从继承89秒变为89+9+30=128秒。手写末次12秒落盘在已经登记的30秒内，且余量不足时确实触发原上限。这里是固定手写账例，不是正式任务已消耗128秒。现阶段未启动正式Ledger，30秒尚未计为本次真实CPU消耗。
+
+四、实际源码、核验与费用
+仅修改本轮控制器、CPU包装的定向测试选择和相应手写测试；方法、训练入口、评价、选择及数据机制未改。repair/sources.json绑定当前58项，实际Linux workspace全量大小/SHA核对一致；CPU06来源前后不变。CPU06在既有py310、空CUDA_VISIBLE_DEVICES、单数值线程、nice15与45/46/47核执行；未读取正式数据、载BGE、生成确认群或运行GPU。
+四项：新增显存额度反例及实际派发、收尾异常与有限预提、受影响的三worker健康续领、关闭正式入口，全部PASS。测试7.450秒，含环境/来源等包装实测11.096239358885214秒，向上取整12秒，峰值RSS585023488字节。继承CPU01—05及原失败补记89秒后，累计101/1200秒，剩余1099秒；repair/budget.json与关闭的新门承接101秒。CPU06原件回传逐项匹配，见repair/receive.json。
+CPU05九项证据按未改计算路径复用：真实目标/独立梯度、3次生产更新与1次完整图参考、encoder/head变化、恢复/错系数拒绝、真实有限Optuna与来源反馈、22指标/配对统计、54次Tiny恢复/4320手写群前向/324矩阵全盲门等。CPU06不是重做这些科学计算，也不把CPU05说成修后全套重跑。未发现因这两处修复引入的新问题；这一判断限已审代码和必要CPU覆盖，不能保证完整BGE/GPU长期运行绝无故障。
+
+五、其余审查意见逐项处置与范围精确化
+CPU02/CPU04：原fixture层级和CPU环境设置错误已有CPU03/05关闭；保留原FAIL、旧版本及费用。
+HOPT-S01：接受措辞澄清。旧dev60只给点值和差值，本轮5000次配对区间只用于新120群确认；不补旧dev重采样。
+HOPT-S02：接受层级澄清。逐运行×实际域/阶段×评分角色给四种混淆计数及合并Precision/MCC；不把它写成所有O/F汇总层级的全部合并分类率。群平均N/A及定义群数仍保留。
+HOPT-B01：接受资格边界。TinyEncoder和CPU子进程支持真实接线/控制行为，不能当作三个完整H模型GPU吞吐或显存实测。正式前需实际输入身份、旧H27实物/恢复来源、旧链完成退出和资源核对；本轮无新增GPU测试。
+HOPT-B02：接受解释边界。当前监督目标系数仍1，但总梯度共同clip_norm=1，历史系数可间接影响最终当前项参数位移。最终RAW MAP主门不能自动解释为遗忘减少、每域/顺序/seed无下降或真实市场优势。F须和A_acq/O并列，较弱初学也会减小F；Brier/log_loss为低值更好，字面F差值不能统一称遗忘加重。旧dev和seed已见、同机制合成、固定九轨迹条件区间以及旧H−S共同门失败均不变。
+HOPT-O01：不扩入候选、维度、seed、全六顺序、GPU测试、新数据、新O/F成功门、通用平台或全历史回归。未另增审查循环。
+上列澄清补充原scope和implementation的精确解释，替代其关于旧显存抵扣和未结案状态的现行效力，不追改提交原件，不改变科研干预、数据、候选、预算或主判据。
+
+六、当前生效入口与保管
+修后关闭门为repair/formal_gate.json，绑定CPU06、当前58来源及本处置；approved=false、actions=[]、train_data/new_confirmation_data/retire_search_weights=false。原formal_gate.json为已送审历史版本，不以旧58来源启动修后代码。新门review_closed仅表示实现审查结案，不授予执行许可；正式输入和具体开始授权仍待绑定。
+服务器23:19后的进程/资源核对见repair/observation.json：同一3485029链及FOREVER BCA三worker的PID/属主/创建时间/cwd均对应旧记录，未干预。首次筛选用了错误入口名而得到空数组，原件保留于observation_incomplete_filter.json；该空数组不能当作旧链退出证据，已按真实入口名纠正。没有开放FOREVER效果结果。
+旧链仍按原许可运行。当前历史权重正式训练、正式Optuna、新确认、GPU资格、新监听与模型删除均0。280累计任务小时仍为待正式批准方案；将来须用户明确开始、承接实际费用、绑定正式输入及审查、旧FOREVER→VendorLink整链完成退出且资源允许。未追加训练或抢占旧链。
+具体SFTP同步和末次关闭核对见repair/final_sync.json、repair/closed_execution.json；根docs仅Windows更新，未宣称双端同步。交接原位替换本研究线当前项，原提交阶段文字转入已有历史区。修复本地提交、不推送。

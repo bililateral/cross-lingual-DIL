@@ -17,6 +17,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--prior-seconds", type=int, required=True)
+    parser.add_argument("--tests", nargs="+", default=[])
     args = parser.parse_args()
     if (sys.platform != "linux" or os.environ.get("CUDA_VISIBLE_DEVICES") != ""
             or args.output.exists() or not 0 <= args.prior_seconds < 1200):
@@ -28,7 +29,7 @@ def main():
         "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
         "OPENBLAS_NUM_THREADS": "1", "PYTHONPATH": str(run.data.ROOT/"scripts")+":"+str(run.data.ROOT/"tests"),
         "HISTORY_TEST_ROOT": str(args.output)}
-    command = [sys.executable, "-B", str(run.data.ROOT/"tests/test_step28_history_optuna.py"), "-v"]
+    command = [sys.executable, "-B", str(run.data.ROOT/"tests/test_step28_history_optuna.py"), "-v", *args.tests]
     peak, stopped, child = 0, None, None
     with (args.output/"stdout.txt").open("x") as stream:
         child = subprocess.Popen(command, env=env, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)

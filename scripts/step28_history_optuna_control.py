@@ -15,6 +15,7 @@ import step28_history_optuna_run as run
 import step28_history_optuna_evaluate as evaluate
 
 m, data, queue = run.m, run.data, run.queue
+FINAL_TAIL_SECONDS = 30
 
 
 def chain_complete(binding):
@@ -85,7 +86,11 @@ class Ledger:
         if set(self.used) != set(caps) or any(v < 0 or v >= caps[k] for k, v in self.used.items()):
             raise ValueError("Finite cumulative prior fees required")
         self.tick = time.monotonic()
-        self.events = []
+        # One finite conservative charge covers the final save/check/receipt/exit.
+        # It is inside the existing auxiliary cap, never an additional allowance.
+        self.used["auxiliary"] += FINAL_TAIL_SECONDS
+        self.events = [dict(id="final_tail", bucket="auxiliary",
+            conservative_seconds=FINAL_TAIL_SECONDS)]
 
     def control(self):
         now = time.monotonic()
@@ -116,9 +121,29 @@ class Ledger:
         self.save()
 
 
+def close_and_settle(monitor, ledger):
+    try:
+        if monitor is not None:
+            monitor.close()
+    finally:
+        ledger.control()
+
+
+def slot_admission(allowed, snapshot, capacity, occupied):
+    # Capacity is frozen only while all owned process groups are released.
+    # Never refund slot credit using non-atomic per-PID usage observations.
+    slot_bytes = run.LIMITS["process_gpu_bytes"]
+    observation = queue.resources(allowed, Path(allowed["campaign"]), snapshot, ())
+    reserved = occupied*slot_bytes
+    return dict(**{k: v for k, v in observation.items() if k != "ready"},
+        cohort_capacity_bytes=capacity, reserved_slot_bytes=reserved,
+        ready=observation["ready"] and capacity-reserved >= slot_bytes)
+
+
 def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, poll_seconds=2):
     """Failed slots retire; healthy slots continue to claim pending trajectories."""
     active, pending, retired, receipts = {}, list(enumerate(rows)), set(), []
+    capacity = None
     width = allowed["workers"] if rows[0]["bucket"] == "training" else 1
     cores = psutil.Process().cpu_affinity()
     if len(cores) < width:
@@ -180,7 +205,11 @@ def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, po
                 if row.get("gpu", True):
                     if monitor is None:
                         raise ValueError("Real GPU admission observation required")
-                    observation = queue.resources(allowed, Path(allowed["campaign"]), monitor.snapshot(), [v["process"].pid for v in active.values()])
+                    current = monitor.snapshot()
+                    if not active:
+                        capacity = current["free"]
+                    occupied = sum(item["row"].get("gpu", True) for item in active.values())
+                    observation = slot_admission(allowed, current, capacity, occupied)
                     data.write_json(root/"admission.json", dict(id=row["id"], **observation))
                     if not observation["ready"]:
                         break
@@ -294,6 +323,7 @@ def execute(gate_path):
         local_allowed = {**allowed, "dispatch_index": str(action_container)}
         dispatch(action_root, rows, command, lambda row, job: data.read_json(job/("feedback.json" if name == "search-evaluate" else "result.json")), local_allowed, ledger, monitor=monitor)
     try:
+        ledger.control()  # Enforce the tail reservation before reading old inputs.
         run.references(allowed)  # Full old weight/restore/source check before any new training.
         ledger.control()
         monitor = queue.GpuMemory()
@@ -336,9 +366,7 @@ def execute(gate_path):
         raise
     finally:
         try:
-            if monitor is not None:
-                monitor.close()
-            ledger.control()
+            close_and_settle(monitor, ledger)
         except BaseException as exc:
             path = campaign/"failure.json"
             previous = data.read_json(path) if path.exists() else {}
