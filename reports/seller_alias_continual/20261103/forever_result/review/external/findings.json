@@ -1,0 +1,228 @@
+{
+  "review": "FOREVER_group_fixed vs H_pos_tuned fixed completed result review",
+  "date": "2026-11-03",
+  "timezone": "Asia/Shanghai",
+  "model": "current GPT-6 Astra Pro session; no model switch",
+  "input_zip_sha256": "313a7a9a908d5bd781e281686c4eb8746f8f2bf7d0e0567e7a3953e6cab80b82",
+  "overall": "NO_NEW_MANDATORY_FINDINGS",
+  "scientific_conclusion": "原预定H−FOREVER raw MAP的O/F共同门及N/Z点值保护通过，仅限固定方法、训练路径及同生成机制新确认群。",
+  "SCIENTIFIC_BLOCKER": [],
+  "REPRODUCIBILITY_DEFECT": [],
+  "mandatory_count": 0,
+  "mandatory_additional_experiments_or_tests": 0,
+  "reviewed_questions": [
+    {
+      "id": "RESULT-01",
+      "topic": "完整训练、H27来源、确认盲门",
+      "verdict": "SUPPORTED_WITH_STATED_EVIDENCE_LIMITS",
+      "mandatory": false,
+      "evidence": [
+        "campaign/training_complete.json#/completed",
+        "campaign/completion.json#/completed",
+        "campaign/*_FOREVER_group_fixed/run/completion.json",
+        "reference/*_H_pos_tuned/completion.json",
+        "formal_gate.json#/h_reference_runs",
+        "campaign/confirmation/all_blind_complete.json",
+        "campaign/confirmation/result.json",
+        "campaign/evaluation_access.json#/events"
+      ],
+      "source": [
+        "source/scripts/step28_forever_formal.py:69–114,140–179",
+        "source/scripts/step28_forever_evaluate.py:28–51,54–186",
+        "source/scripts/step28_continual_comparison_evaluate.py:120–127",
+        "source/scripts/step28_continual_five_evaluate.py:26–32,46–60"
+      ],
+      "reason": "九对有序fit/calibration和完整pretrained_archive相等；54校准JSON与端点相符。108格盲/最终评分身份一致，真实调用先完整保存和检验再登记/读一次pairs。",
+      "boundary": "无模型、原评分/逐query NPY或正式标签独立重读；恢复/前向由冻结实际循环和保存原件支持，不是本外审重新运行。",
+      "minimal_change": "无",
+      "necessary_validation": "无新增核验"
+    },
+    {
+      "id": "RESULT-02",
+      "topic": "MAP定义、均值、差值与主门",
+      "verdict": "SUPPORTED",
+      "mandatory": false,
+      "evidence": [
+        "campaign/analysis/result.json#/absolute",
+        "campaign/analysis/result.json#/difference/raw",
+        "campaign/analysis/result.json#/checks",
+        "summary.json",
+        "tables.zh.txt:6–550"
+      ],
+      "source": [
+        "source/scripts/step28_continual_five_evaluate.py:225–231",
+        "source/scripts/step28_continual_comparison_evaluate.py:212–229",
+        "source/scripts/step28_forever_evaluate.py:189–230"
+      ],
+      "reason": "O、A_acq、F、N、Z、F_first和final_mean系数、924 absolute及462 difference均值一致；原O/F共同门及N/Z点值保护全部通过。原H−S失败不改。",
+      "boundary": "保存条件区间仅核对原值/展示/静态实现，没有重新bootstrap；不把旧确认分数拼入。",
+      "minimal_change": "无",
+      "necessary_validation": "无新增核验"
+    },
+    {
+      "id": "RESULT-03",
+      "topic": "22指标、三口径、N/A与覆盖",
+      "verdict": "SUPPORTED",
+      "mandatory": false,
+      "evidence": [
+        "campaign/confirmation/metrics_*.json（324份）",
+        "summary.json#/defined_counts",
+        "tables.zh.txt:6–529,576–709"
+      ],
+      "source": [
+        "source/scripts/step28_continual_population_evaluate.py:21–100,225–228",
+        "source/scripts/step28_balanced_pooling_run.py:595–614,648–655",
+        "source/scripts/step28_alias_calibration.py:61–94",
+        "source/scripts/step28_continual_five_evaluate.py:46–60"
+      ],
+      "reason": "MAP/对级AP/梯形PR-AUC/分类Recall未混用。null准确对应Precision/MCC零分母；不填零、不丢群、不改合并分类；三口径排序列保持，概率损失F方向正确。",
+      "boundary": "没有新算合并混淆分类，也没有带入前轮H/S方案A权限；逐query阵列值未在本轮读取。",
+      "minimal_change": "无必修；可选措辞见OPTIONAL-01",
+      "necessary_validation": "无新增核验"
+    },
+    {
+      "id": "RESULT-04",
+      "topic": "分解、条件区间、选择与外推",
+      "verdict": "SUPPORTED_WITH_RESTRICTED_CLAIM",
+      "mandatory": false,
+      "evidence": [
+        "report.zh.txt:8,38,42–44,54–65",
+        "campaign/analysis/result.json#/bootstrap",
+        "summary.json#/by_order",
+        "summary.json#/by_seed",
+        "summary.json#/by_domain",
+        "reports/documentation/20261030/forever/revision.zh.txt:8–12; reports/documentation/20261030/forever/formal/plan.zh.txt:15–19"
+      ],
+      "source": [
+        "source/scripts/step28_forever_evaluate.py:194–230",
+        "source/scripts/step28_continual_comparison_evaluate.py:212–229"
+      ],
+      "reason": "固定九路径等权，真实域内40整群配对。43.9%/56.1%仅代数分解；H既有HPO、额外锚点/更新/成本差异明确。不外推至FOREVER家族/作者基准或真实市场。",
+      "boundary": "不覆盖重训/调参、另外三种顺序、方法选择不确定性和训练种子总体；9/9不是总体胜率。",
+      "minimal_change": "无",
+      "necessary_validation": "无新增核验"
+    },
+    {
+      "id": "RESULT-05",
+      "topic": "7776当前＋900回放与实际接线",
+      "verdict": "SUPPORTED_BY_STATIC_WIRING_AND_SAVED_LOGS",
+      "mandatory": false,
+      "evidence": [
+        "campaign/*_FOREVER_group_fixed/run/updates.jsonl（8676行）",
+        "campaign/*_FOREVER_group_fixed/run/completion.json",
+        "campaign/*_FOREVER_group_fixed/run/recovery_retirement.json",
+        "mechanical_attempts.json",
+        "summarize_saved.py"
+      ],
+      "source": [
+        "source/scripts/step28_forever.py:54–164,176–196,210–339",
+        "source/scripts/step28_forever_run.py:104–143,181–238",
+        "source/scripts/step28_record_replay.py:130–182"
+      ],
+      "reason": "R0/reference=None真实任务梯度，解析正则加梯度后统一clip/AdamW；current前后真实P位移、replay不推进clock。日志连续Adam、每阶段48fit各6次、回放六旧群、end beta与保存clock一致。null展示修复未改原指标。",
+      "boundary": "日志无stage字段，按累计current断点并用域成员交叉核对；非零日志不证明因果、未新增GPU/张量验证。",
+      "minimal_change": "无",
+      "necessary_validation": "无新增核验"
+    },
+    {
+      "id": "RESULT-06",
+      "topic": "费用、保管与权重清理",
+      "verdict": "NO_REVIEW_BLOCKER_TO_EXISTING_SCOPED_CLOSEOUT",
+      "mandatory": false,
+      "evidence": [
+        "campaign/completion.json#/used",
+        "budget.json",
+        "transfer_manifest.json",
+        "receive.json",
+        "cleanup_inventory.json",
+        "scope.zh.txt:14",
+        "observation.json",
+        "vendor_observation.json"
+      ],
+      "source": [
+        "source/scripts/step28_formal_queue.py:174–253,325–336",
+        "source/scripts/step28_forever_formal.py:117–137",
+        "source/scripts/step29_vendorlink_formal.py:100–105",
+        "source/scripts/step28_formal_wait.py:85–100"
+      ],
+      "reason": "旧费承接且预算算术一致；27模型盘点与端点元数据匹配。Vendor从自身预训练起点建立模型，不加载FOREVER权重，H27保留。",
+      "boundary": "盘点非删除，未亲核Linux实物或当前进程；结案/保管/删除前核对与回执为已有scope，不增加新门。历史PID字段界限见OPTIONAL-02。",
+      "minimal_change": "无必修；按既定scope完成收尾",
+      "necessary_validation": "仅已有删除前实际路径/属主/链接/大小SHA/依赖核对，不是本审新增任务"
+    }
+  ],
+  "OPTIONAL": [
+    {
+      "id": "OPTIONAL-01",
+      "classification": "OPTIONAL",
+      "required_for_closure": false,
+      "location": {
+        "path": "report.zh.txt",
+        "lines": [
+          101
+        ],
+        "original": "H的校准误差较小"
+      },
+      "impact": "Brier/Log-loss不是纯校准误差分解；目前具体口径和数值清楚且主结论为raw MAP，故不影响主门。",
+      "minimal_suggestion": "最终叙述可写成stage-cal下Brier/Log-loss更低、校准后概率预测损失更小；不改冻结结果。",
+      "validation": "引用已保存字段即可，不新增校准分析或测试。"
+    },
+    {
+      "id": "OPTIONAL-02",
+      "classification": "OPTIONAL",
+      "required_for_closure": false,
+      "location": {
+        "current": "observation.json#/processes/0/create_time",
+        "current_value": 1793504709.8,
+        "historical": "reports/documentation/20261101/formal_chain/report.zh.txt:35",
+        "historical_value": 1793505217.8,
+        "report_claim": "report.zh.txt:121"
+      },
+      "impact": "同PID历史说明与当前快照create_time相差508秒；原state/process.json未入包，外审不独立认证其精确历史身份。无证据表明影响本批科学结果、费用或候选删除集合。",
+      "minimal_suggestion": "将外审结论限定为保存快照所见；主执行者如需更强身份表述，可在已有材料处置中说明依据，不追改旧原件。",
+      "validation": "不新增服务器访问或审查；原scope删除前核对继续适用。"
+    }
+  ],
+  "OUT_OF_SCOPE_OVERDESIGN": [
+    "新增HPO、方法、对照/消融/等算力臂、种子或排列",
+    "全仓回归、全阶段/三槽GPU资格、效果pilot",
+    "重新bootstrap、改显著性方案或为填N/A新算合并分类",
+    "要求补传标签/owners/正文/模型或重载54状态",
+    "因假设的未来用途保留所有FOREVER权重、建设通用调度或灾备框架"
+  ],
+  "prior_closed_reviews_retained": [
+    "FOREVER scientific and implementation review",
+    "F-R01",
+    "V-R01",
+    "V-R02",
+    "CHAIN-R01",
+    "bounded native qualification"
+  ],
+  "old_H_minus_S_joint_gate": false,
+  "cleanup": {
+    "inventory_status": "READ_ONLY_INVENTORY_NO_DELETION",
+    "candidates": 27,
+    "bytes": 35218653363,
+    "new_scientific_dependency_blocker_found": false,
+    "condition": "主执行者完成独立处置、保管和原scope规定的删除前实物/依赖核对；保存真实逐文件回执。",
+    "retain": [
+      "H27",
+      "pretrained",
+      "active VendorLink assets",
+      "Memory",
+      "scores/metrics/calibration/logs/access/budget/source evidence and sealed generated materials"
+    ],
+    "reviewer_deleted_anything": false
+  },
+  "execution_boundary": {
+    "project_import_or_execution": false,
+    "tests": false,
+    "training": false,
+    "inference_or_model_restore": false,
+    "labels_or_owners_or_text_or_memory_opened": false,
+    "metric_recalculation_or_resampling": false,
+    "research_server_access": false,
+    "input_source_gate_result_modified": false,
+    "mechanical_only": true
+  }
+}

@@ -1,5 +1,15 @@
 # 科研文件存储与恢复
 
+## 2026-11-03 FOREVER结果、外审及权重清理
+
+[本轮结果目录](../reports/seller_alias_continual/20261103/forever_result/)保留1217份80030940字节，含324盲分数、324群指标、324逐query指标、完整运行/校准/访问/预算/配置、原H必要完成记录及65份Linux实际来源；[逐文件SFTP接收](../reports/seller_alias_continual/20261103/forever_result/receive.json)大小/SHA全部一致。正式文本、标签源、owners、Memory和模型未回传；其中FOREVER权重按下述授权清理，其余继续原Linux保管。冻结campaign账/结果不覆盖；本地标准库只做身份、字段、计数与简单算术核对，未重算指标或抽样。表格助手一次null格式错误及费用保留，修正只影响N/A展示。
+
+具体[结果外审包](../reports/seller_alias_continual/20261103/forever_result/review/package.json)4784578字节、574载荷，SHA256 313a7a9a908d5bd781e281686c4eb8746f8f2bf7d0e0567e7a3953e6cab80b82，用户明确批准后于客户端10:03单次上传原FOREVER会话并提交。仅包含分析/群指标/运行证据/实际来源/必要旧审查及预盘点，不含分数/query二进制、正文、标签源、owners、模型/Memory或凭据。10:20:41[完整回收](../reports/seller_alias_continual/20261103/forever_result/review/recovery.json)58339字节返回包，SHA256 7fcdcd093c528042d78ef3b06b7b9cfb303f92156f07faac48a6b47d551bbd10；7成员全部核验。[完整原文](../reports/seller_alias_continual/20261103/forever_result/review/external/report.zh.txt)与[逐项主审](../reports/seller_alias_continual/20261103/forever_result/review/primary_disposition.zh.txt)结案，无必修或必要补测，仅两处文字精化。574输入载荷和7返回材料与独立文件/Git原字节核对后，[三份重复传输ZIP已删](../reports/seller_alias_continual/20261103/forever_result/review/transport_cleanup.json)；送审报告在7eec9437、送审预算在review/submitted_budget.json，清单/身份/请求和全部必要审查原件保留，专用网页已关闭。
+
+[权重预盘点](../reports/seller_alias_continual/20261103/forever_result/cleanup_inventory.json)核对本批27份FOREVER模型为35218653363字节（32.799927GiB）、独立普通文件、nlink=1、实际SHA对应端点；run/work、anchors及latest已由原成功规则退役。按用户分析/外审后删除无用权重的明确要求，重新核对无后续加载/诊断依赖及无FOREVER活动作业，服务器11月3日10:30:52[逐文件删除完成](../reports/seller_alias_continual/20261103/forever_result/cleanup_receipt.json)。27路径全不存在，删除前后1215保留文件大小/SHA、14项只stat材料及原H27元数据一致。原H_pos_tuned27份供H_pos_history、预训练、Memory及活动VendorLink保留；原链3485029和Vendor worker4147594前后仍活动。32.80GiB为独立文件逻辑字节，不冒称共享磁盘净变化；SHA不能恢复权重，不重置大清理周期。
+
+首次22项[同步原件](../reports/seller_alias_continual/20261103/forever_result/sync.json)保留；修后报告、外审/处置、删除回执与最终费用按[最终同步](../reports/seller_alias_continual/20261103/forever_result/final_sync.json)核对，原campaign/source不覆盖。准备累计633.731048/900秒，含本轮413秒及原220.731048秒，失败账保留；含原各桶共26.457578累计任务小时。一次本地索引写入OSError 22后核对原文件完整，用定向补丁完成；无科学数据受影响，费用已计入。本节为现有记录原位补齐并归回独立小节，旧10月23日证据未改。当前状态仅在交接FOREVER行维护，根可变docs仅Windows，本轮本地提交、不推送。
+
 ## 2026-11-02 H_pos_tuned两项历史系数实现与CPU证据
 
 实现阶段源码、直接依赖和手写证据保管在Linux独立 reports/documentation/20261102/history_optuna/workspace，未覆盖旧活动链。用户随后确认[实际输入准备](../reports/documentation/20261102/history_optuna/preparation/authorization.json)后，按[回执](../reports/documentation/20261102/history_optuna/preparation/run01/receipt.json)核对83项文件身份，并在该workspace建立19个必要逐文件链接（7数据+12预训练），没有链接heldout、owners或整个数据目录。正文/关系标签只流式校验SHA，不解析；原H27按原路径校验，未加载、复制、移动或删除。原始数据/模型未回传Windows，本地保留脚本、元数据/大小SHA、费用与准备配置。58科学来源保持4215c066与CPU06一致，CPU原失败及旧源码继续保管；CPU101+准备34=辅助135秒。原准备门保留送审字节；[当前有效关闭门](../reports/documentation/20261102/history_optuna/review_round2/formal_gate.json)承接第二轮审查、既有预算/输入/135秒费用，仅review_closed为true，执行仍关闭，无新监听或正式模型产物。
@@ -268,11 +278,8 @@ H/S54端点共70436051280字节继续供新确认使用；其余7713个保留文
 
 ## 2026-10-23 五方法实现、限定资格与待回收实现外审
 
-## 2026-11-03 FOREVER完整结果回传与清理准备
 
-[本轮结果目录](../reports/seller_alias_continual/20261103/forever_result/)保留1217份80030940字节，含324盲分数、324群指标、324逐query指标、完整运行/校准/访问/预算/配置、原H必要完成记录及65份Linux实际来源；[逐文件SFTP接收](../reports/seller_alias_continual/20261103/forever_result/receive.json)大小/SHA全部一致。正式文本、标签源、owners、Memory和模型未回传，继续原Linux保管。冻结campaign账/结果不覆盖；本地标准库只做身份、字段、计数与简单算术核对，未重算指标或抽样。表格助手一次null格式错误及费用保留，修正只影响N/A展示。
 
-[权重预盘点](../reports/seller_alias_continual/20261103/forever_result/cleanup_inventory.json)核对本批27份FOREVER模型为35218653363字节、独立普通文件、nlink=1、实际SHA对应端点；run/work、anchors及latest已由原成功规则退役。本轮用户要求分析/外审完成后删除无用权重，当前尚未删除。原H_pos_tuned27份继续供H_pos_history，活动VendorLink及预训练、Memory与全部必要结果/日志保留。清理依据后续实际依赖和审查处置，SHA不能恢复模型，不重置大清理周期。本轮22份分析/接收/预盘点/许可/送审记录已[同步Linux独立结果目录](../reports/seller_alias_continual/20261103/forever_result/sync.json)并逐项核对，原campaign/source不复制覆盖；当前准备累计534.731048/900秒，含此次314秒及原220.731048秒，冻结费用保持。当前进度仅在交接FOREVER行维护，根可变docs仅Windows，本轮本地提交、不推送。
 
 用户已批准五方法/零HPO/45轨迹/三路/490累计小时，已在Linux独立`reports/documentation/20261023/continual_implementation/workspace`部署最小实现；61份当前来源1056846字节已逐项与Windows核验一致，见[current_sources](../reports/documentation/20261023/continual_implementation/current_sources.json)。模型只链接既有BGE归档，数据目录仅建立既有数据链接，资格均使用手写群，尚未正式训练/生成确认数据/打开正式标签。旧workspace及模型保管不改。
 
@@ -280,7 +287,6 @@ CPU01—07与native01/02失败/完成原件、账本和必要资源样本在两�
 
 实现输入包continual_implementation_review.zip为836755字节、158成员，SHA256 6a792263593188bbf89217f928de67626588b11bb5c329c81151e2f63aa9ff63；157载荷1790191字节及ZIP逐项身份核验一致。含源码、冻结方案、手写资格和来源/运行记录，不含正式文本/标签/owners/Memory或模型载荷/凭据。自动审批首次拒绝后，用户明确批准整个具体包上传到chatgpt.com；15:49已单次提交原会话，当前待完整回收，见[具体授权](../reports/documentation/20261023/continual_implementation/review/authorization.json)与[提交回执](../reports/documentation/20261023/continual_implementation/review/submission.json)。GPU问题修复明确免审，不把此次实现审查扩大为GPU复审。输入包因在审和身份复核保留，不能提前删；未创建重复审查或重新上传。新材料仅本地Git，不推送。
 
-具体[结果外审包](../reports/seller_alias_continual/20261103/forever_result/review/package.json)4784578字节、574载荷，SHA256 313a7a9a908d5bd781e281686c4eb8746f8f2bf7d0e0567e7a3953e6cab80b82，用户明确批准后于客户端10:03单次上传原FOREVER会话并提交。仅包含分析/群指标/运行证据/实际来源/必要旧审查及预盘点，不含分数/query二进制、正文、标签源、owners、模型/Memory或凭据。送审载荷身份与请求保留，当前等待完整回收；新增传输/准备费用见本轮budget.json，冻结完成账不改。
 
 ## 2026-10-23 五方法修订方案送审材料
 

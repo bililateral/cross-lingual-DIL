@@ -1,0 +1,584 @@
+{
+  "path_base": "All paths are input ZIP relative unless marked relative to result_root",
+  "result_root": "reports/seller_alias_continual/20261103/forever_result",
+  "all_input_payloads_byte_checked": 574,
+  "input_manifest_checked": true,
+  "frozen_source_files_byte_checked": 65,
+  "full_text_in_result_root": [
+    "report.zh.txt:1–129",
+    "tables.zh.txt:1–709",
+    "scope.zh.txt:1–14",
+    "review/request.zh.txt:1–17",
+    "summarize_saved.py:1–205"
+  ],
+  "structured_json_and_logs": {
+    "summary.json": "全结构；端点/顺序/种子/实际域/覆盖率和training字段机械核对",
+    "campaign/analysis/result.json": "全部absolute/difference/cell均值、原区间展示/主门/metadata",
+    "campaign/confirmation/result.json & all_blind_complete.json": "全部18轨迹/108格域ID/分数身份/三口径对应",
+    "campaign/confirmation/metrics_*.json": "324份全解析大小SHA、40×22值、counts/NA、保存均值；未从预测重算指标",
+    "campaign/*FOREVER*/run/updates.jsonl": "九份8676行所需字段全解析；stage由current断点与群域交叉推断；未重放Clock或梯度",
+    "campaign/*FOREVER*/run/completion.json": "九份身份/分区/预训练/端点/calibration/count/access/resources",
+    "reference/*/completion.json": "九份旧H身份与来源/分区/预训练/27端点元数据",
+    "campaign/*FOREVER*/run/maps/*.json & reference/*/maps/stage*.json": "54份校准JSON大小SHA和a/b/status与端点匹配",
+    "campaign/*FOREVER*/run/recovery_retirement.json": "九份status/latest state/参数映射/供给/Memory字段及canonical字节算术",
+    "formal_gate.json & reference/formal_gate.json": "来源与H pin完整机械比对",
+    "campaign/training_complete.json,completion.json,budget.json": "完成/费用/来源完整字段",
+    "campaign/evaluation_access.json": "三事件及单次new_pairs顺序",
+    "campaign/generation/result.json": "seed/namespace/群数/来源/文件身份，未打开生成载荷",
+    "campaign/*/process.json & dispatch_receipt.json": "实际存在的训练/后处理进程命令与回执/费用；未称实时进程观察",
+    "campaign/preflight.json,admission.json,confirmation/resource_receipt.json,analysis/resource_receipt.json": "保存资源/时间字段",
+    "opening.json,observation.json,vendor_observation.json,receive.json,check_saved.json,budget.json,mechanical_attempts.json": "完整读取",
+    "transfer_manifest.json": "1217文件与41排除记录；仅547项本包实物交集哈希核对",
+    "cleanup_inventory.json": "27候选/27保留引用全部记录；不等于模型实物亲核"
+  },
+  "source_read_ranges": [
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/run_cpu.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/schema/step28_alias_ranking_policy.json",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/schema/step28_bge_continual_policy.json",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/schema/step28_chinese_base_policy.json",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/schema/step28_continual_expression_catalog.json",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/schema/step28_continual_expression_policy.json",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/schema/step28_record_replay_policy.json",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_alias_calibration.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "50-106 parameters/transform/order checks/fit entry",
+        "1-178",
+        "1–178"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_alias_ranking.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "58-104 LR/hard-negative context"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_balanced_pooling.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_balanced_pooling_run.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "1-50,595-614,648-679（实际调用依赖query_metrics与undefined_metrics；未执行其他代码）",
+        "560–679（关键595–614/648–655）"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_bge_continual.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "70-127 and 242-248 schedule, Supply, Adam step",
+        "1-26（指标import链）"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_bge_continual_evaluate.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_bge_continual_run.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_chinese_base.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "1-90（指标import链）"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_comparison_gcr.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_comparison_l2r.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_comparison_native.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_comparison.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_comparison_evaluate.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "120-137 calibrated_roles",
+        "1-24,112-130,212-231",
+        "1–110,112–129,196–231,243–345（仅本轮使用calibrated_roles/contributions/interval）"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_comparison_run.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "99-175 training_inputs and checkpoint context",
+        "1–148（源清单/冻结Budget/训练输入；未执行）"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_expression_data.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_expression_data_verify.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_expression_run.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_five.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "14-177 and 250-259 identity, fresh, score, restore",
+        "1–255（root另读当前/历史梯度和retain）"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_five_control.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_five_evaluate.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "26-40,131-160 access log and public confirmation loader",
+        "1-62,131-153,225-254,308-316"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_five_run.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "COMPLETE constant only at line23"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_population.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "20-47 and 150-210 optimizer and save/restore"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_population_data.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "1-45 and 202-258 JSON serialization/Memory/schedule"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_population_evaluate.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "1-280（结果调用重点1-100及225-228；未调用的旧流程仅边界阅读）"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_continual_population_run.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_crossfit_retention.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_er_weight.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_forever.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "1-339 full"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_forever_evaluate.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "1-259 full",
+        "1-259"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_forever_formal.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "1-230 full",
+        "93–138; 186–229"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_forever_qualification.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_forever_run.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "1-242 full"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_formal_queue.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "17–59; 171–255; 321–338"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_formal_wait.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "40–101; 122–160"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_g_half.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_optuna.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "105-207 H adapter identity/objective"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_positive_ranking.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_record_replay.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "15-235 config/model/natural objectives/backprop/scoring"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_record_replay_run.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_record_replay_verify.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_replay_diagnostics.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step28_risk_study.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step29_vendorlink_cpu.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step29_vendorlink_data.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step29_vendorlink_evaluate.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step29_vendorlink_export.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step29_vendorlink_formal.py",
+      "byte_identity_checked": true,
+      "semantic_read": true,
+      "read_ranges": [
+        "1–155"
+      ],
+      "note": null
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step29_vendorlink_methods.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step29_vendorlink_native.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step29_vendorlink_native_control.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step29_vendorlink_prepare.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step29_vendorlink_run.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/scripts/step29_vendorlink_wait.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/tests/test_step28_continual_comparison.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/tests/test_step28_forever.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/tests/test_step28_formal_training.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/tests/test_step28_formal_wait.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261103/forever_result/source/tests/test_step29_vendorlink.py",
+      "byte_identity_checked": true,
+      "semantic_read": false,
+      "read_ranges": [],
+      "note": "仅身份核对；不声称已逐行审查未变算法或手写测试。"
+    }
+  ],
+  "historical_read_ranges": {
+    "reports/documentation/20261030/forever/revision.zh.txt": "全文1–60；确认公式、末尾beta、资源差异及原计划边界；被后续scope替代部分不复活",
+    "reports/documentation/20261030/forever/formal/plan.zh.txt": "全文1–28；当前科学/预算沿用，单槽旧叙述由后续scope替代",
+    "reports/documentation/20261030/forever/implementation/qualification/scope_update.zh.txt": "全文1–17；旧单路资格/pooler零任务梯度/失败账，仅历史适用",
+    "reports/documentation/20261101/formal_chain/scope.zh.txt": "全文1–15",
+    "reports/documentation/20261101/formal_chain/report.zh.txt": "全文1–42（重点历史来源/预算/部署时点）",
+    "reports/documentation/20261101/formal_chain/review/primary_disposition.zh.txt": "全文1–16",
+    "reports/documentation/20261030/forever/proposal.zh.txt": "检索并阅读与本次主张有关的8–10、22、32–54、61–65、74、80–82、88–110选段；不是全文重审上游原方法",
+    "reports/documentation/20261030/forever/implementation/review/primary_disposition.zh.txt": "定向匹配段6–41（修复/单路资格/pooler/原失败账）；未重验旧资格原件",
+    "reports/documentation/20261030/forever/formal/review/primary_disposition.zh.txt": "定向匹配段5–33（F-R01等原处置及证据边界）；旧暂停不作为当前决定",
+    "reports/documentation/20261030/forever/formal/review/recheck/primary_disposition.zh.txt": "定向匹配段6–29（已闭合问题适用范围）",
+    "reports/documentation/20261030/forever/formal/review/closure/primary_disposition.zh.txt": "定向匹配段8–21（旧闭合事实和历史时点）",
+    "reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt": "定向匹配8、28、31、37、40、49（原H−S失败/HPO/不拼旧结果边界）"
+  },
+  "not_claimed": [
+    "所有65来源均逐行行为审查",
+    "所有旧CPU/GPU原件本轮重验",
+    "实际模型或Memory实物检查",
+    "未附324评分/324query NPY内容读取",
+    "原统计区间重新计算",
+    "应用访问账等同独立OS I/O审计",
+    "历史PID精确身份已由外审现场认证"
+  ],
+  "not_executed": [
+    "任何项目模块/测试/summarize_saved.py",
+    "训练/校准拟合/模型恢复/推理",
+    "正式指标计算/bootstrap/重采样",
+    "科研服务器网络访问",
+    "输入源码/gate/冻结结果修改",
+    "权重清理"
+  ],
+  "permitted_mechanical_methods": [
+    "stdlib ZIP/JSON/JSONL解析",
+    "文件大小/SHA256核对",
+    "保存数字计数/求和/均值/固定端点系数加减",
+    "已保存区间读取及9位小数展示核对",
+    "源码静态阅读和文字检索"
+  ]
+}

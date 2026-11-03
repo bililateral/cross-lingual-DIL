@@ -1,0 +1,247 @@
+FOREVER_group_fixed 与 H_pos_tuned 正式结果：定向独立科研外审
+审查日期：2026-11-03（Asia/Shanghai）
+审查模型：当前会话 GPT-6 Astra Pro；未切换模型。
+
+一、输入身份与结论
+
+本次实际读取的附件为 forever_result_review.zip。
+实际字节数：4,784,578。
+实际 SHA256：313a7a9a908d5bd781e281686c4eb8746f8f2bf7d0e0567e7a3953e6cab80b82。
+ZIP 共575个文件成员：574项载荷＋input_manifest.json。574项均与清单的路径、大小、SHA256一致；无重复成员、重复清单路径、缺项、额外项或不符项。以上是本外审直接进行的机械核对，不是转述执行者的PASS。
+
+结论：本轮定向结果外审未发现有证据的 SCIENTIFIC_BLOCKER 或 REPRODUCIBILITY_DEFECT。无需为本次结论补训练、测试、载模、正式指标重算或bootstrap。保存结果支持以下限定结论：在事前固定的FOREVER_group_fixed适配、H_pos_tuned原九条模型、ABC/BCA/CAB×s4/s5/s6及本轮同生成机制新120群条件下，H−FOREVER的raw MAP旧域水平/遗忘共同主门通过，同时N/Z点值保护通过。原H−S共同门失败保持。
+
+H最终三域raw MAP为0.495696158，FOREVER为0.439113584，差0.056582574；最终旧域差0.051289815，遗忘量差−0.028793115。该结论是两个固定系统在本协议内的比较，不是单组件因果结论、同开发机会/同总历史状态/等算力竞赛，也不能外推为FOREVER家族或作者语言基准无效。
+
+当前没有发现必须为了本轮结果审查而继续保留FOREVER27权重的具体诊断或下游加载依赖。完成主执行者独立处置、证据保管和原scope已要求的删除前实物核对后，可按既定范围处理27个FOREVER推理模型；本外审没有删除任何文件，也不把预盘点称为已经清理。H27、预训练、活动VendorLink资产、Memory和原始结果证据继续按既定边界保留。
+
+证据基准：下文未另行注明时，路径相对输入包的 reports/seller_alias_continual/20261103/forever_result/；外层历史文件用包内完整相对路径。源码行号按本包原字节显示；JSON使用字段或文件族定位。报告不以哈希、退出0、资格PASS或日志非零代替行为分析。
+
+二、实际审查方式及证据层级
+
+1. 本外审直接完成的工作：ZIP/清单/哈希核对；冻结源码静态阅读；JSON及JSONL解析；对保存字段进行计数、大小求和、均值、加减、固定系数线性组合及显示舍入核对。没有运行包内summarize_saved.py，也没有导入任何项目模块或测试。
+
+2. 已保存的正式运行证据：campaign/下训练日志、完成记录、校准JSON、盲评分元数据、访问记录、324群指标JSON、最终统计和费用原件；reference/下原H gate、九条completion及27映射JSON。它们可以相互交叉核对，并与冻结入口接线对应，但仍是原运行留下的应用层证据。
+
+3. 沿用的旧审查：本会话已关闭的方案、实现、限定原生资格、F-R01、V-R01、V-R02和CHAIN-R01不重开。本轮按需阅读外层旧proposal/修订/资格范围/正式计划/主审及链说明，确认适用边界，没有再次核验上游论文、作者仓库、全部旧CPU/GPU原件或未变全仓算法。
+
+4. 未进行的工作：无服务器连接、无项目/测试执行、无训练、无模型恢复或推理、无正式标签/owners/正文/Memory读取、无指标重新计算、无bootstrap或其他重采样、无新校准拟合、无输入源码/gate/结果修改、无权重删除。
+
+本轮附件与原回传不是同一文件集合。transfer_manifest.json列1217项、80,030,940字节；其中547项实际在本附件中，全部经本外审核对大小/SHA相符。其余670项没有随本包提供，包括324评分.npy、324逐query指标.npy，以及22项progress/startup/chain等元数据。本结果根目录562项＝547项回传交集＋15项本轮分析/保管材料；再加外层12项历史材料，共574载荷。没有把合理选取范围当成文件丢失，也没有要求补传这些对象。
+
+因此，全1217份回传一致、324评分/324查询数组形状合格是receive.json、check_saved.json及实际消费者源码支持的原执行者记录；本外审亲自检查的是本附件中存在的字节和保存群指标，不声称再次看到了未提供数组。54模型恢复、4320前向由真实循环、端点身份/映射和完整产物记录共同支持，不是本外审独立重跑54次恢复或4320前向。
+
+三、完整运行、原H身份和标签边界
+
+3.1 九条FOREVER与27端点
+
+campaign/training_complete.json的completed包含固定九条，各success=true，active为空，retired_slots为空；campaign/completion.json包含九条训练和generation/confirmation/analysis三个后处理完成项。仅这些状态还不足以认定完成，本次同时核对了九条run/completion.json的身份、来源、访问、三个points、当前/回放累计计数与校准文件。
+
+九条各current=864、fixture=0；ABC/BCA各条replay=96，CAB各条108。所有27个阶段端点的stage/current断点、12个当前校准群ID、maps及inference_restore_verified与实际记录一致；27个校准JSON的大小/SHA、PASS_CALIBRATION_FIT及a/b与对应端点吻合。失败校准先写证据再停止的实际路径仍在，并未凭状态字符串跳过校准。
+
+直接接线：source/scripts/step28_forever_formal.py:93–114（validate_completion）、140–179（execute）；source/scripts/step28_forever_run.py:181–214（endpoint）、217–238（stage）。endpoint先实际拟合当阶段calibration，再保存推理状态、恢复并检查校准分数逐元素不变；stage完成巩固、端点、retain/switch及Store提交后才返回。上述恢复不变性是原运行代码与保存记录支持，本外审未重新载入状态。
+
+3.2 H确为原H_pos_tuned，而非H_default/H_pos_history
+
+formal_gate.json.h_reference_gate及九项h_reference_runs[].completion，均与本包reference/原件大小/SHA一致。九条H completion的source_files等于其自身原gate的61项来源；身份为H_pos_tuned，updates=864，三阶段adam_step=288/576/864，原恢复标志保留。H27映射JSON实物均与各自模型端点记录相符。
+
+九对H/FOREVER的partition.fit和partition.calibration完整有序列表精确相等，包含群ID、域、顺序及必需角色；每域48 fit＋12 calibration。完整pretrained_archive字典也逐项相等。H多出的development元数据不再触发旧F-R01，也没有因此放宽共同角色或改成无序集合。
+
+真实调用是formal.verify_reference（step28_forever_formal.py:69–90）和evaluate.complete_training（step28_forever_evaluate.py:28–51），后者先验证实际完成，再比较共同分区和预训练来源，最后组装18条记录。H的development群ID只在generate:62参与排重，不读取开发正文或标签。train-only入口见step28_continual_comparison_run.py:99–148。
+
+当前65来源全部与formal_gate.sources及本包source/相符。旧H与当前来源共有35项，其中34项字节相同；唯一不同项step28_continual_five_run.py在本轮formal中只提供H_COMPLETE常量，本轮没有重新调用旧H训练入口。实际H评分链的共同来源保持原字节。身份一致说明使用了所指定来源，不单独证明算法行为。
+
+3.3 新群和完整盲门
+
+生成记录固定namespace=forever_confirmation_20261030、root_seed=2026103001；120群按A/B/C各40，群ID唯一。generate:54–92检查新种子、生成/验证群结构、跨群账户/控制者/商品ID排重及旧分区群排除，生成后封存owners。这里只审静态接线和保存元数据，未读生成正文或owners。
+
+step28_forever_evaluate.confirmation:114–186的实际顺序是：验证生成来源→读取新公开文本→18轨迹各恢复3阶段状态并核对stage/maps→按已学域产生六格→形成并保存三口径→核对18×6格、域和群顺序、4320前向→重读已保存分数并检查排序/并列保持→写all_blind_complete.json→登记forever_confirmation_joint/new_pairs→才实际打开pairs并生成指标。
+
+原始数值完整门不能只看validate_cells的ID检查。step28_continual_comparison_evaluate.calibrated_roles:120–127还要求raw精确为(40,378)、FP32、finite；校准转换和preserve_order检查见step28_alias_calibration.py:61–94。随后按保存SHA重读数组的路径仍在标签开放之前。
+
+本外审核对all_blind_complete.json与最终confirmation/result.json的全部108格：domain、ids、scores元数据及preserved字段一致；每条六格，两方法各九条，共324评分身份记录。evaluation_access.json只有生成、盲推理、联合pairs三个按时间排列的事件，new_pairs仅一次。access实现先拒绝重复角色，再在读取前登记（step28_continual_five_evaluate.py:26–32）。这支持本批先完成盲评分后单次开标签的应用层边界，不等于独立操作系统I/O审计。
+
+四、MAP公式、数值与共同主门
+
+Rij表示完成到达阶段i后，对到达位置j对应的同一批确认群评价；ABC/BCA/CAB中位置与实际域需映射。MAP先按每个账号查询的27候选计算AP，再平均群内28查询，之后按本合同平均群与固定路径。
+
+端点定义：
+O=(R31+R32)/2：最终两个旧域水平。
+A_acq=(R11+R22)/2：两个旧域各自刚学完的水平。
+F=A_acq−O：从刚学完到最终的平均下降量；MAP上越小越好，可为负。
+N=(R22+R33)/2：后两阶段新域刚学完水平，不是最终所有新/旧域混合均值。
+Z=R33：末域刚学完水平。
+F_first=R11−R31：首域从初学到最终的变化。
+final_mean=(R31+R32+R33)/3：最终三域均值，不能替代O或F。
+
+实际系数见step28_continual_five_evaluate.field_terms:225–231；实际域映射和final_mean见step28_continual_comparison_evaluate.contributions:212–217。保存结果如下，区间均为campaign/analysis/result.json中的原95%条件区间，本外审没有重新抽样：
+
+端点              H_pos_tuned       FOREVER_group_fixed   H−FOREVER        原95%条件区间
+final_mean        0.495696158       0.439113584           0.056582574      [0.049988955,0.063174724]
+O                 0.489827120       0.438537305           0.051289815      [0.044615565,0.058220721]
+A_acq             0.486619510       0.464122810           0.022496701      [0.016609006,0.028708222]
+F                −0.003207610       0.025585505          −0.028793115      [−0.034897381,−0.022876487]
+N                 0.495014659       0.448174211           0.046840448      [0.040264724,0.053747284]
+Z                 0.507434234       0.440266142           0.067168092      [0.057551326,0.076841606]
+F_first          −0.003266937       0.035118566          −0.038385503      [−0.047226898,−0.029971567]
+
+evaluate.analyze:221–230使用ΔO区间下界>0、ΔF上界<0、ΔN点值≥0、ΔZ点值≥0。四项确实满足，保存checks与passed=true相符。N/Z的已有区间也为正，可以描述，但不能追改原规则为统计非劣效、所有场景保证或新的共同主端点。
+
+独立机械核对覆盖324个40×22保存矩阵，7128个cell列均值，18轨迹×3口径×7端点×22列＝8316个端点字段，924个绝对字段及462个差值均值。与summary、analysis和tables的全部462指标行及既存区间显示一致。未舍入字段容限1e−11；九位小数显示最大差约4.9980e−10，符合舍入，不是实质不符。
+
+五、初学与后续保持应如何解释
+
+ΔO=ΔA_acq−ΔF是严格的点值代数恒等式：
+0.051289815333892416
+=0.022496700506919518＋0.028793114826972888。
+
+所以旧域最终约5.129个百分点的优势同时含初学约2.250个百分点和后续下降量约2.879个百分点之差。43.9%/56.1%是这两个点值相对总差的算术比例，不是模块贡献率。不能把区间端点也直接相减来生成新的分解区间；本包A_acq/F各自区间来自原统计实现，本外审仅核对其保存展示。
+
+H平均F约−0.321个百分点，表示按此平均口径最终比刚学完略有提升；FOREVER约2.559个百分点下降。该比较支持“固定协议下H平均下降更少”，不支持“H每域都无遗忘”。本包报告已说明这一点。
+
+三顺序的保存描述：
+顺序     H final_mean     FOREVER final_mean     H F           FOREVER F
+ABC      0.497882617      0.432110282            0.010968832   0.018262878
+BCA      0.493695192      0.436730124           −0.018582411   0.015508220
+CAB      0.495510666      0.448500345           −0.002009250   0.042985417
+
+H的ABC仍下降约1.10个百分点，整体负F包含BCA的后续提升。FOREVER三个顺序均为正F，CAB最大。九个配对的O、F、N、Z及final_mean方向均有利于H，但这只是九条的描述，不把9/9当总体胜率估计。ABC末域C的差约11.30个百分点，说明差距也包含新域学习较弱，不能全部归为旧域遗忘。
+
+按种子跨顺序的final_mean，H为s4/s5/s6=0.494956774/0.494128480/0.498003220，FOREVER为0.446239866/0.432979585/0.438121301。按实际域跨九条的初学→最终：H的A为0.505298427→0.500140736，B为0.505709523→0.503577263，C为0.469665304→0.483370474；FOREVER分别为0.460023135→0.437572408、0.489409245→0.475154851、0.419079382→0.404613492。实际域表包含该域最后到达时的零后续时段，权重范围与只取两个旧域的主F不同。原报告对此限定正确。
+
+上述值均来自summary.by_order/by_seed/by_domain及tables:531–574，已与保存cell均值机械核对。没有把旧L²R/GCR确认中的H数值、旧开发分数或默认H/S结果拼入本批；旧H−S的F区间跨零、共同门false的历史结论也未被本轮替换。其历史限定见reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt:8、28–37。
+
+六、22指标、三口径与N/A
+
+实际链为evaluate.confirmation→step28_continual_five_evaluate.metric_set→step28_continual_population_evaluate.group_metrics，同时保存query_metrics并检查其群内均值与检索列一致。核心定义见population_evaluate.py:21–100、225–228；query指标见balanced_pooling_run.py:595–614；metric_set:46–60检查40×22、40×28×10及每群20正对/358负对。
+
+完整最终三域22指标如下。排序/曲线使用raw；概率和固定0.5概率阈值分类使用stage-cal。这是报告明确标注的展示选择，不是替换主比较或删除其他口径；raw/stage-cal/first-cal全部七端点仍完整保存在tables和analysis。
+
+指标                         H_pos_tuned      FOREVER_group_fixed   水平越优方向
+AP                           0.342159866      0.278581147           高
+梯形PR-AUC                   0.328672439      0.263736766           高
+ROC-AUC                      0.795178719      0.753685922           高
+Recall@FPR1%                 0.195925926      0.148472222           高
+Brier                        0.042874523      0.045151818           低
+Log-loss                     0.168047328      0.179029997           低
+Precision                    N/A              N/A                   高
+分类Recall                   0.125416667      0.045833333           高
+F1                           0.201564962      0.079099879           高
+Specificity                  0.995817815      0.998215394           高
+Balanced Accuracy            0.560617241      0.522024364           高
+MCC                          N/A              N/A                   高
+MAP                          0.495696158      0.439113584           高
+MRR                          0.543371445      0.486968352           高
+Recall@1                     0.296709656      0.252910053           高
+Recall@3                     0.520882937      0.454249339           高
+Recall@5                     0.631134259      0.559937169           高
+Recall@10                    0.774950397      0.711822090           高
+NDCG@1                       0.399735450      0.343518519           高
+NDCG@3                       0.464611391      0.402624538           高
+NDCG@5                       0.514720528      0.450444469           高
+NDCG@10                      0.565875602      0.504301231           高
+
+AP和梯形PR-AUC在每群378个无向对上计算；MAP在每查询排除自身后的27候选上计算，再平均28个查询。PR-AUC约0.329不能叫32.9%准确率，也不能与MAP0.496互换。三口径的正斜率仿射校准保持排序及原有ties；保存矩阵的全部曲线/排序列在三口径间一致，不意味着概率损失或0.5阈值分类也应一致。
+
+分类阈值在实现中为logit≥0，即概率≥0.5（population_evaluate.classification:58–70）。每群20/378≈5.29%正对；H与FOREVER的stage-cal分类召回都不高，FOREVER更高specificity伴随更低recall，体现更少报正，不能说其分类全面更好。不能由低分类召回推断排序指标错误，也不能为了得到更漂亮分类数字改阈值或混用first-cal。
+
+Precision/MCC未定义是真实分母情形。balanced_pooling_run.undefined_metrics:648–655把对应零分母标记为null；metric_set实际覆盖核心函数零占位，后续均值保持null，不跳过这些群、不填零。全部12960重复群次中，Precision、MCC各4890项未定义，其null与保存混淆计数条件逐项吻合。stage-cal六格有效数：H为2106/2160，FOREVER为1613/2160；最终三域分别1062/1080=98.33%、727/1080=67.31%。这些是群次覆盖率，不是独立群数或预测准确率。
+
+本轮没有新算合并混淆矩阵的Precision/MCC，也没有把以前默认H/S方案A的权限移植过来。严格群平均N/A可能不便展示，但不能为出数字而改成定义子集平均或合并分类。保留原counts和覆盖率已足以解释。
+
+Brier/Log-loss的F同样按“初学−最终”计算，含义不能套用MAP方向：对损失，正F表示后续损失下降，负F表示损失增加。例如stage-cal Brier的H F约−0.000091016、FOREVER约−0.000929715；其差为正，表示H的损失增幅较小。原报告对此方向解释正确。
+
+FOREVER的first-cal最终Brier/Log-loss为0.063083023/0.232507508，stage-cal为0.045151818/0.179029997，支持本固定结果中逐阶段校准的概率预测损失更低。raw最终Log-loss却为H 0.404963116、FOREVER0.242175068，方向与stage-cal相反，进一步说明不能混用口径。这里没有新拟合或按结果挑映射。
+
+唯一与本节相关的可选措辞精化：report.zh.txt:101“校准误差较小”可改成“stage-cal口径的Brier与Log-loss更低，校准后的概率预测损失更小”。这两种损失不是纯校准误差分解，因此更精确的措辞有益；但邻近口径/数值清楚，主结论用raw MAP，不构成本轮必修，更不需要新增校准研究。
+
+七、条件区间、选择与外推边界
+
+step28_forever_evaluate.analyze:194–215生成固定seed=2026103002、5000×3×40的索引；贡献先按实际A/B/C放入3×40×22，再对九路径等权；H减FOREVER后传入共享interval。interval:220–229对各实际域抽40个完整群，同一draw跨方法/阶段/路径共享，原分位点为0.025/0.975。没有把到达位置当实际域错误配对，也没有把4320前向当4320独立新样本。
+
+这些区间描述固定训练模型、固定校准和同生成机制下的群抽样不确定性，不覆盖重新训练、再调参、未测的三种反向排列、任意真实商品市场总体或完整方法选择过程。九路径先平均不等于有九个独立训练总体供bootstrap；本实现没有把种子数包装成总体训练波动估计。
+
+本轮确认只在本方案冻结后生成的新群上进行；H已有开发/HPO与选方法经历不会因此消失。已有新群与冻结比较能回答“这两个固定系统在这个新确认协议里怎样”，不能回答“同开发机会下的最优FOREVER与最优H谁更强”。本轮没有据结果换系数、改门、追加种子或选择有利端点的保存证据。
+
+22指标×三口径×七端点为完整辅助描述，不宣称它们同时显著或作为共同获胜验收。原O/F共同门及N/Z保护是预定核心。无需为本轮结案追加多重比较方案、方法、数据或HPO；若将来换研究问题，应另行明确，不能在本次已有结果中追改。
+
+八、位移时钟、真实正则与正式日志
+
+FOREVER正式入口execute:162–175只建立一个Learner/model/optimizer并贯穿三阶段。step28_forever.py:54–65检查全部requires_grad参数与优化器成员一致；:107–126在真实current step前后测全P位移；:129–164逐块把2β(P−anchor)加入现有任务梯度；:233–240调用自然R0/reference=None反向、加正则、统一裁剪后执行optimizer.step。不是只把正则值写进日志。
+
+R0目标的实际分支见step28_record_replay.py:130–182：自然账号记录分配、自然监督及原排序，reference=None不走teacher项，也不加入regroup视图。P仍含已识别的BERT pooler两参数；forever.py:77–104只在限定官方BERT/CLS路由下将结构性闲置任务梯度补数学零，其他缺梯度拒绝，优化器/位移/锚点覆盖不缩小。该处理的旧资格适用边界见外层qualification/scope_update.zh.txt:9–17，不把旧资格重新称为本轮新测试。
+
+Clock:176–196在24个current后校准tau_day和mu0，之后用位移EMA形成beta；update:274–285仅current推进clock，Adam计数与current/replay/fixture总和相符。drain_events和consolidate:297–325先处理当前步应到阈值，再末尾一遍；event:287–294每次开始取最新beta并在该次回放固定。retain_and_switch:328–339只在阶段1/2 retain并建下一阶段anchor，第三阶段不再retain。
+
+本外审解析全部8676条updates.jsonl：7776 current＋900 replay，fixture为0；每条Adam从1连续到960或972，与completion一致。日志本身不单列stage，本审按每288 current的累计断点推断阶段，并用completion断点及域fit成员交叉核对，未重新运行Clock。每阶段48个fit群各出现六次；有回放阶段只用此前域fit中的六个存活群，没有当前或未来域群混入。每个事件内beta固定，末次end的beta与退休latest保存mu/mu0的简单算术一致。
+
+阶段计数为：stage1每条288 current/0 replay；stage2每条288/54；stage3 ABC/BCA每条288/42、CAB每条288/54。54对应四次12更新阈值回放＋6更新末尾巩固，42对应三次12＋6；没有为用满228预算而补回放。current日志displacement.total均正且regularizer=null；replay displacement=null，LR=encoder 1e−5/head0.001，encoder/head正则贡献均记录为正。整体beta范围[0.0005,0.001325787712]与报告相符。
+
+参数映射每条395张量、326046977个FP32参数，共1304187908字节。最终Memory载荷160525—188934字节；按保存state及原canonical序列化做纯字节算术，最终payload＋small state为245651—274081字节。不能把这说成训练全程每个瞬间的独立内存实测，或把额外1.304GB锚点藏进1MiB。实际Store.commit:104–143保留完整Memory＋RNG/调度小状态的1MiB门，anchor另列。
+
+日志和源码相互支持计数、真实接线与资源口径；它们不证明某个组件造成H优势，也不能替代先前数值资格的作用。两系统既改变评分/目标/历史机制，又有不同HPO经历、优化器调用和资源使用。H旧训练每条864次更新，其单次更新可含历史梯度；不能仅凭FOREVER960/972对864的计数就推算等量算力或单位计算效率。本轮不补因果消融或等算力臂。
+
+九、费用、回传与时点记录
+
+原完成费用与campaign/budget.json、completion.json、本轮budget.original_completed一致：
+training       87960.23190893466秒
+generation        60.322000071173534秒
+confirmation    4619.703520712908秒
+analysis          50.475810893112794秒
+CPU              141秒
+native          1441秒
+control          340.81680301437154秒
+preparation      220.7310481009772秒
+合计           94834.2810917272秒＝26.34285585881311累计任务小时。
+
+九条训练收费逐项相加等于87960.23190893466秒＝24.4334任务小时；单条9294.933005—10169.643956秒，均小于43200秒。原全部桶上限之和417600秒＝116小时，未借桶或把并行墙钟当单任务费用。原门preparation181＋preflight39.731048100977205＝220.7310481009772。CPU141/native1441及原失败账承接，未因正式成功清零。
+
+本轮新增准备费1＋6＋157＋25＋4＋2＋3＋60＝258秒；累计preparation478.7310481009772/900秒，余额421.2689518990228秒。最后60秒是明确保守分配，不是精确测时；没有网页等待计费。新training/confirmation/analysis为0。含这258秒的账面总量为95092.2810917272秒，约26.414523小时，但最终收尾实耗仍以主执行者后续记账为准。
+
+mechanical_attempts.json保留4秒失败展示尝试：助手误把原null区间当可迭代二元素列表，修正为按原null显示N/A。summarize_saved.py:128–135、178–184仅检查保存区间/格式并显示；没有重抽样或改结果，故不是科研负结果重试。原统计和指标字节仍冻结。
+
+按保存process时间及transfer_manifest原mtime，首批worker约11月2日18:55:03、训练完整门11月3日03:02:16、总完成约04:21:06（UTC+8），分别约8小时7分和9小时26分。它们与24.4334累计训练小时没有矛盾，不用于承诺未来吞吐或新三槽资格。
+
+observation.json是09:43现场快照，vendor_observation.json明确是较晚预算快照；两者不应混称为同一时刻当前状态。本包有一个非阻断的历史身份界限：外层formal_chain/report.zh.txt:35记PID3485029创建时刻1793505217.8，本轮observation同PID记1793504709.8，差508秒；原state/process.json只在回传清单中登记、没有入本包。因此本外审不独立认证report:121关于历史创建时刻逐字段对应的全部说法，也不猜测差异原因。保存命令/cwd、Vendor子进程和已完成FOREVER产物支持本次链状态描述；没有证据显示此差异污染科学结果或使候选清理错误。无需因此新开服务器检查；删除前现场核对本来就在当前scope之内。
+
+十、权重清理的具体边界
+
+cleanup_inventory.status为READ_ONLY_INVENTORY_NO_DELETION。27个候选路径唯一、九run×三阶段，全部位于本批formal_chain/forever/training/.../run/models/；各项记录path=resolved、uid=1014、nlink=1，合计35218653363字节＝32.7999269245GiB。每项路径、bytes、SHA都与对应completion.points[stage].model元数据相符；与保留H27路径集合不相交。
+
+这些是盘点记录与完成元数据的交叉核对。本外审未读取模型实物，不能说自己在Linux重算了27个模型SHA、检查了当前inode，或确认截至删除时文件没有变化。原scope:14已经规定删除前路径/属主/链接/大小/SHA与依赖核对及逐文件删除回执，此项仍由主执行者按既定任务落实。
+
+九份recovery_retirement.json均记DELETED、latest.metadata.state.phase=complete，各退役两个full/anchor恢复载荷；actual formal.retire_completed:117–137先验证端点，再记录并删除受限恢复载荷及latest，保留推理模型和Memory。没有依据要求为了“以后可能需要”恢复保留已无用途的所有检查点。
+
+后续VendorLink不依赖FOREVER权重：step29_vendorlink_formal.execute:100–105从其allowed.model_files/model_path的本地预训练起点建模；step28_formal_wait.predecessor_state:85–100消费FOREVER完成、预算、确认与分析元数据，未加载FOREVER模型。现链已通过前序门的保存状态与这条依赖相符。H_pos_history依赖H27的保留意图在scope及cleanup_inventory.retained_reference中明确，但本包未含其完整未来实现；本外审不声称复核了那个入口，也不因此动H27。
+
+因此，当前审查没有发现需要继续保留这27份FOREVER权重的具体未解诊断、恢复或已授权下游加载需求。完成结果/主审处置并确保原分数、群/query指标、校准、日志、访问/预算/来源和封存生成材料仍按scope保管后，可以按已有用户要求收尾清理这些指定文件。保管分数/指标可留存本次结果，但不能由SHA恢复权重；删除后的新模型研究仍需另立授权。本审查既不代替删除回执，也不扩大清理到H、预训练或活动Vendor资产。
+
+十一、分类意见及最小处置
+
+SCIENTIFIC_BLOCKER：无。
+REPRODUCIBILITY_DEFECT：无。
+本轮必修项：0；本轮必须新增测试/实验：0。没有为了审查而新增运行要求。
+
+OPTIONAL-01：概率损失的措辞更精确。
+来源：report.zh.txt:101；tables.zh.txt:331–354、506–529；population_evaluate.classification:58–64。
+具体影响：Brier/Log-loss较低同时反映概率预测质量，不能直接作为纯校准误差分解。原文没有因此改变主门或数值。
+最小建议：后续解释可写“stage-cal下概率预测损失更低”，无需改冻结结果。
+必要核验：无新增核验；直接引用现有Brier/Log-loss字段即可。属于可选文字精化，不阻断结案。
+
+OPTIONAL-02：历史进程身份只按可见证据表述。
+来源：外层reports/documentation/20261101/formal_chain/report.zh.txt:35；本轮observation.json.processes[0].create_time；report.zh.txt:121。
+具体影响：两个保存文本的创建时刻相差508秒，完整原state/process未入本包，外审无法独立确认逐字段历史身份比对。没有证据表明影响本批指标、费用或清理候选集合。
+最小建议：最终交接可将表述限定为“09:43保存快照所见状态”，或主执行者在已有材料处置中说明自己采用的原件，不追改历史原件。
+必要核验：本轮不新增服务器访问、科学运行或额外审查；沿原scope实施清理前实物/依赖核对即可。属于证据表述限定，不是新增执行门。
+
+OUT_OF_SCOPE_OVERDESIGN：为本轮结案要求追加HPO、种子/顺序、方法/ER或等算力臂、正式pilot、全阶段/三槽GPU资格、全仓回归、重新bootstrap或另建显著性方案；为填N/A重算合并分类；要求上传正式数据/owners/权重或重载54状态；仅因未来不确定用途保留全部权重；建设通用调度/灾备/审计框架。当前没有具体缺陷需要这些工作，均不转为本轮任务。
+
+十二、已读范围与最终适用范围
+
+全文阅读本轮report、tables、scope、check_saved、review/request、summarize_saved以及开场/观察/回传/费用小JSON；完整结构化核对summary、analysis、confirmation、all_blind_complete、324指标矩阵、9条正式更新日志、9条FOREVER与9条H completion、54校准JSON、9条recovery_retirement、来源和清理清单。大量JSON的“读取”是解析所需字段并交叉核对，不表示人工逐行解释了每个RNG元素。
+
+核心源码全文阅读step28_forever.py、step28_forever_run.py、step28_forever_formal.py、step28_forever_evaluate.py。直接依赖按实际路径阅读：comparison_evaluate的calibrated_roles/contributions/interval，five_evaluate的access/confirmation_public/metric_set/field_terms，population_evaluate指标核心，balanced_pooling_run.query_metrics/undefined_metrics，alias_calibration，record_replay自然目标/真实反向/评分，five/optuna的H身份与评分，train-only training_inputs、Supply/Memory/Adam及保存恢复低层。queue/wait/Vendor正式入口只读计费、完成交接与模型依赖所需范围。65份来源均做字节核对，不称65份均重新逐行审算法；没有运行任何手写测试。
+
+外层历史：全文阅读FOREVER revision、formal plan、qualification scope_update，以及formal_chain scope/report/primary；其余旧proposal、实现主审、正式修复主审、第二/第三轮处置及旧H−S处置按本次结论相关段落回查。具体路径、行范围、机械检查和未读/未执行界限列于reading_scope.json；全部输入文件大小/SHA列于input_files.tsv。
+
+可接受本轮固定配置结果与原主门通过的解释，主执行者可完整回收本报告并独立处置。现有证据没有要求再次科研运行才能结案的缺口。清理仍按已授权scope完成收尾并留下真实回执；本外审不修改输入、冻结结果或执行权限。

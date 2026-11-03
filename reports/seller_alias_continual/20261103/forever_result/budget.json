@@ -1,5 +1,5 @@
 {
-  "status": "RESULT_REVIEW_PREPARATION",
+  "status": "RESULT_ANALYSIS_REVIEW_AND_CLEANUP_COMPLETE",
   "unit": "cumulative task wall-clock seconds",
   "original_completed": {
     "cpu": 141,
@@ -76,13 +76,39 @@
       "action": "final ledger/receipt resync and session close",
       "seconds": 10,
       "measurement": "explicit conservative tail; no review waiting"
+    },
+    {
+      "action": "complete review retrieval, archive verification and browser close",
+      "seconds": 40,
+      "measurement": "explicit conservative active-work allocation; passive review waiting excluded"
+    },
+    {
+      "action": "review closure SFTP deployment",
+      "seconds": 2,
+      "measurement": "ceil actual 1.859 seconds; review/closure_sync.json"
+    },
+    {
+      "action": "authorized 27-weight deletion and retained-file verification",
+      "seconds": 30,
+      "measurement": "ceil SSH outer 29.437 seconds; cleanup receipt internal 29.314875 seconds"
+    },
+    {
+      "action": "local archive cleanup ledger write failure",
+      "seconds": 7,
+      "measurement": "ceil outer 6.362 seconds; archives verified/deleted and transport receipt saved before submission.json open returned OSError 22; no scientific state affected; subsequent read confirmed old submission intact"
+    },
+    {
+      "action": "final report/receipt/ledger SFTP and session closure",
+      "seconds": 20,
+      "measurement": "explicit conservative final tail allocation"
     }
   ],
-  "new_preparation_seconds": 314,
-  "preparation_total_seconds": 534.7310481009772,
-  "preparation_remaining_seconds": 365.2689518990228,
+  "new_preparation_seconds": 413,
+  "preparation_total_seconds": 633.7310481009772,
+  "preparation_remaining_seconds": 266.2689518990228,
   "training_added_seconds": 0,
   "confirmation_added_seconds": 0,
   "analysis_added_seconds": 0,
-  "scientific_tests": 0
+  "scientific_tests": 0,
+  "total_including_original_seconds": 95247.2810917272
 }
