@@ -1,0 +1,20 @@
+H_pos_history整链后等待：本次免外审下的独立处置
+2026-11-03。用户确认完整实施范围，并明确“这次就不用提交外审了”。本次没有送审、没有新网页审查通过的主张；原两轮科学实现审查按未变范围复用。
+
+实际增量：新增scripts/step28_history_wait.py和对应手写CPU测试；step28_history_optuna_control.py只增加dispatch/execute的可选observe参数、派发循环回调及train_batch透传。默认None的旧路径不变；无计算、候选、数据、反馈、选择、参数、seed或评价变化。原57项未改来源按CPU06/两轮主审复用；本轮58来源新清单仅控制器一项变化，附加wait/test两项身份另列CPU03.delta_sources。Linux独立workspace保留旧冻结来源，原活动链没有覆盖。
+
+CPU01：新回调调用处误缩进，导入失败，未执行测试。runner再次在收集sources时遇同错误，未产出原定receipt；保留stdout、原runner、错误control源码及failure.json，保守记30秒（不是实测30秒），不清零费用。
+CPU02：三项中的前序分支与实际等待入口通过；真实dispatch测试夹具遗漏workspace/sources，Popen前KeyError，未启动训练进程；原log及当时wait/test/runner保留。实际3.253793秒、含2秒尾部共记6秒。另修复观察器日志文件未及时关闭，以及早期绑定失败时活动费用落盘，均限本次新增入口。
+CPU03：三项全部通过，实际3秒多、含尾部记6秒；三次累计42/60秒。CPU子进程RSS及执行身份见receipt，不读取真实正文/标签、载模或调用GPU。没有为失败重跑正式实验。
+
+核验与实际路径：
+1. 手写原链两gate、process及完成/失败回执：运行中等待，完成但进程尚在等待，退出且缺完成拒绝，chain失败拒绝；完整且退出调用原production chain_complete，而不是只检测GPU释放。
+2. 原资源门复用；poll在前序未好时不碰资源，资源ready=false继续等，ready=true进入唯一启动。真实资源数值与三H峰值仍须运行时观察，不把手写状态或CPU过程冒充GPU资格。
+3. 实际production dispatch启动普通CPU子进程，子进程向真实console打印正更新；实际新增observe回调将其识别、先写first_update再unlink监听。没有更新时不删；删后调用无动作。控制器源码实际train_batch将observe传入此dispatch，调参execute的后续训练沿同一入口。
+4. 生产wait.execute在隔离临时目录用手写门、两个WAITING及一个READY执行；正式计算动作替换为手写函数，核对只调用一次且传入含等待费用的新gate，再由实际回调自删。重复execute由state.mkdir拒绝，不覆盖原claim。该证据不是正式训练成功证据。
+
+等待每60秒，idle sleep不收费；首次源码/门/导入及每轮检查实际时间从135+42+120=297秒辅助起点累加，落state/budget。准备120秒是本次明确的保守收费，其中5秒覆盖将来门交接/收尾，不作为实测耗时。启动时将累积prior写state/formal_gate，正式Ledger继续一次预提30秒并按原规则计费；observe位于ledger.control前，归该辅助账。等待失败保留费用和异常，无自动重试。原270+6+4小时不变。
+
+实际允许后续完整12候选、条件九复验、新确认/统计及原搜索权重退役；旧H27、预训练及活动VendorLink资产保留。新门绑定本处置、用户本次授权、CPU03和原输入元数据，旧关闭门不改。启动必须整条FOREVER/VendorLink完整且相关进程退出，科学负结果可交接，运行失败不交接；正式入口还会再次执行完整门与H27身份核验。
+
+按纪律第5/6节，现有两轮科学审查+本次可选回调静态接线+三项针对性CPU已足以关闭此次等待缺口，无必要追加GPU资格、全历史回归、第三方包上传或新调度系统。真实部署/进程/WAITING另见launch及observation，未观察前不宣称监听已运行。

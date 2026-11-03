@@ -140,7 +140,7 @@ def slot_admission(allowed, snapshot, capacity, occupied):
         ready=observation["ready"] and capacity-reserved >= slot_bytes)
 
 
-def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, poll_seconds=2):
+def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, poll_seconds=2, observe=None):
     """Failed slots retire; healthy slots continue to claim pending trajectories."""
     active, pending, retired, receipts = {}, list(enumerate(rows)), set(), []
     capacity = None
@@ -182,6 +182,8 @@ def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, po
         ledger.control()
     try:
         while pending or active:
+            if observe is not None:
+                observe()
             ledger.control()
             queue.check_running(None, allowed, Path(allowed["campaign"]))
             snapshot = monitor.snapshot() if monitor else None
@@ -283,7 +285,7 @@ def retire_search_weights(batch_path, specs, allowed):
         data.write_json(batch_path.parent/"weight_retirement_receipt.json", dict(files=deleted))
 
 
-def execute(gate_path):
+def execute(gate_path, *, observe=None):
     started = time.monotonic()
     allowed = run.gate(gate_path, "train")
     if set(allowed["actions"]) != set(run.ACTIONS) or allowed.get("retire_search_weights") is not True:
@@ -304,7 +306,7 @@ def execute(gate_path):
             return [sys.executable, str(data.ROOT/"scripts/step28_history_optuna_run.py"), "--job", str(job),
                 "--spec", str(job/"spec.json"), "--deadline", str(deadline), "--gate", str(gate_path), "--batch", str(path)]
         rows = [dict(id=s.run_id, spec=s.identity(), bucket="training", seconds=21600) for s in specs]
-        dispatch(path.parent, rows, command, lambda row, job: run.validate_completion(job/"run", m.Spec.from_dict(row["spec"]), allowed), allowed, ledger, monitor=monitor)
+        dispatch(path.parent, rows, command, lambda row, job: run.validate_completion(job/"run", m.Spec.from_dict(row["spec"]), allowed), allowed, ledger, monitor=monitor, observe=observe)
     def action(name, path):
         bucket = "confirmation" if name == "confirmation" else "auxiliary"
         # Auxiliary actions share the remaining allowance, including controller overhead.

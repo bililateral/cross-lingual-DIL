@@ -1,0 +1,29 @@
+test_actual_dispatch_hook_deletes_only_after_update (__main__.WaitTests) ... ERROR
+test_predecessor_wait_failure_and_full_exit (__main__.WaitTests) ... ok
+test_production_wait_entry_waits_then_calls_formal_once (__main__.WaitTests) ... /tmp/tmpgtqw4yzj/active_history_wait.py:105: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpgtqw4yzj/workspace/formal/trial_00/toy/console.txt' mode='r' encoding='utf-8'>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+
+======================================================================
+ERROR: test_actual_dispatch_hook_deletes_only_after_update (__main__.WaitTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py", line 227, in dispatch
+    cwd=allowed["workspace"], start_new_session=True)
+KeyError: 'workspace'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261103/history_wait/workspace/tests/test_step28_history_wait.py", line 83, in test_actual_dispatch_hook_deletes_only_after_update
+    result = control.dispatch(trial, [row], command, lambda row, job: None,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py", line 254, in dispatch
+    saved("STOP_NO_RETRY")
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py", line 154, in saved
+    value = dict(status=status, sources=allowed["sources"], completed=receipts,
+KeyError: 'sources'
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.023s
+
+FAILED (errors=1)
