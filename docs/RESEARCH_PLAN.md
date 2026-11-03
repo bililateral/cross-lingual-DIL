@@ -12,6 +12,8 @@ VendorLink和FOREVER沿用[VendorLink四臂36条/每市场40轮/单路296h](../r
 
 复用既有单路GPU资格、[11月1日显存短测](../reports/documentation/20261101/forever_memory/report.zh.txt)及适用旧审查；新增并发/交接按[两轮定向外审与主审](../reports/documentation/20261101/formal_chain/review/primary_disposition.zh.txt)结案。三槽是已批准的调度范围，不能写成三路大模型资格已通过，也不能把旧单路工期直接除3。不追加GPU试跑、G1/G2或无具体缺口的重复审查；实际进度和下一步只看[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
 
+FOREVER后续按[结果回传/分析及清理范围](../reports/seller_alias_continual/20261103/forever_result/scope.zh.txt)完成新结果定向外审和逐项处置；只在证据保管、审查结案且无后续加载用途后清理本批27权重。原H_pos_tuned27端点继续作为H_pos_history未来输入，不能随本批清理。研究结论使用[完整报告](../reports/seller_alias_continual/20261103/forever_result/report.zh.txt)，不追加候选或重采样；原自动链保持。
+
 VendorLink依赖扫描发现57群中48群相连且包含Dream全部8群，用户接受固定数据描述比较：保存完整排序/遗忘差值，不计算整体置信区间、不作统计验收，不宣称真实潜在同控识别或统计确认抗遗忘。不得为获得区间重分群、选账号、加数据或改统计模型。FOREVER保留额外全参数锚点、原O/F主比较及N/Z点值保护，不重训H、不追加HPO；不将两线预算或评价权限互借。
 
 原五方法45条及其新确认/统计、结果外审和[主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)均已结束。H相对S最终MAP正向，但原O/F共同主门未过、额外抗遗忘未确认，不重复旧恢复或为翻转结果重训。H/S54端点继续保留，其中H27供FOREVER后续比较；其余三方法81份独立权重已按用户选择删除，非权重证据和原490h/失败账保留，见[存储记录](STORAGE.zh.md#2026-10-26-五臂中的三臂权重清理)。

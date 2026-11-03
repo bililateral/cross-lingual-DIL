@@ -1,0 +1,73 @@
+{
+  "status": "RESULT_REVIEW_PREPARATION",
+  "unit": "cumulative task wall-clock seconds",
+  "original_completed": {
+    "cpu": 141,
+    "native": 1441,
+    "preparation": 220.7310481009772,
+    "control": 340.81680301437154,
+    "training": 87960.23190893466,
+    "generation": 60.322000071173534,
+    "confirmation": 4619.703520712908,
+    "analysis": 50.475810893112794
+  },
+  "original_limits": {
+    "training": 388800,
+    "confirmation": 21600,
+    "cpu": 600,
+    "native": 3600,
+    "generation": 600,
+    "control": 600,
+    "analysis": 900,
+    "preparation": 900
+  },
+  "new_preparation_charges": [
+    {
+      "action": "read-only metadata/process probe",
+      "seconds": 1,
+      "measurement": "conservative"
+    },
+    {
+      "action": "opening metadata checks",
+      "seconds": 6,
+      "measurement": "ceil actual 5.797"
+    },
+    {
+      "action": "SFTP inventory/hash/download",
+      "seconds": 157,
+      "measurement": "ceil actual 156.89099999999996"
+    },
+    {
+      "action": "27 weight hash inventory",
+      "seconds": 25,
+      "measurement": "ceil actual 24.125"
+    },
+    {
+      "action": "mechanical table failed attempt",
+      "seconds": 4,
+      "measurement": "ceil outer 3.483; failure preserved"
+    },
+    {
+      "action": "mechanical tables first success",
+      "seconds": 2,
+      "measurement": "ceil outer 1.443"
+    },
+    {
+      "action": "score/query identity completion",
+      "seconds": 3,
+      "measurement": "ceil outer 2.046"
+    },
+    {
+      "action": "local preparation/report/package and closure work",
+      "seconds": 60,
+      "measurement": "explicit conservative allocation, no web waiting"
+    }
+  ],
+  "new_preparation_seconds": 258,
+  "preparation_total_seconds": 478.7310481009772,
+  "preparation_remaining_seconds": 421.2689518990228,
+  "training_added_seconds": 0,
+  "confirmation_added_seconds": 0,
+  "analysis_added_seconds": 0,
+  "scientific_tests": 0
+}

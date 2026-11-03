@@ -268,11 +268,19 @@ H/S54端点共70436051280字节继续供新确认使用；其余7713个保留文
 
 ## 2026-10-23 五方法实现、限定资格与待回收实现外审
 
+## 2026-11-03 FOREVER完整结果回传与清理准备
+
+[本轮结果目录](../reports/seller_alias_continual/20261103/forever_result/)保留1217份80030940字节，含324盲分数、324群指标、324逐query指标、完整运行/校准/访问/预算/配置、原H必要完成记录及65份Linux实际来源；[逐文件SFTP接收](../reports/seller_alias_continual/20261103/forever_result/receive.json)大小/SHA全部一致。正式文本、标签源、owners、Memory和模型未回传，继续原Linux保管。冻结campaign账/结果不覆盖；本地标准库只做身份、字段、计数与简单算术核对，未重算指标或抽样。表格助手一次null格式错误及费用保留，修正只影响N/A展示。
+
+[权重预盘点](../reports/seller_alias_continual/20261103/forever_result/cleanup_inventory.json)核对本批27份FOREVER模型为35218653363字节、独立普通文件、nlink=1、实际SHA对应端点；run/work、anchors及latest已由原成功规则退役。本轮用户要求分析/外审完成后删除无用权重，当前尚未删除。原H_pos_tuned27份继续供H_pos_history，活动VendorLink及预训练、Memory与全部必要结果/日志保留。清理依据后续实际依赖和审查处置，SHA不能恢复模型，不重置大清理周期。本轮22份分析/接收/预盘点/许可/送审记录已[同步Linux独立结果目录](../reports/seller_alias_continual/20261103/forever_result/sync.json)并逐项核对，原campaign/source不复制覆盖；当前准备累计534.731048/900秒，含此次314秒及原220.731048秒，冻结费用保持。当前进度仅在交接FOREVER行维护，根可变docs仅Windows，本轮本地提交、不推送。
+
 用户已批准五方法/零HPO/45轨迹/三路/490累计小时，已在Linux独立`reports/documentation/20261023/continual_implementation/workspace`部署最小实现；61份当前来源1056846字节已逐项与Windows核验一致，见[current_sources](../reports/documentation/20261023/continual_implementation/current_sources.json)。模型只链接既有BGE归档，数据目录仅建立既有数据链接，资格均使用手写群，尚未正式训练/生成确认数据/打开正式标签。旧workspace及模型保管不改。
 
 CPU01—07与native01/02失败/完成原件、账本和必要资源样本在两端保管；GPU临时完整/推理状态在实际恢复验证及留存大小/SHA后退休。当前核验源快照source_cpu01_native01.zip、qualification_fix.zip、implementation_update.zip保留其具体重放用途；不是无用传输重复副本。独立处置、预算投影和控制费保守补记见[资格主审](../reports/documentation/20261023/continual_implementation/qualification/primary.zh.txt)。新正式权重尚不存在，计划135阶段推理状态须保留供确认，存储cap224GiB/free288GiB仍是执行上限，不能写成当前占用。
 
 实现输入包continual_implementation_review.zip为836755字节、158成员，SHA256 6a792263593188bbf89217f928de67626588b11bb5c329c81151e2f63aa9ff63；157载荷1790191字节及ZIP逐项身份核验一致。含源码、冻结方案、手写资格和来源/运行记录，不含正式文本/标签/owners/Memory或模型载荷/凭据。自动审批首次拒绝后，用户明确批准整个具体包上传到chatgpt.com；15:49已单次提交原会话，当前待完整回收，见[具体授权](../reports/documentation/20261023/continual_implementation/review/authorization.json)与[提交回执](../reports/documentation/20261023/continual_implementation/review/submission.json)。GPU问题修复明确免审，不把此次实现审查扩大为GPU复审。输入包因在审和身份复核保留，不能提前删；未创建重复审查或重新上传。新材料仅本地Git，不推送。
+
+具体[结果外审包](../reports/seller_alias_continual/20261103/forever_result/review/package.json)4784578字节、574载荷，SHA256 313a7a9a908d5bd781e281686c4eb8746f8f2bf7d0e0567e7a3953e6cab80b82，用户明确批准后于客户端10:03单次上传原FOREVER会话并提交。仅包含分析/群指标/运行证据/实际来源/必要旧审查及预盘点，不含分数/query二进制、正文、标签源、owners、模型/Memory或凭据。送审载荷身份与请求保留，当前等待完整回收；新增传输/准备费用见本轮budget.json，冻结完成账不改。
 
 ## 2026-10-23 五方法修订方案送审材料
 

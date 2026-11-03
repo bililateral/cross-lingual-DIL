@@ -1,5 +1,7 @@
 # 训练期间的科研流程与需求讨论
 
+用户随后明确：“批准此具体包上传该会话作结果外审”，仅覆盖forever_result_review.zip（4784578字节/574载荷/SHA256 313a7a9a908d5bd781e281686c4eb8746f8f2bf7d0e0567e7a3953e6cab80b82）向既有 https://chatgpt.com/c/6ae406c1-160c-83ea-a5a1-3b22ccac18fc 披露作本轮结果审查；[实际许可与提交](../reports/seller_alias_continual/20261103/forever_result/review/submission.json)保留，不扩大为新训练或其他包。
+
 ## 2026-11-02 H_pos_tuned两项历史系数与3-worker实现
 
 用户选中历史监督0.1和旧评分保持0.5两项建议，明确：“就用optuna调整这两个超参数吧。用调整完这两个超参数的H_pos_tuned再次尝试三域的实验，看看调参效果如何”。执行者呈现两项对数范围、12候选/锚点/三顺序、旧dev选择、选后九复验与原H配对、新120群独立确认、固定最终MAP判据及270+6+4累计任务小时的准备方案，并区分实现与正式运行。用户随后要求：“先完整实现吧”，又纠正：“要3-worker的”。
@@ -7,6 +9,10 @@
 本轮依此完成实现及必要手写CPU核验/定向外审，不将实现许可扩成开训许可。并发安排采用同一候选ABC/BCA/CAB三顺序并行，三条齐备后再反馈Optuna；选定后九复验三个槽成功续领，失败槽退休、健康槽继续当前批余项，缺项阻断后续，不自动重试。准备方案及具体边界见[范围](../reports/documentation/20261102/history_optuna/scope.zh.txt)。不启动新等待链，不影响现行FOREVER→VendorLink作业，原H27仍保留。旧开发结果已接触、seed4/5/6已用及原H−S共同门失败的事实保持。
 
 具体新包history_optuna_review.zip为514462字节、132载荷，SHA256 39952612d10e561014d0de8586fbf9bff55ba98396d17616976e28fcfafc1118。用户明确确认：“批准此具体包在 GPT-6 Pro 可用后上传该会话外审”，目的地为既有 https://chatgpt.com/c/6adc2cf8-61b8-83ea-90d2-0a79dd218a72。许可仅覆盖本包/本轮实现审查，不扩大到训练或新材料；实际送审、回收与独立处置见[索引](../reports/documentation/20261102/history_optuna/review/submission.json)。
+
+## 2026-11-03 FOREVER结果回传、分析及无用权重清理
+
+用户要求：“Forever已训练完成，同步结果回来仔细分析”。执行者呈现9条新训练/原H27、新120群/完整盲评分/统计、22指标与分层、保留原判据、仅保存结果核对、定向结果外审、原位更新唯一当前项和本地提交不推送的完整范围后，用户补充：“上述任务完成以后记得删除此次实验产生的没用的训练权重文件”。本轮据此推进回传/分析并将清理加入收尾；清理以分析及外审完成、必要证据保留和确无后续加载/诊断/恢复依赖为条件。原H27仍是H_pos_history输入，预训练和活动VendorLink资产保留；不扩成新训练、GPU试跑、重采样或旧模型清理。具体对象和实际回执见[本轮范围](../reports/seller_alias_continual/20261103/forever_result/scope.zh.txt)及[权重预盘点](../reports/seller_alias_continual/20261103/forever_result/cleanup_inventory.json)。原FOREVER→VendorLink自动链继续，H_pos_history等待开始指令。
 
 用户随后选中“落实正式预算与输入绑定、承接已有费用”，要求“先完成这些”；对完整准备范围确认：“确认，按此完成准备，继续保持训练关闭”。具体包括280累计任务小时、继承101秒、本次最多300秒机械核对原输入/BGE/H27文件身份并建立必要路径、不得解析正文标签/载模/GPU/启动训练或监听、本地提交不推送，见[准备授权](../reports/documentation/20261102/history_optuna/preparation/authorization.json)。另明确“把你修改后的版本继续提交外审”，本轮按此对修后4215c066及必要核验证据作第二轮定向网页审查；这是新指令覆盖修后版本的送审，不沿用旧具体包许可扩大上传，也不构成开训许可。见[第二轮材料与提交身份](../reports/documentation/20261102/history_optuna/review_round2/submission.json)。
 
