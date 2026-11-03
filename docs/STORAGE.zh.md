@@ -5,7 +5,7 @@
 
 Linux workspace为reports/documentation/20261103/history_wait/workspace，仅逐项复制已审58来源并替换控制器可选回调，另存wait/test。19个必要数据/BGE逐文件链接指向原资产，不复制正文/标签/预训练或H27，不链接test/owners。CPU01错误缩进源码及runner、CPU02夹具缺字段时的wait/test/runner和原日志保留；失败费用共计入本轮42秒，不覆盖原冻结workspace。原H27继续作为后续对照，活动VendorLink不改不清理。
 
-唯一监听4159100的活动副本在本轮目录，首个真实训练更新后自行删除；保留源码、state claim、配置、费用、首步及进程身份。旧关闭门保留历史，新条件性执行许可只在前序完整成功退出及资源满足后生效。根docs仅Windows维护；本地提交不推送，不重置大清理周期。
+唯一监听4159100的活动副本在本轮目录，首个真实训练更新后自行删除；保留源码、state claim、配置、费用、首步及进程身份。旧关闭门保留历史，新条件性执行许可只在前序完整成功退出及资源满足后生效。原启动/CPU/部署记录保留；本轮新增[只读核对原件](../reports/documentation/20261103/history_wait/inspection.json)及[逐项结论](../reports/documentation/20261103/history_wait/inspection.zh.txt)，保存60来源身份、15绑定、19链接、H27元数据和进程/等待账。仅Windows新增核对记录，未部署或覆盖Linux活动来源/配置/账本；原28项SFTP回传事实保持。根docs仅Windows维护；本地提交不推送，不重置大清理周期。
 
 ## 2026-11-03 FOREVER结果、外审及权重清理
 

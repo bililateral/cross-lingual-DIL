@@ -3,6 +3,8 @@
 
 用户在准备核对后明确：“那就在前序完整结束后开始吧，写脚本监听等待”。执行者呈现前序FOREVER及VendorLink训练/评分/分析全成功且进程退出、资源准入、唯一启动、原280小时有限搜索与条件复验确认、失败停止无重试、首个真实更新后自删、CPU60秒/准备120秒及本地交付的完整范围，用户确认：“确认，开始执行”。实施中又明确：“这次就不用提交外审了”，仅本次等待接线免网页外审，原两轮科学实现审查继续复用。
 
+用户随后要求“我让别的Agent创建了监听vendor-link训练结束后启动H_pos_tuned新调参实验的脚本，你给我检查一下是否有效。确认有效后，及时更新项目的文件记录进度”，并对只读来源/实际进程/既有证据核对、不启动或改活动来源、不新增GPU/科研测试、原位更新唯一当前项及本地提交不推送的完整范围确认：“确认，按此检查并更新记录”。本次独立核对和边界见[检查记录](../reports/documentation/20261103/history_wait/inspection.zh.txt)，不重复索要已经批准的自动开训许可。
+
 本决定替代旧“保持训练关闭/等开始指令/不安装监听”，不修改旧授权原件。新监听在前序完整门后可直接自动开训，同范围不再询问；不因GPU释放、局部训练完成或科学主门false混淆运行成功与失败。实际范围、免审及费用承接见[本次记录](../reports/documentation/20261103/history_wait/scope.zh.txt)和[授权](../reports/documentation/20261103/history_wait/authorization.json)，实际进程仅看交接当前项。
 
 用户随后明确：“批准此具体包上传该会话作结果外审”，仅覆盖forever_result_review.zip（4784578字节/574载荷/SHA256 313a7a9a908d5bd781e281686c4eb8746f8f2bf7d0e0567e7a3953e6cab80b82）向既有 https://chatgpt.com/c/6ae406c1-160c-83ea-a5a1-3b22ccac18fc 披露作本轮结果审查；[实际许可与提交](../reports/seller_alias_continual/20261103/forever_result/review/submission.json)保留，不扩大为新训练或其他包。
