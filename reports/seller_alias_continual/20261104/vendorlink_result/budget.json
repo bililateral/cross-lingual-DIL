@@ -1,5 +1,5 @@
 {
-  "status": "RESULT_REVIEW_AND_PRIMARY_CLOSEOUT_COMPLETE",
+  "status": "RESULT_REVIEW_AND_TARGETED_WEIGHT_CLEANUP_COMPLETE",
   "original_campaign_used": {
     "preparation": 145.00020673684776,
     "cpu": 132,
@@ -81,17 +81,35 @@
       "actual_seconds": 4.889999999999418,
       "charged_seconds": 8,
       "note": "Ceil active file transfer plus 3 seconds reserved for budget/receipt transfer and close; no server scientific execution."
+    },
+    {
+      "action": "targeted_weight_cleanup_preparation",
+      "charged_seconds": 900,
+      "conservative": true,
+      "note": "Finite conservative allowance for dependency/metadata inspection, script and documentation work, including two wrong-path read-only probes and the AccessDenied pre-delete failure. Excludes approval/passive waits; no scientific retries."
+    },
+    {
+      "action": "targeted_weight_cleanup_execution",
+      "actual_seconds": 43.45630143699236,
+      "charged_seconds": 44.0,
+      "note": "Linux py310 file hashes, exact-path deletions and retained-asset checks; no model loading or scientific evaluation."
+    },
+    {
+      "action": "targeted_weight_cleanup_sftp_closeout",
+      "charged_seconds": 30,
+      "conservative": true,
+      "note": "Conservative allowance for small-file SFTP transfers, two-end hash checks, final budget and receipt transfer, and session close."
     }
   ],
   "used_with_result_work": {
-    "preparation": 655.0002067368478,
+    "preparation": 1629.0002067368478,
     "cpu": 132,
     "control": 753.694709735224,
     "training": 136790.74984660675,
     "confirmation": 508.5436203139834,
     "analysis": 35.26858633314259
   },
-  "total_seconds": 138875.25696972595,
-  "total_task_hours": 38.57646026936832,
-  "note": "Original campaign ledger preserved. New mechanical work is carried in original preparation bucket; no new research computation or budget. Further packaging/sync recorded when completed."
+  "total_seconds": 139849.25696972595,
+  "total_task_hours": 38.84701582492387,
+  "note": "Original campaign and failure ledger preserved. Cleanup adds 974 preparation seconds, including conservatively charged preparation and sync, without new research computation. Historical review closeout hashes refer to the pre-cleanup budget snapshot."
 }

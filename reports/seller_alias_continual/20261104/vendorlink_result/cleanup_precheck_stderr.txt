@@ -1,0 +1,25 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/psutil/_pslinux.py", line 1632, in wrapper
+    return fun(self, *args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/psutil/_pslinux.py", line 2066, in cwd
+    return self._readlink(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/psutil/_pslinux.py", line 1703, in _readlink
+    return readlink(path)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/psutil/_pslinux.py", line 195, in readlink
+    path = os.readlink(path)
+PermissionError: [Errno 13] Permission denied: '/proc/10679/cwd'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261104/vendorlink_result/cleanup_weights.py", line 155, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261104/vendorlink_result/cleanup_weights.py", line 108, in main
+    active_before = processes({r['path'] for r in targets})
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261104/vendorlink_result/cleanup_weights.py", line 53, in processes
+    cwd = process.cwd()
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/psutil/__init__.py", line 788, in cwd
+    return self._proc.cwd()
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/psutil/_pslinux.py", line 1634, in wrapper
+    raise AccessDenied(pid, name) from err
+psutil.AccessDenied: (pid=10679)
