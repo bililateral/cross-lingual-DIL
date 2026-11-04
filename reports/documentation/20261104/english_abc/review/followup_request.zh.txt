@@ -1,0 +1,17 @@
+定向补审：仅ABC-T01经用户确认的成功门修订，不重审全部历史。
+
+首轮review_response.zip已经完整回收，37690字节，SHA256 90359927545e5cd27c227fd34682a78317cd1f5afe3723f04e7e91c83dc9dbbf；四成员及三个内容哈希核对通过，全文已读。原送审包不覆盖。
+
+在首轮审查生成期间，我们向用户具体说明初学下降.005、末态不变的边界，并提出保留所有遗忘改善、初学、新市场和AlphaBay保护条件，只将Dream末态门改为：B3_new >= max(B3_originalH,B3_Vendor)+.005。用户明确答复：“采用更严格的 Dream 最终提升要求（建议）”。该门同时用于seed7/8冻结入选和seed9/10/11开发复核；早期seed7候选质量分档仍按原探索规则，不能单独当成功。未读取任何新dev结果。
+
+实际代码仅将step29_english_abc.py::success中的这一行由
+dream_final=n['B3'] >= max(h['B3'], v['B3'])-QUALITY_MARGIN,
+改为
+dream_final=n['B3'] >= max(h['B3'], v['B3'])+QUALITY_MARGIN,
+其中QUALITY_MARGIN=.005，其他success条件不变。
+
+既有CPU测试加入手写反例：reference={B2:.8,B3:.7,C3:.8,A3:.8}，lower_start只把B2改为.795；basic_quality仍通过，但两seed和三seed的success均要求dream_final=False和passed=False。另测B3=.706的改善正例通过。Linux既有py310的CPU03六项均过，wall_seconds=4.485687707085162，向上计5秒；CPU01/02/03合计14秒。当前policy源码4046字节，SHA256 4046ef20ef204e31773c0c31dc9d810350274475bdd2403aa5b5d69f850ea47c；测试12210字节，SHA256 9c3162fc5745c2aebdd0e3edb57e01f6f68d8a7cffaafbc0d0054fa503bd39ab。以上是执行者提供的实际补测记录，不请你冒称亲自运行或独立核验未附源码字节。
+
+T02按你要求补明：2/3只要求严格D方向，.005只约束均值；C3仅保护Agora末态排序，不是学习净增量。T03补明CPU02的9项CPU来源与两个后更新GPU harness，CPU03虽绑定全部11来源也不等于动态执行GPU脚本；只完成紧凑端点重建和错配置拒绝，GPU终检仍未完成。正式入口未部署、GPU资格未通过和正式实验未启动保持。
+
+请只判断这一经用户选择的科学门是否排除了“B3不升，仅B2降低即成功”的具体反例，是否与原有限开发目标及停止规则相容；保留跨seed末态可能不齐、与Vendor的初学差、固定数据选择及因果外推限制，不把更严格均值门变成独立/显著性证明。请在本次回复直接给完整中文定向意见，限定1000字以内，无需再生成ZIP、不追加运行。用户另提出GPU监听优先问题，目前仍在澄清；不在本次科学门补审范围，不授予重试或改活动调度权限。

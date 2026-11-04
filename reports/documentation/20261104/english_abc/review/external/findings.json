@@ -1,0 +1,425 @@
+{
+  "schema_version": "1.0",
+  "review_id": "ENGLISH_ABC_20261104_INDEPENDENT_REVIEW",
+  "language": "zh-CN",
+  "material_date": "2026-11-04",
+  "date_timezone": "UTC+08:00",
+  "input": {
+    "zip_bytes": 141943,
+    "zip_sha256": "5682b0e12e62d98c85a5c59aeb9dcbb63dc018beb7987499b69f7bf624d65248",
+    "zip_member_count": 40,
+    "payload_count": 39,
+    "all_payloads_match": true
+  },
+  "model_identity": {
+    "session_provided_identity": "GPT-6 Astra Pro",
+    "independent_backend_attestation_performed": false,
+    "independent_ui_model_selection_verified": false,
+    "note_zh": "会话身份信息不是独立后台认证；三个同会话派生交叉审查分工不构成独立实验或统计样本。"
+  },
+  "verdicts": {
+    "research_plan": "ACCEPTABLE_AS_FINITE_FIXED_DATA_DEVELOPMENT_WITH_EXPLICIT_SUCCESS_INTERPRETATION",
+    "implemented_increment": "NO_CONFIRMED_DEFECT_IN_REVIEWED_STATIC_AND_CPU_SCOPE",
+    "launch_readiness": "NOT_READY_NOT_AUTHORIZED",
+    "formal_experiment_started": false,
+    "old_model_dev_precheck_executed": false,
+    "gpu_qualification_passed": false,
+    "formal_adaptive_entry_deployed": false,
+    "independent_final_confirmation": false,
+    "new_formal_execution_authorized_by_this_review": false,
+    "unconditional_scientific_blocker_count": 0,
+    "confirmed_reproducibility_defect_count": 0,
+    "strong_claim_restriction_zh": "现success门不证明排除低初学伪少忘、正的末态保持增益、独立或充分调参后优于VendorLink；若坚持这些强含义，须在结果开放前修订科学规则，不能据零项无条件阻断恢复强主张。"
+  },
+  "category_definitions": {
+    "SCIENTIFIC_BLOCKER": "在本轮明确的固定数据开发口径下，足以阻断研究或既定科学结论的已证问题。",
+    "REPRODUCIBILITY_DEFECT": "已实现增量中有具体证据的行为错误；不把明确未实现的入口或明确失败的资格自动归为该类。",
+    "NECESSARY_TEXT_CLARIFICATION": "需要准确冻结的科学含义或证据说明；可包含必须澄清的科研选择，不能据名称视为无影响措辞润色。",
+    "OPTIONAL": "当前不是闭合或开训前提，仅在相应后续改动发生时考虑。",
+    "OUT_OF_SCOPE_OVERDESIGN": "不属于本轮必要处置的额外研究、验证或通用工程扩展。"
+  },
+  "findings": [
+    {
+      "id": "ABC-T01",
+      "category": "NECESSARY_TEXT_CLARIFICATION",
+      "subtype": "SCIENTIFIC_SUCCESS_INTERPRETATION_TO_FREEZE",
+      "priority": "HIGH",
+      "status": "OPEN_BEFORE_NEW_DEV_RESULTS",
+      "title_zh": "现成功门允许全部0.005少忘幅度来自初学下降，须明确成功含义",
+      "evidence": [
+        {
+          "path": "increment/plan.zh.txt",
+          "location": "28-42",
+          "rationale_zh": "B2容忍0.005，D改善0.005，success记开发目标达到；同时已声明D不证明因果。"
+        },
+        {
+          "path": "workspace/scripts/step29_english_abc.py",
+          "location": "success(), 62-79",
+          "rationale_zh": "数值实现忠实于书面门，允许手写边界反例通过。"
+        },
+        {
+          "path": "workspace/tests/test_step29_english_abc.py",
+          "location": "157-171",
+          "rationale_zh": "低初学用例只覆盖0.89相对0.95的大幅下降。"
+        }
+      ],
+      "fact_zh": "ΔD_H≤−0.005和ΔB2_H≥−0.005联立只推出ΔB3_H≥0，可等号；相对Vendor没有B2保护。",
+      "handwritten_counterexample": {
+        "kind": "independently_written_decimal_hand_example_not_project_execution",
+        "original_h_and_vendor": {
+          "B2": "0.95",
+          "B3": "0.93",
+          "C3": "0.90",
+          "A3": "0.90"
+        },
+        "new_h": {
+          "B2": "0.945",
+          "B3": "0.93",
+          "C3": "0.90",
+          "A3": "0.90"
+        },
+        "original_D": "0.02",
+        "new_D": "0.015",
+        "repeat_identical_rows_for_each_of_3_seeds": true,
+        "checks": {
+          "D_reduction": true,
+          "B2_protection": true,
+          "B3_protection": true,
+          "C3_protection": true,
+          "A3_protection": true,
+          "vendor_D_positive": true,
+          "per_seed_D_strict_improvement": true,
+          "per_seed_C3_protection": true
+        },
+        "all_defined_inequalities_pass": true,
+        "final_dream_change": "0.00",
+        "initial_dream_change": "-0.005"
+      },
+      "impact_zh": "success=True可只有变化量改善而没有Dream末态增益。不能自动宣称已排除低初学原因或保持机制更强。也不能误报现门允许相对原H的平均B3下降。",
+      "minimal_disposition_zh": "在新dev开放前冻结解释：保留现数值门时，只称带初学与末态容忍的开发D指标目标，强制并列ΔB2/ΔB3/ΔD；B3未升不得称末态保持增益。若用户坚持强目标，则先明确并冻结另一个与目标相符的门，审查者不擅加阈值或统计。",
+      "current_code_change_required": false,
+      "code_change_conditional_zh": "只有在选择更强成功定义时，才须同步修改success及对应受限手写用例。",
+      "additional_formal_runs_required": false,
+      "why_not_unconditional_scientific_blocker_zh": "现方案已限定开发性质并承认D不能证明因果；明确容忍可合理定义弱数值目标，问题在于强解释不能自动成立。",
+      "report_section": "六；十三 ABC-T01"
+    },
+    {
+      "id": "ABC-T02",
+      "category": "NECESSARY_TEXT_CLARIFICATION",
+      "subtype": "STABILITY_AND_NEW_MARKET_SCOPE",
+      "priority": "MEDIUM",
+      "status": "OPEN_BEFORE_RULE_FREEZE",
+      "title_zh": "明确2/3方向门与Agora末态保护的精确含义",
+      "evidence": [
+        {
+          "path": "increment/plan.zh.txt",
+          "location": "21,35-43",
+          "rationale_zh": "固定六格与均值门、逐seed保护、阈值非显著性。"
+        },
+        {
+          "path": "workspace/scripts/step29_english_abc.py",
+          "location": "success(), 74-78",
+          "rationale_zh": "逐seed C3保护与严格D方向数实现。"
+        }
+      ],
+      "fact_zh": "单seed方向成功为严格D_new<D_reference，0.005只用于均值；固定六格不含stage2对Agora的评价。",
+      "impact_zh": "不得误称每个方向成功seed均改善0.005，也不能把C3保护扩为学习Agora净获得不下降或排除所有少学Agora机制。",
+      "minimal_disposition_zh": "写明0.005/0.01是实际幅度/容忍，2/3是方向规则；新市场保护指C3末态排序水平。保留六格，不追加C2、CI或独立样本。",
+      "current_code_change_required": false,
+      "additional_formal_runs_required": false,
+      "report_section": "四4.3；六6.4；十三 ABC-T02"
+    },
+    {
+      "id": "ABC-T03",
+      "category": "NECESSARY_TEXT_CLARIFICATION",
+      "subtype": "EVIDENCE_VERSION_AND_COVERAGE",
+      "priority": "MEDIUM",
+      "status": "OPEN_TEXT_ONLY",
+      "title_zh": "区分CPU回执来源版本、局部恢复证据与未完成GPU终检",
+      "evidence": [
+        {
+          "path": "increment/implementation.zh.txt",
+          "location": "8-13",
+          "rationale_zh": "当前来源、CPU及GPU的说明需要按实际版本和完成范围解读。"
+        },
+        {
+          "path": "increment/cpu01/receipt.json",
+          "location": "sources.files",
+          "rationale_zh": "保留旧测试和两个旧GPU harness身份。"
+        },
+        {
+          "path": "increment/cpu02/receipt.json",
+          "location": "sources.files",
+          "rationale_zh": "9项当前依赖相符，2个GPU harness为较早版本。"
+        },
+        {
+          "path": "increment/source_manifest.json",
+          "location": "files",
+          "rationale_zh": "11项与现行workspace完全相符。"
+        },
+        {
+          "path": "increment/gpu_permit.json",
+          "location": "sources",
+          "rationale_zh": "GPU许可11项绑定现行workspace。"
+        },
+        {
+          "path": "workspace/tests/test_step29_english_abc.py",
+          "location": "72-110",
+          "rationale_zh": "实际新恢复证据为紧凑端点重建及错配置拒绝。"
+        },
+        {
+          "path": "workspace/gpu_probe.py",
+          "location": "89-95",
+          "rationale_zh": "参数变化终检、peak与result在两次更新之后，此次未到达。"
+        }
+      ],
+      "version_differences": [
+        {
+          "file": "workspace/gpu_probe.py",
+          "cpu_receipt_bytes": 4562,
+          "current_bytes": 4912
+        },
+        {
+          "file": "workspace/gpu_check.py",
+          "cpu_receipt_bytes": 6899,
+          "current_bytes": 7073
+        }
+      ],
+      "impact_zh": "不能把CPU02说成当前11文件全部动态核验；不能把局部settings恢复和首步更新日志扩大为全部恢复或GPU资格通过。",
+      "minimal_disposition_zh": "补版本沿革及执行范围：CPU02所测CPU依赖与现版一致；两个GPU harness随后更新并由现GPU许可绑定；保留原回执和失败记录，不覆盖旧SHA。按实际完成断言描述恢复和GPU证据。",
+      "current_code_change_required": false,
+      "repeat_full_cpu_required": false,
+      "repeat_gpu_required_now": false,
+      "why_not_reproducibility_defect_zh": "两个GPU脚本没有被CPU六项用例执行；现源码清单和GPU许可相符，未出现被测CPU行为的来源错配。",
+      "report_section": "五5.5；八；十10.3；十三 ABC-T03"
+    },
+    {
+      "id": "ABC-O01",
+      "category": "OPTIONAL",
+      "priority": "LOW",
+      "status": "OPTIONAL_IF_RULE_CHANGES",
+      "title_zh": "规则后续调整时加入容忍边界手写反例",
+      "evidence": [
+        {
+          "path": "workspace/tests/test_step29_english_abc.py",
+          "location": "157-171",
+          "rationale_zh": "现例只覆盖较大B2下降。"
+        }
+      ],
+      "impact_zh": "可防止以后把弱D目标和强末态保持目标混同。",
+      "minimal_disposition_zh": "若改成功函数，在既有受限CPU范围加第六节反例并检查选定行为；若仅补文且保留规则，不把重跑作为当前结案条件。",
+      "required_now": false,
+      "report_section": "十三 ABC-O01"
+    },
+    {
+      "id": "ABC-O02",
+      "category": "OPTIONAL",
+      "priority": "LOW",
+      "status": "OPTIONAL_IF_RECOVERY_WIRING_CHANGES",
+      "title_zh": "真实恢复接线后续改变时再定向检查新配置完整恢复",
+      "evidence": [
+        {
+          "path": "workspace/scripts/step29_vendorlink_run.py",
+          "location": "save_state/load_state, 51-73",
+          "rationale_zh": "未变完整状态路径保存并核对settings。"
+        },
+        {
+          "path": "workspace/tests/test_step29_english_abc.py",
+          "location": "97-108",
+          "rationale_zh": "当前新增用例不是正确中途恢复后续更新比较。"
+        }
+      ],
+      "impact_zh": "避免把紧凑端点重建扩大为所有恢复行为新验证。",
+      "minimal_disposition_zh": "只有实际新恢复接线发生改动时，补一个小的正确配置恢复后续更新用例；当前旧闭合行为复用，不全量重测。",
+      "required_now": false,
+      "report_section": "五5.5；十三 ABC-O02"
+    },
+    {
+      "id": "ABC-X01",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "priority": "NOT_REQUIRED",
+      "status": "EXCLUDED_FROM_CURRENT_REQUIREMENTS",
+      "title_zh": "不扩展本轮研究、数据权限、统计或通用工程范围",
+      "evidence": [
+        {
+          "path": "request.zh.txt",
+          "location": "18-22",
+          "rationale_zh": "限定静态/手写核对、分类和完整交付，不扩大研究范围。"
+        }
+      ],
+      "not_required": [
+        "上传或索取正文、真实账号、qrels、owners、Memory、权重或凭据",
+        "追加独立数据、整体bootstrap/CI或把群/query/seed当独立样本",
+        "追加VendorLink对称HPO、方法、候选、种子、顺序或完整大模型阶段pilot",
+        "因受限OOM擅自改骨干、精度、批量或长度，或无资源反复试跑",
+        "重开已关闭的旧方法/资格/结果，重复全仓测试或建设通用审计/调度平台"
+      ],
+      "minimal_disposition_zh": "未来独立英文最终确认等另立安排，不作为当前有限开发方案的必要闭合条件。",
+      "report_section": "十三 ABC-X01"
+    }
+  ],
+  "future_launch_conditions": [
+    {
+      "id": "ABC-P01",
+      "status": "REQUIRED_BEFORE_NEW_DEV_OPENING",
+      "kind": "SCIENTIFIC_INTERPRETATION_FREEZE",
+      "requirement_zh": "处置T01/T02，明确success和逐seed方向口径；新dev结果开放后不得再改门、候选或停止规则。",
+      "is_current_implemented_defect": false,
+      "evidence": [
+        {
+          "path": "increment/plan.zh.txt",
+          "location": "27-43",
+          "rationale_zh": "固定有限候选与成功规则。"
+        }
+      ]
+    },
+    {
+      "id": "ABC-P02",
+      "status": "ACKNOWLEDGED_NOT_DEPLOYED",
+      "kind": "DEV_EVALUATION_AND_OLD_ENDPOINTS",
+      "requirement_zh": "实际接通旧12轨迹36端点dev前置及新六格评价，核原模型配置/来源/view顺序/query权重；旧Settings新增字段按旧默认解释，保留盲分数数值形状门与dev读取边界。",
+      "is_current_implemented_defect": false,
+      "evidence": [
+        {
+          "path": "increment/implementation.zh.txt",
+          "location": "4",
+          "rationale_zh": "明确开发评价未部署。"
+        },
+        {
+          "path": "workspace/scripts/step29_vendorlink_run.py",
+          "location": "51-73,231-238",
+          "rationale_zh": "保存/严格settings恢复与盲评分基本路径。"
+        }
+      ]
+    },
+    {
+      "id": "ABC-P03",
+      "status": "ACKNOWLEDGED_NOT_DEPLOYED",
+      "kind": "ADAPTIVE_SELECTION_AND_EXACT_PAIRING",
+      "requirement_zh": "以精确seed集合及配置/方法/端点身份建立唯一配对；去重、最多8配置/2个seed8候选/最终15条和完整六格门接入实际入口；新候选各自初始化和产生教师，缺项不选择。",
+      "is_current_implemented_defect": false,
+      "evidence": [
+        {
+          "path": "workspace/scripts/step29_english_abc.py",
+          "location": "33-86",
+          "rationale_zh": "纯函数只查数值和行数，匿名行按位置配对。"
+        },
+        {
+          "path": "increment/implementation.zh.txt",
+          "location": "4,6",
+          "rationale_zh": "完整候选控制器明确未部署。"
+        }
+      ]
+    },
+    {
+      "id": "ABC-P04",
+      "status": "ACKNOWLEDGED_NOT_DEPLOYED",
+      "kind": "TWO_SLOT_CAMPAIGN_AND_WORKER_BUDGET",
+      "requirement_zh": "新ABC最多2槽gate；全批持久退休和费用/在途承诺；成功释放余额；单条8h服从训练48h/总55h；健康槽完成本轮独立任务但失败阻断依赖；每次补槽重新核实际资源及未反映预留。",
+      "is_current_implemented_defect": false,
+      "evidence": [
+        {
+          "path": "workspace/scripts/step28_formal_queue.py",
+          "location": "39-52,171-186,263-327",
+          "rationale_zh": "旧gate仅1/3或1槽，固定整队预留且每调用重置退休；不能直接承接新适应性整批。"
+        }
+      ]
+    },
+    {
+      "id": "ABC-P05",
+      "status": "REQUIRED_ON_ACTUAL_NEW_WIRING",
+      "kind": "WORKER_BUDGET_RACE_AND_FIRST_UPDATE_OBSERVER",
+      "requirement_zh": "真实worker预算继承CHAIN-R01逐文件消失容忍并保留共享disk/small/reserve/free/time/RSS；首步observer匹配ABC日志schema/路径或真实更新回调；对这些新增接线做限定手写验证。",
+      "is_current_implemented_defect": false,
+      "evidence": [
+        {
+          "path": "workspace/scripts/step28_formal_queue.py",
+          "location": "139-151",
+          "rationale_zh": "修后安全采集helper。"
+        },
+        {
+          "path": "workspace/scripts/step28_formal_wait.py",
+          "location": "103-119",
+          "rationale_zh": "旧observer只看role=current。"
+        },
+        {
+          "path": "workspace/scripts/step29_vendorlink_run.py",
+          "location": "197-199",
+          "rationale_zh": "ABC日志无role字段。"
+        },
+        {
+          "path": "prior/chain_repair_review.zh.txt",
+          "location": "48-81",
+          "rationale_zh": "历史修复必须作用真实worker，不只是父queue。"
+        }
+      ]
+    },
+    {
+      "id": "ABC-P06",
+      "status": "GPU_QUALIFICATION_FAILED_STOPPED",
+      "kind": "GPU_AND_ALL_TASK_MEMORY_ENVELOPE",
+      "requirement_zh": "后续重试须符合失败停止规则及明确许可/资源。新资格取得当前/历史/教师和参数终检及适用峰值；双路需真实重叠更新与资源依据。显存承诺覆盖正式五系统，可复用旧Vendor适用峰值，不能只用H三pooling的worst或FOREVER9+1/规划20GiB。当前不要求立即重试。",
+      "is_current_implemented_defect": false,
+      "evidence": [
+        {
+          "path": "increment/gpu/gpu_ledger.json",
+          "location": "status,completed,used",
+          "rationale_zh": "FAILED_NO_RETRY且completed为空。"
+        },
+        {
+          "path": "workspace/gpu_probe.py",
+          "location": "82-95",
+          "rationale_zh": "第二步失败，终检未完成。"
+        },
+        {
+          "path": "workspace/gpu_check.py",
+          "location": "40-45,98-105",
+          "rationale_zh": "只在H三pooling间选worst并计划双路。"
+        },
+        {
+          "path": "prior/old_vendorlink_gpu.json",
+          "location": "ledger.g1_nvml",
+          "rationale_zh": "旧Vendor峰值高于旧H_full。"
+        }
+      ]
+    },
+    {
+      "id": "ABC-P07",
+      "status": "FORMAL_START_AUTHORIZATION_ABSENT",
+      "kind": "FINAL_SOURCE_BINDING_REVIEW_AND_AUTHORIZATION",
+      "requirement_zh": "完成实际新增入口定向核验/审查与主执行者处置，更新来源及累计账；取得正式候选训练和旧模型dev评分开始指令。当前不得建自动开训监听，GPU短步许可不能替代正式许可。",
+      "is_current_implemented_defect": false,
+      "evidence": [
+        {
+          "path": "increment/plan.zh.txt",
+          "location": "8,49-60",
+          "rationale_zh": "正式训练/评分关闭、有限核验、启动前提及不自动重试。"
+        },
+        {
+          "path": "increment/budget.json",
+          "location": "formal_training_authorized,gpu_qualification_passed",
+          "rationale_zh": "两者为false。"
+        }
+      ]
+    }
+  ],
+  "review_execution": {
+    "project_code_imported_or_run": false,
+    "project_tests_run": false,
+    "model_loaded": false,
+    "training_or_inference_run": false,
+    "formal_text_or_labels_read": false,
+    "statistics_resampling_run": false,
+    "network_research_or_server_access": false,
+    "input_files_modified": false,
+    "allowed_checks_zh": "ZIP/JSON/哈希/文本差异；保存数字简单算术；独立手写数字核对；审查文件生成。"
+  },
+  "classification_summary": {
+    "SCIENTIFIC_BLOCKER": 0,
+    "REPRODUCIBILITY_DEFECT": 0,
+    "NECESSARY_TEXT_CLARIFICATION": 3,
+    "OPTIONAL": 2,
+    "OUT_OF_SCOPE_OVERDESIGN": 1,
+    "acknowledged_future_launch_conditions_not_counted_as_defects": 7
+  }
+}

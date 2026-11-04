@@ -161,6 +161,17 @@ class EnglishABC(unittest.TestCase):
         self.assertFalse(policy.basic_quality(low,old))
         self.assertTrue(policy.success([good]*3,[old]*3,[old]*3,final=True)['passed'])
         self.assertFalse(policy.success([low]*3,[old]*3,[old]*3,final=True)['passed'])
+        # The original .005 initial-learning tolerance must not itself supply
+        # the entire .005 forgetting gain while terminal Dream stays unchanged.
+        reference = dict(B2=.8,B3=.7,C3=.8,A3=.8)
+        lower_start = {**reference,'B2':.795}
+        self.assertTrue(policy.basic_quality(lower_start,reference))
+        for final,count in ((False,2),(True,3)):
+            verdict=policy.success([lower_start]*count,[reference]*count,[reference]*count,final=final)
+            self.assertFalse(verdict['checks']['dream_final'])
+            self.assertFalse(verdict['passed'])
+        improved = {**reference,'B3':.706}
+        self.assertTrue(policy.success([improved]*3,[reference]*3,[reference]*3,final=True)['passed'])
         bad_seed = [good,good,{**good,'C3':.889}]
         self.assertFalse(policy.success(bad_seed,[old]*3,[old]*3,final=True)['passed'])
         self.assertFalse(policy.precheck([{**old,'B3':.96}]*3))
@@ -168,7 +179,9 @@ class EnglishABC(unittest.TestCase):
         self.assertLess(policy.selection_key('P0',policy.baseline(),old,old,old),
                         policy.selection_key('P1',policy.candidate('P1'),old,old,old))
         EVIDENCE['selection'] = {'false_no_forgetting_rejected':True,'bad_agora_seed_rejected':True,
-                                 'missing_seed_rejected':True,'no_vendor_forgetting_stops':True,'tie_favors_simple':True}
+                                 'missing_seed_rejected':True,'no_vendor_forgetting_stops':True,'tie_favors_simple':True,
+                                 'lower_start_same_terminal_rejected_in_both_phases':True,
+                                 'required_terminal_gain':.005}
 
     def test_two_real_children_failure_retirement_and_refill(self):
         # Only NVML/resource readings are handwritten; child process execution is real.

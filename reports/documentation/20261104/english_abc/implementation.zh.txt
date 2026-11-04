@@ -9,6 +9,9 @@ Linux独立workspace部署11文件，SFTP后按source_manifest逐项大小/SHA�
 
 CPU证据含手算CLS/末层mean/四层sum mean、padding零梯度、四个层输出各自梯度；真实tiny BERT的current＋history更新和六更新三阶段execute，三个端点及配置保存恢复一致；BCE配比变化与独立softplus参考的梯度差在当前/历史分支分别一致，hard置零确实改变两分支梯度；有效学习率直接作用Adam参数组，末步零lr不更新、非零lr发生真实更新；低初学伪少忘、单seed Agora退步、缺种子、Vendor无遗忘及tie反例；两真实小子进程中槽0失败退休，槽1完成剩余，缺项不开放。两槽证据调用的是现有dispatch内核，模拟的是NVML，不是GPU大模型并发；还未验证新正式入口及跨小轮永久退休接线。
 
+用户随后确认收紧Dream末态标准。success的dream_final已改为B3_new≥max(B3_originalH,B3_Vendor)+.005；同时约束两seed冻结门和三seed复核门。CPU03补上B2从.800降到.795、B3保持.700的反例：基本质量门可通过，但两阶段success均拒绝；另核对B3提升到.706的正例。Linux py310六项全过，4.485688秒收费5秒，CPU累计14/1800秒；实际来源见cpu03/receipt.json，原CPU01/02及送审包均保留。没有运行新候选、读取开发标签或追加GPU尝试。
+来源与覆盖补充：CPU02与首轮送审版的9项CPU相关来源一致，gpu_probe.py/gpu_check.py则在其后更新；这两个GPU脚本没有被六项CPU用例动态执行，不能因同列在receipt就说全部11项行为通过。CPU03的source清单绑定更新后的11项，但动态覆盖仍限相同六项CPU行为。保存恢复证据具体为紧凑端点按新设置重建且records相等、错误pooling被完整load_state拒绝；没有新增正确配置中途恢复后继续训练的完整比较，未变部分复用旧闭合证据。
+
 GPU：服务器21:58只读观察12.14GiB空闲，中文HPO父4159100及trial01子423743/423744/423745仍活动，未读HPO效果。用户随后明确要求尝试单路，按实际12,430MiB空闲设置本次allocator11,406MiB、PID监测12,174MiB；候选优先mean_last4_sum，批量8/每通道256/32条记录/FP32均不变。既有英文BERT＋手写数据，首个current＋history真实更新完成3.439656秒；第二次更新的history编码CUDA OOM，进程约11.76GiB、PyTorch允许11.14GiB，尚差一次完整更新。父耗时13.593791秒，收费14秒，保留ledger/stdout/updates，GPU资格失败停止，无自动重试；mean_last、cls和两路未启动。
 本次OOM只证明该受限分配/共享现场未通过，不证明整卡空闲时单路或双路不可能。结束后空闲回到12,430MiB，中文HPO三子进程PID/创建时刻/父子身份保持；没有修改/停止其作业。GPU本轮1800秒短测额度已用14，但余额本身不授予失败重试。此前已完成的单路资格和本次新表示资格分开记录。
 

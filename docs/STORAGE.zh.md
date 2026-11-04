@@ -1,11 +1,13 @@
 # 科研文件存储与恢复
 ## 2026-11-04 ABC英文适配准备材料
 
-[独立目录](../reports/documentation/20261104/english_abc/)保留完整方案、当前增量源码身份、CPU01/02原失败与通过证据、GPU单路失败的日志/真实更新记录及预算。11项必要来源通过SFTP部署至Linux同名目录的workspace，原formal_chain和活动history_wait源码未覆盖；开发导出只核已有manifest元数据，没有读取其正文或标签。CPU01错误测试捕获器原文件单独保留，失败费用不清零。
+[独立目录](../reports/documentation/20261104/english_abc/)保留完整方案、当前增量源码身份、CPU01—06原失败与通过证据、GPU单路失败的日志/真实更新记录及预算。初次11来源，新增独立监听及测试后为13来源，通过SFTP部署至Linux同名目录的workspace；原formal_chain和活动history_wait源码未覆盖；开发导出只核已有manifest元数据，没有读取其正文或标签。CPU01错误测试捕获器原文件单独保留，失败费用不清零。
 
-source_bundle.zip为初次11来源传输及CPU01的冻结快照；CPU02只修测试捕获器，随后GPU单路尝试来源/限额变化由各实际receipt、当前source_manifest和gpu_permit区分，不把新GPU入口说成已由先前CPU执行。外审包[清单](../reports/documentation/20261104/english_abc/review/package_manifest.json)包含39载荷，141943字节、SHA256 5682b0e12e62d98c85a5c59aeb9dcbb63dc018beb7987499b69f7bf624d65248；只含方案、源码、手写证据和必要旧审查/结果摘要，不含科研数据/模型载荷或凭据。具体目的地和提交身份见[原件](../reports/documentation/20261104/english_abc/review/submission.json)。外审未结案前保留该实际送审包，不覆盖原件。
+source_bundle.zip为初次11来源传输及CPU01的冻结快照；CPU02只修测试捕获器，随后GPU单路尝试来源/限额变化由各实际receipt、当前source_manifest和gpu_permit区分，不把新GPU入口说成已由先前CPU执行。原[39载荷送审包](../reports/documentation/20261104/english_abc/review/package_manifest.json)141943字节、SHA256 5682b0e12e62d98c85a5c59aeb9dcbb63dc018beb7987499b69f7bf624d65248保留实际旧门及来源版本；[完整四文件审查回收](../reports/documentation/20261104/english_abc/review/recovery.json)、[主审处置](../reports/documentation/20261104/english_abc/review/primary_disposition.zh.txt)及严格B3门的定向回复保留。新增监听送审包保存CPU04的原监听版本，自删增量包和CPU05对应最终来源；这些输入快照承担不同历史执行/审查版本恢复用途。所有包只含方案、源码、手写小证据和必要旧审查/结果摘要，不含科研数据/模型载荷或凭据。
 
-本批未产生正式候选权重。手写GPU尝试在第二次更新OOM并退出，只有一次完成更新记录，不能从没有完整result.json推断没有做过更新。ABC旧36权重继续保留，中文H27及活动HPO保持。根docs只维护Windows，本地提交不推送；后续外审回收及双端核验另记实际回执，不重置大清理周期。
+本批未产生正式候选权重。原手写GPU尝试在第二次更新OOM并退出，只有一次完成更新记录，不能从没有完整result.json推断没有做过更新。新gpu_wait独立活动副本按用户要求首个真实更新后自删，保留workspace源码及许可/日志/state，不删除其他作业。ABC旧36权重继续保留，中文H27及活动HPO保持。根docs只维护Windows，本地提交不推送；双端同步以实际回执范围为准，不重置大清理周期。
+
+23:20:50的[本轮同步核对](../reports/documentation/20261104/english_abc/closeout_sync.json)确认49项当前材料/保留来源大小与SHA一致；13来源和活动副本另在启动前核对，活动副本及持续变化的state不在同步覆盖范围。CPU06补齐异常首更自删，累计CPU20秒。返回审查ZIP两份冗余下载经四原件及内容哈希验收后删除，原件在review/external，删除记录并入recovery.json；新监听输入ZIP仅Windows保留，承担CPU04/05不同旧来源恢复用途。启动后运行费用继续Linux状态账，budget.json是注明时点的核账快照。
 
 ## 2026-11-04 VendorLink结果回传与保管
 

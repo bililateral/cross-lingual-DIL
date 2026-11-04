@@ -1,17 +1,24 @@
 {
-  "status": "PREPARATION_CPU_COMPLETE_GPU_ATTEMPT_FAILED_REVIEW_PENDING",
+  "status": "REVIEWS_CLOSED_GPU_WAITER_ACTIVE_WAIT_RESOURCE",
   "limits_seconds": {"training": 172800, "gpu_qualification_and_evaluation": 10800, "auxiliary": 14400},
   "preparation_subcaps_seconds": {"cpu": 1800, "gpu_worker": 1800},
   "events": [
     {"action": "cpu01", "actual_seconds": 3.927985476097092, "charged_seconds": 4, "result": "5 passed, 1 test observer error under no_grad; original failure retained"},
     {"action": "cpu02", "actual_seconds": 4.395824076142162, "charged_seconds": 5, "result": "6 passed after correcting only the gradient observer"},
+    {"action": "cpu03", "actual_seconds": 4.485687707085162, "charged_seconds": 5, "result": "6 passed including stricter terminal Dream gate and lower-start/unchanged-terminal counterexample"},
+    {"action": "cpu04", "actual_seconds": 1.1412427839823067, "charged_seconds": 2, "result": "3 fast waiter CPU checks passed; NVML handwritten, real small subprocesses, no GPU/model"},
+    {"action": "cpu05", "actual_seconds": 1.1431105721276253, "charged_seconds": 2, "result": "4 waiter checks passed including first-real-update self-deletion and continued serial dispatch"},
+    {"action": "cpu06", "actual_seconds": 1.1375807290896773, "charged_seconds": 2, "result": "5 waiter checks passed, including update receipt landing at a monitor exception; original error and charges preserved"},
     {"action": "gpu_single_attempt", "actual_seconds": 13.593790758168325, "charged_seconds": 14, "result": "1 actual update; second history encoding OOM at permitted allocator cap; no retry"},
-    {"action": "active_preparation_through_review_package", "charged_seconds": 1200, "conservative": true, "note": "Finite preparation charge including source/document inspection, edits, SSH/SFTP, deployment and failed read-only path probes; excludes passive waits and approval/login waiting"}
+    {"action": "active_preparation_through_review_package", "charged_seconds": 1200, "conservative": true, "note": "Finite preparation charge including source/document inspection, edits, SSH/SFTP, deployment and failed read-only path probes; excludes passive waits and approval/login waiting"},
+    {"action": "review_recovery_and_waiter_preparation", "charged_seconds": 1200, "conservative": true, "note": "Scientific threshold repair, review recovery/disposition, read-only HPO scheduling inspection, waiter implementation and incremental package; passive web generation excluded; includes failed UI text selector and Windows glob lookup"},
+    {"action": "bounded_final_preparation_and_delivery", "charged_seconds": 300, "conservative": true, "note": "Finite allowance charged for final source/permit/SFTP checks, launch/observation, documentation and local commit; listener runtime active checks are separately metered in gpu_wait/state/status.json, not this tail"},
+    {"action": "gpu_wait_runtime_snapshot", "actual_seconds": 0.5779397876467556, "charged_seconds": 1, "as_of_server_time": "2026-11-04T23:16:18.369212+08:00", "note": "Snapshot of active auxiliary checks only; idle sleeps excluded. Replace this snapshot with a later cumulative value when reconciled, do not add overlapping snapshots. Live authoritative ledger: gpu_wait/state/status.json on Linux."}
   ],
-  "used_seconds": {"training": 0, "gpu_qualification_and_evaluation": 14, "auxiliary": 1209},
-  "total_charged_seconds": 1223,
+  "used_seconds": {"training": 0, "gpu_qualification_and_evaluation": 14, "auxiliary": 2721},
+  "total_charged_seconds": 2735,
   "formal_training_authorized": false,
   "gpu_qualification_passed": false,
   "automatic_gpu_retry": false,
-  "note": "Original VendorLink and Chinese HPO ledgers are unchanged. These preparation fees carry into the proposed 55-hour ABC budget; unused allowance does not authorize a retry or formal start. Review closeout increments recorded when performed."
+  "note": "Original VendorLink and Chinese HPO ledgers are unchanged. Fees carry into the proposed 55-hour ABC budget. One separately authorized single-GPU waiter is active; unused allowance still does not authorize repeated failures or formal experiments. This file is a reconciliation snapshot; subsequent waiter costs continue in its live state."
 }

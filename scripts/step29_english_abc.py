@@ -67,7 +67,7 @@ def success(new, original, vendor, final=False):
     checks = dict(dream_forgetting_original=n['D'] <= h['D']-QUALITY_MARGIN,
                   dream_forgetting_vendor=n['D'] <= v['D']-QUALITY_MARGIN,
                   dream_initial=n['B2'] >= h['B2']-QUALITY_MARGIN,
-                  dream_final=n['B3'] >= max(h['B3'], v['B3'])-QUALITY_MARGIN,
+                  dream_final=n['B3'] >= max(h['B3'], v['B3'])+QUALITY_MARGIN,
                   agora_new=n['C3'] >= max(h['C3'], v['C3'])-QUALITY_MARGIN,
                   alphabay_old=n['A3'] >= h['A3']-QUALITY_MARGIN,
                   vendor_forgetting_present=v['D'] > 0,

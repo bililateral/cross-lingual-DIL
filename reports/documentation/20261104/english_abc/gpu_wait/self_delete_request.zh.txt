@@ -1,0 +1,4 @@
+仅补审监听的最后两处改动，不重复上一轮。
+用户最新明确要求“确认单路GPU校验开始后，监听脚本会自删吧”。已实现：observe_update核当前自有probe的PID、updates.json中optimizer_updates=1和有效区间后，仅删除许可绑定、非symlink且属本用户的gpu_wait/active_gpu_wait.py；先写事件，删除成功后更新listener_deleted=true；workspace源码、state、许可和日志保留。main单独核活动副本的身份及其与保留源码的大小/SHA相同；活动副本不加入probe的sources，因此第一步后自删不会破坏后续两个probe来源验证。loop中及子进程退出后均观察，覆盖两次轮询之间完成的情况。无更新或启动前失败不删。
+另将开始关闭时刻从295秒提前到280秒，为queue.stop的TERM5秒/KILL10秒预留，300秒上限和实际计费不变。没有修改probe/model/中文调度，未运行新GPU。
+CPU05在Linux py310四项全部通过，1.1431105721276253秒，收费2，CPU累计18秒；原CPU04和旧GPU14秒保留。附件是实际修改后listener/test、CPU05回执/日志及清单。请只静态复核以上自删、后续来源与关闭余量，回复完整中文意见600字以内，不再生成ZIP，不要求全量测试；前轮已通过部分复用。监听仍待这一小段核对及主审绑定后启动。

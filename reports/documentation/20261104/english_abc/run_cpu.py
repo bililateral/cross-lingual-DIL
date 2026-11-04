@@ -16,6 +16,8 @@ p = argparse.ArgumentParser()
 p.add_argument('--workspace', type=Path, required=True)
 p.add_argument('--job', type=Path, required=True)
 p.add_argument('--prior', type=int, required=True)
+p.add_argument('--test', choices=('test_step29_english_abc.py', 'test_step29_english_gpu_wait.py'),
+               default='test_step29_english_abc.py')
 args = p.parse_args()
 if sys.platform != 'linux' or args.job.exists() or not 0 <= args.prior < 1800:
     raise ValueError('Fresh Linux attempt and remaining CPU allowance required')
@@ -29,7 +31,7 @@ env = {**os.environ, 'OMP_NUM_THREADS':'1', 'MKL_NUM_THREADS':'1', 'OPENBLAS_NUM
        'TOKENIZERS_PARALLELISM':'false', 'CUDA_VISIBLE_DEVICES':'', 'TRANSFORMERS_OFFLINE':'1',
        'HF_HUB_OFFLINE':'1', 'PYTHONDONTWRITEBYTECODE':'1', 'TMPDIR':str(args.job),
        'ABC_TEST_ROOT':str(args.job), 'PYTHONPATH':str(args.workspace/'scripts')+':'+str(args.workspace/'tests')}
-command = [sys.executable, '-B', str(args.workspace/'tests/test_step29_english_abc.py')]
+command = [sys.executable, '-B', str(args.workspace/'tests'/args.test)]
 started, peak, reason = time.monotonic(), 0, None
 with (args.job/'console.txt').open('w') as output:
     child = subprocess.Popen(command,cwd=args.workspace,env=env,stdout=output,stderr=subprocess.STDOUT,start_new_session=True)
