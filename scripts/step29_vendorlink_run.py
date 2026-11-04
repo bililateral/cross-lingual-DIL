@@ -83,7 +83,8 @@ def set_rates(optimizer, settings, update, total):
         warmup = min(total, math.ceil(.1*total))
         factor = update/warmup if update <= warmup else (total-update)/(total-warmup)
         optimizer.param_groups[0]["lr"] = settings.encoder_lr*settings.lr_multiplier*factor
-        optimizer.param_groups[1]["lr"] = settings.head_lr*settings.lr_multiplier
+        head_factor = factor if settings.head_schedule == 'encoder' else 1.
+        optimizer.param_groups[1]["lr"] = settings.head_lr*settings.lr_multiplier*head_factor
 
 
 def execute(model, load_fit, job, *, order, seed, epochs, identity, check=lambda: None, resume=None,

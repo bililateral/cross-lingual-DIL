@@ -1,0 +1,50 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261104/english_abc/workspace/gpu_probe.py", line 98, in <module>
+    if __name__=='__main__':main()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261104/english_abc/workspace/gpu_probe.py", line 85, in main
+    logs=method.update_h(model,optimizer,current,history,teacher,700+update,check)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261104/english_abc/workspace/scripts/step29_vendorlink_methods.py", line 260, in update_h
+    logs["history"] = model.backward_h(history, seed_for(step_seed, "history"), teacher, True, check)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261104/english_abc/workspace/scripts/step29_vendorlink_methods.py", line 205, in backward_h
+    z = self.records(group, check)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261104/english_abc/workspace/scripts/step29_vendorlink_methods.py", line 192, in records
+    output, mask = self.encode(texts[start:start+self.settings.microbatch], self.settings.channel_tokens,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261104/english_abc/workspace/scripts/step29_vendorlink_methods.py", line 183, in encode
+    output = self.encoder(**features, output_hidden_states=hidden, return_dict=True)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 1142, in forward
+    encoder_outputs = self.encoder(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 695, in forward
+    layer_outputs = layer_module(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 585, in forward
+    self_attention_outputs = self.attention(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 515, in forward
+    self_outputs = self.self(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 409, in forward
+    value_layer = self.transpose_for_scores(self.value(current_states))
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 20.00 MiB. GPU 0 has a total capacity of 31.32 GiB of which 382.06 MiB is free. Process 423744 has 6.33 GiB memory in use. Process 423745 has 6.32 GiB memory in use. Process 423743 has 6.29 GiB memory in use. Including non-PyTorch memory, this process has 11.76 GiB memory in use. 11.14 GiB allowed; Of the allocated memory 10.95 GiB is allocated by PyTorch, and 178.55 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

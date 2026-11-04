@@ -1,0 +1,17 @@
+{
+  "status": "PREPARATION_CPU_COMPLETE_GPU_ATTEMPT_FAILED_REVIEW_PENDING",
+  "limits_seconds": {"training": 172800, "gpu_qualification_and_evaluation": 10800, "auxiliary": 14400},
+  "preparation_subcaps_seconds": {"cpu": 1800, "gpu_worker": 1800},
+  "events": [
+    {"action": "cpu01", "actual_seconds": 3.927985476097092, "charged_seconds": 4, "result": "5 passed, 1 test observer error under no_grad; original failure retained"},
+    {"action": "cpu02", "actual_seconds": 4.395824076142162, "charged_seconds": 5, "result": "6 passed after correcting only the gradient observer"},
+    {"action": "gpu_single_attempt", "actual_seconds": 13.593790758168325, "charged_seconds": 14, "result": "1 actual update; second history encoding OOM at permitted allocator cap; no retry"},
+    {"action": "active_preparation_through_review_package", "charged_seconds": 1200, "conservative": true, "note": "Finite preparation charge including source/document inspection, edits, SSH/SFTP, deployment and failed read-only path probes; excludes passive waits and approval/login waiting"}
+  ],
+  "used_seconds": {"training": 0, "gpu_qualification_and_evaluation": 14, "auxiliary": 1209},
+  "total_charged_seconds": 1223,
+  "formal_training_authorized": false,
+  "gpu_qualification_passed": false,
+  "automatic_gpu_retry": false,
+  "note": "Original VendorLink and Chinese HPO ledgers are unchanged. These preparation fees carry into the proposed 55-hour ABC budget; unused allowance does not authorize a retry or formal start. Review closeout increments recorded when performed."
+}

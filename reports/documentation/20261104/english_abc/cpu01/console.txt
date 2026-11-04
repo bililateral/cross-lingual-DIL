@@ -1,0 +1,27 @@
+test_actual_records_reach_four_layers_and_saved_endpoints (__main__.EnglishABC) ... ERROR
+test_effective_rates_and_adam_parameter_effect (__main__.EnglishABC) ... ok
+test_loss_weights_affect_both_branches_and_independent_bce_gradient (__main__.EnglishABC) ... ok
+test_pool_independent_values_padding_and_each_layer_gradients (__main__.EnglishABC) ... ok
+test_selection_rejects_low_initial_learning_and_missing_pairs (__main__.EnglishABC) ... ok
+test_two_real_children_failure_retirement_and_refill (__main__.EnglishABC) ... ok
+
+======================================================================
+ERROR: test_actual_records_reach_four_layers_and_saved_endpoints (__main__.EnglishABC)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261104/english_abc/workspace/tests/test_step29_english_abc.py", line 87, in test_actual_records_reach_four_layers_and_saved_endpoints
+    teacher = model.teacher(g)+.2
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261104/english_abc/workspace/scripts/step29_vendorlink_methods.py", line 225, in teacher
+    return self.table(self.records(group, check)).float().cpu().clone()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261104/english_abc/workspace/scripts/step29_vendorlink_methods.py", line 192, in records
+    output, mask = self.encode(texts[start:start+self.settings.microbatch], self.settings.channel_tokens,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261104/english_abc/workspace/tests/test_step29_english_abc.py", line 82, in capture
+    value.retain_grad()
+RuntimeError: can't retain_grad on Tensor that has requires_grad=False
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.874s
+
+FAILED (errors=1)

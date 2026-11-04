@@ -1,4 +1,12 @@
 # 科研文件存储与恢复
+## 2026-11-04 ABC英文适配准备材料
+
+[独立目录](../reports/documentation/20261104/english_abc/)保留完整方案、当前增量源码身份、CPU01/02原失败与通过证据、GPU单路失败的日志/真实更新记录及预算。11项必要来源通过SFTP部署至Linux同名目录的workspace，原formal_chain和活动history_wait源码未覆盖；开发导出只核已有manifest元数据，没有读取其正文或标签。CPU01错误测试捕获器原文件单独保留，失败费用不清零。
+
+source_bundle.zip为初次11来源传输及CPU01的冻结快照；CPU02只修测试捕获器，随后GPU单路尝试来源/限额变化由各实际receipt、当前source_manifest和gpu_permit区分，不把新GPU入口说成已由先前CPU执行。外审包[清单](../reports/documentation/20261104/english_abc/review/package_manifest.json)包含39载荷，141943字节、SHA256 5682b0e12e62d98c85a5c59aeb9dcbb63dc018beb7987499b69f7bf624d65248；只含方案、源码、手写证据和必要旧审查/结果摘要，不含科研数据/模型载荷或凭据。具体目的地和提交身份见[原件](../reports/documentation/20261104/english_abc/review/submission.json)。外审未结案前保留该实际送审包，不覆盖原件。
+
+本批未产生正式候选权重。手写GPU尝试在第二次更新OOM并退出，只有一次完成更新记录，不能从没有完整result.json推断没有做过更新。ABC旧36权重继续保留，中文H27及活动HPO保持。根docs只维护Windows，本地提交不推送；后续外审回收及双端核验另记实际回执，不重置大清理周期。
+
 ## 2026-11-04 VendorLink结果回传与保管
 
 [本轮结果目录](../reports/seller_alias_continual/20261104/vendorlink_result/)保留811份172378651字节：216盲分数JSON、216逐query指标JSON、36条完整更新/工作量/完成/访问/进程记录、批次配置和65份Linux实际来源。[SFTP清单](../reports/seller_alias_continual/20261104/vendorlink_result/receive_manifest.json)与[接收回执](../reports/seller_alias_continual/20261104/vendorlink_result/receive.json)逐文件大小/SHA一致；[保存字段核对](../reports/seller_alias_continual/20261104/vendorlink_result/saved_check.json)只检查字段、计数及既存指标简单算术，没有新标签解析或科学重算。原正文、qrels、owners、模型/Memory载荷留Linux，未回传。原冻结账和原结果不覆盖，新增活跃用时按[同桶增量账](../reports/seller_alias_continual/20261104/vendorlink_result/budget.json)保管。

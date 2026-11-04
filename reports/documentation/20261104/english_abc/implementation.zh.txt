@@ -1,0 +1,15 @@
+ABC方案准备：实际实现与证据边界
+2026-11-04，正式实验关闭。
+
+本轮交付对象首先是完整科研方案及其必要核验、外审；关键计算已有增量实现，尚未把全批适应性搜索/开发评价接成并部署一个获准正式控制器。不能将本次内核核验冒称“全批已可一键开训”，也不能把旧VendorLink固定36条的formal入口直接用于新候选。正式启用前仍需按冻结方案接好开发读取门、全批预算、跨小轮退休状态、候选去重/选择与最终15条完整门，并针对实际新增接线补核验/审查；本次不制作approved=true的正式门、不启动前置开发评分或正式监听。
+
+现已修改实际单轨迹调用的step29_vendorlink_methods.py和step29_vendorlink_run.py：Settings增加pooling/head_schedule/bce_weight/hard_weight默认保持旧行为；records在训练、教师和score共用路径调用text_pool，mean_last4_sum取四个Transformer层、mask排除padding，归一化/拼接保持；h_objective的当前和历史监督共用新bce/hard配比；set_rates把head调度接入真实优化器参数组。原single trajectory CLI从config.settings构造Settings，run.execute的实际三阶段及保存/恢复路径消费这些设置。新step29_english_abc.py提供有限候选、质量门、选序、前置停止和开发成功函数，不执行I/O或派发，不以该文件存在宣称全批编排已实现。
+
+Linux独立workspace部署11文件，SFTP后按source_manifest逐项大小/SHA核对；不覆盖formal_chain或正在运行的history_wait/workspace。CPU01六项中五项通过，一项在教师no_grad下的测试捕获器错误调用retain_grad，未进入该项预定训练检查；保留原失败测试和全部输出，收费4秒。修正仅令捕获器在启用梯度时retain_grad；CPU02六项全通过，收费5秒，累计9/1800秒。不是修改教师no_grad或放宽科研验收。
+
+CPU证据含手算CLS/末层mean/四层sum mean、padding零梯度、四个层输出各自梯度；真实tiny BERT的current＋history更新和六更新三阶段execute，三个端点及配置保存恢复一致；BCE配比变化与独立softplus参考的梯度差在当前/历史分支分别一致，hard置零确实改变两分支梯度；有效学习率直接作用Adam参数组，末步零lr不更新、非零lr发生真实更新；低初学伪少忘、单seed Agora退步、缺种子、Vendor无遗忘及tie反例；两真实小子进程中槽0失败退休，槽1完成剩余，缺项不开放。两槽证据调用的是现有dispatch内核，模拟的是NVML，不是GPU大模型并发；还未验证新正式入口及跨小轮永久退休接线。
+
+GPU：服务器21:58只读观察12.14GiB空闲，中文HPO父4159100及trial01子423743/423744/423745仍活动，未读HPO效果。用户随后明确要求尝试单路，按实际12,430MiB空闲设置本次allocator11,406MiB、PID监测12,174MiB；候选优先mean_last4_sum，批量8/每通道256/32条记录/FP32均不变。既有英文BERT＋手写数据，首个current＋history真实更新完成3.439656秒；第二次更新的history编码CUDA OOM，进程约11.76GiB、PyTorch允许11.14GiB，尚差一次完整更新。父耗时13.593791秒，收费14秒，保留ledger/stdout/updates，GPU资格失败停止，无自动重试；mean_last、cls和两路未启动。
+本次OOM只证明该受限分配/共享现场未通过，不证明整卡空闲时单路或双路不可能。结束后空闲回到12,430MiB，中文HPO三子进程PID/创建时刻/父子身份保持；没有修改/停止其作业。GPU本轮1800秒短测额度已用14，但余额本身不授予失败重试。此前已完成的单路资格和本次新表示资格分开记录。
+
+实现核验通过的部分、未接线的正式部分、GPU未通过的部分和用户未授权启动的部分分别陈述。方案外审可独立进行，但最终正式运行前必须处理实际接线和资源资格缺口；不为外审好看删除负结果、失败日志或伪造多worker通过。

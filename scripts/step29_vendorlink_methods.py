@@ -37,12 +37,36 @@ class Settings:
     vendor_tokens: int = 512
     memory_groups: int = 6
     memory_bytes: int = 1048576
+    pooling: str = 'cls'
+    head_schedule: str = 'constant'
+    bce_weight: float = 1.
+    hard_weight: float = .5
 
     def __post_init__(self):
         if self.method not in METHODS or min(self.microbatch, self.vendor_batch, self.memory_groups) < 1:
             raise ValueError("Invalid method or batch/memory capacity")
         if not 2 <= self.channel_tokens <= 256 or not 4 <= self.vendor_tokens <= 512:
             raise ValueError("Explicit BERT input bounds required")
+        if self.pooling not in ('cls', 'mean_last', 'mean_last4_sum') or self.head_schedule not in ('constant', 'encoder'):
+            raise ValueError('Unknown English pooling/head schedule')
+        if not all(math.isfinite(v) and v >= 0 for v in (self.bce_weight, self.hard_weight)):
+            raise ValueError('Nonnegative finite supervision weights required')
+
+
+def text_pool(output, mask, pooling):
+    if pooling == 'cls':
+        return output.last_hidden_state[:, 0].float()
+    if pooling == 'mean_last':
+        values = output.last_hidden_state.float()
+    elif pooling == 'mean_last4_sum':
+        if output.hidden_states is None or len(output.hidden_states) < 5:
+            raise ValueError('Four Transformer layer outputs required, excluding embeddings')
+        values = torch.stack(output.hidden_states[-4:]).sum(0).float()
+    else:
+        raise ValueError('Unknown text pooling')
+    if mask.shape != values.shape[:2] or (mask.sum(1) == 0).any():
+        raise ValueError('Aligned nonempty attention mask required')
+    return (values * mask.unsqueeze(-1)).sum(1) / mask.sum(1, keepdim=True)
 
 
 def vendor_embeddings(hidden_states, mask):
@@ -85,7 +109,7 @@ def h_pool(table, slots):
     return torch.stack(values)
 
 
-def h_loss(scores, labels, n, rank_weight):
+def h_loss(scores, labels, n, rank_weight, bce_weight=1., hard_weight=.5):
     if scores.shape != (n*(n-1)//2,) or labels.shape != scores.shape:
         raise ValueError("Unordered account-pair scores/labels mismatch")
     if not torch.isin(labels, labels.new_tensor([0, 1])).all():
@@ -110,7 +134,7 @@ def h_loss(scores, labels, n, rank_weight):
     # Preserve the existing unweighted mean over unordered pairs.
     bce = F.binary_cross_entropy_with_logits(scores, labels)
     rank, hard_loss = torch.stack(ranks).mean(), torch.stack(hard).mean()
-    return bce+rank_weight*rank+.5*hard_loss
+    return bce_weight*bce+rank_weight*rank+hard_weight*hard_loss
 
 
 def h_objective(table, group, regroup_seed, settings, teacher=None, history=False):
@@ -118,7 +142,8 @@ def h_objective(table, group, regroup_seed, settings, teacher=None, history=Fals
     natural, regrouped = assignment(group), assignment(group, regroup_seed)
     predictions = [h_pool(table, slots) for slots in (natural, regrouped)]
     labels = table.new_tensor(group.labels())
-    supervised = sum(h_loss(p, labels, len(group.views), settings.lambda_rank) for p in predictions)/2
+    supervised = sum(h_loss(p, labels, len(group.views), settings.lambda_rank,
+                           settings.bce_weight, settings.hard_weight) for p in predictions)/2
     distillation = table.new_zeros(())
     if history and settings.method == "H_full":
         if teacher is None:
@@ -164,8 +189,9 @@ class Model(nn.Module):
         parts = []
         for start in range(0, len(texts), self.settings.microbatch):
             check()
-            output, _ = self.encode(texts[start:start+self.settings.microbatch], self.settings.channel_tokens)
-            parts.append(output.last_hidden_state[:, 0].float())
+            output, mask = self.encode(texts[start:start+self.settings.microbatch], self.settings.channel_tokens,
+                                       hidden=self.settings.pooling == 'mean_last4_sum')
+            parts.append(text_pool(output, mask, self.settings.pooling))
         title, description = F.normalize(torch.cat(parts), dim=1).chunk(2)
         return torch.cat((title, description), dim=1)/math.sqrt(2)
 
