@@ -14,7 +14,7 @@ VendorLink和FOREVER沿用[VendorLink四臂36条/每市场40轮/单路296h](../r
 
 FOREVER的[结果回传/分析及清理范围](../reports/seller_alias_continual/20261103/forever_result/scope.zh.txt)已由[完整报告](../reports/seller_alias_continual/20261103/forever_result/report.zh.txt)、[外审逐项处置](../reports/seller_alias_continual/20261103/forever_result/review/primary_disposition.zh.txt)及[实际删除回执](../reports/seller_alias_continual/20261103/forever_result/cleanup_receipt.json)闭合；本范围无剩余科研或清理动作。保留全部分数、指标、日志、Memory和原有效结论，原H_pos_tuned27端点继续作为H_pos_history未来输入。已删FOREVER权重不可凭SHA恢复，不从本轮正结果派生新候选、消融或重采样；既有VendorLink链按原范围继续。
 
-VendorLink依赖扫描发现57群中48群相连且包含Dream全部8群，用户接受固定数据描述比较：保存完整排序/遗忘差值，不计算整体置信区间、不作统计验收，不宣称真实潜在同控识别或统计确认抗遗忘。不得为获得区间重分群、选账号、加数据或改统计模型。FOREVER保留额外全参数锚点、原O/F主比较及N/Z点值保护，不重训H、不追加HPO；不将两线预算或评价权限互借。
+VendorLink的[本轮结果分析范围](../reports/seller_alias_continual/20261104/vendorlink_result/scope.zh.txt)承接完整回传、逐项指标分析与结果外审，下一步按[完整分析](../reports/seller_alias_continual/20261104/vendorlink_result/report.zh.txt)准备具体材料并回收审查，不追加训练、标签读取或重采样，本轮权重保留。依赖扫描发现57群中48群相连且包含Dream全部8群，用户接受固定数据描述比较：保存完整排序/遗忘差值，不计算整体置信区间、不作统计验收，不宣称真实潜在同控识别或统计确认抗遗忘。不得为获得区间重分群、选账号、加数据或改统计模型。FOREVER保留额外全参数锚点、原O/F主比较及N/Z点值保护，不重训H、不追加HPO；不将两线预算或评价权限互借。
 
 原五方法45条及其新确认/统计、结果外审和[主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)均已结束。H相对S最终MAP正向，但原O/F共同主门未过、额外抗遗忘未确认，不重复旧恢复或为翻转结果重训。H/S54端点继续保留，其中H27已供FOREVER比较并继续供H_pos_history使用；其余三方法81份独立权重已按用户选择删除，非权重证据和原490h/失败账保留，见[存储记录](STORAGE.zh.md#2026-10-26-五臂中的三臂权重清理)。
 ## 已结束Optuna的授权与恢复历史

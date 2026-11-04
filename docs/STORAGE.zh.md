@@ -1,4 +1,12 @@
 # 科研文件存储与恢复
+## 2026-11-04 VendorLink结果回传与保管
+
+[本轮结果目录](../reports/seller_alias_continual/20261104/vendorlink_result/)保留811份172378651字节：216盲分数JSON、216逐query指标JSON、36条完整更新/工作量/完成/访问/进程记录、批次配置和65份Linux实际来源。[SFTP清单](../reports/seller_alias_continual/20261104/vendorlink_result/receive_manifest.json)与[接收回执](../reports/seller_alias_continual/20261104/vendorlink_result/receive.json)逐文件大小/SHA一致；[保存字段核对](../reports/seller_alias_continual/20261104/vendorlink_result/saved_check.json)只检查字段、计数及既存指标简单算术，没有新标签解析或科学重算。原正文、qrels、owners、模型/Memory载荷留Linux，未回传。原冻结账和原结果不覆盖，新增活跃用时按[同桶增量账](../reports/seller_alias_continual/20261104/vendorlink_result/budget.json)保管。
+
+本轮获准外审ZIP为16644193字节、577载荷，SHA256 364f1de8f95084de23595f9b984f676aad93d493108b832e80a0e67c58510a0b；[具体许可及单次提交](../reports/seller_alias_continual/20261104/vendorlink_result/review/submission.json)保留。包不含原始分数矩阵或正式数据/权重载荷；原送审报告/表格及预算可从保留ZIP恢复，本地后补候选池分层与数据边界的版本不冒称送审原字节。16项分析/证据已按[sync](../reports/seller_alias_continual/20261104/vendorlink_result/sync.json)同步Linux，后补报告、候选池分层、提交及当前费用11项已按[最终同步](../reports/seller_alias_continual/20261104/vendorlink_result/final_sync.json)再次匹配；当前准备526.000207/3900秒、含本轮381秒，全部累计38.540627任务小时。原准备145.000207及失败账保留，网页生成等待不计费；当前根docs仍仅Windows。
+
+108个阶段权重按本次明确范围继续保管Linux原路径，46985731650逻辑字节（43.758873GiB）；本轮仅核实际文件类型/大小等元数据，保留正式端点记录原SHA，没有重读或删除模型。H_pos_history启动/首步回执只作已有接续留证，不包含未开放HPO效果；原H27、预训练和活动资产保持。根docs仅Windows维护，分析/审查实际同步另由本轮回执登记，本地提交不推送，不重置大清理周期。
+
 ## 2026-11-03 H_pos_history独立等待接线
 
 本轮[独立目录](../reports/documentation/20261103/history_wait/)保留授权、范围、主审、58来源和wait/test两项增量身份、CPU01—03原失败/成功证据、正式模板/等待配置、launch及现场快照。[SFTP回传核对](../reports/documentation/20261103/history_wait/receive.json)确认28项文件及60项本地来源SHA一致；48247字节传输ZIP在两端核验解包后删除，保留清单/身份，不制作或上传外审包。
