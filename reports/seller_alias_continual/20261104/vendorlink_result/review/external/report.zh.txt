@@ -1,0 +1,321 @@
+VendorLink 正式结果与结论：定向独立外审完整报告
+本轮材料日期：2026-11-04；沿用当前 GPT-6 Pro 会话
+
+一、输入身份、裁决与适用范围
+
+实际输入：vendorlink_result_review.zip
+实际字节数：16,644,193
+实际 SHA256：364f1de8f95084de23595f9b984f676aad93d493108b832e80a0e67c58510a0b
+实际成员：578＝577 项载荷＋package_manifest.json。
+清单列载荷合计：155,018,430 字节；实际解压载荷逐项求和相同。
+本外审实际读取 ZIP 字节计算 SHA256，并对全部 577 项载荷逐一计算字节数和 SHA256、核对路径集合。无重复路径、缺项、未列载荷或大小／SHA 不一致。清单自身为 138,809 字节，SHA256 ae7621c77c1dea089a2bc2343c3a388ffb63934caf87e0bd6243c6381066a247。身份核对只证明本次读到指定材料，不代替下述行为和算术审查。
+
+裁决：未发现本轮有证据的 SCIENTIFIC_BLOCKER；未发现本轮有证据的 REPRODUCIBILITY_DEFECT。保存指标、固定加权、预定比较与负结果解释的核心结论成立。没有发现必须修改项目代码、重训、载模复验、重算预测指标或重新统计的事项。
+
+报告结案前有两项最小文字／表格补全：
+VRES-T01：明确仅排除规范化原文及遮蔽账号名后的精确重复；近重复排除与真实 owners 跨划分独立性未被证明。
+VRES-T02：补充最终阶段按“实际市场×候选池大小”的保存指标算术表，并保留单群及构成混杂限制。本外审已给出可直接回收的六层 MAP 表和完整十指标小附件，无须再运行评价。
+
+这两项属于必要解释补全，不是已发现泄漏、算法失效或数值错误。按本文给出的文字与表格忠实回收、由主执行者核对即可，无须为这两项再增加代码测试或单独一轮外审。未变的 V-R01、V-R02、CHAIN-R01 和原科学／实现资格闭合在适用范围内保持。
+
+可报告的主结论是：在本批固定英文观察账号视图、候选群、40 epoch、三循环顺序和 seed4/5/6 上，VendorLink_SEQ 最终平均 MAP 最高；H_ER 是三种 H 中平均最好的方法；当前 H_full 的旧评分约束没有带来平均整体收益。H_full 虽较 VendorLink 有更低的平均 F，但初学 Q、旧市场最终 O、末市场 N 及最终均值均更低，不能据较低 F 宣称抗遗忘胜出。本批仍是 DESCRIPTIVE_FIXED_DATA_ONLY，passed=null，无整体置信区间或统计验收。
+
+这是已完成结果的审查，不是新的实施或启动授权。108 份 VendorLink 阶段权重按当前要求保留。本报告不授予新训练、调参、GPU 资格、数据开放、重采样、自动资源等待或删除权限，也不替代主执行者的独立处置。
+
+二、路径约定、实际阅读与证据层次
+
+以下 R 代表包内目录：
+reports/seller_alias_continual/20261104/vendorlink_result
+所有 R 下引用均使用实际冻结 source 字节，不替换成其他项目或当前仓库根同名文件。历史文件引用给出 reports/documentation/... 完整相对路径。源码行号按包内文本，JSON 以字段路径定位。
+
+全文语义阅读覆盖：R/report.zh.txt、R/scope.zh.txt；实际 VendorLink data、prepare、export、methods、run、formal、evaluate 源码；共享 step28_formal_queue.py；R/receive.py、R/summarize_saved.py；原正式 plan.zh.txt、implementation.zh.txt、authorization.json；必要的 20261029 实现／原生主审处置，以及本轮费用快照。CPU10 两个用例及其 tiny model 夹具为定向阅读，未对所有未变测试和无关算法重新逐行审查。
+
+完整字段机械解析覆盖：全部 216 个 formal/analysis/*_queries.json、formal/analysis/result.json、saved_summary.json、tables.zh.txt 全部数值；36 条 run/updates.jsonl、completion/workload/access/dispatch/process/retirement 记录；批次完成、训练完成、盲评分元数据、评价访问、正式 gate、依赖、预算和回传清单。大 JSON／JSONL 的逐字段机械核对不冒充人工逐行阅读所有重复来源条目。阅读记录逐文件区分全文、定向、机械检查和仅哈希检查，见 reading_scope.json。
+
+本外审的证据分三层：
+1. 本轮独立机械检查：包身份、所提供源文件与 gate 身份、保存计数／费用／均值／差值／显示舍入等。
+2. 静态代码追踪：实际输入如何进入目标与更新、端点如何保存和严格恢复、盲门如何先于标签开放、指标如何聚合。没有运行这些代码。
+3. 已有 Linux 动态证据：随包正式日志／回执和 CPU10 旧证据；审查其内容及对应字节和测试行为，不把旧 PASS 数量当作当前结果的证明，也不声称本轮重跑了资格。
+
+未执行或导入项目代码、手写测试、模型或项目汇总脚本；未训练、推理、载模、访问科研服务器；未解析正式 qrels／owners／商品正文；未从预测分数重新评价指标，未做 bootstrap／重采样。所用运算仅为独立标准库的 ZIP／JSON／哈希和已保存字段求和、平均、差值、计数及比较。没有修改输入、冻结源、gate 或正式结果。
+
+本包没有 216 原始评分矩阵、正文、关系标签、owners、预训练或阶段权重、Memory。逐 query 文件是已计算的十指标，不能当成 qrels 或预测源。故本外审可以独立核对保存指标之间的算术关系，不能声称从未提供的预测／标签独立再现了每个 query 指标，也不能声称重新加载了 108 个模型。
+
+三、完整执行与来源是否支持本批结果
+
+3.1 规模与合同
+
+原正式计划 reports/documentation/20261030/vendorlink/formal/plan.zh.txt:5–14 固定四方法×三顺序×三种子、每市场 40 个完整当前 epoch；当前 inputs/chain/vendorlink/formal_gate.json 的 runs/epochs/per_run_seconds/conclusion_scope 与之相符。原暂停或后来替代的队列描述不拿来否定本轮已批准并完成的批次。
+
+机械检查实际 36 条完整日志：每条 10,280 行，total_updates 连续，每行 optimizer_updates=1；阶段、阶段内计数、40 个 epoch 与固定顺序相符。97＋34＋126＝257 个市场内更新单位，257×40＝10,280；全批 36×10,280＝370,080。108 个阶段各有 40 epoch，合计 4,320 个“轨迹阶段 epoch”。这与本轮 4,104 次留出群前向是不同计量，不能混用。
+
+批次 formal/completion.json 保存 38 项成功：36 训练、scoring、analysis；active={}、retired_slots=[]、各 error=null。formal/training_complete.json 只含完整的 36 条训练。36 个 completion 均为 THREE_STAGES_TRAINED_NOT_EVALUATED、三端点、预期 identity、updates=10280、inference_endpoints=true，无继承的旧端点。36 个 process 的实际命令均指向独立 workspace 的正式入口与本 gate；全部 slot=0。记录顺序及 deadline／耗时关系与单槽 36 训练→评分→分析相容；这不是另一次现场进程监控。
+
+计数对照：
+对象                         本外审核对结果
+训练轨迹                     36
+阶段端点元数据               108
+完整六格                     216＝36×6
+保存群指标块                 4,104
+保存逐 query 指标行          65,664
+每 query 指标列              10，共 656,640 个保存标量
+实际更新日志行               370,080，每行 optimizer_updates=1
+元数据所述预定视图／群       912／57；不是 65,664 个独立样本
+
+上述完整性不靠 status 字符串单独判断：还核对了各 spec、阶段顺序、来源、端点集合、六格集合、实际市场、群 ID 集合、query 数及日志累计与 workload 的相互关系。
+
+3.2 输入→目标→真实更新
+
+source/scripts/step29_vendorlink_formal.py:88–124 按固定 seed 初始化，核对共同冻结 BERT 文件；load_fit 每次只接受当前预定市场并核对 fit 导出身份、群数及 split。实际 run.execute 接收这个 loader。36 份 access.json 及 completion.access 均按顺序记录三市场 fit，dev/heldout/qrels/owners 为 0。结合源码，这支持合同所述训练访问边界；访问账不是独立操作系统 I/O 审计。
+
+run.py:143–198 按当前市场逐 epoch 构造并打乱当前流，实际调用 update_vendor 或 update_h，成功返回后才追加计数。VendorLink 按广告分类 batch；H 按自然群和重组监督。methods.py:241–253 确实执行分类 loss.backward、clip 和 optimizer.step；H 的 177–194、227–238 则由 h_objective 的分数梯度，经成对 head 反传和 z.backward 回到 encoder，再统一 clip/step，未见只记日志而不作用训练的接线。
+
+H_ER 和 H_full 均保留全局六群 Memory，历史监督系数 0.1。methods.py:116–132 只有 history 且 method=H_full 才取出生教师的自然群评分平方差，并以 0.5 纳入总目标。H_ER 即使使用相同 Memory 留存／教师生成路径，其 distillation 为 0，不能把教师生成次数写成已使用旧评分损失。Memory.retain:262–283 先做存活选择，只生成新存活群的教师，旧教师不刷新。
+
+日志独立核对：H_ER 的 61,680 个历史更新蒸馏分项均为 0；H_full 的 61,680 个历史更新均记录非零分项。保存加权值与 .1×监督＋.5×蒸馏相容。其证据强度是“冻结实际反传路径＋已运行日志相互支持”，不是本外审新增的梯度因果测验。不能据非零日志单独证明某项约束导致效果变化。
+
+3.3 保存／恢复与完整盲门
+
+run.py:211–223 的紧凑端点保留 identity、settings、classes、model、stage、updates。推理所需 encoder/head/classifier 状态都在 model state_dict；优化器和 Memory 不参与后续盲评分。formal.py:125–144 在训练后实际读取三个端点、核阶段计数／设置／身份，按 Vendor 分类数重建头并 strict load，然后保存 endpoint_files 身份；成功验证后才按 145–151 留存 retirement 记录并删除 latest，未删除阶段权重。
+
+evaluate.py:92–99 的 complete_training 要求完整 36 spec 且逐条调用 validate_completion；formal.py:71–85 核身份、10,280 更新、三端点、访问边界，并 verify 端点文件。score:129–168 在完成训练门之后登记盲文本评分；148–154 对实际端点 queue.verify 后 torch.load，再核身份／阶段并 strict load，随后 run.evaluate→model.score 执行盲评分。这里是正式运行入口的静态证据，不是本轮重新载模。
+
+validate_blind:102–123 要求完整 36 run、216 格、4,104 forwards；核市场／群／视图顺序，对 float64 转换后的 shape 精确要求一维 pairs 长度，并对原 scores 做 np.isfinite。这保留了 V-R01 的形状修复与 V-R02 的原数值输入边界，数字字符串不会留到开标签后才报错。当前 evaluate 实际 SHA256＝534885232ec9f1eae25fc897cb63bf9be733a9152a5e76ae17641198a07ae74a，与用户指定和实际 gate 相符。
+
+analyze:216–245 的顺序是：再次完成训练检查→盲评分来源一致→全批 validate_blind→依赖身份／覆盖／query 数检查→229 行登记 heldout_qrels_joint_opening→230 行读取三个固定 qrels→逐格核 view_ids 后计算 query 指标。formal/evaluation_access.json 仅记录 heldout_blind_text_scoring、heldout_qrels_joint_opening 各一次且顺序正确。该“单次”是一次集中开放事件，里面读取三个市场文件，不是只有一个标签文件。
+
+评分矩阵不在本包，因此没有独立检查其内容 shape／finite；本轮能核其 216 条文件元数据、既有 saved_check 主审检查声明及上述实际门的行为。报告不能把这些升级为外审读取了原分数。没有迹象表明关闭的 V-R01/V-R02 在当前来源中复发。
+
+3.4 CPU10 的具体适用范围
+
+tests/test_step28_formal_training.py:204–228 对小模型的完整／紧凑保存比较真实参数、更新日志和盲分数；230–302 的 workload 用例包装原 backward_h、teacher、encode，先调用真实函数再计数，采用独立 A/B/C 广告数 20/24/28 检查 144 当前广告、回放臂 4 历史群／80 广告与 2 教师／44 广告，并检查阶段求和、恢复和删除 latest 后记录保留。它不是任意 PASS 或空函数替身。
+
+cpu10/receipt.json 与 evidence.json 是既有 Linux 动态证据，本次没有重跑。旧 receipt 63 份 sources 中 61 份与本包相同；差异是后续已审链变化的 step28_forever_formal.py 与 step28_formal_queue.py。VendorLink workload／compact 相关 run/methods/formal/evaluate 和该测试字节保持。故复用两个既有行为证据合理，但不能称 cpu10 重跑了当前所有 65 份来源，更不能把手写 tiny BERT 证据当作新全大小模型资格。
+
+四、指标定义、全部加权与数值核对
+
+4.1 数学含义
+
+固定六格为 R11、R21、R22、R31、R32、R33。每格 R 为该实际市场所有 query 的平均，而非先求群平均再把群等权。实际分母：AlphaBay 358、Dream 120、Agora 434；合计 912。三市场最终再等权，而不是按 358:120:434 混成一个全市场 query 均值。
+
+每条轨迹、每项指标均为：
+Q=(R11+R22)/2，前两个市场各自刚学完时的表现；
+O=(R31+R32)/2，第三阶段后前两个市场的表现；
+F=Q−O，较低表示从初学到最终下降较少，允许负值；
+N=R33，最后一个市场最终表现；
+final=(R31+R32+R33)/3=(2O+N)/3。
+
+再对固定九条顺序／seed 轨迹等权。R21 保存并完整报告，但没有被偷换成 F 的“历史最好值”；本合同的 F 是指定初学点到最终点的差，非逐域最大峰值遗忘。N 不套用 FOREVER 的 N/Z 定义。按真实市场的 final 含九轨迹；Q/O/F 只含该市场位于前两位置的六轨迹；N 含该市场位于末位置的三轨迹。顺序或 seed 分层各含三轨迹。
+
+源码依据：evaluate.py:19–22 定义角色和列；193–200、251–258 将群 query 总和除以该市场 query 总数并对九路径 /9；summarize_saved.py:45–50、71–105 是本地保存字段汇总口径。本外审没有执行该原汇总脚本，另用标准库从提供的保存 query 指标核对。
+
+4.2 单正例与十指标
+
+run.query_ap:240–265 排除自身，在相同分数下按不含关系的 opaque view ID 排序，AP 为正例位置精度的均值。evaluate.query_metrics:171–190 明确要求每 query 恰一正例，因此 AP=1/rank=RR，MAP 与 MRR 相等；Recall@k 是正例是否进入前 k，NDCG@k 为入选时 1/log2(rank+1)，否则 0，故 Recall@1=NDCG@1。两组数值相同是任务定义所致，不是额外独立证据。
+
+全部 65,664 行已保存十指标均具有正确列数、有限值和 [0,1] 范围；MAP=MRR、Recall@1=NDCG@1 逐行相等，截断指标单调关系一致。没有用这些检查冒充重算原标签排序。只评价十项排序指标，没有分类阈值／概率校准协议；Precision、MCC、F1、ROC-AUC、PR-AUC、Brier、Log loss 不能补零或写成已计算后 N/A，也不能套用中文 22 指标表。
+
+4.3 独立机械核对覆盖和误差
+
+216 query 文件形成 4,104 群块、65,664 行，共 656,640 个保存指标标量。对全部十指标核对了 216 格、36 轨迹五角色、四方法九轨迹均值、三种市场／顺序／seed 分层及全部三个预定比较，而非只抽 MAP。
+
+与 saved_summary 的 cells/per_run/absolute/by_market/by_order/by_seed/paired_map 完全一致。与 formal/analysis/result.json 的 per_run 最大绝对差 3.885780586188048e−16，absolute 最大差 3.3306690738754696e−16，三比较的 120 个差值最大差 4.440892098500626e−16，均属求和顺序浮点尾差。三个比较×Q/O/F/N×十指标的 120 个区间均为 null。
+
+tables.zh.txt 的 50 个总体／分层表块、36×5 逐轨迹行及 216 格，共 5,960 个展示数字全部与保存字段相符；九位小数显示最大舍入差 4.999070046807219e−10。没有发现必须订正的数值或字段。这里核对的是保存字段的算术重组，不是从模型预测重新评价。
+
+五、主要结果、负结果与反例的独立判读
+
+5.1 最终三市场十指标
+
+指标	VendorLink_SEQ	H_SEQ	H_ER	H_full
+map	0.897071877	0.881144571	0.891883684	0.876405194
+mrr	0.897071877	0.881144571	0.891883684	0.876405194
+recall@1	0.849797730	0.818316733	0.834755345	0.817550479
+recall@3	0.932502639	0.939514905	0.943065834	0.923749564
+recall@5	0.961894234	0.967195139	0.969096025	0.956056687
+recall@10	0.988512159	0.991941443	0.990917378	0.989608031
+ndcg@1	0.849797730	0.818316733	0.834755345	0.817550479
+ndcg@3	0.897817009	0.888348692	0.897853202	0.879046166
+ndcg@5	0.909925062	0.899847367	0.908566698	0.892334762
+ndcg@10	0.918566962	0.907872587	0.915668817	0.903270077
+
+5.2 MAP 的学习水平与变化量
+
+方法	Q	O	F=Q−O	N	final
+VendorLink_SEQ	0.888851968	0.897433256	-0.008581288	0.896349120	0.897071877
+H_SEQ	0.863276747	0.875790450	-0.012513703	0.891852813	0.881144571
+H_ER	0.863182198	0.890267083	-0.027084885	0.895116886	0.891883684
+H_full	0.860286906	0.875940955	-0.015654049	0.877333673	0.876405194
+
+预定比较（左减右；Q/O/N/final 越高越好，F 越低越好）：
+比较	ΔQ	ΔO	ΔF	ΔN	Δfinal
+H_full−VendorLink_SEQ	-0.028565062	-0.021492302	-0.007072760	-0.019015447	-0.020666683
+H_full−H_ER	-0.002895292	-0.014326128	0.011430836	-0.017783213	-0.015478490
+H_full−H_SEQ	-0.002989841	0.000150504	-0.003140345	-0.014519141	-0.004739377
+
+这支持原报告的负结论：H_full−VendorLink final=−0.020666683，即约 −2.066668 个百分点，九个固定配对全为负；H_full−H_ER final=−0.015478490，七负二正；H_full−H_SEQ final=−0.004739377，四负五正。不能把“平均较低”扩大成每个内部配对都更差，也不能将九配对当独立数据样本作符号检验。
+
+H_full 相对 VendorLink 的 ΔF=−0.007072760 看似有利，但 ΔQ=−0.028565062、ΔO=−0.021492302、ΔN=−0.019015447。同一关系 ΔF=ΔQ−ΔO 解释了为什么从较低初学水平出发可以有更好的变化量而最终仍更弱。H_full 的 F 改善不能抵消其 O、N 或最终排序劣势。四方法平均 F 都负，说明这组指定初学点至最终点平均改善，不表示每市场、每轨迹均不遗忘；它也不产生统计确认。
+
+H_ER−H_SEQ 的 Q 差 −0.000094549、O 增 0.014476633、F 降 0.014571181、N 增 0.003264072、final 增 0.010739113，支持本批“增加历史监督平均有益”的描述。H_full−H_ER 则 O 低 0.014326128、F 高 0.011430836、N 低 0.017783213；本固定强度的旧评分约束未带来平均收益。教师早期分数可能抑制后续改善，是与机制相容的假说；本批没有隔离教师质量、约束强度或 Memory 覆盖率，不应写成已证机制原因。
+
+可选补一句 H_ER 的反例：final 改善是七正二负，ABC seed6 为 −0.008961444，BCA seed4 为 −0.004345828；O 为八正一负。原报告没有声称逐条必胜，因此此为 OPTIONAL，不要求新增计算或验证。
+
+5.3 不能遗漏的异质性
+
+原报告第 41 行正确指出 VendorLink 不是所有十指标都最好：H_ER 的 Recall@3/5 更高，NDCG@3 仅约高 0.000036；H_SEQ 的 Recall@10 最高。H_full 相对 VendorLink 只有 Recall@10 小幅更高，不能据该一项抹去 MAP／首位排序差距。Recall@k、NDCG@k 都不是分类准确率或 PR-AUC。
+
+H_full 的最终 MAP 对 VendorLink 三市场均低；H_ER 在 AlphaBay 高于 VendorLink，但 Dream、Agora 仍低。H_full 的 BCA 最差，CAB 明显接近 VendorLink且平均高于另两种 H；seed6 中 H_SEQ/H_ER 的最终均值超过 VendorLink，但 H_full 仍落后。原报告已保留这些市场／顺序／seed 例外，未把均值方向外推为统一机制。H_full 对 VendorLink 的 O、N 各为七负二正，F 五负四正；“九个最终均值全负”不能改写成“每个组成表现都负”。这些分层的具体十指标已全部核对，无须另增种子或顺序。
+
+来源：R/report.zh.txt:6–10、29–43、47–104；R/saved_summary.json.absolute/by_market/by_order/by_seed/paired_map；R/formal/analysis/result.json；本外审 mechanical_checks.json。
+
+六、任务范围、依赖与两个必要解释补全
+
+6.1 固定适配的含义
+
+本轮从同一冻结英文 bert-base-cased 档案起步；H_full 使用 H_pos_tuned 已有 lambda_rank 与 LR multiplier，但这里是英文 BERT、英文固定数据和本实现，不能等同于中文 BGE 模型，也不能写成新 H_pos_history 调参得到的结果。methods.py:24–39 的固定设置、formal.py:97–105 的载模调用支持这一区分。保留 VendorLink 最后四层相加后 masked token mean 的已接受复现假设，不声称精确复现作者未说明的 token 归约或全部原论文任务。
+
+每个正例是同一“市场内观察账号”的另一份不相交广告集视图，而非经真实控制人核验的跨账号别名。排序候选来自固定小群；456 是市场内观察账号数，不能当成 456 个已验证不同真实 owners。英文真实文本与中文合成任务的候选、正例、语言与数据生成不同，不对绝对 MAP 直接排高低。
+
+6.2 VRES-T01 — 必要文字限制，不是已证泄漏
+
+位置：R/report.zh.txt:23–25、128；R/source/scripts/step29_vendorlink_data.py:85–123、126–128、174–205。
+原报告写了同一观察账号、小候选池、同名不等于 owners，但没有明确保留近重复和真实 owners 独立性未证实的边界。
+
+实际代码 canonical 只做 Unicode NFKC／空白规范；eligible_ads 对规范化 title＋description 的 casefold 精确指纹，以及遮蔽该账号名后的精确指纹去重／排除跨观察账号共享内容。这里局部变量 owners 是指纹到观察账号集合，不是经过验证的真实控制人标签。build_views 的返回元数据明确：
+near_duplicate_exclusion=False
+latent_owner_disjointness_verified=False
+
+因此建议在数据说明处直接补入：
+“本轮仅排除了规范化原文和遮蔽账号名后的精确重复；未证明近重复内容已经被排除，也未证明潜在真实 owners 在划分之间完全独立。casefold 同名只用于划分或依赖关联，不作为真实 owner 标签。”
+
+影响：防止“身份留出／清理”被读成语义近重复和真实 owners 已完全独立。此遗漏不足以证明本批确有泄漏，更不应据此取消固定代理任务结果。
+最小处置／核验：只补文字，主执行者对照上述两布尔字段及清理函数即可；不重新去重、不新读正文／标签／owners、不重训或重算。按这一定义补文不需再外审。
+
+6.3 VRES-T02 — 最小候选池分层表
+
+位置：R/report.zh.txt:23、104；R/tables.zh.txt 的现有分层；R/inputs/dependencies.json.query_counts；全部 formal/analysis/*_3_*_queries.json。
+目前报告列出 54 群 16 视图及 18／22／8 各一群，数量正确，但未展示不同候选池的保存指标。结合用户本轮明确要求，以及下面可见的反例，应补一张小表完成解释；不把它上升为新的科学主比较。
+
+下表仅取最终阶段 3_{pos} 的已保存 query 指标：每条轨迹在“实际市场×视图数”层内 query 等权，随后九轨迹等权。候选数＝视图数−1。query 数是固定视图元数据计数，未乘九，也不是独立样本数。完整十指标放 candidate_pool_final.zh.txt 和 candidate_pool_final.json。
+
+市场	视图／候选	群数	query数	VendorLink MAP	H_SEQ MAP	H_ER MAP	H_full MAP
+AlphaBay	16／15	21	336	0.882429194	0.881522979	0.890728613	0.874374419
+AlphaBay	22／21	1	22	0.893197417	0.847327883	0.849870093	0.872298072
+Dream	8／7	1	8	0.905092593	0.951388889	0.939814815	0.903935185
+Dream	16／15	7	112	0.947572200	0.911608324	0.929258787	0.915634448
+Agora	16／15	26	416	0.867091686	0.848999907	0.857684178	0.841434707
+Agora	18／17	1	18	0.777706741	0.867127625	0.852538794	0.809597296
+
+AlphaBay 两层按 336/358、22/358；Dream 按 8/120、112/120；Agora 按 416/434、18/434 重组。每市场所有十指标都重建原 final，最大浮点尾差 3.3306690738754696e−16，故补表不改变原估计。不能把六个层等权再当总体结果。
+
+解释价值：Agora 的 18 视图单群中 VendorLink 的 MAP 低于三种 H，而 Agora 的 16 视图层 VendorLink 最好；Dream 的 8 视图单群 H_SEQ 最好，而 16 视图层 VendorLink 最好。AlphaBay 的 16 视图层 H_ER 最好、22 视图单群 VendorLink 最好。这比只列大小更充分地展示固定数据异质性。Dream 8 视图层只有 7 个候选，Recall@10 按定义已经覆盖候选全集，四方法为 1，不能把该数视为困难的前十检索证据。
+
+必须附的限制：18／22／8 各只有一群，且分别处在 Agora／AlphaBay／Dream，候选数、市场及群成员构成相互混杂。表格不能证明候选池大小导致差异，不能用来筛掉不利群、改变原权重或新增显著性验收。它是解释性保存字段算术，并非新增预测指标、正式主判据或独立重复。
+
+最小处置／核验：直接回收本报告六行表及附带十指标，用同市场 query 权重核回原 market final 即可；本外审已完成该机械核对。无需新数据、重分组、重新去重、载模、预测评价或统计重采样。原 three_market 数据方案正文未随本包提供，正式 plan 仅引用它；此建议依据本轮明确要求、实际 report 与保存字段，不冒称核验了未提供的原计划原文。忠实纳入补表不需再外审。
+
+6.4 固定描述而非统计确认
+
+inputs/dependencies.json 的 57 群、912 视图、10 个分量可机械核对：最大分量 48＝Agora21＋AlphaBay19＋Dream8，其余九个为单群。Dream 全部 8 群在最大分量。它描述共享候选／同名 casefold 关联，不是真实 owners 图。
+
+原正式 plan.zh.txt:16–19 和 authorization.conclusion_decision 表明依赖限制在效果产生前已接受，整体 bootstrap／O/F 显著性门已撤回；不是本次看到负结果才撤门。当前 evaluate.comparison_summary:204–213 固定输出 passed=None 和全部区间 None；analyze 未重采样，正式结果对应 null。9 条训练路径、57 群、65,664 重复评分 query 行不能充作互相独立的跨市场样本。没有“统计检验通过或失败”；没有恢复整体 CI 的本轮必要性。
+
+七、共同曝光、算法差异与成本公平性
+
+四方法每市场 40 epoch，当前广告总曝光一致；本批恰好各有 92,520 个 optimizer 更新。但目标、表示、batch／群单位、有效 token 路径、LR、weight decay 和历史运算不同，不能说已做等实际算力或单一抗遗忘组件因果对照。VendorLink 广告分类与表示余弦评分；H 标题／正文双通道、成对评分、自然与重组的平均监督、ranking 和 hard-top-5 目标不同。H 的 encoder LR 有 10% warmup 再衰减，head LR 固定；Vendor 每新市场重置优化器与分类头并线性衰减，不能把基础学习率误读成每步恒定。
+
+实际保存曝光／调用累计如下；这是完成调用曝光数，不是 FLOPs、token 数或独立样本数。
+
+方法	当前更新	当前广告	历史群	历史广告	新教师群	教师广告	训练累计小时
+VendorLink_SEQ	92520	2954880	0	0	0	0	3.839678664
+H_SEQ	92520	2954880	0	0	0	0	8.027498537
+H_ER	92520	2954880	61680	1973760	79	2528	12.927053219
+H_full	92520	2954880	61680	1973760	79	2528	13.203200093
+
+全批当前广告 11,819,520。VendorLink 的 current_groups=0 表示当前单位是广告 batch，不表示没有当前训练。两种回放臂每条对应的保存 workload 一致；它们都实际生成新存活群教师，但只有 H_full 消费旧评分保持损失。H_ER 的教师计算并非免费，已包含在曝光／时间证据。当前相同曝光及两个回放臂相同历史计数不意味着模型计算相同；本轮不另增等算力臂。
+
+H_full−H_ER 是较聚焦的固定约束比较，仍只限本继承强度、教师、六群 Memory 和路径，不能推广成旧评分约束普遍无用。语言、任务或超参迁移可能有关，但当前没有隔离这些因素。原报告把原因列作假说、保留负结果、不据结果换参数或对手，是适当的。
+
+来源：methods.py:24–39、48–68、116–132、177–253、262–299；run.py:76–86、110–127、174–223；全部 updates/workload/completion；cpu10/evidence.json 与实际用例。
+
+八、费用、SFTP 回传及权重保管
+
+8.1 原正式账与新增机械费用分账
+
+formal/budget.json 与 completion.json 的原 used：
+training       136790.74984660675 秒
+confirmation      508.5436203139834 秒
+analysis           35.26858633314259 秒
+control           753.694709735224 秒
+cpu               132 秒
+preparation       145.00020673684776 秒
+合计           138365.25696972595 秒＝38.43479360270165 累计任务小时。
+
+36 训练回执求和与 training 桶相同；最长单条 5964.040804771008 秒，低于 8 小时。各方法九条训练小时与上表一致。原六桶上限合计 296 小时（训练288、确认6、辅助2），各桶及单条均未超额。这里不是把并行墙钟误除或跨线借用预算；也不把“低于上限”当科学有效性的依据。历史最慢单步投影并非本次实际费用或后续必需时间，已完成后不再沿用为待跑预测。
+
+原 formal plan:22 明说“原资格124秒另列历史成本”。38.434793603 小时是本批 formal 六桶，不是 VendorLink 全部历史开发／资格总成本；CPU132 也不是那 124 秒的同义字段。本包未提供原资格124秒完整原生账，本外审按该历史合同边界另列，不冒称重新核原资格或失败实测。
+
+review/submitted_budget.json 保留 original_campaign_used，并只新增三项准备收费：initial probe 1 秒、metadata/SFTP 123 秒、保存字段算术检查 3 秒，共 127 秒。preparation 因而为 272.00020673684776 秒，送审快照总计 138492.25696972595 秒＝38.47007138047943 小时。其 status=RESULT_PREPARATION_IN_PROGRESS，note 明示之后打包／同步另记，不能把它当最终所有准备费，也不能因没含后续实际同步费判本轮科学缺陷。不得覆盖冻结 formal 原账；网页等待不计研究计算。没有证据要求改预算或补运行。
+
+8.2 收件账与本外审实际得到的载荷不同
+
+receive.json 与 receive_manifest.json 的 811 条收件元数据逐项一致、路径唯一，字节和为 172,378,651。该 811 是主执行者 SFTP 回传范围，不是本包声称向外审提供的数量。
+
+本包实际含其中 551 个载荷，本外审已逐一核到原收件记录的大小／SHA。未随包的 260 项是：216 原分数文件、38 console、4 个 HPO 原件、scoring 独立 dispatch_receipt 与 progress 各一份。scoring 的成功／收费在批次 completed 中仍有记录，独立小回执未提供不构成结果阻断。本包其他计划／报告／摘要等属于另行编入的送审材料，全部仍在 577 载荷清单验证范围内。
+
+因此严格区分：577 项送审载荷身份已核；811 项原收件账元数据已核；其中 551 项收件载荷在本包可重新核 SHA；216 原分数的内容形状／有限值仅有既有主审记录和实际代码路径支持。不能把第一个或第二个数量当第三种语义／载荷验证。
+
+8.3 权重与 HPO 接续
+
+receive_manifest.models 的 108 条与 36 个 completion.endpoint_files 逐项匹配，逻辑总大小 46,985,731,650 字节＝43.758872570469975 GiB。记录明示 verification='stat_only; saved SHA retained, payload not read'；这轮执行者未重读权重字节，本外审也没有。训练结束和正式评分前的实际 verify/load 路径见第三节，可支持原正式程序确实要求模型实物和身份，不能改写成这轮重新验证 47GB 权重。
+
+scope.zh.txt:12、report.zh.txt:124 当前要求保留全部108权重。成功删除的是每条无需继续的完整 latest 恢复载荷，有 recovery_retirement.json；其与供评分／保管的阶段权重不同。FOREVER 此前清理权限不能套用到本轮 VendorLink，原 H27、预训练和活动 H_pos_history 资产也不属于本次清理对象。本外审没有实施删除。
+
+HPO 接续仅是执行者的只读观察说明。inputs/history 的 start、first_update、process、formal_gate 四原件未随本包提供；只有收件清单身份、receive_manifest.history 的当时进程摘要及报告文字。本外审不把这些升级成独立核验其启动时点、当前活跃进程、调参效果或首步现场，也不要求上传这些对象。该边界不阻碍 VendorLink 完成结果的判断，不应因此重开 HPO 或干预正在执行的其他合同。
+
+九、逐项意见与最小处置
+
+已证科学阻断 SCIENTIFIC_BLOCKER：无。
+已证可重放缺陷 REPRODUCIBILITY_DEFECT：无。
+必须修改的数值／指标字段：无。
+必要文字／表格补全：2 项，均已在本报告提供完整可回收内容。
+
+VRES-T01 — NECESSARY_TEXT_CORRECTION
+证据：report:23–25、128；data.py:85–123、202–205 的清理行为及两个 false 字段。
+影响：限制外推，不让观察账号留出被误读成近重复和真实 owners 独立已证。
+最小修正：补第6.2节给出的完整句子，保持现有结果。
+必要核验：对照冻结源码文字；不新增科学计算。
+是否再外审：否，忠实补文由主执行者核对即可。
+
+VRES-T02 — NECESSARY_TEXT_TABLE_COMPLETION
+证据：report:23、104；dependencies.query_counts；已保存最终阶段 query 指标；第6.3节与附表。
+影响：现有只列大小不能完整呈现可见候选池异质性，且小池 Recall@10 有结构性上限现象。
+最小修正：补六行 MAP、群/query 数，完整十指标作为小附件；明确最终阶段、层内 query／九路径权重、非16层单群且构成混杂。
+必要核验：同市场按 query 数重组还原原 final，本外审已完成；原主权重与结果不变。
+是否再外审：否，直接回收本表并机械核对即可；不要求新测试或评价。
+
+VRES-O01 — OPTIONAL
+证据：saved_summary.per_run；H_ER−H_SEQ 的九配对 final 与 O。
+建议：在“回放平均有益”后补七正二负及两个 final 反例，避免读成逐条有益。
+当前必要性：原文已经是平均描述，没有错误；不列结案阻断，不新增验证／外审。
+
+VRES-O02 — OPTIONAL
+证据：report:21；run.py:76–86。
+建议：如完善方法小表，可将所列 LR 标成基础／峰值并补具体调度。原报告未声称学习率每步恒定，且冻结代码已明确，故非本轮必修；无须新增实验或外审。
+
+OUT_OF_SCOPE_OVERDESIGN：以下都不是完成本轮审查的必要处置。
+1. 为负结果追加 HPO、方法、seed、顺序、轮数、数据或等算力臂；为追正结果改变对手、筛群或选择模型。
+2. 为恢复显著性追加整体 bootstrap／CI、按新依赖模型重算统计，或把小池分层设为新验收。
+3. 以本次报告补文为由重新去重、要求正文／qrels／owners／预测矩阵／权重上传，重跑全仓测试、GPU资格或大模型 pilot。
+4. 修改未变训练／调度框架、建立通用审计或灾备平台，或沿用其他实验权限清理本轮权重。
+
+这些边界不是说将来永远不能研究机制或泛化，而是没有本轮必要性和授权。本次只保留可由当前固定结果支持的结论。
+
+十、结案意见与交付记录
+
+在提供材料范围内，核心负结果、指标定义、固定加权、全部预定比较、结果完整性与成本账相互一致；未发现具体矛盾足以阻断结果或要求代码／实验修复。完成 VRES-T01/T02 的最小解释补全后，可以按“固定数据描述结果审查已完成、保留负结果与依赖限制”由主执行者独立处置收存。
+
+该结论不证明未提供的 qrels／正文／分数／权重载荷内容，不是现场 Linux 复验，也不对未来复跑 bitwise 一致性、HPO效果、跨语言绝对排名或真实跨账号同控识别作背书。当前已闭合科学方案／资格无需重开；没有发现必须新增测试或计算的事项。
+
+本次交付包含：完整 report.zh.txt、逐项 audit_notes.json、input_identity.json、input_files.json、reading_scope.json、mechanical_checks.json、候选池十指标的 JSON／中文小表，以及各交付成员大小／SHA 的 output_manifest.json。输出 ZIP 自身字节数／SHA 由页面另列；清单不自引用自身哈希。输入及正式结果原件保持不变。

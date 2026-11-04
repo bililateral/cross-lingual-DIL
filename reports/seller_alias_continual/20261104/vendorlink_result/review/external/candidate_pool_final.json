@@ -1,0 +1,545 @@
+{
+  "description": "候选池大小的解释性算术分层；只使用已保存最终阶段3_{pos}逐query十指标，不改变主估计、不重新从预测或标签计算指标。",
+  "weighting": "Within each market × view-count stratum, equal query weight per trajectory; then equal weight across the fixed nine trajectories. Each market original final is reconstructed using query-count stratum weights; original three-market final remains equal market weight.",
+  "stage": "final stage 3; position determined from ABC/BCA/CAB actual market order",
+  "columns": [
+    "map",
+    "mrr",
+    "recall@1",
+    "recall@3",
+    "recall@5",
+    "recall@10",
+    "ndcg@1",
+    "ndcg@3",
+    "ndcg@5",
+    "ndcg@10"
+  ],
+  "rows": [
+    {
+      "market": "AlphaBay",
+      "views": 16,
+      "candidates": 15,
+      "groups": 21,
+      "unique_queries": 336,
+      "trajectories": 9,
+      "method": "VendorLink_SEQ",
+      "metrics": {
+        "map": 0.8824291944827659,
+        "mrr": 0.8824291944827659,
+        "recall@1": 0.8306878306878307,
+        "recall@3": 0.921957671957672,
+        "recall@5": 0.9553571428571429,
+        "recall@10": 0.9851190476190477,
+        "ndcg@1": 0.8306878306878307,
+        "ndcg@3": 0.8831636577593552,
+        "ndcg@5": 0.8968234278729366,
+        "ndcg@10": 0.9063804803080404
+      }
+    },
+    {
+      "market": "AlphaBay",
+      "views": 16,
+      "candidates": 15,
+      "groups": 21,
+      "unique_queries": 336,
+      "trajectories": 9,
+      "method": "H_SEQ",
+      "metrics": {
+        "map": 0.8815229789684155,
+        "mrr": 0.8815229789684155,
+        "recall@1": 0.8204365079365079,
+        "recall@3": 0.9368386243386243,
+        "recall@5": 0.9646164021164021,
+        "recall@10": 0.9900793650793651,
+        "ndcg@1": 0.8204365079365079,
+        "ndcg@3": 0.887773207011765,
+        "ndcg@5": 0.8993596532274909,
+        "ndcg@10": 0.9075176802601751
+      }
+    },
+    {
+      "market": "AlphaBay",
+      "views": 16,
+      "candidates": 15,
+      "groups": 21,
+      "unique_queries": 336,
+      "trajectories": 9,
+      "method": "H_ER",
+      "metrics": {
+        "map": 0.8907286129508353,
+        "mrr": 0.8907286129508353,
+        "recall@1": 0.8356481481481481,
+        "recall@3": 0.9414682539682541,
+        "recall@5": 0.9652777777777778,
+        "recall@10": 0.9894179894179894,
+        "ndcg@1": 0.8356481481481481,
+        "ndcg@3": 0.896524826275512,
+        "ndcg@5": 0.906373254568434,
+        "ndcg@10": 0.9142523594181884
+      }
+    },
+    {
+      "market": "AlphaBay",
+      "views": 16,
+      "candidates": 15,
+      "groups": 21,
+      "unique_queries": 336,
+      "trajectories": 9,
+      "method": "H_full",
+      "metrics": {
+        "map": 0.8743744194885068,
+        "mrr": 0.8743744194885068,
+        "recall@1": 0.8171296296296295,
+        "recall@3": 0.9183201058201058,
+        "recall@5": 0.9566798941798942,
+        "recall@10": 0.9923941798941799,
+        "ndcg@1": 0.8171296296296295,
+        "ndcg@3": 0.8750853366756441,
+        "ndcg@5": 0.8908524152777915,
+        "ndcg@10": 0.9024357780378103
+      }
+    },
+    {
+      "market": "AlphaBay",
+      "views": 22,
+      "candidates": 21,
+      "groups": 1,
+      "unique_queries": 22,
+      "trajectories": 9,
+      "method": "VendorLink_SEQ",
+      "metrics": {
+        "map": 0.8931974170610535,
+        "mrr": 0.8931974170610535,
+        "recall@1": 0.8585858585858586,
+        "recall@3": 0.9040404040404041,
+        "recall@5": 0.9393939393939394,
+        "recall@10": 0.9747474747474748,
+        "ndcg@1": 0.8585858585858586,
+        "ndcg@3": 0.8846194382215015,
+        "ndcg@5": 0.8994027129934007,
+        "ndcg@10": 0.9111648809058539
+      }
+    },
+    {
+      "market": "AlphaBay",
+      "views": 22,
+      "candidates": 21,
+      "groups": 1,
+      "unique_queries": 22,
+      "trajectories": 9,
+      "method": "H_SEQ",
+      "metrics": {
+        "map": 0.8473278825551553,
+        "mrr": 0.8473278825551553,
+        "recall@1": 0.7777777777777778,
+        "recall@3": 0.9040404040404041,
+        "recall@5": 0.914141414141414,
+        "recall@10": 0.9747474747474748,
+        "ndcg@1": 0.7777777777777778,
+        "ndcg@3": 0.8534730571608975,
+        "ndcg@5": 0.8578233254242651,
+        "ndcg@10": 0.8761774231169377
+      }
+    },
+    {
+      "market": "AlphaBay",
+      "views": 22,
+      "candidates": 21,
+      "groups": 1,
+      "unique_queries": 22,
+      "trajectories": 9,
+      "method": "H_ER",
+      "metrics": {
+        "map": 0.8498700934306995,
+        "mrr": 0.8498700934306995,
+        "recall@1": 0.7828282828282828,
+        "recall@3": 0.8989898989898989,
+        "recall@5": 0.914141414141414,
+        "recall@10": 0.9848484848484849,
+        "ndcg@1": 0.7828282828282828,
+        "ndcg@3": 0.8528117957792234,
+        "ndcg@5": 0.8588945340243874,
+        "ndcg@10": 0.8808641599859157
+      }
+    },
+    {
+      "market": "AlphaBay",
+      "views": 22,
+      "candidates": 21,
+      "groups": 1,
+      "unique_queries": 22,
+      "trajectories": 9,
+      "method": "H_full",
+      "metrics": {
+        "map": 0.8722980722980723,
+        "mrr": 0.8722980722980723,
+        "recall@1": 0.8232323232323232,
+        "recall@3": 0.9040404040404041,
+        "recall@5": 0.9242424242424243,
+        "recall@10": 0.9696969696969696,
+        "ndcg@1": 0.8232323232323232,
+        "ndcg@3": 0.870910238834778,
+        "ndcg@5": 0.8787254470617384,
+        "ndcg@10": 0.8938194679769578
+      }
+    },
+    {
+      "market": "Dream",
+      "views": 8,
+      "candidates": 7,
+      "groups": 1,
+      "unique_queries": 8,
+      "trajectories": 9,
+      "method": "VendorLink_SEQ",
+      "metrics": {
+        "map": 0.9050925925925927,
+        "mrr": 0.9050925925925927,
+        "recall@1": 0.8194444444444444,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "ndcg@1": 0.8194444444444444,
+        "ndcg@3": 0.9297253790178617,
+        "ndcg@5": 0.9297253790178617,
+        "ndcg@10": 0.9297253790178617
+      }
+    },
+    {
+      "market": "Dream",
+      "views": 8,
+      "candidates": 7,
+      "groups": 1,
+      "unique_queries": 8,
+      "trajectories": 9,
+      "method": "H_SEQ",
+      "metrics": {
+        "map": 0.9513888888888888,
+        "mrr": 0.9513888888888888,
+        "recall@1": 0.9027777777777778,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "ndcg@1": 0.9027777777777778,
+        "ndcg@3": 0.964118170486114,
+        "ndcg@5": 0.964118170486114,
+        "ndcg@10": 0.964118170486114
+      }
+    },
+    {
+      "market": "Dream",
+      "views": 8,
+      "candidates": 7,
+      "groups": 1,
+      "unique_queries": 8,
+      "trajectories": 9,
+      "method": "H_ER",
+      "metrics": {
+        "map": 0.9398148148148149,
+        "mrr": 0.9398148148148149,
+        "recall@1": 0.8888888888888888,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "ndcg@1": 0.8888888888888888,
+        "ndcg@3": 0.9553552572420659,
+        "ndcg@5": 0.9553552572420659,
+        "ndcg@10": 0.9553552572420659
+      }
+    },
+    {
+      "market": "Dream",
+      "views": 8,
+      "candidates": 7,
+      "groups": 1,
+      "unique_queries": 8,
+      "trajectories": 9,
+      "method": "H_full",
+      "metrics": {
+        "map": 0.9039351851851851,
+        "mrr": 0.9039351851851851,
+        "recall@1": 0.8333333333333334,
+        "recall@3": 0.9861111111111112,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "ndcg@1": 0.8333333333333334,
+        "ndcg@3": 0.9224515038194472,
+        "ndcg@5": 0.9284331226815777,
+        "ndcg@10": 0.9284331226815777
+      }
+    },
+    {
+      "market": "Dream",
+      "views": 16,
+      "candidates": 15,
+      "groups": 7,
+      "unique_queries": 112,
+      "trajectories": 9,
+      "method": "VendorLink_SEQ",
+      "metrics": {
+        "map": 0.9475722001763669,
+        "mrr": 0.9475722001763669,
+        "recall@1": 0.9156746031746033,
+        "recall@3": 0.9761904761904763,
+        "recall@5": 0.9930555555555556,
+        "recall@10": 1.0,
+        "ndcg@1": 0.9156746031746033,
+        "ndcg@3": 0.9512580554528073,
+        "ndcg@5": 0.9583040700689318,
+        "ndcg@10": 0.9606017349373298
+      }
+    },
+    {
+      "market": "Dream",
+      "views": 16,
+      "candidates": 15,
+      "groups": 7,
+      "unique_queries": 112,
+      "trajectories": 9,
+      "method": "H_SEQ",
+      "metrics": {
+        "map": 0.9116083238851096,
+        "mrr": 0.9116083238851096,
+        "recall@1": 0.8551587301587301,
+        "recall@3": 0.9771825396825398,
+        "recall@5": 0.9950396825396824,
+        "recall@10": 1.0,
+        "ndcg@1": 0.8551587301587301,
+        "ndcg@3": 0.9246135257759371,
+        "ndcg@5": 0.9321302748255064,
+        "ndcg@10": 0.9338340642813032
+      }
+    },
+    {
+      "market": "Dream",
+      "views": 16,
+      "candidates": 15,
+      "groups": 7,
+      "unique_queries": 112,
+      "trajectories": 9,
+      "method": "H_ER",
+      "metrics": {
+        "map": 0.9292587868480725,
+        "mrr": 0.9292587868480725,
+        "recall@1": 0.8829365079365079,
+        "recall@3": 0.9801587301587301,
+        "recall@5": 0.998015873015873,
+        "recall@10": 1.0,
+        "ndcg@1": 0.8829365079365079,
+        "ndcg@3": 0.9390812755031196,
+        "ndcg@5": 0.9463806448362261,
+        "ndcg@10": 0.9470647128128545
+      }
+    },
+    {
+      "market": "Dream",
+      "views": 16,
+      "candidates": 15,
+      "groups": 7,
+      "unique_queries": 112,
+      "trajectories": 9,
+      "method": "H_full",
+      "metrics": {
+        "map": 0.915634448223734,
+        "mrr": 0.915634448223734,
+        "recall@1": 0.8621031746031745,
+        "recall@3": 0.9751984126984126,
+        "recall@5": 0.9920634920634921,
+        "recall@10": 0.9990079365079365,
+        "ndcg@1": 0.8621031746031745,
+        "ndcg@3": 0.927223575134639,
+        "ndcg@5": 0.9341826378641785,
+        "ndcg@10": 0.9364846917074452
+      }
+    },
+    {
+      "market": "Agora",
+      "views": 16,
+      "candidates": 15,
+      "groups": 26,
+      "unique_queries": 416,
+      "trajectories": 9,
+      "method": "VendorLink_SEQ",
+      "metrics": {
+        "map": 0.8670916860620387,
+        "mrr": 0.8670916860620387,
+        "recall@1": 0.8141025641025641,
+        "recall@3": 0.8993055555555556,
+        "recall@5": 0.936698717948718,
+        "recall@10": 0.9802350427350428,
+        "ndcg@1": 0.8141025641025641,
+        "ndcg@3": 0.8634533767198962,
+        "ndcg@5": 0.878832021372211,
+        "ndcg@10": 0.8929972704281821
+      }
+    },
+    {
+      "market": "Agora",
+      "views": 16,
+      "candidates": 15,
+      "groups": 26,
+      "unique_queries": 416,
+      "trajectories": 9,
+      "method": "H_SEQ",
+      "metrics": {
+        "map": 0.8489999072330803,
+        "mrr": 0.8489999072330803,
+        "recall@1": 0.7769764957264957,
+        "recall@3": 0.9057158119658121,
+        "recall@5": 0.9455128205128206,
+        "recall@10": 0.9869123931623931,
+        "ndcg@1": 0.7769764957264957,
+        "ndcg@3": 0.851767378890036,
+        "ndcg@5": 0.8681930087916827,
+        "ndcg@10": 0.8817120966489682
+      }
+    },
+    {
+      "market": "Agora",
+      "views": 16,
+      "candidates": 15,
+      "groups": 26,
+      "unique_queries": 416,
+      "trajectories": 9,
+      "method": "H_ER",
+      "metrics": {
+        "map": 0.8576841783572553,
+        "mrr": 0.8576841783572553,
+        "recall@1": 0.7884615384615384,
+        "recall@3": 0.9097222222222222,
+        "recall@5": 0.9479166666666666,
+        "recall@10": 0.9842414529914529,
+        "ndcg@1": 0.7884615384615384,
+        "ndcg@3": 0.8599677225856632,
+        "ndcg@5": 0.8757148707571815,
+        "ndcg@10": 0.8875514106388326
+      }
+    },
+    {
+      "market": "Agora",
+      "views": 16,
+      "candidates": 15,
+      "groups": 26,
+      "unique_queries": 416,
+      "trajectories": 9,
+      "method": "H_full",
+      "metrics": {
+        "map": 0.8414347071198033,
+        "mrr": 0.8414347071198033,
+        "recall@1": 0.7777777777777778,
+        "recall@3": 0.8774038461538461,
+        "recall@5": 0.9198717948717948,
+        "recall@10": 0.9783653846153846,
+        "ndcg@1": 0.7777777777777778,
+        "ndcg@3": 0.8362635093177675,
+        "ndcg@5": 0.8537341049841537,
+        "ndcg@10": 0.8727999930950616
+      }
+    },
+    {
+      "market": "Agora",
+      "views": 18,
+      "candidates": 17,
+      "groups": 1,
+      "unique_queries": 18,
+      "trajectories": 9,
+      "method": "VendorLink_SEQ",
+      "metrics": {
+        "map": 0.777706741132667,
+        "mrr": 0.777706741132667,
+        "recall@1": 0.6604938271604939,
+        "recall@3": 0.8888888888888888,
+        "recall@5": 0.9629629629629629,
+        "recall@10": 1.0,
+        "ndcg@1": 0.6604938271604939,
+        "ndcg@3": 0.78923910842152,
+        "ndcg@5": 0.8200590077642688,
+        "ndcg@10": 0.8323773775996541
+      }
+    },
+    {
+      "market": "Agora",
+      "views": 18,
+      "candidates": 17,
+      "groups": 1,
+      "unique_queries": 18,
+      "trajectories": 9,
+      "method": "H_SEQ",
+      "metrics": {
+        "map": 0.8671276254609588,
+        "mrr": 0.8671276254609588,
+        "recall@1": 0.8209876543209877,
+        "recall@3": 0.8888888888888888,
+        "recall@5": 0.9259259259259258,
+        "recall@10": 0.9814814814814815,
+        "ndcg@1": 0.8209876543209877,
+        "ndcg@3": 0.8605957300925939,
+        "ndcg@5": 0.8749236118420213,
+        "ndcg@10": 0.8928253348493208
+      }
+    },
+    {
+      "market": "Agora",
+      "views": 18,
+      "candidates": 17,
+      "groups": 1,
+      "unique_queries": 18,
+      "trajectories": 9,
+      "method": "H_ER",
+      "metrics": {
+        "map": 0.8525387935110157,
+        "mrr": 0.8525387935110157,
+        "recall@1": 0.7901234567901234,
+        "recall@3": 0.8888888888888888,
+        "recall@5": 0.9259259259259258,
+        "recall@10": 0.9691358024691357,
+        "ndcg@1": 0.7901234567901234,
+        "ndcg@3": 0.8500128814594379,
+        "ndcg@5": 0.8648817971698388,
+        "ndcg@10": 0.8788003596004352
+      }
+    },
+    {
+      "market": "Agora",
+      "views": 18,
+      "candidates": 17,
+      "groups": 1,
+      "unique_queries": 18,
+      "trajectories": 9,
+      "method": "H_full",
+      "metrics": {
+        "map": 0.8095972957084068,
+        "mrr": 0.8095972957084068,
+        "recall@1": 0.7098765432098766,
+        "recall@3": 0.8888888888888888,
+        "recall@5": 0.9444444444444444,
+        "recall@10": 0.9876543209876544,
+        "ndcg@1": 0.7098765432098766,
+        "ndcg@3": 0.8155468831569701,
+        "ndcg@5": 0.8383912906835449,
+        "ndcg@10": 0.8524510497423802
+      }
+    }
+  ],
+  "query_counts_by_market": {
+    "AlphaBay": 358,
+    "Dream": 120,
+    "Agora": 434
+  },
+  "max_market_reconstruction_difference": 3.3306690738754696e-16,
+  "limits": "Non-16 strata each contain only one group in one market; pool size is confounded with group membership and market. No size effect, independence, interval, test, or revised success criterion is inferred.",
+  "source_pattern": "reports/seller_alias_continual/20261104/vendorlink_result/formal/analysis/{order}_s{seed}_{method}_3_{position}_queries.json",
+  "reconstruction_weights": {
+    "AlphaBay": {
+      "16": "336/358",
+      "22": "22/358"
+    },
+    "Dream": {
+      "8": "8/120",
+      "16": "112/120"
+    },
+    "Agora": {
+      "16": "416/434",
+      "18": "18/434"
+    }
+  }
+}

@@ -1,0 +1,341 @@
+{
+  "review": "VendorLink completed formal fixed-data results targeted independent audit",
+  "model": "当前GPT-6 Pro会话；未切换模型",
+  "input": {
+    "input_filename": "vendorlink_result_review.zip",
+    "actual_bytes": 16644193,
+    "actual_sha256": "364f1de8f95084de23595f9b984f676aad93d493108b832e80a0e67c58510a0b",
+    "zip_members": 578,
+    "payload_members": 577,
+    "all_payloads_match": true
+  },
+  "verdict": {
+    "scientific_blockers": 0,
+    "reproducibility_defects": 0,
+    "required_numeric_corrections": 0,
+    "required_text_table_completions": 2,
+    "decision": "Core saved results and descriptive negative interpretation supported; integrate two report-only completions.",
+    "passed_is_statistical_acceptance": false,
+    "formal_passed": null,
+    "primary_status": "DESCRIPTIVE_FIXED_DATA_ONLY",
+    "new_execution_authorized": false,
+    "weights_to_retain": 108,
+    "another_external_review_required_for_listed_minimum_report_changes": false
+  },
+  "proven_scientific_blockers": [],
+  "proven_reproducibility_defects": [],
+  "required_numeric_corrections": [],
+  "required_text_table_corrections": [
+    {
+      "id": "VRES-T01",
+      "category": "NECESSARY_TEXT_CORRECTION",
+      "status": "NEEDS_REPORT_ONLY_COMPLETION",
+      "scientific_blocker": false,
+      "reproducibility_defect": false,
+      "title": "明确精确重复清理与近重复／真实owners独立性的边界",
+      "evidence": [
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/report.zh.txt",
+          "location": "lines 23–25,128",
+          "supports": "报告有观察账号和owners限制，但未明确两个false边界"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/source/scripts/step29_vendorlink_data.py",
+          "location": "eligible_ads lines 85–123; split_for 126–128; build_views 174–205",
+          "supports": "只做规范化原文和遮蔽后casefold精确指纹排除；near_duplicate_exclusion=False，latent_owner_disjointness_verified=False"
+        }
+      ],
+      "impact": "避免将观察账号留出/精确清理误读成近重复和真实owners跨划分独立已证；不是已发现实际泄漏的证据。",
+      "minimal_disposition": "在数据与结论限制处补：本轮仅排除了规范化原文和遮蔽账号名后的精确重复；未证明近重复内容已经被排除，也未证明潜在真实owners在划分之间完全独立。casefold同名只用于划分或依赖关联，不作为真实owner标签。",
+      "necessary_verification": "主执行者逐字对照冻结data.py所引函数/两个false字段；不重新读取正式数据或计算。",
+      "new_tests_or_scientific_computation_required": false,
+      "another_external_review_required_for_minimum_change": false
+    },
+    {
+      "id": "VRES-T02",
+      "category": "NECESSARY_TEXT_TABLE_COMPLETION",
+      "status": "TABLE_PROVIDED_FOR_REPORT_INTEGRATION",
+      "scientific_blocker": false,
+      "reproducibility_defect": false,
+      "title": "补最终阶段的市场×候选池大小保存指标表及单群限制",
+      "evidence": [
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/report.zh.txt",
+          "location": "lines 23,104",
+          "supports": "现有报告列池大小，未列池大小指标分层"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/inputs/dependencies.json",
+          "location": "query_counts",
+          "supports": "AlphaBay21×16+22；Dream7×16+8；Agora26×16+18"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/formal/analysis/*_3_*_queries.json",
+          "location": "columns, queries[*][*]",
+          "supports": "已保存最终阶段十指标可作简单算术；不是qrels/分数"
+        },
+        {
+          "path": "candidate_pool_final.json",
+          "location": "rows",
+          "supports": "本外审已提供24行＝6层×4方法完整十指标"
+        }
+      ],
+      "impact": "呈现实际可见异质性：Agora18视图单群Vendor低于三种H，Dream8视图单群H_SEQ最佳；小候选池Recall@10可以结构性覆盖全集。不得将总体均值读成各池均优。",
+      "minimal_disposition": "回收报告第6.3节六行MAP表、群/query数及完整十指标附件；说明只取最终3_pos、层内query等权后九轨迹等权、非16视图各单群且市场/成员混杂，不改原主估计或统计范围。",
+      "necessary_verification": "同市场两层按query数重组还原原market final；本外审全部十指标已核，最大差3.3306690738754696e-16。",
+      "new_tests_or_scientific_computation_required": false,
+      "another_external_review_required_for_minimum_change": false,
+      "original_three_market_plan_body_provided_or_read": false,
+      "basis": "用户本轮明确的候选池解释要求、当前报告与保存字段；不引述未提供计划原文。"
+    }
+  ],
+  "optional": [
+    {
+      "id": "VRES-O01",
+      "category": "OPTIONAL",
+      "title": "补H_ER平均收益的两条负反例",
+      "evidence": [
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/saved_summary.json",
+          "location": "per_run[*].final / per_run[*].O",
+          "supports": "H_ER−H_SEQ final七正二负、O八正一负"
+        }
+      ],
+      "impact": "防止读者把平均回放收益理解为每条轨迹收益；原报告平均表述本身正确。",
+      "minimal_disposition": "可注明ABC seed6 −0.00896144375342689、BCA seed4 −0.004345827709207439。",
+      "necessary_for_result_closure": false,
+      "new_tests_or_scientific_computation_required": false,
+      "another_external_review_required": false
+    },
+    {
+      "id": "VRES-O02",
+      "category": "OPTIONAL",
+      "title": "将学习率标成基础/峰值并简述调度",
+      "evidence": [
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/report.zh.txt",
+          "location": "line 21",
+          "supports": "列固定基准学习率"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/source/scripts/step29_vendorlink_run.py",
+          "location": "set_rates lines 76–86",
+          "supports": "Vendor逐市场线性；H encoder warmup+衰减、head固定"
+        }
+      ],
+      "impact": "提高可读性；原文没有说每步恒定，非错误。",
+      "minimal_disposition": "可补一行调度定义，不改参数。",
+      "necessary_for_result_closure": false,
+      "new_tests_or_scientific_computation_required": false,
+      "another_external_review_required": false
+    }
+  ],
+  "out_of_scope_overdesign": [
+    {
+      "id": "VRES-X01",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "proposal_not_required": "追加HPO、方法、种子、顺序、数据、轮数、等算力臂或按结果换对手/筛群",
+      "reason": "本轮是固定配置结果与解释审查，未发现需新增实验的具体缺口。"
+    },
+    {
+      "id": "VRES-X02",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "proposal_not_required": "恢复整体bootstrap/CI、事后统计验收或候选池新主门",
+      "reason": "依赖限制已接受，passed=null和无区间是原正式定义。"
+    },
+    {
+      "id": "VRES-X03",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "proposal_not_required": "要求上传分数/正文/qrels/owners/权重、重去重、全仓回归、新GPU或大模型pilot",
+      "reason": "已保存字段与静态链足以完成本范围；不可把未提供对象说成已核。"
+    },
+    {
+      "id": "VRES-X04",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "proposal_not_required": "通用调度/灾备/审计框架或套用FOREVER许可删除VendorLink权重",
+      "reason": "未变实现闭合复用，当前108权重明确保留。"
+    }
+  ],
+  "review_items": [
+    {
+      "id": "CHECK-01",
+      "topic": "36轨迹/108阶段/216格/4104前向/65664行/370080更新",
+      "status": "SUPPORTED_WITH_STATED_EVIDENCE_LIMITS",
+      "evidence": [
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/formal/*/run/updates.jsonl",
+          "location": "all 36 logs",
+          "supports": "连续更新与epoch/stage/workload核对"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/formal/*/run/completion.json",
+          "location": "identity,updates,endpoint_files,access,workload",
+          "supports": "固定spec和阶段端点"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/formal/scoring/all_blind_complete.json",
+          "location": "runs,forwards,sources",
+          "supports": "六格及分数身份元数据"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/formal/analysis/*_queries.json",
+          "location": "queries",
+          "supports": "实际保存指标块和行数"
+        }
+      ]
+    },
+    {
+      "id": "CHECK-02",
+      "topic": "指标公式、query/市场/轨迹权重、全十指标及三个差值",
+      "status": "ARITHMETIC_MATCH",
+      "evidence": [
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/source/scripts/step29_vendorlink_evaluate.py",
+          "location": "lines 19–22,171–213,251–267",
+          "supports": "固定角色/排名公式/query加权/null统计"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/saved_summary.json",
+          "location": "all metric aggregates",
+          "supports": "从保存query重组核回"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/tables.zh.txt",
+          "location": "all 5960 displayed metric values",
+          "supports": "九位小数舍入核对"
+        }
+      ]
+    },
+    {
+      "id": "CHECK-03",
+      "topic": "负结果、Q/O/F/N分解与机制假说",
+      "status": "CORE_INTERPRETATION_SUPPORTED",
+      "evidence": [
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/report.zh.txt",
+          "location": "lines 6–10,41,47–104,128–130",
+          "supports": "均值负结果、路径例外、低F不等于最终胜出，机制仅假说"
+        }
+      ]
+    },
+    {
+      "id": "CHECK-04",
+      "topic": "观察账号代理、清理/owners边界、候选池、固定描述",
+      "status": "TWO_REPORT_COMPLETIONS_NEEDED",
+      "findings": [
+        "VRES-T01",
+        "VRES-T02"
+      ],
+      "evidence": [
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/source/scripts/step29_vendorlink_data.py",
+          "location": "lines 85–128,174–205",
+          "supports": "实际清理和两个false"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/inputs/dependencies.json",
+          "location": "components,query_counts",
+          "supports": "57群/10分量/最大48"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/formal/analysis/result.json",
+          "location": "primary_status,passed,comparisons",
+          "supports": "DESCRIPTIVE_FIXED_DATA_ONLY/null"
+        }
+      ]
+    },
+    {
+      "id": "CHECK-05",
+      "topic": "共同当前曝光、回放教师、成本与保管",
+      "status": "SUPPORTED_WITH_FROZEN_SNAPSHOT_BOUNDARY",
+      "evidence": [
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/source/scripts/step29_vendorlink_methods.py",
+          "location": "lines 116–132,177–253,262–299",
+          "supports": "实际目标、梯度/step和出生教师"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/formal/budget.json",
+          "location": "used,limits,completed",
+          "supports": "原38.43479360270165小时"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/review/submitted_budget.json",
+          "location": "events,used_with_result_work,note",
+          "supports": "127准备秒承接；非最终同步总账"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/receive_manifest.json",
+          "location": "models,files,history",
+          "supports": "stat/回传/HPO观察的适用边界"
+        }
+      ]
+    },
+    {
+      "id": "CHECK-06",
+      "topic": "既有V-R01/V-R02/CHAIN-R01与cpu10适用性",
+      "status": "CLOSED_SCOPE_REUSED_NO_REOPEN",
+      "evidence": [
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/source/scripts/step29_vendorlink_evaluate.py",
+          "location": "validate_blind 102–123; analyze 216–245",
+          "supports": "形状/原数值finite在qrels前"
+        },
+        {
+          "path": "reports/seller_alias_continual/20261104/vendorlink_result/source/tests/test_step28_formal_training.py",
+          "location": "lines 204–302",
+          "supports": "cpu10真实原函数调用观察和独立期望"
+        },
+        {
+          "path": "reports/documentation/20261030/vendorlink/formal/cpu10/receipt.json",
+          "location": "sources",
+          "supports": "61/63同字节；仅两份后来已审非workload源变化"
+        }
+      ]
+    }
+  ],
+  "evidence_boundaries": {
+    "mechanical_checks": "ZIP/JSON/text/SHA plus sums, means, differences and counts of already-saved metrics/log fields only.",
+    "static_inference": "Read actual frozen entry, objective/gradient, save/load, scoring/label gate, aggregation and costs; did not run them.",
+    "existing_dynamic_evidence": "Supplied Linux formal logs/receipts and old CPU10. No new Linux project execution by this reviewer.",
+    "unprovided": [
+      "216 raw scoring matrices",
+      "formal text",
+      "qrels",
+      "owners",
+      "pretrained/endpoint weights",
+      "Memory",
+      "four original HPO metadata files"
+    ],
+    "not_executed": [
+      "project modules",
+      "tests",
+      "training",
+      "inference/model load",
+      "metric evaluation from scores",
+      "label parsing",
+      "bootstrap/resampling",
+      "research server connection"
+    ],
+    "receive_payload_boundary": {
+      "receive_record_count": 811,
+      "receive_record_bytes": 172378651,
+      "receive_lists_metadata_match": true,
+      "received_payloads_in_package_rehashed": 551,
+      "received_payloads_not_provided": 260,
+      "score_payloads_not_provided": 216,
+      "source_files_match_current_gate": 65,
+      "weights_records": 108,
+      "weight_record_total_bytes": 46985731650,
+      "weight_record_total_gib": 43.758872570469975,
+      "weight_records_match_training_completions": true,
+      "all_weight_verification_marked_stat_only": true,
+      "weight_payload_read": false,
+      "weights_retained": true,
+      "hpo_original_four_files_in_package": false,
+      "hpo_current_server_visited": false
+    },
+    "input_sources_gates_results_unchanged": true
+  },
+  "minimum_closeout": "主执行者回收两处文字/表格、核对来源与保存字段关系并独立处置；不修改冻结结果，不启动新执行，不清理当前权重。"
+}

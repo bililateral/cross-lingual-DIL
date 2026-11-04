@@ -1,5 +1,5 @@
 {
-  "status": "RESULT_ANALYSIS_SYNCED_EXTERNAL_REVIEW_IN_PROGRESS",
+  "status": "RESULT_REVIEW_AND_PRIMARY_CLOSEOUT_COMPLETE",
   "original_campaign_used": {
     "preparation": 145.00020673684776,
     "cpu": 132,
@@ -64,17 +64,34 @@
       "actual_seconds": 1.485000000000582,
       "charged_seconds": 4,
       "note": "ceil active transfer plus 2 seconds reserved for budget/receipt write and close"
+    },
+    {
+      "action": "external_review_recovery_and_document_closeout",
+      "charged_seconds": 120,
+      "conservative": true,
+      "note": "Finite conservative allowance for active Playwright recovery, source/document reads and edits; excludes external generation and passive waiting."
+    },
+    {
+      "action": "external_payload_and_pool_arithmetic_check",
+      "actual_seconds": 0.5870723000043654,
+      "charged_seconds": 1
+    },
+    {
+      "action": "external_review_closeout_sftp",
+      "actual_seconds": 4.889999999999418,
+      "charged_seconds": 8,
+      "note": "Ceil active file transfer plus 3 seconds reserved for budget/receipt transfer and close; no server scientific execution."
     }
   ],
   "used_with_result_work": {
-    "preparation": 526.0002067368478,
+    "preparation": 655.0002067368478,
     "cpu": 132,
     "control": 753.694709735224,
     "training": 136790.74984660675,
     "confirmation": 508.5436203139834,
     "analysis": 35.26858633314259
   },
-  "total_seconds": 138746.25696972595,
-  "total_task_hours": 38.54062693603498,
+  "total_seconds": 138875.25696972595,
+  "total_task_hours": 38.57646026936832,
   "note": "Original campaign ledger preserved. New mechanical work is carried in original preparation bucket; no new research computation or budget. Further packaging/sync recorded when completed."
 }
