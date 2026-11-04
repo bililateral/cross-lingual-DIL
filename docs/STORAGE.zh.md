@@ -7,7 +7,7 @@ source_bundle.zip为初次11来源传输及CPU01的冻结快照；CPU02只修测
 
 本批未产生正式候选权重。原手写GPU尝试在第二次更新OOM并退出，只有一次完成更新记录，不能从没有完整result.json推断没有做过更新。新gpu_wait独立活动副本按用户要求首个真实更新后自删，保留workspace源码及许可/日志/state，不删除其他作业。ABC旧36权重继续保留，中文H27及活动HPO保持。根docs只维护Windows，本地提交不推送；双端同步以实际回执范围为准，不重置大清理周期。
 
-23:20:50的[本轮同步核对](../reports/documentation/20261104/english_abc/closeout_sync.json)确认49项当前材料/保留来源大小与SHA一致；13来源和活动副本另在启动前核对，活动副本及持续变化的state不在同步覆盖范围。CPU06补齐异常首更自删，累计CPU20秒。返回审查ZIP两份冗余下载经四原件及内容哈希验收后删除，原件在review/external，删除记录并入recovery.json；新监听输入ZIP仅Windows保留，承担CPU04/05不同旧来源恢复用途。启动后运行费用继续Linux状态账，budget.json是注明时点的核账快照。
+23:20:50的[本轮同步核对](../reports/documentation/20261104/english_abc/closeout_sync.json)确认49项当前材料/保留来源大小与SHA一致；13来源和活动副本另在启动前核对，活动副本及持续变化的state不在同步覆盖范围。CPU06补齐异常首更自删，累计CPU20秒。返回审查ZIP两份冗余下载经四原件及内容哈希验收后删除，原件在review/external，删除记录并入recovery.json；新监听输入ZIP仅Windows保留，承担CPU04/05不同旧来源恢复用途。启动后运行费用继续Linux状态账，budget.json是注明时点的核账快照。后续[23:29:05观测](../reports/documentation/20261104/english_abc/gpu_wait/observation_20261104_232905.json)单独留存，原23:16观测不覆盖；该回执及更新后的budget大小/SHA按[进度同步核对](../reports/documentation/20261104/english_abc/gpu_wait/progress_sync_20261104_232905.json)保管，本次未重传活动脚本、许可或冻结来源。
 
 ## 2026-11-04 VendorLink结果回传与保管
 
