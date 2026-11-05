@@ -1,4 +1,14 @@
 # 科研文件存储与恢复
+## 2026-11-05 退役手写CPU/GPU校验脚本双端清理
+
+用户确认按已呈现范围清理，并明确排除本次VendorLink英文ABC新实验全部CPU/GPU脚本。Windows删除360份4,229,378字节，Linux删除669份8,474,183字节，合计1,029份12,703,561逻辑字节（12.11MiB）；包含旧资格入口、启动包装及退役手写_verify/_check重复副本，不将逻辑字节冒称共享磁盘净变化。逐文件路径、大小、SHA和恢复依据见[Windows清单](../reports/maintenance/20261105/qualification_cleanup/windows_inventory.json)、[Linux清单](../reports/maintenance/20261105/qualification_cleanup/linux_inventory.json)，实际缺失和保护核对见同目录两端receipt及verification.json。
+
+删除的135种字节版本均已核实为现有Git的commit:path和blob原字节；清单每项recovery记录具体提交、仓库路径、blob及换行恢复方式。恢复只在Windows读取Git，若restore=lf_to_crlf则先统一LF再转换CRLF，恢复后核对bytes/SHA，再按实际用途和许可SFTP到Linux；不运行旧脚本或重训来替代恢复。旧冻结回执、来源清单和已发生事实不改写，历史路径若指向本次退役脚本，以此清理记录及恢复清单解释；结果、分数、标签开放账、日志、原审查、失败诊断和费用保留。
+
+当前中文HPO的Linux58来源、Windows对应58来源均不变；Linux英文ABC27份受保护脚本在删除前后SHA一致，20261104/english_abc和20261105/english_abc_formal_prepare及根目录英文入口/测试全部排除。保留通用模块、普通回归测试及正式代码所需校验函数。Linux另保留3份未找到精确Git恢复版本的唯一历史源码：retention_diagnostic_execution/20261011_140900/workspace/scripts/step28_retention_diagnostic_verify.py、h_consistency_execution/20261016_124900/workspace/reports/qualification/cpu/attempt04/sources/scripts/step28_g_half_verify.py、seller_alias_continual/20261015/balanced_pooling_repair/20261015_105800/workspace/scripts/step28_balanced_pooling_verify.py；完整路径及SHA见Linux清单keep项。活动父4159100及541431/541432/541433在删除后身份保持，无重启、重试、新科学运行或预算修改。
+
+本轮仅维护清理清单/回执与根docs；两端维护记录按同目录sync.json核对，根docs仅Windows。一次性盘点/删除助手和传输索引收尾删除，没有新增备份ZIP，不改写Git历史。仅本地commit、不推送；局部脚本清理不重置项目大清理周期。
+
 ## 2026-11-04 ABC英文适配准备材料
 
 [独立目录](../reports/documentation/20261104/english_abc/)保留完整方案、当前增量源码身份、CPU01—06原失败与通过证据、GPU单路失败的日志/真实更新记录及预算。初次11来源，新增独立监听及测试后为13来源，通过SFTP部署至Linux同名目录的workspace；原formal_chain和活动history_wait源码未覆盖；开发导出只核已有manifest元数据，没有读取其正文或标签。CPU01错误测试捕获器原文件单独保留，失败费用不清零。

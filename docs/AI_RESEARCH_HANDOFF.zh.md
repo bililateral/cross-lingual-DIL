@@ -560,6 +560,8 @@ Step28-v13 v1.3—v1.12、V8、V9、V9.1、V9.2、V9.3-R2关闭路线不重启�
 
 ## 历史与证据
 
+历史CPU/GPU手写校验脚本的退役工作区副本已按[11月5日清理与恢复记录](STORAGE.zh.md#2026-11-05-退役手写cpugpu校验脚本双端清理)处理：Windows360份、Linux669份，清单绑定135种Git原字节版本；现行中文HPO、英文ABC新实验及必要共用模块保留。历史原来源清单不改写，复核前先按清单恢复已退役脚本。
+
 历史仅在与任务相关时读取，不作为现行授权。优先按上表进入实际合同、结果和所属主审，再读直接相关的外审原文与实现证据。详细用户决定见[讨论记录](RESEARCH_DISCUSSION.zh.md)，保管与删除事实见[存储](STORAGE.zh.md)。不称全部背景已经语义全审，不以文件数、哈希或外审自述代替主执行者判断。
 
 本页精简前的详细接手流水可通过已交付提交9bf7ed58的[交接原文](https://github.com/bililateral/cross-lingual-DIL/blob/9bf7ed58dd8e7f3bad58d6ac1420a4d89f02f07b/docs/AI_RESEARCH_HANDOFF.zh.md)回溯。更早重构前的[原交接](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/AI_RESEARCH_HANDOFF.zh.md)、[原进展](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/PROJECT_PROGRESS.md)、[原设计](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/CURRENT_EXPERIMENT_DESIGN.md)、[原计划](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/RESEARCH_PLAN.md)继续可追溯。这些是固定历史版本；原合同、报告、审查及运行证据保持原字节，不另存重构前文档副本。
