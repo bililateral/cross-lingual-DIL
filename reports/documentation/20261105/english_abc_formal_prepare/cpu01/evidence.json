@@ -1,0 +1,199 @@
+{
+  "finite_pipeline": {
+    "rounds": [
+      {
+        "name": "representations",
+        "count": 4
+      },
+      {
+        "name": "L1",
+        "count": 1
+      },
+      {
+        "name": "L2",
+        "count": 1
+      },
+      {
+        "name": "L3",
+        "count": 1
+      },
+      {
+        "name": "T1",
+        "count": 1
+      },
+      {
+        "name": "T2",
+        "count": 1
+      },
+      {
+        "name": "seed8",
+        "count": 4
+      },
+      {
+        "name": "final",
+        "count": 15
+      }
+    ],
+    "selected": "P2",
+    "verdict": {
+      "passed": true,
+      "checks": {
+        "dream_forgetting_original": true,
+        "dream_forgetting_vendor": true,
+        "dream_initial": true,
+        "dream_final": true,
+        "agora_new": true,
+        "alphabay_old": true,
+        "vendor_forgetting_present": true,
+        "agora_seed_protection": true,
+        "direction_original": true,
+        "direction_vendor": true
+      },
+      "interpretation": "FIXED_DATA_DEVELOPMENT_ONLY"
+    },
+    "precheck_stop": {
+      "status": "STOP_PRECHECK_NO_VENDOR_DREAM_FORGETTING"
+    }
+  },
+  "pairing_and_metrics": {
+    "wrong_seed_rejected": true,
+    "wrong_query_count_rejected": true,
+    "old_settings_defaults": {
+      "method": "H_full",
+      "lambda_rank": 1.3051794547562026,
+      "lr_multiplier": 1.2832655111666686,
+      "encoder_lr": 1e-05,
+      "head_lr": 0.001,
+      "vendor_lr": 4e-05,
+      "weight_decay": 0.01,
+      "vendor_weight_decay": 0.0,
+      "microbatch": 8,
+      "vendor_batch": 32,
+      "channel_tokens": 256,
+      "vendor_tokens": 512,
+      "memory_groups": 6,
+      "memory_bytes": 1048576,
+      "pooling": "cls",
+      "head_schedule": "constant",
+      "bce_weight": 1.0,
+      "hard_weight": 0.5
+    },
+    "hand_rank_ap": 0.5
+  },
+  "actual_worker_and_evaluator": {
+    "updates": 6,
+    "cells": 6,
+    "metrics": {
+      "H_full_s7_a2f7720bb7c74bf3": {
+        "B2": 0.24375,
+        "B3": 0.5833333333333333,
+        "C3": 0.5833333333333334,
+        "A3": 0.5833333333333333
+      }
+    },
+    "closed_cli_rejected": true,
+    "missing_endpoint_refused_before_dev": true,
+    "access": {
+      "dev_text_attempted": true,
+      "dev_qrels_attempted": true,
+      "heldout": 0,
+      "owners": 0
+    }
+  },
+  "real_dispatch": {
+    "first": {
+      "status": "STOP_NO_RETRY",
+      "retired_slots": [
+        0
+      ],
+      "pending": [],
+      "completed": [
+        {
+          "id": "0",
+          "slot": 0,
+          "success": false,
+          "error": "Worker failed/overran: exit=2, descendants=False",
+          "actual_seconds": 0.20989053207449615,
+          "released": true
+        },
+        {
+          "id": "1",
+          "slot": 1,
+          "success": true,
+          "error": null,
+          "actual_seconds": 0.2824307079426944,
+          "released": true
+        },
+        {
+          "id": "2",
+          "slot": 1,
+          "success": true,
+          "error": null,
+          "actual_seconds": 0.1933127660304308,
+          "released": true
+        },
+        {
+          "id": "3",
+          "slot": 1,
+          "success": true,
+          "error": null,
+          "actual_seconds": 0.1695612680632621,
+          "released": true
+        },
+        {
+          "id": "4",
+          "slot": 1,
+          "success": true,
+          "error": null,
+          "actual_seconds": 0.2340352179016918,
+          "released": true
+        }
+      ],
+      "active": {}
+    },
+    "second": {
+      "status": "COMPLETE",
+      "retired_slots": [
+        0
+      ],
+      "pending": [],
+      "completed": [
+        {
+          "id": "next",
+          "slot": 1,
+          "success": true,
+          "error": null,
+          "actual_seconds": 0.2323023348581046,
+          "released": true
+        }
+      ],
+      "active": {}
+    },
+    "budget": {
+      "training": 6,
+      "gpu": 0,
+      "auxiliary": 31.07343347533606
+    }
+  },
+  "shared_scan_and_receipt": {
+    "retirement_race_accepted": true,
+    "first_update": {
+      "epoch": 1793844821.6260073,
+      "pid": 123,
+      "created": 42,
+      "slot": 1,
+      "job": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/cpu01/tmpiw75q8r1/job",
+      "update": {
+        "stage": 1,
+        "total_updates": 1,
+        "optimizer_updates": 1
+      }
+    },
+    "reservation": {
+      "free_gpu_bytes": 21474836480,
+      "pending_gpu_bytes": 14565769217,
+      "required_gpu_bytes": 31279022082,
+      "ready": false
+    }
+  }
+}

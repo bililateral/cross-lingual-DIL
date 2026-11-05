@@ -1,0 +1,59 @@
+{
+  "status": "PREPARATION_REVIEW_CLOSED_FORMAL_OFF",
+  "limits_seconds": {
+    "auxiliary": 14400,
+    "gpu": 10800,
+    "training": 172800
+  },
+  "prior_used_seconds": {
+    "auxiliary": 2759,
+    "gpu": 37,
+    "training": 0
+  },
+  "events": [
+    {
+      "charged_seconds": 7,
+      "action": "cpu01",
+      "actual_seconds": 6.065309952013195
+    },
+    {
+      "charged_seconds": 7,
+      "action": "cpu02",
+      "actual_seconds": 6.44777745497413
+    },
+    {
+      "charged_seconds": 1800,
+      "action": "formal_entry_preparation_through_review",
+      "note": "Finite active source/metadata inspection, implementation, sync and review-package preparation; passive waits excluded",
+      "conservative": true
+    },
+    {
+      "action": "cpu03",
+      "actual_seconds": 7.146781323943287,
+      "charged_seconds": 8,
+      "exit_code": 1
+    },
+    {
+      "action": "cpu04",
+      "actual_seconds": 7.227338511962444,
+      "charged_seconds": 8,
+      "exit_code": 0
+    },
+    {
+      "action": "review_fix_recovery_sync_and_local_delivery",
+      "charged_seconds": 1200,
+      "conservative": true,
+      "note": "Finite active repair, report recovery, primary disposition, sync and local delivery allowance; passive webpage waits excluded; not exact measured wall time"
+    }
+  ],
+  "used_seconds": {
+    "auxiliary": 5789,
+    "gpu": 37,
+    "training": 0
+  },
+  "total_charged_seconds": 5826,
+  "cpu_qualification_cumulative_seconds": 50,
+  "gpu_qualification_cumulative_seconds": 37,
+  "formal_training_authorized": false,
+  "extra_gpu_test": false
+}

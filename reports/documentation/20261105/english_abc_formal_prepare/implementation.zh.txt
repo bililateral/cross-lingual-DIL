@@ -1,0 +1,18 @@
+正式入口筹备：新增接线与证据边界
+2026-11-05，正式训练/真实dev评价关闭，用户明确取消额外双路GPU短测。
+
+两个新增文件：step29_english_control.py负责整批有限流程与两槽派发；step29_english_formal.py负责正式门、真实训练worker、独立dev评价器与完整性检查。原step29_vendorlink_run.execute/Settings/Model/评分公式和step29_english_abc选择规则保持，旧固定36条入口未改。旧formal/evaluate作为query_metrics直接依赖进入来源清单，但其旧unsafe Budget不被新worker采用；新Budget.check实际使用queue.campaign_files的逐文件FileNotFoundError容忍，仍扫描共同campaign，并预留两槽共6GiB临时checkpoint和64GiB共享余量。
+
+实际顺序为precheck→representations→L1→L2→L3→T1→T2→seed8→final。precheck绑定原ABC四方法seed4/5/6完整12条、36端点；新每条固定六格/十指标，先全部盲评分完成并核shape、view顺序和group集，再记录本轮qrels尝试并读取dev标签。每轮dev文本和qrels各一次，最多9轮；此前没有真实dev读取。本次只读取已有export manifest和旧completion元数据制作input_bindings，不解析文本/标签、载模或重算。dev查询数由manifest为AlphaBay386/Dream120/Agora502；不能按群数平均代替query等权。
+
+新H的三阶段、40轮、初始权重/随机流、Memory及教师仍走原execute；修改配置从Settings进入实际模型及保存端点。旧端点缺新字段时仅用原默认CLS/constant/BCE1/hard.5恢复含义。每方法/有效配置/seed生成唯一ID，按精确ID映射取seed配对；同配置去重，依赖候选只在完整上一轮后生成。最终15条完成后再判固定开发门和报告全部系统的配对及差值，不凭一个遗忘数宣称机制贡献。
+
+Runner实例、retired集合及Ledger在整批内各一个。正常退出才验证端点/结果，失败和创建进程失败只退休该槽、不重派，健康槽继续完成当轮；不完整轮直接拒绝进入评价/依赖选择。各worker进程组释放后按完整生命周期向上取整，活动任务按完整余时承诺准入，成功释放未用预算；父有效控制工作另记，所有sleep排除，辅助桶内预留30秒收尾。每条8h仍受48h训练/3hGPU评价/4h辅助的全批约束。资源不足等待，实时NVML准入扣尚未反映的统一槽承诺。首步观察适配实际run/updates.jsonl中stage=1、total_updates=1、optimizer_updates=1。本次没有创建会自动开训的监听；正式启动仍待用户指令。
+
+单路已完成：新三表示各两真实更新/编码器及head变化，最大NVML12.2890625GiB；完成回执01:08:31，首更自删01:08:16，10:01只读核实进程和活动文件已退出/不存在。新增GPU23秒承接旧失败14秒，共37。统一槽需求以旧VendorLink原ledger中的15193866240bytes加10%按当前ceil实现取16713252865bytes（较精确十进制余量多1字节），allocator少1GiB。两路容量估算约31.13GiB；没有双路实测，不是所有共享现场不会OOM的保证。现有资源/故障规则保持，不能将用户取消重复核验解释成取消显存准入。
+
+CPU01在Linux既有py310五项通过，6.065310秒计7秒。覆盖actual train→compact endpoint restore→six-cell evaluate/query aggregation、缺端点在dev前拒绝、真实关闭CLI拒绝、seed/查询数错误、完整28条有限选择及前置失败/缺项停止、两真实小子进程失败退休/健康续领/跨次持久、共享目录消失容忍和首步schema。随后对Popen创建失败做必要最小修正，CPU02六项通过，6.447777秒计7秒，加旧20秒共34/1800秒。原CPU01对应来源由source_bundle和其receipt恢复，CPU02绑定当时12来源，原字节保存在冻结送审包。外审唯一必修为清理sleep重复计父辅助费用，已在实际Runner.finish→release中注入Ledger.exclude_sleep关闭；仅平移父计时，子生命周期不扣等待。CPU03首次新增断言因固定延迟被进程扫描占用而失败，原测试和8秒保留；CPU04将夹具改为三次等待握手后退出，七项通过，7.227338512秒计8，累计CPU50/1800秒。父有效清理.362754400秒、排除sleep .060301458秒、子完整.443218038秒计1，见CPU04 evidence。当前12来源与CPU04一致。
+
+这些是手写CPU与微型随机BERT证据，NVML为替身，部分有限选择使用事先手写MAP以验证控制流；不宣称真实28条已跑、GPU并发已测、完整40轮峰值或独立英文效果。CPU试验不打开正式门，不读预训练或真实语料，源码身份绑定不表示每个被列依赖的所有分支都动态覆盖。未变科学计算和旧数值边界复用先前审查/资格，不另加全量测试、GPU试跑或调参。
+
+完整外审四文件已回收并核大小/SHA，唯一必修ABC-F-R01按上述定向证据关闭，其余澄清/可选项见review/primary_disposition.zh.txt。正式筹备完成，formal_gate.draft.json绑定实际输入元数据、CPU04当前来源和最终费用，review_closed=true但approved=false。gate对authorization只核字节，未语义证明新的用户许可；日后正式开始须另绑明确开始许可和最新费用，准备许可不能代替。累计训练0、GPU37、辅助5789，共5826/198000秒，其中3000秒为明确保守准备/收尾收费，网页等待不计。运行Ledger的30秒收尾预留尚未启动，不与已发生费用混称。只在新独立workspace部署，不改活动中文HPO；实际同步见final_sync.json，正式训练、真实dev和自动正式监听均关闭。

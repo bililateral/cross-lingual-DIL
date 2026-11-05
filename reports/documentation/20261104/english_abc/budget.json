@@ -1,5 +1,5 @@
 {
-  "status": "REVIEWS_CLOSED_GPU_WAITER_ACTIVE_WAIT_RESOURCE",
+  "status": "SINGLE_GPU_COMPLETE_DUAL_TEST_WAIVED_FORMAL_OFF",
   "limits_seconds": {"training": 172800, "gpu_qualification_and_evaluation": 10800, "auxiliary": 14400},
   "preparation_subcaps_seconds": {"cpu": 1800, "gpu_worker": 1800},
   "events": [
@@ -13,12 +13,14 @@
     {"action": "active_preparation_through_review_package", "charged_seconds": 1200, "conservative": true, "note": "Finite preparation charge including source/document inspection, edits, SSH/SFTP, deployment and failed read-only path probes; excludes passive waits and approval/login waiting"},
     {"action": "review_recovery_and_waiter_preparation", "charged_seconds": 1200, "conservative": true, "note": "Scientific threshold repair, review recovery/disposition, read-only HPO scheduling inspection, waiter implementation and incremental package; passive web generation excluded; includes failed UI text selector and Windows glob lookup"},
     {"action": "bounded_final_preparation_and_delivery", "charged_seconds": 300, "conservative": true, "note": "Finite allowance charged for final source/permit/SFTP checks, launch/observation, documentation and local commit; listener runtime active checks are separately metered in gpu_wait/state/status.json, not this tail"},
-    {"action": "gpu_wait_runtime_snapshot", "actual_seconds": 5.033379473024979, "charged_seconds": 6, "as_of_server_time": "2026-11-04T23:29:05.459360+08:00", "evidence": "gpu_wait/observation_20261104_232905.json", "note": "Snapshot of active auxiliary checks only; idle sleeps excluded. Replaces the earlier cumulative snapshot, not an additional charge. Live authoritative ledger: gpu_wait/state/status.json on Linux."}
+    {"action": "gpu_wait_runtime_snapshot", "actual_seconds": 38.56970635266043, "charged_seconds": 39, "as_of_server_time": "2026-11-05T01:08:31.642749+08:00", "evidence": "gpu_wait/state/status.json", "note": "Final cumulative active auxiliary checks; passive sleeps excluded. Replaces the earlier snapshot, not an additional charge."},
+    {"action": "gpu_wait_three_serial_probes", "charged_seconds": 23, "result": "Three handwritten pooling probes each completed two updates; first-update self-deletion confirmed; formal data reads zero"}
   ],
-  "used_seconds": {"training": 0, "gpu_qualification_and_evaluation": 14, "auxiliary": 2726},
-  "total_charged_seconds": 2740,
+  "used_seconds": {"training": 0, "gpu_qualification_and_evaluation": 37, "auxiliary": 2759},
+  "total_charged_seconds": 2796,
   "formal_training_authorized": false,
-  "gpu_qualification_passed": false,
+  "gpu_qualification_passed": true,
   "automatic_gpu_retry": false,
-  "note": "Original VendorLink and Chinese HPO ledgers are unchanged. Fees carry into the proposed 55-hour ABC budget. One separately authorized single-GPU waiter is active; unused allowance still does not authorize repeated failures or formal experiments. This file is a reconciliation snapshot; subsequent waiter costs continue in its live state."
+  "gpu_qualification_scope": "Single-worker handwritten three-pooling check only; separate dual-worker test cancelled by user",
+  "note": "Closed single-GPU preparation phase; original failures retained. Subsequent formal-entry preparation and fees continue in reports/documentation/20261105/english_abc_formal_prepare, without resetting this ledger."
 }

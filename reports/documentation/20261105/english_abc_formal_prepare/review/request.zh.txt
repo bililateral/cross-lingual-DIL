@@ -1,0 +1,16 @@
+请使用当前GPT-6 Pro对ABC正式训练筹备新增接线作独立外审，沿用本会话已完成的科学方案审查，不重开已结案负结果。附件只含源码、方案、手写CPU证据、单路GPU手写完成证据和旧资源/审查小材料；没有真实语料、标签、owners、private_custody载荷、权重或凭据。
+
+先核manifest、字节/SHA，明确实际阅读范围。必须先读scope.zh.txt、implementation.zh.txt、prior/plan.zh.txt和prior/primary_disposition.zh.txt。背景：原36条英文四臂实验H_full九配对最终MAP均低于VendorLink；用户按已见结果选定ABC，要求改善表示及英文训练适配、重点少忘Dream并保持Agora。63群dev用于本轮有限选参，非独立最终确认，不计算整体CI/统计显著性。原账号两视图代理和未证实真实owners独立性边界保持。科学方案/严格B3门已审且获用户确认；本次只接实际控制器、worker/evaluator、数据读取门、配对/预算/失败行为。
+
+最新用户决定优先：单路三表示GPU短测已成功，各两真实更新，原失败14秒+新23秒共37秒；首更自删和控制退出有原始回执。我们提出补双路短测后，用户明确说“没必要了，既然单路GPU核验已经说明双路不会超出32G显卡最大显存，双路GPU检验就是多余的”。因此取消额外GPU短测，不把独立双路实测作为本轮必备门。主执行者保留准确措辞：单路峰值加余量估算支持两路容量，不声称真实双路已验证或共享现场绝不会OOM。请不要把已被用户取消的额外双路GPU试跑重新列为强制项；如发现具体容量算术/准入/监控错误，可给最小修法。当前现有中文HPO未动，正式训练/真实dev评分/自动正式监听全部关闭。
+
+本轮新增step29_english_control.py与step29_english_formal.py。请从实际CLI、gate、pipeline→Runner.dispatch→worker main→train/evaluate追踪，重点对应前审P02—P05/P07：
+1. 旧ABC12条/36端点和旧Settings缺字段的恢复，真实dev独立评分、六格/十指标、按query等权和view顺序，完整一轮后才开dev qrels；有没有误读heldout/owners、未来域fit或漏掉完整性。
+2. seed7的P0/P1/P2及Vendor参照→五个依赖候选→最多两个seed8→唯一冻结→五系统×seed9/10/11，去重、精确seed键、严格B3与停止；没有把helper存在代替整批接线。
+3. 同一Runner/Ledger跨轮保持退休和累计账；创建失败/训练失败后健康槽继续本轮、失败不重派、不完整不开放；resource不足等、显存未反映承诺、进程/共享RAM磁盘上限、实际worker安全扫描、保存reserve、首步schema、清理和费用是否有具体缺陷。
+4. 源码/配置/输入元数据身份，旧正式入口只复用query_metrics等直接依赖，不调用其unsafe Budget；正式draft双false及准备authorization不是开训授权；未更改方法/数据/门槛或跳过正式启动指令。
+5. CPU01五项通过后，仅补Popen OSError退休行为，CPU02六项通过，累计CPU34秒。tiny BERT/真实小子进程和手写MAP/NVML各自证据边界；需要补测只针对具体已证缺口，不全量重测、不建立通用平台、不额外训练。读source_bundle说明：原CPU01来源由冻结初始包保留，CPU02为本包当前12来源。
+
+预算仍55h三桶，旧账+本轮准备费用见budget.json；稿中计费是注明的保守准备收费，等待网页生成不计。正式48h训练与3hGPU、4h辅助是上限，不是保证全部28条跑完。两路21—22h只是旧速依赖排程估计，不承诺共享卡工期减半。
+
+请区分SCIENTIFIC_BLOCKER、REPRODUCIBILITY_DEFECT、必要澄清、可选后续与OUT_OF_SCOPE_OVERDESIGN。每个必修给实际文件/函数、可复现触发、对合同的影响、最小修法和必要定向验证；不要只列泛泛建议。没有证据支持的问题写不确定/可选。完整返回report.zh.txt、findings.json、read_scope.json、output_manifest.json，并打包为abc_formal_review_response.zip提供下载；正文也给主要裁决。静态推导/手写参考与项目Linux真实执行分开，不冒称执行我们的CUDA或正式数据。当前不能判“正式实验已经启动/效果达标”。

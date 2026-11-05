@@ -1,0 +1,468 @@
+{
+  "schema_version": "1.0",
+  "language": "zh-CN",
+  "review_date": "2026-11-05",
+  "timezone": "Asia/Shanghai",
+  "input": {
+    "filename": "abc_formal_review.zip",
+    "bytes": 187671,
+    "sha256": "bec1a781ac67842ddafb793ced373a315268ed1cfae39a2d59cc27436bd8d782",
+    "payloads": 40,
+    "zip_members": 41,
+    "actual_bytes_verified": true,
+    "payload_manifest_verification": "40/40 sizes and SHA256 matched; exact unique member set"
+  },
+  "scope": {
+    "included": [
+      "新增正式controller/worker/evaluator实际接线",
+      "数据读取门、端点完整性、query等权、配对与有限选择",
+      "跨轮两槽、失败退休、资源准入、清理与累计费用",
+      "CPU01/CPU02来源与手写证据",
+      "单路GPU完成材料及统一槽容量算术"
+    ],
+    "reused": [
+      "已闭合ABC科学方案",
+      "已确认严格B3门",
+      "旧36条负结果与解释边界",
+      "未变方法/训练/数据/评价直接依赖及CHAIN-R01语义"
+    ],
+    "not_performed": [
+      "附带项目代码或测试执行",
+      "CUDA或模型执行",
+      "真实数据/标签/owners/权重读取",
+      "旧端点真实载入",
+      "新训练或dev评分",
+      "指标/统计重采样",
+      "活动中文HPO操作",
+      "后台模型身份独立认证"
+    ],
+    "extra_dual_gpu_test_required": false
+  },
+  "verdict": {
+    "scientific_plan": "ACCEPT_REUSE_PRIOR_CLOSED_SCOPE",
+    "incremental_implementation": "CONDITIONALLY_ACCEPT_ONE_LOCAL_ACCOUNTING_FIX",
+    "preparation_fully_closed": false,
+    "scientific_blocker_count": 0,
+    "reproducibility_defect_count": 1,
+    "mandatory_fix_ids": [
+      "ABC-F-R01"
+    ],
+    "single_gpu_handwritten_qualification": "COMPLETED_ACCORDING_TO_PROVIDED_RAW_RECORDS",
+    "dual_gpu": "NOT_INDEPENDENTLY_TESTED_ADDITIONAL_TEST_CANCELLED_BY_USER",
+    "formal_training_started": false,
+    "real_dev_evaluation_started": false,
+    "automatic_formal_listener_started": false,
+    "formal_start_authorized_by_this_review": false,
+    "effectiveness_established_by_this_review": false
+  },
+  "categories": {
+    "SCIENTIFIC_BLOCKER": [],
+    "REPRODUCIBILITY_DEFECT": [
+      "ABC-F-R01"
+    ],
+    "NECESSARY_CLARIFICATION": [
+      "ABC-F-C01",
+      "ABC-F-C02",
+      "ABC-F-C03",
+      "ABC-F-C04",
+      "ABC-F-C05"
+    ],
+    "OPTIONAL_FOLLOWUP": [
+      "ABC-F-O01",
+      "ABC-F-O02"
+    ],
+    "OUT_OF_SCOPE_OVERDESIGN": [
+      "ABC-F-X01"
+    ]
+  },
+  "findings": [
+    {
+      "id": "ABC-F-R01",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "severity": "LOW",
+      "must_fix": true,
+      "blocks_preparation_closure": true,
+      "blocks_scientific_plan": false,
+      "title": "清理worker时的被动sleep未从父辅助费用排除",
+      "evidence": [
+        {
+          "file": "scripts/step29_english_control.py",
+          "function": "release",
+          "lines": [
+            36,
+            46
+          ]
+        },
+        {
+          "file": "scripts/step29_english_control.py",
+          "function": "Ledger.control / Ledger.pause",
+          "lines": [
+            65,
+            77
+          ]
+        },
+        {
+          "file": "scripts/step29_english_control.py",
+          "function": "Runner.dispatch.finish",
+          "lines": [
+            121,
+            143
+          ]
+        },
+        {
+          "file": "implementation.zh.txt",
+          "lines": [
+            10,
+            10
+          ]
+        },
+        {
+          "file": "prior/plan.zh.txt",
+          "lines": [
+            53,
+            53
+          ]
+        }
+      ],
+      "evidence_basis": "静态确定的控制流/计时推导；未运行项目测试；不是现场已观测GPU故障",
+      "reproducible_trigger": "自有worker仍在运行，因超时或显存超额等进入finish；TERM后延迟退出，使release执行一次或多次time.sleep(.02)。",
+      "actual_behavior": "release未调整Ledger.tick；后续Ledger.control以now-tick把这些被动等待计入auxiliary。worker从启动至完整释放的生命周期又通过Ledger.finish计入训练/GPU桶。",
+      "expected_behavior": "父辅助只计有效控制工作并排除纯sleep；worker生命周期仍完整包含等待并ceil计费。",
+      "impact": "保守多收父辅助费、提前消耗4h辅助桶，与冻结费用口径不符。不会因此少收worker费用、放宽总帽或改变科学门。",
+      "independent_derivation": "令清理有效工作为a秒、sleep为s秒，当前父账计a+s，合同要求a；worker账包含s是正确的。",
+      "minimal_fix": "只从父辅助计时剔除release实际sleep时段；可注入不会检查预算/中断清理的计时等待回调，或在finally中平移tick。保留扫描、信号、写账耗时与完整worker生命周期。",
+      "caution": "不要直接无条件调用可能因辅助额度耗尽而抛错的Ledger.pause，避免必要清理被中断。",
+      "targeted_validation": [
+        "一次延迟TERM退出的手写CPU小子进程，或严格手写时钟夹具。",
+        "验证sleep不计父辅助实耗，但计入worker生命周期且只结算一次。",
+        "验证释放、失败槽退休、健康槽续领及不完整轮拒绝保持。"
+      ],
+      "tests_not_required": [
+        "GPU短测",
+        "模型或正式数据",
+        "全量CPU重测",
+        "旧资格重跑"
+      ],
+      "existing_evidence_limit": "CPU01/CPU02主要是自然退出的真实小进程，未覆盖该清理等待计费分支。",
+      "disposition": "OPEN_REQUIRED_LOCAL_FIX",
+      "code_modified_by_reviewer": false
+    },
+    {
+      "id": "ABC-F-C01",
+      "category": "NECESSARY_CLARIFICATION",
+      "severity": "INFO",
+      "must_fix": false,
+      "title": "正式开始许可须单独绑定；gate目前仅核授权文件字节",
+      "evidence": [
+        {
+          "file": "scripts/step29_english_formal.py",
+          "function": "gate",
+          "lines": [
+            52,
+            94
+          ]
+        },
+        {
+          "file": "authorization.json",
+          "json_pointers": [
+            "/purpose",
+            "/formal_experiment",
+            "/real_dev_evaluation"
+          ]
+        },
+        {
+          "file": "formal_gate.draft.json",
+          "json_pointers": [
+            "/approved",
+            "/review_closed",
+            "/authorization"
+          ]
+        },
+        {
+          "file": "implementation.zh.txt",
+          "lines": [
+            18,
+            18
+          ]
+        }
+      ],
+      "observation": "当前双false拒绝正常CLI，准备authorization明确不授权正式训练/dev。gate第79行只verify其字节，未解析业务许可字段。",
+      "impact": "不能把审查闭合或单纯翻双旗称为已有新的用户开始许可；当前未发现实际误开门。",
+      "required_disposition": "修后主审可更新review_closed及来源/费用；approved保持false直至用户明确开始，并换绑新的实际开始许可。",
+      "verification": "启动前核对最终gate所绑定许可和最新费用元数据即可；本审不要求执行真实训练证明此项。",
+      "status": "EXPLICIT_DEPLOYMENT_PRECONDITION"
+    },
+    {
+      "id": "ABC-F-C02",
+      "category": "NECESSARY_CLARIFICATION",
+      "severity": "INFO",
+      "must_fix": false,
+      "title": "CPU来源匹配与动态执行覆盖分别表述",
+      "evidence": [
+        {
+          "file": "source_bundle.zip",
+          "member": "source_manifest.json"
+        },
+        {
+          "file": "source_manifest.json"
+        },
+        {
+          "file": "cpu01/receipt.json"
+        },
+        {
+          "file": "cpu02/receipt.json"
+        },
+        {
+          "file": "tests/test_step29_english_formal.py",
+          "lines": [
+            35,
+            191
+          ]
+        },
+        {
+          "file": "tests/test_step29_english_abc.py",
+          "function": "group / tiny",
+          "lines": [
+            26,
+            45
+          ]
+        }
+      ],
+      "observation": "CPU01初版12/12与冻结bundle一致；CPU02当前12/12一致。真实tiny训练6更新/六格；28条使用手写MAP；两槽是真实CPU子进程+NVML替身；CLI动态覆盖关闭拒绝。",
+      "impact": "不能称真实28条已训练、获准CUDA入口已端到端执行、旧36权重已载入或每个来源所有分支已测试。",
+      "required_disposition": "沿上述分层保留证据口径；除ABC-F-R01外无已证缺口要求扩测。",
+      "status": "SUPPORTED_WITH_EXPLICIT_LIMITS"
+    },
+    {
+      "id": "ABC-F-C03",
+      "category": "NECESSARY_CLARIFICATION",
+      "severity": "INFO",
+      "must_fix": false,
+      "title": "新单路完成成立；双路容量仅为带准入条件的估算",
+      "evidence": [
+        {
+          "file": "single_gpu/state/status.json"
+        },
+        {
+          "file": "single_gpu/state/first_update.json"
+        },
+        {
+          "file": "single_gpu/completion_observation_20261105.json"
+        },
+        {
+          "file": "single_gpu/probes/probe00_mean_last4_sum/result.json"
+        },
+        {
+          "file": "single_gpu/probes/probe01_mean_last/result.json"
+        },
+        {
+          "file": "single_gpu/probes/probe02_cls/result.json"
+        },
+        {
+          "file": "prior/vendor_single_gpu_ledger.json"
+        },
+        {
+          "file": "scripts/step29_english_formal.py",
+          "lines": [
+            32,
+            38
+          ]
+        },
+        {
+          "file": "scripts/step28_formal_queue.py",
+          "function": "admission / resources",
+          "lines": [
+            101,
+            126
+          ]
+        }
+      ],
+      "observation": "三表示各2更新、参数变化及interval对应；首更PID/事件一致；8份已附观察清单成员匹配。旧14+新23=37。统一槽16713252865B，两槽33426505730B，低于旧NVML total34190917632B。",
+      "limitations": [
+        "不声称真实双路、完整40轮峰值或共享现场永不OOM。",
+        "新23秒取控制总账；内部result.wall_seconds不能替代完整生命周期费用。",
+        "4份零字节stdout未附，未声称已读。",
+        "当前监听回执绑定11250B/d25f1e...源码未附，未宣称逐字审核该版本。"
+      ],
+      "required_disposition": "更新当前单路状态，保留失败账及实时准入/限制/失败停止；不得重新要求已被用户取消的双路试跑。",
+      "status": "SINGLE_COMPLETED_DUAL_ESTIMATE_ONLY"
+    },
+    {
+      "id": "ABC-F-C04",
+      "category": "NECESSARY_CLARIFICATION",
+      "severity": "INFO",
+      "must_fix": false,
+      "title": "费用快照、预留与工期均按其真实含义报告",
+      "evidence": [
+        {
+          "file": "budget.json"
+        },
+        {
+          "file": "scripts/step29_english_control.py",
+          "function": "Ledger",
+          "lines": [
+            52,
+            84
+          ]
+        },
+        {
+          "file": "scripts/step29_english_control.py",
+          "function": "Runner.dispatch",
+          "lines": [
+            162,
+            167
+          ]
+        },
+        {
+          "file": "prior/plan.zh.txt",
+          "lines": [
+            53,
+            55
+          ]
+        }
+      ],
+      "observation": "aux=2759+7+7+1800=4573；GPU37；总4610；CPU累计34。1800是保守准备收费，运行Ledger另预收30秒收尾。",
+      "required_disposition": "不得把保守项写成精确实耗；55h和各桶是可停止上限，不保证28条完成；21—22h是旧速排程估计，不承诺共享卡减半。",
+      "impact": "关系到预算可复核性与工期解释；不由此产生额外预算或要求降低安全准入。",
+      "status": "ARITHMETIC_VERIFIED_ESTIMATES_RETAINED"
+    },
+    {
+      "id": "ABC-F-C05",
+      "category": "NECESSARY_CLARIFICATION",
+      "severity": "INFO",
+      "must_fix": false,
+      "title": "本轮接线通过不改变固定数据开发与贡献解释边界",
+      "evidence": [
+        {
+          "file": "prior/plan.zh.txt",
+          "lines": [
+            6,
+            9
+          ]
+        },
+        {
+          "file": "prior/plan.zh.txt",
+          "lines": [
+            34,
+            45
+          ]
+        },
+        {
+          "file": "scripts/step29_english_abc.py",
+          "function": "success",
+          "lines": [
+            62,
+            79
+          ]
+        },
+        {
+          "file": "scripts/step29_english_control.py",
+          "function": "pipeline",
+          "lines": [
+            278,
+            288
+          ]
+        }
+      ],
+      "required_disposition": "保留ABC事后选择、固定dev重复使用、无独立确认/整体CI/显著性、owner/近重复/两视图代理限制；新B3仅均值门，C3非净学习；完整系统收益与同配置H_ER/H_SEQ差分别解释；Vendor无对称HPO。",
+      "impact": "当前科学方案可接受，但不能把工程或手写资格当作方法效果/旧评分项增量价值。",
+      "status": "PRIOR_SCIENTIFIC_BOUNDARIES_REUSED"
+    },
+    {
+      "id": "ABC-F-O01",
+      "category": "OPTIONAL_FOLLOWUP",
+      "severity": "INFO",
+      "must_fix": false,
+      "title": "可选为新开始许可增加最小语义交叉检查",
+      "evidence": [
+        {
+          "file": "scripts/step29_english_formal.py",
+          "function": "gate",
+          "lines": [
+            79,
+            79
+          ]
+        }
+      ],
+      "suggestion": "新的开始许可格式确定后，可读取其正式训练/dev字段，拒绝与gate批准旗矛盾的绑定。",
+      "why_optional": "当前草稿已关闭，文档明确另绑开始许可；没有本包已误开门的证据。",
+      "limit": "不要求通用授权框架、不新增真实训练或GPU测试。"
+    },
+    {
+      "id": "ABC-F-O02",
+      "category": "OPTIONAL_FOLLOWUP",
+      "severity": "INFO",
+      "must_fix": false,
+      "title": "可选先登记新子进程清理句柄再读取psutil元数据",
+      "evidence": [
+        {
+          "file": "scripts/step29_english_control.py",
+          "function": "Runner.dispatch",
+          "lines": [
+            189,
+            205
+          ]
+        }
+      ],
+      "hypothetical_trigger": "Popen成功后psutil.Process/create_time读取异常，而active尚未登记。",
+      "suggestion": "先保存process/job/log/begin等最小清理信息，再补创建时刻/owner元数据。",
+      "why_optional": "本包无元数据异常证据；普通Linux快速退出通常仍可读未回收子进程元数据，不能将快退出当作已证孤进程触发。",
+      "impact_if_triggered": "可能缩小异常时清理/记账窗口；当前不据此否定已验证Popen OSError和正常退出路径。"
+    },
+    {
+      "id": "ABC-F-X01",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "INFO",
+      "must_fix": false,
+      "title": "不增设额外科研/资源试跑或泛化平台",
+      "excluded_requests": [
+        "用户已取消的额外双路GPU短测或重跑单路资格",
+        "真实文本/标签/owners/权重/Memory补交",
+        "对称VendorLink HPO、额外候选/seed/整体CI",
+        "共享锁、暂停/热改现有中文HPO",
+        "通用调度/授权/审计平台",
+        "无具体缺口的全量测试或旧资格重跑"
+      ],
+      "rationale": "本轮唯一必修为局部父辅助计时，可用限定CPU验证解决；已闭合科学和旧实现按未变范围复用。"
+    }
+  ],
+  "prior_items": [
+    {
+      "id": "ABC-P02",
+      "status": "NEW_WIRING_ACCEPTED_REAL_DEV_NOT_EXECUTED",
+      "evidence": "formal.py::old_completed/evaluation_specs/evaluate/validate_evaluation"
+    },
+    {
+      "id": "ABC-P03",
+      "status": "NEW_WIRING_ACCEPTED",
+      "evidence": "control.py::pipeline/round_action"
+    },
+    {
+      "id": "ABC-P04",
+      "status": "MAIN_WIRING_ACCEPTED_LOCAL_ACCOUNTING_FIX_OPEN",
+      "open_findings": [
+        "ABC-F-R01"
+      ]
+    },
+    {
+      "id": "ABC-P05",
+      "status": "NEW_WORKER_SCAN_AND_FIRST_UPDATE_WIRING_ACCEPTED",
+      "evidence": "formal.py::Budget.check; control.py::observe_first_update"
+    },
+    {
+      "id": "ABC-P06",
+      "status": "SINGLE_GPU_COMPLETED_DUAL_TEST_CANCELLED_BY_USER",
+      "extra_dual_test_required": false
+    },
+    {
+      "id": "ABC-P07",
+      "status": "PENDING_PRIMARY_DISPOSITION_FINAL_BINDINGS_AND_EXPLICIT_START_PERMISSION"
+    }
+  ],
+  "minimal_remaining_steps": [
+    "修复ABC-F-R01，完成受影响的限定CPU核验。",
+    "保留CPU01历史来源，更新修后来源、费用，回收本次外审并完成独立主审。",
+    "正式开始前另绑用户明确开始许可、最终gate和最新账目；此前approved保持false。",
+    "未来运行继续实时资源准入、失败停止、不完整不开放；不追加GPU资格门。"
+  ]
+}

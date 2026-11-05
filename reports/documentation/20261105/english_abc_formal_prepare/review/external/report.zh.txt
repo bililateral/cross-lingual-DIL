@@ -1,0 +1,338 @@
+ABC正式训练筹备新增接线：独立静态外审报告
+审查日期：2026-11-05（Asia/Shanghai）
+输入：abc_formal_review.zip
+实际字节数：187671
+实际SHA256：bec1a781ac67842ddafb793ced373a315268ed1cfae39a2d59cc27436bd8d782
+载荷：40项；另有package_manifest.json；共41个ZIP成员。
+范围：新增正式控制器、训练worker、独立dev评价器、完整性/配对/资源/预算/失败接线及所附限定证据。
+性质：静态源码追踪、附件字节/JSON核对和独立简单算术；不是项目Linux原生执行报告。
+
+一、主要裁决
+
+1. 沿用已闭合的ABC有限开发科学方案与严格Dream末态门。本轮没有发现新的SCIENTIFIC_BLOCKER，不重新评价旧36条负结果，也不要求额外候选、seed、VendorLink HPO或独立数据实验。
+
+2. 新增实现已形成真实的整批调用链，不再是只有选择helper或两槽内核：
+   control CLI → formal.gate → pipeline → 同一个Runner.dispatch → formal worker main → train或evaluate → 完整性核对 → 下一依赖轮或固定停止。
+   P02开发评价、P03候选/配对、P05实际worker资源和首步路径的主要新增接线可以接受。
+
+3. 发现1项局部REPRODUCIBILITY_DEFECT，编号ABC-F-R01：清理自有worker时release()直接执行的time.sleep(.02)，未从父辅助计时中排除。其后Ledger.control()会把这段被动等待计入auxiliary；worker完整生命周期又正确包含了同一段等待。问题是额外收取了不应计入的父辅助等待费用，影响费用口径和剩余额度，不是少收worker费用、突破预算或科学算法错误。修正及一项受影响的定向核验后，方可把本次准备整体记为闭合；不需要GPU试跑或全量重测。
+
+4. 新单路三表示手写GPU资格已有完成材料：各两次真实更新、当前/历史分支日志和encoder/head变化，共六次更新；旧失败14秒仍保留，新账23秒，累计37秒。不能继续把旧审查时“单路资格未通过”当作当前状态，也不能把新单路完成写成双路实测、完整40轮峰值或效果通过。用户取消额外双路短测的决定有效，本审不重新设立该必备门。
+
+5. 当前formal_gate.draft.json的approved=false、review_closed=false；authorization.json仍是准备许可。正式训练、真实dev评分和自动正式监听均未启动。本审不替用户发出正式开始指令。源码已形成、静态接线可审，与已部署运行、已取得效果是不同状态。
+
+总体判断：科学方案维持接受；新增接线有条件接受，保留1项小范围账目必修及明确的证据/授权边界。不得写成“正式实验已启动”“全部28条已实际跑通”或“英文效果已达标”。
+
+二、输入身份、实际阅读及验证方法
+
+2.1 包身份
+
+对实际收到的ZIP字节计算长度和SHA256，均与用户提供值一致。检查ZIP成员集合、重复名、清单覆盖和安全解包路径：41个唯一成员，40项载荷与package_manifest逐项大小、SHA256完全一致，无额外载荷、遗漏或重复成员。本结论来自实际字节计算，不是复述manifest。
+
+先按指定次序全文阅读：
+scope.zh.txt；
+implementation.zh.txt；
+prior/plan.zh.txt；
+prior/review/primary_disposition.zh.txt。
+用户请求中的prior/primary_disposition.zh.txt在包内实际位于prior/review/primary_disposition.zh.txt；已按清单定位，不作为科研缺陷。
+
+随后完整追读两个新增入口、选择策略、当前测试/CPU回执，以及训练/评价/数据/资源的直接依赖。旧外审report仅定向阅读P01—P07及相邻结论，未把上下文来源扩成全仓重审。逐文件阅读方式、根审与并行交叉复核范围、未读部分均见read_scope.json。
+
+2.2 来源与两次CPU版本
+
+当前source_manifest.json的12项源码/测试/wrapper均与实际字节相符；formal gate中的当前12来源记录也与之相符。
+
+source_bundle.zip是CPU01初始来源快照，不是应当覆盖当前源码的更新包。其13成员包括12来源及自己的source_manifest。内部清单与CPU01 receipt.sources完整相等，12份实际成员的大小和SHA逐一匹配。CPU02 receipt.sources则与当前source_manifest完整相等，12项实际字节匹配。
+
+CPU01初版到当前版只有两个来源改变：
+— step29_english_control.py：把Popen的OSError改为收费、失败槽退休、失败任务出队、健康槽继续；
+— test_step29_english_formal.py：增加对应创建失败检查。
+其余10来源字节相同。没有把当前来源追写成CPU01当时已经执行的版本。
+
+另对本会话前包保留副本逐字节比较：english_abc、vendorlink_methods、vendorlink_run、vendorlink_data、formal_queue及旧english_abc测试六份均未改变。因此本轮认可的是已审科学计算之上的新增接线，不重新证明旧梯度算法。
+
+2.3 不能由包身份替代的验证
+
+formal_gate包含真实项目输入、模型和旧completion的路径/大小/哈希元数据，但相应真实正文、标签、权重和旧completion实体没有附上。本审没有连接这些服务器路径、读取标签或载入旧36个实际端点。可以核查绑定结构和运行时验证逻辑，不能声称已独立验证所有被引用实体当前仍存在且字节相符。
+
+本次所做可执行操作限标准库ZIP、SHA、JSON、文本差异及保存数值的简单算术；没有导入或执行附带项目模块、测试、模型、CUDA、正式数据解析、指标重算或统计重采样。CPU/GPU动态结果是执行方提供的记录，经本审核对内部对应，不是本审亲自在项目Linux产生的结果。
+
+用户请求使用当前GPT-6 Pro。本报告不把模型自述或会话环境提供的模型名称当作独立后台身份认证；本次没有独立认证后台路由，也没有声称亲眼核验网页选择器。并行静态复核使用本会话继承的环境，主要结论由根审沿实际代码再次核对。
+
+三、背景与本轮范围的准确承接
+
+prior/plan第6—9行保留原事实：旧四臂36条实验中H_full最终均值低于VendorLink，九配对最终差全负，H_ER均值优于H_full；ABC由用户在见过结果后选定。当前63群dev用于顺序开发选择，新的seed不会使数据重新独立。
+
+本轮没有改变这些事实，也没有修改科学门。成功定义仍要求Dream末态均值至少比两个参照中较高者高.005；相对两参照的遗忘改善、相对原H初学保护、Agora及AlphaBay保护和相应稳定性规则同时成立。早期seed7质量分档仍只是探索规则。
+
+必须保留的解释边界：
+— .005和.01是实际幅度/容忍阈值，不是显著性阈值；
+— 严格B3是均值门，不保证每个seed的Dream末态都提高；
+— 相对VendorLink没有同等B2初学水平保障，D差不能全归因于抗遗忘；
+— C3保护Agora末态排序，不等于保护其学习净增量；
+— VendorLink没有获得对称HPO；当前比较不能代表充分调优后的模型优劣；
+— 观察账号双视图是代理正例，不是已验证的跨账号同控；真实owner独立性和近重复限制保持；
+— 损失配比、表示和优化同时改变完整系统，不等于单独证明旧评分保持项有效。与同配置H_ER、H_SEQ的配对差需共同解释。
+
+本次新增控制器未添加CI、重采样、额外评价格或新的成功门。本审也不自行发明这些内容。
+证据：prior/plan第27—45行；english_abc.py::selection_key/success；control.py::pipeline。
+
+四、从CLI到实际worker的接线
+
+4.1 门与唯一启动
+
+控制器CLI将gate路径resolve后交给execute。execute先调用formal.gate，再检查campaign位于隔离workspace，使用mkdir作一次性声明。没有存在即复用、失败即重启或自动翻开正式门的代码。
+
+formal.gate核Linux、approved/review_closed、固定实验名、2 workers、40 epochs、三桶、固定LIMITS、无自动重试、取消双路短测及固定数据结论范围。门关闭时先拒绝，不会继续读取export manifest或模型。获准后才核导出清单元数据、来源、authorization字节和旧12条ID集合。
+
+worker main再次经过同一gate，核batch绑定的gate SHA、campaign内batch路径、job对应关系和新鲜目录内容；随后才创建Budget、configure和train/evaluate。控制器调用的是当前formal.__file__，不是旧36条formal入口。
+
+必要限制：gate对authorization目前只做queue.verify字节绑定，没有解析准备许可中的formal_experiment=false/real_dev_evaluation=false。因此“换绑实际开始许可”仍是正式启动前的具体操作条件；不能把只翻两个布尔值描述成已自动核验了新的用户许可。当前双false与准备文件一致，不存在本包已经误开门的事实。见ABC-F-C01。
+
+4.2 实际训练
+
+train根据明确seed初始化Python、NumPy和Torch，Settings由该轨迹完整配置构造，make_model从被冻结的同一BERT来源独立起步。每个任务有自己的模型、优化器、Memory、随机流和目录，不承接前一候选权重。
+
+load_fit只允许下一个当前市场：AlphaBay→Dream→Agora。每次先记录尝试，再验证当前来源并解析；检查固定群数、domain和fit分区。run.execute每阶段才调用该loader，历史由存活Memory提供，不在后续阶段重新载入整份旧fit，也没有在早期读未来域fit的路径。
+
+Settings进入真实Model、run.set_rates、update_h/update_vendor和保存端点。原H评分、训练目标和历史语义按已审来源复用；VendorLink仍使用其原分类路径和每市场重置语义。新入口不改科学计算。
+
+train在三阶段完成后逐个加载紧凑端点，核identity、Settings、stage、累计更新数，严格load_state_dict，记录实际文件身份；validate_completed再核完整声明和路径。只有成功轨迹的冗余latest.pt被留证删除，三个推理端点保留。这里不实现正式失败恢复或自动重训。
+证据：formal.py第132—204行；run.py::execute、set_rates；methods.py::Model及update函数。
+
+五、旧前置评价、新六格评价和数据读取门
+
+5.1 旧12条/36端点
+
+gate精确绑定ABC、seed4/5/6、四方法的12个ID。old_completed读取绑定completion，核spec、ABC顺序、seed、40 epochs、原来源身份、10280更新、三个端点、访问声明，并逐个验证端点字节。
+
+evaluation_specs对precheck生成原方法Settings；evaluate加载实际state后用Settings(**state['settings'])补齐缺失的新字段，并与该旧方法的原Settings比较。缺省值为CLS、constant、BCE1、hard.5；原lr_multiplier及原参数字段保留。它没有把旧权重按新pooling解释，也没有将旧设置错误地与新P0规范化学习率字典直接等同。
+
+新P0的等效有效学习率表示与旧端点恢复是两个不同对象，这一分开是正确的。真实旧权重未附，当前CPU只动态检查默认字段补齐，不是实际36端点载入证据。
+
+5.2 开发文本与qrels开放次序
+
+独立evaluate子进程首先执行全轮evaluation_specs，检查该轮所有轨迹的完成证据与端点；缺端点会在dev文本访问前失败。之后才记录dev_text_attempted，读取三个固定dev来源，核群数、唯一group ID、domain、dev分区及无identity。
+
+对全轮每条轨迹和每个端点，按固定CELLS产生六格盲分数。所有轨迹盲评分结束后，再核每格群集合、view_ids精确顺序、无序对三角形状和有限性。只有这些检查通过，才记录dev_qrels_attempted=true并读取三份dev qrels。标签群集合、view顺序和单正例条件还会继续校验。
+
+最终所有轨迹、六格和十指标全部validate后才写result.json。内部blind_complete.json的名字不能替代后续盲表校验，实际代码没有这样替代。任一异常不补零，不返回部分MAP供选择。
+
+训练进程不读dev；新评价进程不调用旧heldout/canonical/owners扫描。旧evaluate模块中有这些历史函数，但本入口只使用CELLS、METRICS、query_metrics及其直接纯计算依赖。函数被定义或模块被列入来源，不等于它们被执行。
+
+5.3 六格和query等权
+
+固定六格为1_A、2_A、2_B、3_A、3_B、3_C。十指标为MAP、MRR、Recall@1/3/5/10和NDCG@1/3/5/10。query_metrics先按精确view顺序恢复成对分数/标签，以固定ID破同分；当前代理要求每个query恰有一个positive。
+
+evaluate第304—308行把各群的逐query指标展开成all_queries，再统一mean。因此同一市场内按query等权，而不是先求群均值再等权平均；随后policy.mean按预定seed等权。validate_evaluation核每域群数A24/B8/C31和查询数386/120/502、完整spec、六格及十项有限指标。
+
+独立算术核对：
+每轨迹群前向=3×24+2×8+31=119；
+旧12轨迹=1428；
+最多28新轨迹=3332；
+合计上限4760群前向、240格。
+这些是固定计划的结构算术，不是已执行量。
+
+CPU的真实微型评价仅每域一个手写群，不能声称已动态区分不等大小群的加权方式；本轮权重正确性由实际flatten代码和固定查询数校验支持。没有已证权重错误，不因此强制新增测试。
+证据：formal.py第207—335行；vendorlink_evaluate.py::query_metrics；vendorlink_run.py::query_ap。
+
+六、完整有限选择链、去重、配对及停止
+
+实际pipeline不是由说明文字拼出的流程，round_action已经连接训练dispatch与独立评价dispatch：
+
+阶段                         新训练上限       依赖和停止
+precheck                     0                旧12条全评后，Vendor三seed平均D>0且至少2/3严格>0才继续
+representations              4                seed7 P0/P1/P2及Vendor；全轮完成后选表示
+L1→L2→L3→T1→T2              5                每次从当时入选配置派生，完整返回后才决定下一候选
+seed8                        4                最多两个合格非P0配置，加P0与Vendor；无候选/无达标则停止
+final                        15               唯一冻结配置的H_full/H_ER/H_SEQ、原H、Vendor×seed9/10/11
+
+seed7最多8个H配置及1个Vendor，总新轨迹上限9+4+15=28。重复的完整有效Settings不另跑；spec ID含方法、seed及完整Settings摘要。实际execute还维护跨轮seen并拒绝同轮/跨轮重复ID。没有笛卡尔积搜索或看seed8后追加第三候选。
+
+返回结果先核精确ID集合。seed7/8按各自spec取数，final明确按[9,10,11]构造每系统配对，不依靠字典或返回列表碰巧顺序一致。五系统全部结果先完成，随后才评最终科学门，并保存相对原H、Vendor、同配置H_ER/H_SEQ的均值差。
+
+早期候选只按既定basic_quality和selection_key探索。seed7/8的success及final=True的success都包含严格B3门。最终三seed才加相对两参照的严格D方向至少2/3；均值.005没有被误写成每个同向seed都必须改善.005。
+
+无Vendor遗忘、无seed8候选、无冻结达标者均有明确正常停止状态。完整复核但科学门false仍可记COMPLETE_FIXED_DATA_DEVELOPMENT，同时保留verdict.passed=false；这是运行完成与科学达标的区分，不是把失败改写成功。
+证据：control.py::pipeline第226—288行、round_action第306—332行；english_abc.py第15—86行。
+
+七、两槽、资源、失败和累计预算
+
+7.1 同一实例跨轮
+
+execute只建一个Ledger、Runner及retired集合。各训练小轮、precheck和后续评价都复用它们。没有进入下一轮就重新补满失败槽或清零费用。
+
+正常退出才验证产物。训练失败、超时、显存超额或端点验证失败退休本槽，不把失败任务放回pending；健康槽继续本轮已确定的独立任务。本轮最终有任一失败，dispatch拒绝返回成功，因而round_action不会进入评价或下一依赖候选。
+
+CPU02对Popen OSError的修复符合该规则：收费、记录launch_failed、退休该槽、失败任务出队，另一槽继续。实际测试的完成序列为槽0失败、槽1成功、槽1继续成功。共享RAM/磁盘失效、资源观察错误、总预算耗尽等全局故障停止全批，不能被误解释成只需退休某个无关槽。
+
+7.2 GPU承诺与容量
+
+统一槽需求覆盖旧适用Vendor峰值和新H三表示，而非只取H峰值，更未照搬FOREVER 9+1GiB：
+
+新H最大NVML：13195280384 bytes = 12.2890625 GiB。
+旧Vendor适用峰值：15193866240 bytes = 14.150390625 GiB。
+当前SLOT_BYTES：16713252865 bytes = 15.565429688431323 GiB。
+两槽合计：33426505730 bytes = 31.130859376862645 GiB。
+allocator：15639511041 bytes，较槽需求少1 GiB。
+
+10%大于1GiB，符合既定max(1GiB,10%)余量原则。当前浮点ceil结果比精确十进制乘法大1字节，是更保守舍入，代码与gate一致，不是应修的容量误差。
+
+还用旧ledger记录的实际NVML total=34190917632 bytes核算，而非只看商品名“32G”：该值约31.8427734375GiB，两槽相差764411902 bytes，约0.712GiB。此算术支持容量估计；不保证共享卡上的实时空闲、不证明真实双路峰值。
+
+queue.admission按每个活动PID计算max(0,统一槽承诺−当前NVML已反映占用)，总和再加新槽需求。这样CUDA尚未初始化、暂未在NVML显示的worker仍占承诺；不会把同一空闲重复派给两槽。资源只够一路时可先一路，补第二路重新观察。实际LIMITS统一，也不存在用新任务较小需求替换旧活动承诺的问题。
+
+7.3 RAM、磁盘、保存及首步
+
+父级queue.check_running覆盖父进程及全部后代的共享RSS32GiB、campaign新增磁盘96GiB和共享空闲64GiB。资源准入还检查可用RAM和完整磁盘余量。
+
+实际worker使用新的formal.Budget.check。该函数调用queue.campaign_files逐文件容忍FileNotFoundError，沿用CHAIN-R01的并发退役语义；扫描共同campaign，不退回只检查本job。按两槽预留6GiB临时checkpoint空间，检查small文件上限和64GiB共享余量。旧formal.Budget虽然随直接依赖导入，但没有被新worker实例化或调用。
+
+首步观察读取实际run/updates.jsonl首行，要求完整换行、stage=1、total_updates=1、optimizer_updates=1，并保存自有PID/创建时刻/job。finish还在释放子进程后补观察。正式控制器没有实现或启用自动等待后自删的正式监听；这不妨碍当前首步证据接线，不能把手写GPU监听的权限移交为自动开训权限。
+
+release按自己start_new_session建立的进程组释放，核同用户、排除父进程，并处理退出后遗留后代。未发现暂停、热改或清理中文HPO的代码路径。其被动等待的计费问题另列ABC-F-R01。
+
+7.4 三桶与保守准入
+
+上限保持training172800秒、gpu10800秒、auxiliary14400秒，总198000秒即55h。
+当前准备账可核为：
+auxiliary=2759+7+7+1800=4573秒；
+GPU=14+23=37秒；
+training=0；
+合计4610秒。
+CPU资格旧20+7+7=34秒；旧20是承接快照，不由本包重新重建全部历史CPU事件。1800秒明确是保守准备收费，不能当作逐秒实测值，也不能据此把未来纯sleep解释成获准收费。
+
+训练每条上限8h。准入使用“已结算费用+活动任务完整上限+新任务上限”。活动任务尚未结算，因此其完整上限等于在途已用加余下承诺，不是重复收费；退出后按完整生命周期向上取整，释放未用承诺。串行评价使用同一GPU桶，并保留关闭余量。
+
+Ledger预收30秒收尾额度，budget文件也写明final_tail_seconds=30。因此used辅助字段包含这项保守预留，不应在结果报告里改称全是精确实耗。它在4h内，不是追加预算。
+
+48h训练、3hGPU和4h辅助是可提前停止的硬帽；不能保证28条全部跑完。剩余不足以承诺下一完整8h任务时停止或等活动任务退款，是保守实现，不必为追求跑满而修改合同。两路21—22h仍是旧速依赖排程估计，不承诺共享卡工期减半。
+
+八、唯一必修：ABC-F-R01
+
+类别：REPRODUCIBILITY_DEFECT。
+严重程度：低；费用语义与准备闭合问题，不影响已接受的科学门或已完成单路资格。
+位置：
+scripts/step29_english_control.py::release，第36—46行；
+Ledger.control/pause，第65—77行；
+Runner.dispatch内部finish，第121—143行。
+合同依据：implementation.zh.txt第10行；prior/plan.zh.txt第53行。
+
+可复现触发：
+一个仍在运行的自有worker因超时或显存超额进入finish。收到TERM后并非立即退出，release第45行执行一次或多次time.sleep(.02)。这不要求真实GPU，可用一个收到TERM后短暂延迟退出的手写小进程表达。
+
+实际计算：
+设release期间有效扫描/信号工作为a秒，被动sleep为s秒。release不调整Ledger.tick，后续control执行used_aux += now−tick，因此把a+s计入父辅助账；合同要求该段父辅助只收a。另一方面finish(row,begin,end)按worker完整生命周期收费，包含s是正确的，不能从worker桶扣掉s。
+
+影响：
+会保守多收辅助费，缩短4h辅助桶的可用余额，与“所有sleep排除”不一致。它不放宽总帽、不少收失败任务，也没有证据表明本次CPU/GPU账已因此出现重大超支；但当前新增运行账实现确有此分支，不能以六项PASS关闭。
+
+最小修法：
+仅对release内部实际发生的被动等待，补偿父计时tick或返回/累计可排除时长；扫描进程、发信号、写账等有效控制时间仍计费。worker启动到释放结束的生命周期及ceil收费保持。
+建议注入不会中断清理的计时等待回调，或在finally中完成对应计时调整。不要直接无条件把清理sleep换成会先检查预算并抛错的Ledger.pause，以免辅助耗尽时反而跳过必要回收。
+
+必要定向验证：
+一个延迟TERM退出的CPU小子进程，或严格手写时钟夹具，验证：
+(1) 被动等待不增加父辅助实耗；
+(2) worker生命周期仍包含这段时间且只结算一次；
+(3) 释放、失败槽退休、健康槽续领和不完整轮拒绝仍保持。
+只需核本分支及其异常收尾，不要求重跑全部科学测试、训练、旧资格或任何GPU短测。
+
+目前未修改用户源码。以上为外审发现与最小修复要求，不冒称修后已经通过。
+
+九、CPU证据与单路GPU完成证据的强度
+
+9.1 CPU01/02
+
+CPU01日志5项通过，wrapper墙钟6.065309952013195秒，ceil为7秒；CPU02日志6项通过，wrapper墙钟6.44777745497413秒，ceil为7秒，累计34秒。单元测试自身显示3.031/3.727秒，与wrapper包含导入、启动和收尾的6秒余并不矛盾。
+
+有区分力的已执行内容：
+— 实际formal.train→run.execute→三紧凑端点恢复→formal.evaluate六格与query聚合；
+— 缺端点在dev文本开放之前拒绝；
+— 实际关闭CLI拒绝准备gate；
+— 错seed、错query_count、旧Settings默认补齐及手写AP=.5；
+— 实际pipeline的满28条结构、前置停止和缺配对拒绝；
+— 真实CPU小子进程的一槽失败/健康续领/复用Runner后的退休保持；
+— 新增Popen OSError行为；
+— 实际Budget回调到安全共享扫描，及首步schema、NVML未反映承诺算术。
+
+限定：
+真实模型路径采用随机微型四层BERT，hidden_size=8、缩短token长度、每域一个手写群×两轮，共六更新，不是冻结正式BERT、40轮或真实英文任务。
+完整28条的选择测试使用手写MAP回调，未训练28条。
+两槽是真实CPU小进程，NVML是替身；不是双路CUDA。
+旧Settings测试不等于加载实际旧36端点。
+来源绑定不等于动态执行每个被列来源的所有函数；此次CLI动态覆盖的是关闭拒绝路径，不是已获准CUDA正式入口。
+CPU01/02未覆盖清理sleep计费分支，故ABC-F-R01仍成立。
+
+9.2 单路GPU
+
+逐值核对三份独立result与status嵌入结果一致；各自两条interval与updates.json一致，optimizer_updates均为1，区间为正。三份result均报告encoder/head改变，formal_data_reads=0。first_update的PID及事件与probe00首interval一致，listener_deleted=true。
+
+completion_observation中所列、且本包实际附上的8份文件，大小和SHA逐项一致。它还列了4份零字节stdout，本包未附；无需索取，不将它们写成已经独立读取。回执支持提供方所报告的01:08:16首更自删、01:08:31完成，以及10:01进程/活动副本已不存在的后续观察；这是提供方原始记录的对应核查，不是本审远程观察。
+
+新23秒由控制状态总账给出，包含完整子进程启动至退出；三个result.wall_seconds是更窄的内部计算区间，不能简单相加替代23秒。可独立核对14+23=37；缺少首两个完整生命周期明细时，不声称把23秒逐任务完全重算了一遍。
+
+当前first_update绑定的实际活动副本为11250字节、SHA256 d25f1e1f1ea067f67a88a985bd8d2c5b9c70a08ddbe8dc6b09cb66c94c29cd01，和上一小轮10668字节版本不同。本包没有该活动源码；本审只按所附原始回执描述当前完成，不声称逐字核验了未附版本，也不由此重开已结束的监听外审。
+
+单路资格完成属于新的有限执行证据，不能推导真实并发已验证、完整训练峰值已测、资源永不竞争或英文效果通过。取消额外双路试跑不取消实时准入、allocator/PID限制和失败停止。
+
+十、分类意见及最小处置
+
+SCIENTIFIC_BLOCKER：0项。
+既定固定数据开发问题、严格B3门和停止规则维持；没有本轮证据要求重新讨论旧负结果或改变研究设计。
+
+REPRODUCIBILITY_DEFECT：1项。
+ABC-F-R01：清理sleep计入父辅助账。按第八节最小修复并定向核验，之后方可关闭本次准备中的该项。
+
+必要澄清：
+ABC-F-C01：开始许可与双false草稿。未来必须绑定新的明确开始许可及最新费用；审查闭合不等于开训。gate目前做授权文件字节绑定，不是授权内容语义核验。
+ABC-F-C02：CPU覆盖层级。tiny实际计算、手写MAP流程、真实CPU小进程、NVML替身与关闭CLI分别陈述，不合并为正式全批动态通过。
+ABC-F-C03：新单路完成与容量推断。更新当前单路状态，保留旧失败；双路未实测且额外短测已取消，不把容量估算升级为并发保证。
+ABC-F-C04：费用快照与工期。1800是保守准备收费，Ledger含30秒收尾预留；55h是可停止上限，28条/21—22h均不保证完成。
+ABC-F-C05：科研解释。完整系统收益、旧评分项增量价值、事后ABC选择、固定dev重复使用、代理任务和不对称HPO边界分别保留。
+
+可选后续：
+ABC-F-O01：在已有明确开始许可格式形成后，gate可增加针对其正式训练/dev字段的简单语义交叉检查。当前草稿关闭且人工绑定条件明确，不因此要求通用授权框架。
+ABC-F-O02：Popen成功后可先登记最小清理句柄再取psutil元数据，减少元数据读取异常窗口。当前没有该异常证据；普通Linux快速退出通常仍可读取未回收子进程元数据，不能仅凭“快退出”断言现有代码必然漏账/孤进程。此项非当前必修。
+
+OUT_OF_SCOPE_OVERDESIGN：
+ABC-F-X01：强制额外双路GPU短测、重跑单路或旧资格、索取真实文本/标签/owners/权重、对称Vendor HPO、额外候选/seed/CI、共享锁/改活动中文HPO、通用调度/审计平台及重复全量测试，均不由本轮发现导出。唯一必修可由局部CPU核验处理。
+
+十一、前审待办P02—P07的本轮处置
+
+P02（真实dev评价与旧端点兼容）：
+新增源码接线可接受，必要CPU证据相符；实际旧端点载入和真实dev执行尚未进行，不混称已经完成正式前置评价。
+
+P03（选择、配对、去重与冻结）：
+实际pipeline已接通，可接受。最多28新轨迹、精确seed键、完整轮返回、唯一冻结及最终15条均有直接源码和有限手写控制流证据。
+
+P04（两槽与累计预算）：
+主要实现和CPU故障行为可接受；局部费用口径待ABC-F-R01关闭。退休集合和三桶不逐轮重置，已承诺未反映显存确实扣除，失败不开放依赖阶段。
+
+P05（实际worker资源与首步）：
+新Budget采用安全共享扫描和两槽保存预留，当前日志schema正确，相关CPU测试到达实际函数；不等于正式运行或正式监听已部署。
+
+P06（GPU与任务包络）：
+相对于旧审查时点已更新为单路手写资格完成，失败账保留。五系统统一需求综合旧Vendor和新H适用峰值，算术成立。用户取消额外双路短测，故此项不再要求双路试跑；仍保留并发未实测和实时资源风险限定。
+
+P07（回收、主审、绑定与开始指令）：
+本次外审完整材料可供回收。主执行者仍须处置唯一必修、完成定向核验并绑定最终源码/费用；review_closed可在闭合后更新，approved仍保持false，直至新的正式开始指令及相应许可绑定。不得从本报告推定已获开训权限。
+
+最小剩余动作：
+一是修复ABC-F-R01并只做必要受影响CPU验证；
+二是保留CPU01冻结版本、更新修后来源及CPU费用，完成主审回收；
+三是在未来用户明确开始时，绑定实际开始许可、最终gate和最新账目，按现有实时资源准入启动。
+本轮不要求额外训练、额外GPU核验、真实数据/权重上传或无关框架。
+
+十二、交付与最终状态
+
+完整交付为report.zh.txt、findings.json、read_scope.json、output_manifest.json，打包abc_formal_review_response.zip。output_manifest记录三个内容文件的实际大小/SHA，清单自身不作递归自哈希；ZIP身份另在交付正文提供。
+
+结案口径：
+科学方案继续成立；
+正式控制器与worker/evaluator已经形成实际源码；
+新增接线仅余一项局部账目必修及既定回收/授权条件；
+限定单路GPU资格完成，双路未实测且不再要求额外试跑；
+正式实验、真实dev评分和自动正式监听未启动；
+任何英文效果、独立确认、整体显著性或旧评分项贡献结论目前均未由本轮产生。
+

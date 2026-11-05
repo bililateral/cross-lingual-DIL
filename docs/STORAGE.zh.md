@@ -9,6 +9,12 @@
 
 本轮仅维护清理清单/回执与根docs；两端维护记录按同目录sync.json核对，根docs仅Windows。一次性盘点/删除助手和传输索引收尾删除，没有新增备份ZIP，不改写Git历史。仅本地commit、不推送；局部脚本清理不重置项目大清理周期。
 
+## 2026-11-05 ABC正式入口筹备与单路GPU完成回收
+
+原gpu_wait的12份状态/首更/三表示结果与更新/空日志已回传，逐文件大小/SHA与[完成观测](../reports/documentation/20261104/english_abc/gpu_wait/completion_observation_20261105.json)一致；原launch、许可、23:16/23:29观测和失败账保持，不重建已自删的活动副本。旧准备账在单路完成后结算，新阶段从[独立目录](../reports/documentation/20261105/english_abc_formal_prepare/)承接，无新增GPU试跑。
+
+新目录保留范围、元数据输入绑定、approved=false的formal门草稿、12来源清单、CPU01—04手写核验及费用；CPU03失败测试原件保留，CPU04七项通过并绑定最终来源。source_bundle.zip承担CPU01原来源恢复，冻结abc_formal_review.zip承担CPU02执行来源和外审当时上下文恢复；四份完整外审、主审处置与回收记录保留，返回ZIP验收后删除重复压缩副本。只从既有export manifest和旧completion读取允许的元数据，未回传/解析真实fit/dev/qrels或权重。独立Linux workspace不覆盖原GPU或活动中文HPO来源。外审输入包仅40份已列载荷和清单，不含数据/权重/凭据；实际审查与同步状态见交接和review回执。根docs仍只维护Windows，本地提交不推送。
+
 ## 2026-11-04 ABC英文适配准备材料
 
 [独立目录](../reports/documentation/20261104/english_abc/)保留完整方案、当前增量源码身份、CPU01—06原失败与通过证据、GPU单路失败的日志/真实更新记录及预算。初次11来源，新增独立监听及测试后为13来源，通过SFTP部署至Linux同名目录的workspace；原formal_chain和活动history_wait源码未覆盖；开发导出只核已有manifest元数据，没有读取其正文或标签。CPU01错误测试捕获器原文件单独保留，失败费用不清零。
