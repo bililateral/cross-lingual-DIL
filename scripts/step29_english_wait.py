@@ -192,8 +192,10 @@ def execute(config_path):
             if ready:
                 break
             begin_sleep = time.monotonic()
-            time.sleep(5)
-            tick += time.monotonic()-begin_sleep
+            try:
+                time.sleep(5)
+            finally:
+                tick += time.monotonic()-begin_sleep
         monitor.close(); monitor = None
         # Activation/save/import costs are charged through the same auxiliary bucket.
         gate['prior_used_seconds']['auxiliary'] = used + time.monotonic()-now

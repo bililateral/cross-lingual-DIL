@@ -132,9 +132,6 @@ class Runner:
             end = time.monotonic()
             item['log'].close()
             self.ledger.finish(row, item['begin'], end)
-            observe_first_update(self.root, {slot: item})
-            if self.observe is not None:
-                self.observe()
             del active[slot]
             if process.returncode or unexpected or end-item['begin'] > row['seconds']:
                 error = error or f'Worker failed/overran: exit={process.returncode}, descendants={unexpected}'
@@ -150,6 +147,10 @@ class Runner:
             if error:
                 self.retired.add(slot)
             self.ledger.control()
+            # Optional observer failure must not settle this released worker twice.
+            observe_first_update(self.root, {slot: item})
+            if self.observe is not None:
+                self.observe()
         try:
             while pending or active:
                 self.ledger.control()

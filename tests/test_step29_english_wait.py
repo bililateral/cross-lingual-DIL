@@ -125,6 +125,61 @@ class WaitTests(unittest.TestCase):
         self.assertFalse(listener.exists())
         self.assertEqual(wait.read(state/'retirement.json')['reason'],'PRECHECK_ENDED_WITHOUT_TRAINING')
 
+    def test_callback_failure_settles_released_worker_once(self):
+        root = self.root/'campaign'; root.mkdir()
+        allowed = dict(campaign=str(root),workspace=str(self.root),workers=2,limits=control.formal.LIMITS)
+        ledger = control.Ledger(root,dict(training=0,gpu=0,auxiliary=0),control.formal.CAPS)
+        def fail_after_settlement():
+            if ledger.events:
+                raise OSError('handwritten retirement failure after child settlement')
+        runner = control.Runner(allowed,ledger,None,poll_seconds=.02,observe=fail_after_settlement)
+        with self.assertRaises(OSError):
+            runner.dispatch(root,[dict(id=name,bucket='training',seconds=65,gpu=False)
+                                  for name in ('child','other','never')],
+                            lambda row,job,deadline:[sys.executable,'-c',
+                                'import time;time.sleep(20)' if row['id']=='other' else 'pass'],
+                            lambda row,job:None)
+        self.assertEqual(len(ledger.events),2)
+        self.assertEqual({e['id'] for e in ledger.events},{'child','other'})
+        import math, psutil
+        for event in ledger.events:
+            self.assertEqual(event['charged_seconds'],math.ceil(event['actual_seconds']))
+            self.assertFalse(psutil.pid_exists(wait.read(root/event['id']/'process.json')['pid']))
+        self.assertTrue(wait.read(root/'child/dispatch_receipt.json')['success'])
+        dispatch=wait.read(root/'dispatch.json')
+        self.assertEqual(dispatch['status'],'STOP_NO_RETRY')
+        self.assertEqual(len(dispatch['completed']),2)
+        self.assertFalse(dispatch['active'])
+        self.assertEqual(dispatch['pending'],['never'])
+        self.assertFalse((root/'never').exists())
+
+    def test_interrupted_sleep_is_not_charged(self):
+        listener=self.root/'active.py';listener.write_text('synthetic')
+        auth=self.root/'auth.json';wait.write(auth,dict(approved=True))
+        gate=dict(workspace=str(self.root),campaign=str(self.root/'formal'),
+                  authorization=control.queue.record(auth),prior_used_seconds=dict(auxiliary=10))
+        template=self.root/'gate.json';wait.write(template,gate)
+        state=self.root/'state'
+        config=dict(approved=True,review_closed=True,state=str(state),listener=str(listener),
+                    prior_auxiliary_seconds=10,gate_template=control.queue.record(template),
+                    authorization=gate['authorization'],review_evidence=control.queue.record(auth),
+                    active_source=control.queue.record(listener),predecessor={})
+        path=self.root/'config.json';wait.write(path,config)
+        clock=[0.]
+        def interrupted(seconds):
+            self.assertEqual(seconds,5);clock[0]+=2
+            raise KeyboardInterrupt('handwritten interrupted idle wait')
+        cwd,argv=os.getcwd(),sys.argv[:]
+        try:
+            with patch.object(wait,'__file__',str(listener)),patch.object(wait,'predecessor',return_value=dict(ready=False)),patch.object(wait.time,'monotonic',lambda:clock[0]),patch.object(wait.time,'sleep',interrupted),patch.object(control.formal,'gate',return_value=gate):
+                with self.assertRaises(KeyboardInterrupt):wait.execute(path)
+        finally:
+            os.chdir(cwd);sys.argv=argv
+        self.assertEqual(wait.read(state/'budget.json')['auxiliary_used_seconds'],10)
+        self.assertEqual(wait.read(state/'failure.json')['status'],'STOP_NO_RETRY')
+        self.assertFalse((state/'start.json').exists())
+        self.assertTrue(listener.exists())
+
 
 if __name__=='__main__':
     unittest.main(verbosity=2)
