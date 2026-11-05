@@ -109,8 +109,9 @@ def observe_first_update(root, active):
 
 
 class Runner:
-    def __init__(self, allowed, ledger, monitor, poll_seconds=1.):
+    def __init__(self, allowed, ledger, monitor, poll_seconds=1., observe=None):
         self.allowed, self.ledger, self.monitor = allowed, ledger, monitor
+        self.observe = observe
         self.root, self.poll = Path(allowed['campaign']), poll_seconds
         self.retired = set()  # Never reconstructed/reset at a new adaptive round.
 
@@ -132,6 +133,8 @@ class Runner:
             item['log'].close()
             self.ledger.finish(row, item['begin'], end)
             observe_first_update(self.root, {slot: item})
+            if self.observe is not None:
+                self.observe()
             del active[slot]
             if process.returncode or unexpected or end-item['begin'] > row['seconds']:
                 error = error or f'Worker failed/overran: exit={process.returncode}, descendants={unexpected}'
@@ -152,6 +155,8 @@ class Runner:
                 self.ledger.control()
                 queue.check_running(None, self.allowed, self.root)
                 observe_first_update(self.root, active)
+                if self.observe is not None:
+                    self.observe()
                 snapshot = self.monitor.snapshot() if self.monitor else None
                 for slot, item in list(active.items()):
                     row, p = item['row'], item['process']
@@ -294,7 +299,7 @@ def pipeline(evaluate_old, round_action, save):
                 interpretation='No independent confirmation; H_ER contribution requires joint interpretation of all differences')
 
 
-def execute(gate_path):
+def execute(gate_path, *, observe=None):
     begin = time.monotonic()
     allowed = formal.gate(gate_path)
     root = Path(allowed['campaign'])
@@ -308,7 +313,7 @@ def execute(gate_path):
     try:
         ledger.control()
         monitor = queue.GpuMemory()
-        runner = Runner(allowed, ledger, monitor)
+        runner = Runner(allowed, ledger, monitor, observe=observe)
         def round_action(name, specs):
             if any(row['id'] in seen for row in specs) or len({r['id'] for r in specs}) != len(specs):
                 raise ValueError('Duplicate effective configuration/method/seed')

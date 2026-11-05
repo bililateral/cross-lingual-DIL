@@ -4,6 +4,8 @@ H/S评价补充（2026-11-02）：用户选择[方案A](../reports/seller_alias_
 
 ## 当前合同入口
 
+ABC自动接续补充（2026-11-05）：用户已确认[等待与正式接续范围](../reports/documentation/20261105/english_abc_wait/scope.zh.txt)，在H_pos_history整批有效完成及相关进程退出、原资源门满足后，由唯一监听自动进入旧ABC dev前置评价及条件有限开发。此决定替代下述历史准备阶段的“正式关闭/不得自动监听”，保留原科学方案、2-worker、55h与严格Dream门；新增监听接线审查/部署状态只见交接顶部。下述准备文件和冻结回执保持原时点含义，不回写旧许可。
+
 ABC英文适配准备（2026-11-04）：用户指定最多两worker并沿用原三槽失败隔离/健康续领/资源预留逻辑，要求先完成方案、必要核验和背景充分的外审，正式训练仍关闭。[完整方案](../reports/documentation/20261104/english_abc/plan.zh.txt)固定ABC、最多8个H_full候选、seed7/8开发及五系统seed9/10/11复核、55h累计预算及开发结论边界；[实现与证据范围](../reports/documentation/20261104/english_abc/implementation.zh.txt)区分已接入单轨迹的表示/学习率/损失改动、两槽内核证据、尚未部署的全批适应性入口。GPU限定短测按用户明确许可及后续单路尝试指令执行，失败事实保留；当前核验/外审状态只看交接，不以本稿或CPU通过授予正式启动。
 
 该方案后续明确补充：用户确认B3均值须比原H_full与VendorLink较高者至少提升.005，作用于冻结入选和开发复核；科学审查见[逐项处置](../reports/documentation/20261104/english_abc/review/primary_disposition.zh.txt)。原GPU尝试失败后，用户单独批准[高频单路监听与首更自删](../reports/documentation/20261104/english_abc/gpu_wait/scope.zh.txt)，承接原费用，不修改活动中文调度，不开放正式实验。11月5日用户在单路完成后要求[正式批次入口筹备](../reports/documentation/20261105/english_abc_formal_prepare/scope.zh.txt)，并明确取消额外双路GPU短测；以单路适用峰值加安全余量安排实时两槽准入，不冒称实际双路已测。新增接线/证据范围见[实现说明](../reports/documentation/20261105/english_abc_formal_prepare/implementation.zh.txt)，筹备后按用户要求清理退役CPU/GPU脚本，当前formal门仅绑定九份未变运行源码；历史核验版本按[清理恢复记录](../reports/documentation/20261105/english_abc_cleanup/plan.json)从Git恢复。正式启动权限仍关闭；实际状态只查交接和对应回执。
