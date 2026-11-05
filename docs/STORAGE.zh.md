@@ -1,4 +1,12 @@
 # 科研文件存储与恢复
+## 2026-11-05 ABC校验脚本及压缩包定向清理
+
+用户在正式筹备完成后要求删除此次CPU/GPU校验脚本，取代此前大清理中对英文ABC脚本的暂时排除。Windows删除10份脚本和6个压缩包，共16文件574252字节；Linux删除14份脚本副本和4个压缩包，共18文件545333字节；合计1119585逻辑字节（约1.07MiB）。逐文件路径、SHA、Git恢复方式见[定向清单](../reports/documentation/20261105/english_abc_cleanup/plan.json)，实际删除及保护检查见同目录windows_receipt.json和linux_receipt.json。Linux观测10:56:46，客户端Windows回执10:58:01；时钟不混用。
+
+删除前逐项核实Git提交a47f2ce7a1acdaac6ea54119dd0e0a070ee2d413的commit:path/blob可恢复完全相同字节，不只保留哈希；清单恢复模式全部为raw_blob。需要复核历史CPU/GPU执行版本时先在Windows从该提交恢复并核bytes/SHA，再按实际许可SFTP，不在Linux使用Git。旧CPU01/02/03来源和原送审上下文由其原压缩包/文件的Git版本恢复，工作树不再保留重复压缩包。原通过/失败日志、指标、费用、审查原文及旧source_manifest/同步回执未追改，旧路径不表示校验脚本仍存在。
+
+当前formal_gate.draft只绑定九份实际运行源码，移除两个CPU测试与run_cpu的历史文件校验项；实际算法/调度/评价源码字节不变，approved=false、review_closed=true保持。Linux九来源、119份非删除材料及中文HPO的58来源在删除前后核验一致，父4159100与三子进程身份保持；旧模型权重及数据不在清理范围。原10:47同步回执仍为当时快照，清理后来源/费用及证据以[本次同步](../reports/documentation/20261105/english_abc_cleanup/sync.json)为准。无新CPU/GPU核验、正式训练或真实dev读取；局部清理不重置大清理周期。根docs仅Windows，本地提交不推送。
+
 ## 2026-11-05 退役手写CPU/GPU校验脚本双端清理
 
 用户确认按已呈现范围清理，并明确排除本次VendorLink英文ABC新实验全部CPU/GPU脚本。Windows删除360份4,229,378字节，Linux删除669份8,474,183字节，合计1,029份12,703,561逻辑字节（12.11MiB）；包含旧资格入口、启动包装及退役手写_verify/_check重复副本，不将逻辑字节冒称共享磁盘净变化。逐文件路径、大小、SHA和恢复依据见[Windows清单](../reports/maintenance/20261105/qualification_cleanup/windows_inventory.json)、[Linux清单](../reports/maintenance/20261105/qualification_cleanup/linux_inventory.json)，实际缺失和保护核对见同目录两端receipt及verification.json。

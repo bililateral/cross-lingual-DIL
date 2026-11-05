@@ -1,0 +1,172 @@
+{
+  "source": "reports/seller_alias_continual/20261104/vendorlink_result/formal/budget.json",
+  "original_abc_receipts": [
+    {
+      "id": "ABC_s4_VendorLink_SEQ",
+      "slot": 0,
+      "bucket": "training",
+      "actual_seconds": 1534.8903717510402,
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "ABC_s4_H_SEQ",
+      "slot": 0,
+      "bucket": "training",
+      "actual_seconds": 3178.5311148660257,
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "ABC_s4_H_ER",
+      "slot": 0,
+      "bucket": "training",
+      "actual_seconds": 5057.3321289520245,
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "ABC_s4_H_full",
+      "slot": 0,
+      "bucket": "training",
+      "actual_seconds": 5172.560597393196,
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "ABC_s5_VendorLink_SEQ",
+      "slot": 0,
+      "bucket": "training",
+      "actual_seconds": 1526.15427911398,
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "ABC_s5_H_SEQ",
+      "slot": 0,
+      "bucket": "training",
+      "actual_seconds": 3208.113661434967,
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "ABC_s5_H_ER",
+      "slot": 0,
+      "bucket": "training",
+      "actual_seconds": 5132.5180241758935,
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "ABC_s5_H_full",
+      "slot": 0,
+      "bucket": "training",
+      "actual_seconds": 5190.563937091036,
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "ABC_s6_VendorLink_SEQ",
+      "slot": 0,
+      "bucket": "training",
+      "actual_seconds": 1535.4568386459723,
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "ABC_s6_H_SEQ",
+      "slot": 0,
+      "bucket": "training",
+      "actual_seconds": 3321.7590573190246,
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "ABC_s6_H_ER",
+      "slot": 0,
+      "bucket": "training",
+      "actual_seconds": 5110.868751796894,
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "ABC_s6_H_full",
+      "slot": 0,
+      "bucket": "training",
+      "actual_seconds": 5238.485843450995,
+      "success": true,
+      "error": null
+    }
+  ],
+  "method_mean_seconds": {
+    "VendorLink_SEQ": 1532.167163170331,
+    "H_full": 5200.536792645075,
+    "H_SEQ": 3236.1346112066726,
+    "H_ER": 5100.239634974937
+  },
+  "max_new_trajectories": 28,
+  "stages": [
+    {
+      "stage": "representations",
+      "trajectories": 4,
+      "worker_seconds": 17133.77754110556,
+      "ideal_two_slot_seconds": 10401.07358529015
+    },
+    {
+      "stage": "L1",
+      "trajectories": 1,
+      "worker_seconds": 5200.536792645075,
+      "ideal_two_slot_seconds": 5200.536792645075
+    },
+    {
+      "stage": "L2",
+      "trajectories": 1,
+      "worker_seconds": 5200.536792645075,
+      "ideal_two_slot_seconds": 5200.536792645075
+    },
+    {
+      "stage": "L3",
+      "trajectories": 1,
+      "worker_seconds": 5200.536792645075,
+      "ideal_two_slot_seconds": 5200.536792645075
+    },
+    {
+      "stage": "T1",
+      "trajectories": 1,
+      "worker_seconds": 5200.536792645075,
+      "ideal_two_slot_seconds": 5200.536792645075
+    },
+    {
+      "stage": "T2",
+      "trajectories": 1,
+      "worker_seconds": 5200.536792645075,
+      "ideal_two_slot_seconds": 5200.536792645075
+    },
+    {
+      "stage": "seed8",
+      "trajectories": 4,
+      "worker_seconds": 17133.77754110556,
+      "ideal_two_slot_seconds": 10401.07358529015
+    },
+    {
+      "stage": "final",
+      "trajectories": 15,
+      "worker_seconds": 60808.84498392628,
+      "ideal_two_slot_seconds": 31002.626440530174
+    }
+  ],
+  "worker_hours_at_old_speed": 33.633078897045216,
+  "ideal_two_slot_training_hours": 21.613182659537735,
+  "planning_elapsed_hours": [
+    24,
+    36
+  ],
+  "planning_assumptions": "Existing single-worker means; unchanged speed per worker gives ideal critical path. 24-36h is a planning allowance including evaluation/loading and moderate same-card slowdown, not measured dual-GPU throughput or a guarantee. External resource waiting excluded; early stop or 48h training cap can prevent all 28 trajectories.",
+  "limits_hours": {
+    "auxiliary": 4,
+    "training": 48,
+    "gpu": 3,
+    "total": 55
+  },
+  "formal_started": false
+}

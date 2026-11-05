@@ -1,5 +1,5 @@
 正式入口筹备：新增接线与证据边界
-2026-11-05，正式训练/真实dev评价关闭，用户明确取消额外双路GPU短测。
+2026-11-05，正式训练/真实dev评价关闭，用户明确取消额外双路GPU短测。筹备完成后，用户进一步要求删除本次CPU/GPU校验脚本；两端退役脚本和压缩包已按../english_abc_cleanup/plan.json及回执清理，可从Git a47f2ce7恢复原字节。原核验来源清单/回执为历史证据保留；当前正式gate仅绑定九份实际运行源码，移除两个test与run_cpu的文件校验绑定，运行算法/源码字节不变，不重新运行测试。
 
 两个新增文件：step29_english_control.py负责整批有限流程与两槽派发；step29_english_formal.py负责正式门、真实训练worker、独立dev评价器与完整性检查。原step29_vendorlink_run.execute/Settings/Model/评分公式和step29_english_abc选择规则保持，旧固定36条入口未改。旧formal/evaluate作为query_metrics直接依赖进入来源清单，但其旧unsafe Budget不被新worker采用；新Budget.check实际使用queue.campaign_files的逐文件FileNotFoundError容忍，仍扫描共同campaign，并预留两槽共6GiB临时checkpoint和64GiB共享余量。
 
@@ -15,4 +15,4 @@ CPU01在Linux既有py310五项通过，6.065310秒计7秒。覆盖actual train�
 
 这些是手写CPU与微型随机BERT证据，NVML为替身，部分有限选择使用事先手写MAP以验证控制流；不宣称真实28条已跑、GPU并发已测、完整40轮峰值或独立英文效果。CPU试验不打开正式门，不读预训练或真实语料，源码身份绑定不表示每个被列依赖的所有分支都动态覆盖。未变科学计算和旧数值边界复用先前审查/资格，不另加全量测试、GPU试跑或调参。
 
-完整外审四文件已回收并核大小/SHA，唯一必修ABC-F-R01按上述定向证据关闭，其余澄清/可选项见review/primary_disposition.zh.txt。正式筹备完成，formal_gate.draft.json绑定实际输入元数据、CPU04当前来源和最终费用，review_closed=true但approved=false。gate对authorization只核字节，未语义证明新的用户许可；日后正式开始须另绑明确开始许可和最新费用，准备许可不能代替。累计训练0、GPU37、辅助5789，共5826/198000秒，其中3000秒为明确保守准备/收尾收费，网页等待不计。运行Ledger的30秒收尾预留尚未启动，不与已发生费用混称。只在新独立workspace部署，不改活动中文HPO；实际同步见final_sync.json，正式训练、真实dev和自动正式监听均关闭。
+完整外审四文件已回收并核大小/SHA，唯一必修ABC-F-R01按上述定向证据关闭，其余澄清/可选项见review/primary_disposition.zh.txt。正式筹备完成，formal_gate.draft.json绑定实际输入元数据、CPU04已验证且未变的九份实际运行来源和最新费用，review_closed=true但approved=false。gate对authorization只核字节，未语义证明新的用户许可；日后正式开始须另绑明确开始许可和最新费用，准备许可不能代替。含本次文件清理收尾600秒后，累计训练0、GPU37、辅助6389，共6426/198000秒，其中3600秒为明确保守准备/收尾收费，网页等待不计。运行Ledger的30秒收尾预留尚未启动，不与已发生费用混称。只在新独立workspace部署，不改活动中文HPO；筹备时点同步见final_sync.json，清理后当前绑定见../english_abc_cleanup/sync.json；正式训练、真实dev和自动正式监听均关闭。
