@@ -1,4 +1,10 @@
 # 科研文件存储与恢复
+## 2026-11-05 ABC正式监听部署后的增量校验脚本清理
+
+用户已确认自动接续，新增监听外审及两项异常计费修复完成。按此前“此次试验CPU/GPU校验脚本完成后删除”的决定，Windows删除新增CPU测试及CPU02/03两份必要中间副本共3脚本，并删除已验收的重复外审ZIP，共4文件；Linux删除本轮唯一CPU测试副本1文件。逐项大小/SHA、原字节恢复依据与删除回执见[清单](../reports/documentation/20261105/english_abc_wait/cleanup_plan.json)、同目录cleanup_windows.json和cleanup_linux.json。恢复提交28e531489d3df89217473a1de357c87797595ad0；CPU01原来源和冻结送审批次也可从387d0d02恢复。各原CPU回执、来源清单、外审全文/主审和费用保留，不回写历史路径。
+
+实际运行的active_abc_wait.py、保留源码scripts/step29_english_wait.py、九runtime来源及活动state均不在清理范围。服务器11:37:19核13项当前运行绑定未变，唯一监听583983继续等待，HPO未改。新CPU累计62秒、GPU仍37秒；本次清理无额外GPU/科研测试，不重置大清理周期。最新保管同步见[本轮sync](../reports/documentation/20261105/english_abc_wait/sync.json)，根docs仅Windows。
+
 ## 2026-11-05 ABC校验脚本及压缩包定向清理
 
 用户在正式筹备完成后要求删除此次CPU/GPU校验脚本，取代此前大清理中对英文ABC脚本的暂时排除。Windows删除10份脚本和6个压缩包，共16文件574252字节；Linux删除14份脚本副本和4个压缩包，共18文件545333字节；合计1119585逻辑字节（约1.07MiB）。逐文件路径、SHA、Git恢复方式见[定向清单](../reports/documentation/20261105/english_abc_cleanup/plan.json)，实际删除及保护检查见同目录windows_receipt.json和linux_receipt.json。Linux观测10:56:46，客户端Windows回执10:58:01；时钟不混用。
