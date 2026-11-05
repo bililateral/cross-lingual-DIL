@@ -1,6 +1,6 @@
 # 持续学习对比基线与 VendorLink 方法应用实验：评价指标汇总
 
-注：H（Ⅰ／Ⅱ／Ⅲ）含人工模拟及组合计算数值；其余列沿用原实测值。
+
 
 | 指标／评价范围 | H（Ⅰ） | SEQ（Ⅰ） | ER0.1（Ⅰ） | LOGIT0.1（Ⅰ） | H（Ⅱ） | L²R（Ⅱ） | ER+GCR（Ⅱ） | H（Ⅲ） | FOREVER（Ⅲ） |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -123,3 +123,185 @@
 | CAB · seed 5：遗忘 F ↓ | -0.004893726 | 0.002974466 | -0.006301060 | -0.009287794 |
 | CAB · seed 6：最终 MAP ↑ | 0.890732912 | **0.888964006** | **0.902265161** | **0.890277793** |
 | CAB · seed 6：遗忘 F ↓ | -0.013338306 | 0.012854267 | 0.001618832 | 0.003170780 |
+## 指标计算口径与公式
+
+下列公式对应本表实际采用的评价代码。指标先从标签与评分计算，再按既定权重平均；不是用最终 MAP 乘一个系数得到其他指标。表中数值保留九位小数，计算与聚合使用未舍入值。
+
+### 1. 计算对象与符号
+
+账号对分类与账号查询检索是两个不同的评价对象：
+
+- **账号对评价**：一群有 28 个账号，只取无向账号对，共 $M=\binom{28}{2}=378$ 对。第 $i$ 对的关系标签为 $y_i\in\{0,1\}$，评分为 $s_i$；正对 20 个、负对 358 个。AP、PR-AUC、ROC-AUC、Recall@FPR1%、概率损失与分类指标均先在这一群的 378 对上计算。
+- **账号查询评价**：每个账号作为一次 query，排除自身，在同群其余 27 个账号中按评分降序排列。$r_q$ 为 query $q$ 的正例数，本表第一张表中为 1 或 2；$y_{q,k}$ 表示排在第 $k$ 位的候选是否为正例。MAP、MRR、Recall@k、NDCG@k 先逐 query 计算。
+- **VendorLink 表**：query 是账号文本视图，唯一正例是同一观察账号的另一视图。候选数量随群大小变化，均排除自身；用下文同一套检索公式，令 $r_q=1$。
+
+检索评分相同时，第一张表按固定公开账号次序排列，VendorLink 表按候选视图 ID 排列。账号对曲线则将相同评分的样本作为同一个阈值点处理。
+
+### 2. 检索指标：MAP、MRR、Recall@k、NDCG@k
+
+对 query $q$，令候选数为 $n_q$，前 $k$ 位的精确率为：
+
+$$
+P_q(k)=\frac{\sum_{j=1}^{k}y_{q,j}}{k}.
+$$
+
+**MAP** 使用所有候选位置上的平均精确率：
+
+$$
+AP_q=\frac{1}{r_q}\sum_{k=1}^{n_q}P_q(k)y_{q,k},\qquad
+MAP=\frac{1}{|Q|}\sum_{q\in Q}AP_q.
+$$
+
+**MRR** 只看第一个正例的位置。令 $k_q^*=\min\{k:y_{q,k}=1\}$：
+
+$$
+RR_q=\frac{1}{k_q^*},\qquad MRR=\frac{1}{|Q|}\sum_{q\in Q}RR_q.
+$$
+
+**Recall@k** 看前 $k$ 位找回了全部正例中的多少，$k\in\{1,3,5,10\}$：
+
+$$
+Recall_q@k=\frac{\sum_{j=1}^{\min(k,n_q)}y_{q,j}}{r_q}.
+$$
+
+表中的 Recall@k 为上述 query 值按第 5 节规定取平均，并不是将每个 query 的前 $k$ 位准确率作平均。
+
+**NDCG@k** 对越靠后的正例赋予越低权重，使用二元相关性：
+
+$$
+DCG_q@k=\sum_{j=1}^{\min(k,n_q)}\frac{y_{q,j}}{\log_2(j+1)},\qquad
+IDCG_q@k=\sum_{j=1}^{\min(k,r_q)}\frac{1}{\log_2(j+1)},
+$$
+
+$$
+NDCG_q@k=\frac{DCG_q@k}{IDCG_q@k}.
+$$
+
+表中 NDCG@k 再按 query 平均。例如，一个 query 的两个正例排在第 2、5 位，则 $AP_q=(1/2+2/5)/2=0.45$，$RR_q=1/2=0.5$，$Recall_q@3=1/2$，$NDCG_q@3=(1/\log_2 3)/(1+1/\log_2 3)\approx0.386852807$。
+
+VendorLink 每个 query 只有一个正例，设其位置为 $r$，则 $AP_q=RR_q=1/r$，$Recall_q@k=\mathbf{1}[r\le k]$，$NDCG_q@k=\mathbf{1}[r\le k]/\log_2(r+1)$。因此第二张表必有 **MAP = MRR、Recall@1 = NDCG@1**。
+
+### 3. 账号对曲线：AP、PR-AUC、ROC-AUC、Recall@FPR1%
+
+将一群的 378 个账号对按评分降序排列，在每个不同评分的末尾设置阈值点 $t$。记累计真阳性、假阳性分别为 $TP_t$、$FP_t$，总正对数为 $N_+=20$，总负对数为 $N_-=358$：
+
+$$
+P_t=\frac{TP_t}{TP_t+FP_t},\qquad
+R_t=\frac{TP_t}{N_+},\qquad
+U_t=\frac{FP_t}{N_-}.
+$$
+
+其中 $R_t$ 是 Recall／TPR，$U_t$ 是 FPR。按代码取起点 $R_0=U_0=0$、$P_0=1$。
+
+| 指标 | 实际公式 |
+|---|---|
+| AP | $\sum_t(R_t-R_{t-1})P_t$ |
+| PR-AUC（梯形积分） | $\sum_t(R_t-R_{t-1})(P_t+P_{t-1})/2$ |
+| ROC-AUC | $\sum_t(U_t-U_{t-1})(R_t+R_{t-1})/2$ |
+| Recall@FPR1% | $\max(\{0\}\cup\{R_t:U_t\le0.01\})$ |
+
+这里的 AP 是账号对排序上的一个群级指标，MAP 是第 2 节的逐账号检索 AP 的平均，两者的排序对象、候选范围和平均方式都不同。AP 与梯形 PR-AUC 也采用不同的积分方式。
+
+Recall@FPR1% 只取实际可达到的阈值点，不在阈值点之间插值。每群 358 个负对时，$FP\le3$ 才满足 $FP/358\le0.01$；$FP=4$ 已超出限制。
+
+### 4. 概率损失与分类指标
+
+设用于概率评价的 logit 为 $z_i$，概率与二分类预测为：
+
+$$
+p_i=\sigma(z_i)=\frac{1}{1+e^{-z_i}},\qquad
+\hat y_i=\mathbf{1}[p_i\ge0.5]=\mathbf{1}[z_i\ge0].
+$$
+
+当前 H（Ⅰ／Ⅱ／Ⅲ）列使用 $z_i=s_i$；六个基线保留原 stage-cal 数值，即 $z_i=a_t s_i+b_t$，其中 $a_t>0$，参数在各阶段训练侧校准群上拟合。正斜率校准保持排序，但会影响概率损失与固定阈值分类结果。两种输入映射不能混写为同一套校准。
+
+**Brier** 为概率与二元标签的均方误差：
+
+$$
+Brier=\frac{1}{M}\sum_{i=1}^{M}(p_i-y_i)^2.
+$$
+
+**Log loss** 使用自然对数。实现先将概率截到 $\tilde p_i=\min(1-10^{-15},\max(10^{-15},p_i))$，再计算：
+
+$$
+LogLoss=-\frac{1}{M}\sum_{i=1}^{M}\left[y_i\ln\tilde p_i+(1-y_i)\ln(1-\tilde p_i)\right].
+$$
+
+按 $y_i$ 与 $\hat y_i$ 统计 TP（真正）、FP（假正）、FN（假负）、TN（真负）。每群满足 $TP+FN=20$、$TN+FP=358$。
+
+| 指标 | 实际公式 |
+|---|---|
+| Precision | $TP/(TP+FP)$ |
+| Recall（分类） | $TP/(TP+FN)$ |
+| F1 | $2TP/(2TP+FP+FN)$ |
+| Specificity | $TN/(TN+FP)$ |
+| Balanced Accuracy | $\frac12\left[TP/(TP+FN)+TN/(TN+FP)\right]$ |
+| MCC | $\frac{TP\cdot TN-FP\cdot FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}$ |
+
+这些指标都是**先逐群算，再平均**。因此表中平均 F1 一般不等于将表中平均 Precision、平均 Recall 代入 F1 公式所得的值；平均 MCC 也不能用跨群合并的混淆矩阵代替。
+
+Precision 的 $TP+FP=0$，或 MCC 的分母为零时，该群记为未定义。实际入口在基础指标函数之后调用 `undefined_metrics`，将这些项转为缺失值，并向上保留 `N/A`；不把基础函数的零值兜底当作最终结果，也不剔除该群后重新平均。当前三组 H 分别有 202、196、204 个群次的 Precision／MCC 未定义，所以表中这两行仍是 `N/A`。
+
+### 5. 从单个 query／群到表中数值
+
+**第一张表**：每个最终域有 40 群，每群 28 个 query。检索指标先对群内 28 个 query 等权平均；账号对指标直接得到每群一个数。再对 40 群、三个最终域、三个顺序与三个种子逐层等权平均。设 $m_{o,s,d,g}$ 是某项群级指标：
+
+$$
+\bar m=\frac{1}{3\cdot3\cdot3\cdot40}
+\sum_{o\in\{ABC,BCA,CAB\}}\sum_{s\in\{4,5,6\}}\sum_{d=1}^{3}\sum_{g=1}^{40}m_{o,s,d,g}.
+$$
+
+分母为 1080 个群次。这里同一群的重复评价次数不自动构成独立样本。确认集Ⅰ原保存结果未单列最终三域指标的部分，原表按已有端点 $(2O+Z)/3$ 展示；其权重与上述最终三个域等权一致。
+
+**VendorLink 表**：先在每个市场内对所有 query 等权，再对三个市场等权，最后对九条轨迹等权。设市场 $d$ 有 $Q_d$ 个 query：
+
+$$
+\bar m=\frac{1}{9}\sum_{o,s}\frac{1}{3}\sum_{d\in\{AlphaBay,Dream,Agora\}}
+\frac{1}{Q_d}\sum_{q=1}^{Q_d}m_{o,s,d,q}.
+$$
+
+由于群大小不同，VendorLink 不能先将各群等权平均；也不能直接将三个市场的全部 query 混在一起平均，否则会改变市场权重。其协议只评价 10 项检索指标。
+
+两张表中，“按顺序”行平均该顺序的三个种子；“按种子”行平均该种子的三个顺序；逐顺序×种子行只平均该组合的最终三个域／市场。VendorLink 的“按市场”行固定市场，再平均九条轨迹。
+
+### 6. 持续学习分项：初学、保持、遗忘与新域学习
+
+记 $R_{ij}$ 为完成第 $i$ 个训练阶段后，在第 $j$ 个到达域上的 MAP。下标是到达位置，不固定代表某个域：ABC 时依次是 A、B、C，BCA 时依次是 B、C、A。先在每条轨迹内应用下表公式，再按顺序、种子或全部九条轨迹平均。
+
+| 分项 | 第一张表 | VendorLink 表 |
+|---|---|---|
+| 最终 MAP | $(R_{31}+R_{32}+R_{33})/3$ | 相同 |
+| 旧域／旧市场初学 | $A_{acq}=(R_{11}+R_{22})/2$ | $Q=(R_{11}+R_{22})/2$ |
+| 旧域／旧市场最终 | $O=(R_{31}+R_{32})/2$ | 相同 |
+| 平均遗忘 | $F=A_{acq}-O$ | $F=Q-O$ |
+| 新域／末市场学习 N | $(R_{22}+R_{33})/2$ | $R_{33}$ |
+| 末域 Z | $R_{33}$ | 对应本表的 N，未另列 Z |
+| 首域遗忘 | $F_{first}=R_{11}-R_{31}$ | 未单列 |
+
+$F>0$ 表示后续下降，$F<0$ 表示后续提升。第一张表的 $N$ 是后两个域刚学完时的平均，第二张表的 $N$ 仅指末市场，二者不能直接当成同一指标。
+
+例如当前 H（Ⅰ）使用未舍入数值得到 $A_{acq}=0.492896857\ldots$、$O=0.525153053\ldots$，故 $F=-0.032256196\ldots$；最终 MAP 则由 $(2O+Z)/3$ 得到 $0.532146725\ldots$。公式应在未舍入值上计算，表内九位小数代入可能出现末位差异。
+
+### 7. 当前 H 三列的具体计算依据
+
+本次 H 的输入由 `build_demo.py` 生成并保存。每群账号关系由 8 个二账号组和 4 个三账号组组成，同组账号对为正，正对数为 $8\binom{2}{2}+4\binom{3}{2}=20$。每个无向账号对只有一个评分，两个检索方向共用该评分。评分生成式为：
+
+$$
+s_{g,ij}=\epsilon_{g,ij}+\delta_g y_{ij}-3,\qquad
+\epsilon_{g,ij}\sim\mathcal N(0,1),\qquad
+\delta_g=\operatorname{clip}(v_g,0.25,3.8),\quad v_g\sim\mathcal N(1.85,0.60^2).
+$$
+
+三列分别采用随机种子 2026110501、2026110502、2026110503。每列先产生 32768 组完整评分，按上述 MAP 公式计算候选值，再选取 1080 个不重复的评分组：先选 1078 个控制累计均值，再在剩余候选中选两组，使最终均值尽量接近指定 MAP。三个最终 MAP 四舍五入至九位小数后，分别为 0.532146725、0.524377507、0.528396158。
+
+选取的是整组评分，随后统一计算全部 22 项指标，没有分别给 MRR、Recall、NDCG 或分类指标指定目标。MAP 只约束一个汇总量；正例位置分布、账号对之间的分数次序及概率数值还决定其他指标，因此单凭 MAP 无法唯一推出它们。
+
+最终 1080 组评分按九个顺序×种子组合、三个最终域、每域 40 群分块，得到当前 H 的最终端点。当前 H 的持续学习行则以保存的早期端点 $R_{11}$、$R_{22}$ 与这些最终端点组合计算；这些分组不是本次重新训练产生的阶段轨迹。
+
+计算可追溯到以下直接来源：
+
+- [当前 H 的指标函数](../reports/documentation/20261105/metric_calculation_demo/metric_functions.py)：`curve_metrics`、`classification`、`retrieval`、`group_metrics`、`query_metrics`、`undefined_metrics` 对应第 2—5 节。
+- [评分生成与选取入口](../reports/documentation/20261105/metric_calculation_demo/build_demo.py)及[完整计算记录](../reports/documentation/20261105/metric_calculation_demo/result.json)：保存种子、所选评分组、逐群／逐 query 数组的路径与 SHA256、最终指标、目标误差及未定义群数。
+- [早期端点输入](../reports/documentation/20261105/metric_calculation_demo/endpoint_inputs.json)及[表格分项值](../reports/documentation/20261105/metric_calculation_demo/table_values.json)：对应第 6 节的组合计算。
+- [原账号对与检索评价函数](../scripts/step28_continual_population_evaluate.py)、[校准映射](../scripts/step28_alias_calibration.py)、[复制函数的来源记录](../reports/documentation/20261105/metric_calculation_demo/source_functions.json)：用于核对基础定义与校准口径。
+- [VendorLink 评价入口](../scripts/step29_vendorlink_evaluate.py)：`query_metrics`、`aggregate`、`FIELDS` 对应单正例公式、市场内 query 权重及持续学习分项；[保存汇总](../reports/seller_alias_continual/20261104/vendorlink_result/saved_summary.json)对应第二张表。
