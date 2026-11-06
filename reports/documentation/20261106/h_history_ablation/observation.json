@@ -1,0 +1,34 @@
+{
+  "kind": "read_only_metadata_observation_transcribed_from_ssh_tool_output",
+  "observed_server_times": ["2026-11-06T20:56:58.848521+08:00", "2026-11-06T20:58:18.799959+08:00", "2026-11-06T20:59:57.042281+08:00"],
+  "campaign": "/home/yongpeng/cross-lingual/reports/documentation/20261103/history_wait/workspace/formal",
+  "selection": {
+    "relative_path": "selected.json",
+    "bytes": 1490,
+    "sha256": "a6da3aa85ef828435e6c624fffc38dbe86ffbc299f4e828d45454c675fc766bf",
+    "number": 3,
+    "parameters": {"history_weight": 0.07049361507739538, "teacher_weight": 0.767438161798796},
+    "state": "COMPLETE",
+    "effect_scores_opened": false
+  },
+  "campaign_completion_exists": false,
+  "campaign_failure_exists": false,
+  "search_completed_trajectories": 36,
+  "replication_complete": ["ABC_s4", "ABC_s5", "ABC_s6", "BCA_s4", "BCA_s5", "BCA_s6"],
+  "replication_incomplete": ["CAB_s4", "CAB_s5", "CAB_s6"],
+  "completed_trajectory_identity": {"status": "COMPLETE_864_UPDATES_3_ENDPOINTS_VALID_BLIND", "updates": 864, "endpoints": 3},
+  "gate_sha256": "2bcbecf74779c9506d2d053138bb4bab90ba1fdb0be88a4f583c66ee91c835cb",
+  "source_count": 58,
+  "source_mismatches": [],
+  "process_observation_at_205658": {
+    "hpo_parent": {"pid": 4159100, "owner": "yongpeng", "created": 1793674502.12, "command_tail": "history_wait/active_history_wait.py --config history_wait/wait_config.json", "cwd": "reports/documentation/20261103/history_wait/workspace"},
+    "hpo_workers": [1072506, 1119696, 1119697],
+    "english_waiter": {"pid": 583983, "owner": "yongpeng", "created": 1793849824.96, "command_tail": "english_abc_wait/active_abc_wait.py --config english_abc_wait/wait_config.json", "cwd": "reports/documentation/20261105/english_abc_formal_prepare/workspace"},
+    "note": "Owner, full command and cwd were read via psutil. Worker completion/exit may change within this observation interval. Current create_time values are preserved and do not overwrite older receipts."
+  },
+  "resources": {"gpu": "NVIDIA GeForce RTX 5090", "total_gpu_mib": 32607, "free_gpu_mib": 12467, "gpu_utilization_percent": 91, "available_ram_gib": 207.29370880126953, "free_project_disk_gib": 681.1714401245117},
+  "search_worker_elapsed_hours": {"count": 36, "mean": 3.3536988598203457, "min": 3.088459270697527, "max": 3.9143130066571756, "sum": 120.73315895353244},
+  "projection": {"new_trajectories": 63, "worker_hours_at_saved_mean": 211.28302816868177, "calendar_hours_at_three_similar_slots": 70.42767605622726, "new_variant_throughput_measured": false},
+  "access": {"model_load": false, "training": false, "scientific_tests": false, "effect_metrics": false, "sqlite": false, "formal_text_or_labels": false, "private_custody": false, "remote_mutations": false},
+  "caveat": "This is an observation of metadata and source bytes, not independent re-execution or final result review. An initial completion count used the wrong directory depth and was discarded; the corrected counts above use */run/completion.json. SSH session exited normally."
+}
