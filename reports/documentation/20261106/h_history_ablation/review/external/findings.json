@@ -1,0 +1,673 @@
+{
+  "schema_version": 1,
+  "review_id": "HABL-20261106",
+  "review_type": "static_scientific_design_review",
+  "language": "zh-CN",
+  "single_reviewer": true,
+  "subagents_used": false,
+  "decision": "ACCEPT_BOUNDED_DESIGN_RECOMMEND_IMPLEMENTATION_PREPARATION_DECISION",
+  "scientific_blockers": 0,
+  "open_proven_design_or_reproducibility_defects": 0,
+  "mandatory_proposal_revisions": 0,
+  "new_experiments_required_by_review": 0,
+  "implementation_verified": false,
+  "run_authorization_granted": false,
+  "findings": [
+    {
+      "id": "HABL-01",
+      "title": "历史两项2×2成立，限制为完整训练策略的条件效应",
+      "severity": "解释边界",
+      "status": "ACCEPTED_WITH_STATED_LIMITS",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            42,
+            63
+          ]
+        },
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            103,
+            107
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_history_optuna.py",
+          "lines": [
+            105,
+            131
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_continual_five.py",
+          "lines": [
+            178,
+            251
+          ]
+        }
+      ],
+      "minimum_disposition": "保留完整策略、固定配置和条件交互表述；不把Full删除差值相加为唯一贡献比例。",
+      "impact_scope": "2×2结论、模块贡献和交互解释",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": false,
+      "detailed_review_markdown": "**分类：解释边界；状态：方案可接受，无新增必修。**\n\n证据：proposal.zh.md 第42—63、103—107行；S/step28_history_optuna.py 第105—131行；S/step28_continual_five.py 第178—219、239—251行。\n\n2×2设置充分支持前述四个简单效应和一个条件交互。K的“无历史监督”仅指历史损失中不使用标签监督；它的模型和出生目标仍来自此前有监督训练，不能改称整条学习过程不依赖标签。Full、E、K都处理历史群，区别是如何使用这些群。\n\n最小处置：保留“完整策略、固定配置、条件于其余模块”的表述；不能把若干Full删除差值相加当成各模块的唯一贡献比例。当前限制主张足够，不需新增实验。影响范围：2×2结论、论文模块贡献和交互解释。"
+    },
+    {
+      "id": "HABL-02",
+      "title": "E/K/Q真实分支及计数不能靠系数设零直接复用",
+      "severity": "复现或实现设计缺陷",
+      "status": "INHERITED_CODE_RISK_ALREADY_COVERED_BY_PROPOSAL",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            57,
+            63
+          ]
+        },
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            119,
+            123
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_history_optuna.py",
+          "lines": [
+            105,
+            125
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_continual_five.py",
+          "lines": [
+            183,
+            246
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_continual_five_run.py",
+          "lines": [
+            194,
+            211
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_continual_five_run.py",
+          "lines": [
+            269,
+            269
+          ]
+        }
+      ],
+      "minimum_disposition": "未来实现同时落实显式current/history角色、教师需要性、K历史监督及重组日志关闭、Q历史/Memory关闭和864呈现计数；仅作定向核验。",
+      "impact_scope": "主要Full−E、整个2×2和资源账",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": true,
+      "detailed_review_markdown": "**分类：复现或实现设计缺陷风险；状态：风险真实存在于母体直接复用方式，方案第3.1节已明确规避，不计为本稿开放缺陷。**\n\n证据：proposal.zh.md 第57—63、119—123行；S/step28_history_optuna.py 第105—125行；S/step28_continual_five.py 第183—210、221—246行；S/step28_record_replay.py 第248—303行；S/step28_continual_five_run.py 第194—211、269行。\n\n具体核查结果：\n\n- E：母体第124行确实以reference是否为空决定监督系数1或alpha。只移除教师会把历史监督变成1，约为选定alpha的14.19倍。应由显式current/history角色定权；E不生成、读取或匹配教师，不能为了通过旧接口而保留无用教师。\n- K：母体目标先生成两个assignment、计算标签监督；外层更新第210行还会为了记录assignment摘要再次调用有标签重组。因此只跳过损失里的A1仍不满足“不执行历史重组”，日志路径也要一并关闭。当前群监督和当前群A1继续保留；历史分支只做自然视图的beta·D0。\n- Q：不能仅令alpha=beta=0后仍draw历史群、编码历史、生成教师或维护Memory。现训练计数第269行只识别旧名SEQ_ref；新名H-SEQ若直接沿用会误计1440次群呈现。应按实际分支记录Q每轨迹864次。\n\n最小处置：在新入口同时落实角色、教师是否需要、监督／重组是否执行、Memory与计数；使用方案已有的定向手写核验，检查调用与分项梯度，不只检查总损失或非零总梯度。无需新增训练臂或补做全部GPU资格。影响范围：主要Full−E、整个2×2及资源账。"
+    },
+    {
+      "id": "HABL-03",
+      "title": "R/M/P必须采用正确监督尺度、聚合精度及实际rank字段",
+      "severity": "复现或实现设计缺陷",
+      "status": "INHERITED_CODE_RISK_ALREADY_COVERED_BY_PROPOSAL",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            65,
+            71
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_record_replay.py",
+          "lines": [
+            113,
+            156
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_g_half.py",
+          "lines": [
+            39,
+            49
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_positive_ranking.py",
+          "lines": [
+            58,
+            79
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_history_optuna.py",
+          "lines": [
+            115,
+            118
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_chinese_base.py",
+          "lines": [
+            165,
+            191
+          ]
+        }
+      ],
+      "minimum_disposition": "未来实现按已有标量/autograd参考核对R完整B0、M FP64纯mean再一次FP32输出、P四处真正选择旧rank；不增HPO。",
+      "impact_scope": "Full−R/M/P及数值可复现性",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": true,
+      "detailed_review_markdown": "**分类：复现或实现设计缺陷风险；状态：方案已覆盖，无新增方案必修。**\n\n证据：proposal.zh.md 第65—71、121行；S/step28_record_replay.py 第113—127、130—156行；S/step28_g_half.py 第39—49行；S/step28_positive_ranking.py 第58—79行；S/step28_history_optuna.py 第115—118行；S/step28_chinese_base.py 第165—191行。\n\nR应把(B0+B1)/2替成B0，当前与历史同步。保留0.5B0会同时改变监督强度；计算两份B0虽然数学上可能抵消平均，也不符合关闭重组操作的定义。D0仍取自然A0。\n\nM应把所有完整记录块转FP64取mean，再按Full生产路径一次转回FP32。旧record.account_logits使用FP32矩阵乘法汇聚，不能直接改名为本轮M；0.5mean也不是纯mean。训练、出生目标聚合、恢复与评价必须采用同一M身份。\n\nP的原rank公式与源码一致：logsumexp覆盖除自身以外27个候选，再减正例均值。单正例时与L_pos数学等价；双正例时梯度分配及相对有效尺度改变。另一个具体接线陷阱是：positive.objectives(old_rank=True)虽把旧rank放入rank_used，却仍返回rank_pos；当前history目标显式读取rank_pos。只翻old_rank标志并不足以替换真实训练目标，必须选取正确字段或直接构造旧rank。\n\n最小处置：兑现方案中的独立标量／直接autograd参考，核对四个监督位置和实际使用字段；保留固定lambda下的目标替换解释。无需匹配每步梯度范数、追加lambda网格或纯LogMeanExp臂。影响范围：Full−R/M/P及其数值可复现性。"
+    },
+    {
+      "id": "HABL-04",
+      "title": "A与M不重复，结构策略不能缩为单一池化或教师效应",
+      "severity": "解释边界",
+      "status": "ACCEPTED_WITH_IMPLEMENTATION_REQUIREMENTS",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            73,
+            77
+          ]
+        },
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            121,
+            123
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_record_replay.py",
+          "lines": [
+            43,
+            63
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_record_replay.py",
+          "lines": [
+            102,
+            182
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_record_replay.py",
+          "lines": [
+            285,
+            303
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_chinese_base.py",
+          "lines": [
+            143,
+            162
+          ]
+        },
+        {
+          "archive_path": "context/reports/seller_alias_continual/20261011/record_attribution_result/review/primary_disposition.zh.txt",
+          "lines": [
+            53,
+            60
+          ]
+        }
+      ],
+      "minimum_disposition": "维持均值表示、同头、无二次归一化/额外std、自己的378出生目标与直接autograd；明确目标载荷格式。",
+      "impact_scope": "Full−A、Memory恢复和结构归因",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": false,
+      "detailed_review_markdown": "**分类：解释边界，兼有明确的新实现接口；状态：接受方案现有边界。**\n\n证据：proposal.zh.md 第38—40、73—77、121—123行；S/step28_record_replay.py 第43—63、102—127、159—182、211—219、285—303行；S/step28_chinese_base.py 第143—162行；C/reports/seller_alias_continual/20261011/record_attribution_result/review/primary_disposition.zh.txt 第24、53—60行。\n\n一般有 h(mean(z_a),mean(z_b)) ≠ mean[h(z_i,z_j)]，而Full还含LogMeanExp部分，因此A和M不是同一干预。一个抽象手算例：两个账号各含记录−1、+1，头只取绝对差，则“先均值再匹配”为0，“先匹配再均值”为1。此例只说明运算不等价，不是BGE实验或正式数据核验。\n\nA保留同维记录z、同4096→128→1头、同初始参数，有助于避免旧LOGIT/R0对照中头维数变化的混杂；但均值后表示范数、输入分布、匹配非线性、计算量和自身教师轨迹仍会变化。Full−A应解释为整套结构策略的条件效果，不能缩成“单独证明记录细节／池化顺序／教师格式贡献”。\n\n现有账号基线的pool_channels加入mean、std并做最终归一化，不符合A定义。现有记录Memory序列化又硬要求n(n−1)/2长表，A的378维出生分数不能直接塞进该格式。应使用明确的账号目标载荷，直接autograd贯通encoder/head；保存目标在该轨迹阶段边界接纳群时由eval/no_grad自然A0产生，存活目标不刷新。\n\n最小处置：按方案实现并限定表述；不得借用Full教师、补std／二次归一化或伪装记录表。方案已有有限A核验足够作为准备要求，不需要新结构网格。影响范围：Full−A、教师／Memory恢复与结构归因。"
+    },
+    {
+      "id": "HABL-05",
+      "title": "固定Full超参数公平性是条件公平性，复用依赖尚未由本审验证",
+      "severity": "解释边界",
+      "status": "ACCEPTED_PENDING_EXISTING_REUSE_CONDITIONS",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            17,
+            34
+          ]
+        },
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            79,
+            95
+          ]
+        },
+        {
+          "archive_path": "observation.json",
+          "lines": [
+            5,
+            19
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_history_optuna.py",
+          "lines": [
+            58,
+            87
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_continual_five.py",
+          "lines": [
+            163,
+            219
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_history_optuna_run.py",
+          "lines": [
+            129,
+            185
+          ]
+        }
+      ],
+      "minimum_disposition": "落实已有Full完整性和实际依赖门；独立预训练起点、自己的教师/Memory和固定随机键；不把无显著收益当运行无效。",
+      "impact_scope": "所有配对比较和母体复用",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": false,
+      "detailed_review_markdown": "**分类：解释边界；状态：接受，无需新增HPO。**\n\n证据：proposal.zh.md 第17—34、63、79—95、137行；observation.json 第5—19、30—33行；S/step28_history_optuna.py 第58—87、139—144行；S/step28_continual_five.py 第20—22、75—107、110—137、163—169行；S/step28_history_optuna_run.py 第129—185行。\n\n母体参数为alpha=0.07049361507739538、beta=0.767438161798796、lambda_rank=1.3051794547562026、LR倍率=1.2832655111666686。后两项与所附源码一致；前两项与本次观察摘录一致，但selected.json原文件未提供，本审未独立验证其字节或选择结果。\n\n固定这些参数回答“删除／替换选定H的一部分会怎样”，是合理消融。它不使各变体成为各自家族最优；尤其alpha/beta是在Full条件下选出的。无需给E/K/Q或R/M/P/A重新调参来改变这个研究问题。\n\n实际源码的dropout和regroup键含schedule根、order、stage、step、role，regroup再含group uid；Memory有独立根和draw流。新分支应继承这些既定键，而非因少一次历史调用改变当前随机流。所谓“当前监督系数仍1”也不等于其最终参数位移不变：所有分支梯度共用clip_norm=1，再进入持续AdamW状态。\n\nFull九轨迹、27端点只能在原整批有效完成、问题处置、来源／预训练／划分／随机根／参数／更新／校准／恢复和实际模型依赖齐备后复用。新确认必须重评分；旧分数、缺失seed、搜索seed7或旧H都不能顶替。复验收益不显著不等于轨迹无效。新结果可标作Full，但应保留旧run_id和来源引用，不改写旧模型身份。\n\n最小处置：沿方案既有复用门落实，所有变体独立从预训练并使用自己的教师／Memory；容量省下的字节不换成更多历史群。无额外实验。影响范围：全部配对比较、母体来源和实施可行性。"
+    },
+    {
+      "id": "HABL-06",
+      "title": "新确认与实际域配对bootstrap支持限定条件推断",
+      "severity": "解释边界",
+      "status": "ACCEPTED_WITH_STATED_LIMITS",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            87,
+            115
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_history_optuna_evaluate.py",
+          "lines": [
+            133,
+            301
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_continual_five_evaluate.py",
+          "lines": [
+            225,
+            250
+          ]
+        }
+      ],
+      "minimum_disposition": "一次生成/结构验证和统一开放分角色登记；按实际域整群共享抽样索引，维持固定训练流/seed/order/选择条件。",
+      "impact_scope": "全部区间和独立性表述",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": false,
+      "detailed_review_markdown": "**分类：解释边界；状态：接受，无新增必修。**\n\n证据：proposal.zh.md 第87—115行；S/step28_history_optuna_evaluate.py 第133—187、190—254、257—301行；S/step28_continual_five_evaluate.py 第225—250行。\n\n同机制、独立新随机群和新namespace能够提供冻结选择后的新评价对象；不会把原训练流、反复开发的旧dev或seed4/5/6变成新的独立训练世界。方案明确先完成全部训练及来源门，再一次生成A/B/C各40群，之后全部预定盲分数齐备才由评价角色一次开放pairs。生成／结构验证已接触owners和pairs，因此正确说法是“学习器未见、结果开放受限”，不能说所有角色此前均未接触标签。\n\n5000次bootstrap应按实际域A/B/C各抽40个完整群，所有方法、阶段、顺序、seed和比较共享群索引。不能按到达位置把ABC的A与BCA的B配在一起，不能将28个query或378个pair当独立簇，也不能各比较另抽模型或独立区间相减。源码中的实际域贡献归位和共享抽样结构适合复用；本轮应换成本方案seed与八配置全集。\n\n推断条件于固定训练流、已选参数、三个seed、三个循环顺序、校准映射和同一生成机制；没有覆盖HPO、训练随机性总体或真实市场的不确定性。三个seed的sample SD应先各自平均三个顺序再计算，不把九路径当九个iid训练重复。5000次是预定Monte Carlo近似，不能称有限样本精确覆盖保证。\n\n最小处置：保持本方案的配对、开放与条件解释，落实新身份和完整集合绑定。当前不需更多seed、全六顺序或新生成机制。影响范围：全部区间、独立性表述和结果开放。"
+    },
+    {
+      "id": "HABL-07",
+      "title": "O/F交并主要门成立，点保护和探索性比较不可升级",
+      "severity": "解释边界",
+      "status": "ACCEPTED_WITH_STATED_LIMITS",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            99,
+            115
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_continual_five_evaluate.py",
+          "lines": [
+            225,
+            250
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_continual_five_evaluate.py",
+          "lines": [
+            287,
+            305
+          ]
+        },
+        {
+          "archive_path": "context/reports/seller_alias_continual/20261026/continual_result/report.zh.txt",
+          "lines": [
+            28,
+            53
+          ]
+        }
+      ],
+      "minimum_disposition": "维持单一Full−E联合主张；A_acq/N/Z只是聚合点保护；次级和交互探索性，主要失败不被替代。",
+      "impact_scope": "主要结论、遗忘及交互解释",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": false,
+      "detailed_review_markdown": "**分类：解释边界；状态：接受现有主要门。**\n\n证据：proposal.zh.md 第99—115行；S/step28_continual_five_evaluate.py 第225—250、287—305行；C/reports/seller_alias_continual/20261026/continual_result/report.zh.txt 第6—10、28—53、112—120行。\n\n六格R11、R21、R22、R31、R32、R33足以计算本轮预定的O、A_acq、F、N、Z、final与F_first；R21保留中间变化。F=A_acq−O，ΔO=ΔA_acq−ΔF；F负是相对取得时的平均后续提高，不是历史最大值遗忘，也不是每个域不退化。A_acq和N是学完水平，不能称相对未训练状态的净增益或学习速度；本轮不需要为这些未提出的主张增评R12/R23。\n\n唯一主要主张是Full−E同时满足ΔO>0、ΔF<0。其联合零假设为“ΔO≤0，或ΔF≥0”，只有两个方向都过门才支持联合主张。因此采用两个双侧95%条件区间分别检查下界和上界，没有必要仅因两个共同端点而机械再加Bonferroni。**这不意味着两条区间构成同时95%置信区域，也不允许从中挑一个单独宣布主要成功。** 其误差解释仍受bootstrap近似覆盖限制。\n\nΔA_acq、ΔN、ΔZ≥0只是聚合点值保护，不能证明统计非劣或每域／每路径无损。若Full与E的首阶段确实按约定相同，则ΔR11=0，进而ΔN=ΔA_acq+ΔZ/2；在这个前提下A_acq和Z点保护已蕴含N点保护。保留N有报告价值，这只是判据层面的代数冗余，不是需要删除实验的理由。\n\n八个次级对比及2×2交互采用明确标记的探索性区间可以接受，不能声称“所有模块均已显著证明必要”。P的一／二正例分组也是同一次开放派生的解释性描述，组间区间一正一跨零不构成组间效应差异检验。主要门失败不能由次级成功替代。\n\n最小处置：保持现门与分层结论；对于更强的协同、逐域无损、统计非劣或普遍组件必要性主张，当前先限制措辞即可。没有要求为本方案追加实验或统计家族。影响范围：主要结论、遗忘解释与次级声明。"
+    },
+    {
+      "id": "HABL-08",
+      "title": "22指标、N/A、query分组和72轨迹完整门须完整接线",
+      "severity": "复现或实现设计缺陷",
+      "status": "INHERITED_CODE_RISK_ALREADY_COVERED_BY_PROPOSAL",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            99,
+            107
+          ]
+        },
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            119,
+            121
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_continual_population_evaluate.py",
+          "lines": [
+            21,
+            100
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_continual_five_evaluate.py",
+          "lines": [
+            46,
+            60
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_history_optuna_evaluate.py",
+          "lines": [
+            174,
+            187
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_history_optuna_evaluate.py",
+          "lines": [
+            229,
+            276
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_alias_calibration.py",
+          "lines": [
+            61,
+            94
+          ]
+        }
+      ],
+      "minimum_disposition": "保留底层指标后的N/A覆盖、raw/stage-cal/first-cal职责、秩保持检查和分组对齐；更新八配置全集/432格/17280前向门。",
+      "impact_scope": "评价有效性、P诊断和开放门",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": true,
+      "detailed_review_markdown": "**分类：复现或实现设计缺陷风险；状态：方案已规定目标，母体调用不能原样照搬。**\n\n证据：proposal.zh.md 第91、99—107、119—121行；S/step28_continual_population_evaluate.py 第21—26、47—100、225—228行；S/step28_continual_five_evaluate.py 第46—60、241—250行；S/step28_history_optuna_evaluate.py 第174—187、229—253、267—276行；S/step28_alias_calibration.py 第61—94行。\n\n22项应完整保留：pair AP、梯形PR-AUC、ROC-AUC、Recall@FPR≤1%；Brier、log-loss、precision、recall、F1、specificity、balanced accuracy、MCC；MAP、MRR、Recall@1/3/5/10和NDCG@1/3/5/10。检索指标先query再群；pair AP等按群内378对计算，不能把“先query再群”扩展为全部22项重新定义。\n\n底层confusion_metrics对无定义precision/MCC有返回0的旧约定，实际metric_set再通过undefined_metrics掩码改为NaN／None。新入口必须保留这一完整路径，不能直接用底层0值；也不能nanmean删去困难群。合并混淆计数得到的precision/MCC需另标pooled，不顶替原群宏平均。undefined_metrics和query_metrics的函数本体未随包提供，本审核到的是调用、覆盖写回和旧合同边界，未对未附函数冒称重新验证。\n\nraw用于排序与曲线；stage-cal用于主要概率和0.5分类，另保留raw／first-cal。正斜率并不免除有限精度下检查顺序和ties的需要，现preserve_order已提供对应路径。Brier/log-loss的方向要明确：若保留字面“取得损失−最终损失”，正值表示损失改善；若另外展示方向统一的遗忘值，必须同时标注转换，不能悄悄翻号。\n\n历史评价器仍硬编码18轨迹、4320前向以及旧主门；本轮要核对72逻辑轨迹、216端点、432个六格单元、17280群前向和三种角色。不能仅改方法名或最终表格。P的query分组应在同次开放时保存与query顺序对齐的正例数／分组信息，避免后来重开标签。\n\n最小处置：按方案已有的六格映射、缺项拒绝、N/A传播和分组对齐核验落地；不增新指标门、不改阈值。影响范围：评价有效性、P诊断、概率代价和开放门。"
+    },
+    {
+      "id": "HABL-09",
+      "title": "计数和资源算术一致，工期和确认预算仅为有条件规划",
+      "severity": "解释边界",
+      "status": "MECHANICAL_COUNTS_VERIFIED_RUNTIME_UNVERIFIED",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            85,
+            85
+          ]
+        },
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            123,
+            135
+          ]
+        },
+        {
+          "archive_path": "observation.json",
+          "lines": [
+            29,
+            33
+          ]
+        },
+        {
+          "archive_path": "context/reports/documentation/20261102/history_optuna/review_round2/external/report.zh.md",
+          "lines": [
+            214,
+            216
+          ]
+        }
+      ],
+      "minimum_disposition": "保留观测、代理、停止上限、工期的区分；不把旧尺寸记录和worker耗时摘要冒称新变体实测；不借桶/补跑。",
+      "impact_scope": "394小时预算、磁盘和排期",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": false,
+      "detailed_review_markdown": "**分类：解释边界；状态：通过静态机械核算，不是资源实测或预算批准。**\n\n证据：proposal.zh.md 第85、123、127—135行；observation.json 第29—33行；C/reports/documentation/20261102/history_optuna/review_round2/primary_disposition.zh.txt 第18行；同目录external/report.zh.md 第214—216行。\n\n| 项目 | 独立机械核算 | 结论 |\n|---|---|---|\n| 逻辑轨迹 | 8×3×3=72 | 含复用Full九条 |\n| 新训练轨迹 | 7×9=63 | 不把复用Full重复记费 |\n| 更新 | 每条3×48×6=864；新增63×864=54,432 | 相同优化器调用数 |\n| 推理端点 | 72×3=216；新增189，复用27 | 与方案相符 |\n| Q梯度群呈现 | 9×864=7,776 | 全程只有当前群 |\n| 其余新增呈现 | 54×[288+576+576]=77,760 | K的历史D0仍算一次历史群呈现 |\n| 新增呈现合计 | 7,776+77,760=85,536 | 不是FLOPs或非零梯度群计数 |\n| 新确认 | 72×6×40=17,280群前向 | 432个raw评分格，独立群仅120 |\n| 三分数角色 | 432×3=1,296组指标矩阵 | 共享raw前向，不三倍计算独立样本 |\n| 硬预算 | 63×6+12+4=394累计任务小时 | 378训练／12确认／4辅助分别封顶 |\n| Full耗时代理 | 63×3.3536988598203457=211.283028h | 来源为观察摘录中的36条旧worker均值 |\n| 理想满三槽训练日历 | 211.283028/3=70.427676h | 仅持续满槽且吞吐相近时成立 |\n| 新推理权重代理 | 7×35,218,028,616字节≈229.595416GiB | 旧27份尺寸记录的七倍，不是新189份实测 |\n| 新载荷cap与开工free | 288GiB；288+64=352GiB | 推理代理之外约58.404584GiB余量 |\n| Full原件依赖 | 35,218,028,616字节≈32.799345GiB | 保留原件、不重复复制；启动free须在保留依赖后实查 |\n\n189端点的体积代理留出的约58.4GiB可容纳方案所列临时完整状态、恢复与小证据，但仍以实际生命周期和动态cap为准；不能把历史尺寸记录当作当前全部Full权重已存在。训练端点原有校准、盲dev、保存／恢复前向不在17280这个“新确认”数内，它们应随对应训练worker外层费用计入378小时，不能漏算，也不能因17280没含它们就判该确认计数错误。\n\n4—5天可以保留为有条件排期参考。394小时是各桶累计停止上限，不是承诺4—5天必定完成，也不能整体除以3得日历。12小时确认桶折合每群2.5秒是在完全不计载模／I/O／指标开销时的平均额度；实际可用于纯前向的额度更少。包内没有本轮八配置确认吞吐实测，因此12小时只能称待批准cap。已设“不完整不开放、不借桶、不自动补跑”足以限制失败后行为，当前没有证据要求自动增加预算或新做全套压测。\n\n最小处置：保留观察、代理、上限和工期四种口径；未来承接本轮实际准备／失败费用，并在真实入口按cap停止。影响范围：执行可行性、费用说明和结果完整性，无需改变科学问题。"
+    },
+    {
+      "id": "HABL-10",
+      "title": "三槽专用修后准入及新RAM、退休和计费口径必须落实",
+      "severity": "复现或实现设计缺陷",
+      "status": "LIMITED_IMPLEMENTATION_ADAPTATION_REQUIRED_NOT_OPEN_DESIGN_DEFECT",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            119,
+            119
+          ]
+        },
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            127,
+            137
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_history_optuna_control.py",
+          "lines": [
+            82,
+            255
+          ]
+        },
+        {
+          "archive_path": "source/scripts/step28_formal_queue.py",
+          "lines": [
+            101,
+            168
+          ]
+        },
+        {
+          "archive_path": "context/reports/documentation/20261102/history_optuna/review_round2/primary_disposition.zh.txt",
+          "lines": [
+            8,
+            15
+          ]
+        }
+      ],
+      "minimum_disposition": "复用整槽信用修后控制器；兑现available≥72GiB、跨批退休状态及明确睡眠计费口径；仅验证新调用差异。",
+      "impact_scope": "资源准入、失败处置和费用",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": true,
+      "detailed_review_markdown": "**分类：复现或实现设计缺陷风险；状态：方案方向正确，列为有限实施接线要求。**\n\n证据：proposal.zh.md 第119、127—137行；S/step28_history_optuna_control.py 第82—140、143—255行；S/step28_formal_queue.py 第101—126、139—168行；C/reports/documentation/20261102/history_optuna/review/primary_disposition.zh.txt 第9—18行；同history_optuna/review_round2/primary_disposition.zh.txt 第8—15行。\n\n三槽allocator共27.75GiB，整槽承诺共30.75GiB。observation中的32607MiB约31.842773GiB，仅比三槽承诺多约1.092773GiB；这是容量算术，不是当前可用量，更不是给本任务的预约。使用最新free门和整槽承诺、在进程组完整释放后归还信用，合理。\n\n所附通用queue.admission仍有按另时点PID用量抵扣待分配预留的旧路径；修后history控制器则在active为空时冻结容量，已派发未释放槽占完整额度，实际dispatch调用slot_admission。新方案应复用后者，不能只因为通用文件名更像队列而退回旧路径。旧CPU06关闭结论在本包是外审／主审记录，本次未重读CPU06原始载荷或重做GPU验证。\n\n还需在限定新入口兑现三处具体差异：\n\n1. 原queue.resources的RAM门是64GiB减去已有自家RSS，并没有本方案独立的available≥72GiB条件；不能原样调用后就声称72GiB门已执行。\n2. history控制器的retired集合位于一次dispatch内部。把63条放入同一次固定训练清单可以保持退休状态；若按(order,seed)切成多次dispatch，应保持campaign级退休状态，不能每批复活失败槽。任一必需轨迹失败仍阻止确认，健康槽继续完成独立任务不等于获准部分开结果。\n3. 原Ledger.pause只在active=True时排除轮询睡眠，资源空等会进入辅助费用；本方案应按第129行明确的计费口径实现，区分纯睡眠与主动工作。原30秒尾部属于一次保守收费，完整任务6h预留则是未消费信用，二者不可混称实际消耗。清理失败仍尝试结算、成功回执在其后，均应保持。\n\n最小处置：只核新63条清单、72GiB门、修后槽信用、退休状态及计费口径的真实调用；既有适用行为证据可以复用。无需重做全部三路GPU组合、原子资源平台或递归尾部记账。影响范围：资源准入、失败处理和394小时账，不改变算法。"
+    },
+    {
+      "id": "HABL-11",
+      "title": "有限CPU/GPU核验应针对真实改变，不能机械重跑",
+      "severity": "解释边界",
+      "status": "ACCEPTED_LIMITED_VERIFICATION_SCOPE",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            117,
+            123
+          ]
+        }
+      ],
+      "minimum_disposition": "未来获准后按实际改变核验角色/梯度/目标/恢复/完整门/队列；A原生缺口按需要补，充分即停。",
+      "impact_scope": "实施准备及资格边界",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": false,
+      "detailed_review_markdown": "**分类：解释边界；状态：接受当前有限核验方案。**\n\n证据：proposal.zh.md 第117—123行及HABL-02/03/04/08/10所列直接源码。\n\nCPU累计≤1200秒、必要GPU短测累计≤1800秒且≤12次optimizer更新，是未来获准后的上限，均不是要求用满。最有价值的证据是：显式角色和删除路径真正生效、各损失项的独立梯度与更新作用、R/M/P标量定义、A真实encoder/head梯度及378目标恢复、自己的教师和Memory不越界、完整集合／域配对／N/A、队列与费用接线。\n\n这些检查应能区分“删除预期分项”“换错教师”“走错rank字段”“日志仍重组”等具体错误，不能仅看PASS、总梯度非零或参数发生变化。A的新直接autograd路径最可能需要限定原生证据；哪些已审原生证据仍适用，应按最终代码改变确定，不自动给八臂各跑一套。静态审查没有替代未来真实接线核验，也没有理由在当前阶段运行它。\n\n最小处置：保持方案的有限核验和停止原则。影响范围：实施准备与资格边界，无新增实验要求。"
+    },
+    {
+      "id": "HABL-12",
+      "title": "保留旧H−S失败、旧单seed归因及观察未完成状态",
+      "severity": "解释边界",
+      "status": "HISTORICAL_AND_UNFINISHED_BOUNDARIES_RETAINED",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            11,
+            34
+          ]
+        },
+        {
+          "archive_path": "context/reports/seller_alias_continual/20261026/continual_result/report.zh.txt",
+          "lines": [
+            6,
+            10
+          ]
+        },
+        {
+          "archive_path": "context/reports/seller_alias_continual/20261026/continual_result/report.zh.txt",
+          "lines": [
+            44,
+            53
+          ]
+        },
+        {
+          "archive_path": "context/reports/seller_alias_continual/20261026/continual_result/review/external/review_report.zh.txt",
+          "lines": [
+            8,
+            24
+          ]
+        },
+        {
+          "archive_path": "context/reports/seller_alias_continual/20261011/record_attribution_result/report.zh.txt",
+          "lines": [
+            125,
+            127
+          ]
+        }
+      ],
+      "minimum_disposition": "原负结果不追改；本轮有效负结果不触发换母体/数据/判据；未附其他基线原件不冒称已读。",
+      "impact_scope": "论文叙事与负结果归档",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": false,
+      "detailed_review_markdown": "**分类：解释边界；状态：无新增必修，必须延续现有诚实表述。**\n\n证据：proposal.zh.md 第11—13、30—34、95、137行；C/reports/seller_alias_continual/20261026/continual_result/report.zh.txt 第6—10、44—53、153—169行；其review/external/review_report.zh.txt 第8—24、86—90行；C/reports/seller_alias_continual/20261011/record_attribution_result/report.zh.txt 第23—29、47、125—127行及其review/primary_disposition.zh.txt 第53—60、80—87行。\n\n旧五方法报告记录H−S的ΔF条件区间跨零，O/F共同门失败；较高取得水平是旧最终优势的重要描述性组成，不能改写成模块因果比例。早期LOGIT／R0／S记录与重组归因是旧配置、单seed和反复使用的开发数据，不能代替本轮选定H的共同新确认。包内旧外审还记载过Memory尺寸口径勘误，本轮不沿旧报告错误最小值作新容量论据。\n\nL²R／ER+GCR、FOREVER及英文比较的完整结果原件不在本包，本审仅承认本次方案对这些背景的说明，没有声称重读或重验其结果。基线比较即便为正，也不证明本轮模块作用；未来主要门即使失败，仍按有效负结果报告，不换母体、数据或成功定义。\n\n最小处置：保留当前边界，不重开旧资格或历史结果审查。影响范围：论文叙事、母体选择和有效负结果归档。"
+    },
+    {
+      "id": "HABL-13",
+      "title": "仅可选术语精确化，拒绝无必要扩展",
+      "severity": "可选后续",
+      "status": "OPTIONAL_WORDING_AND_REJECTED_OVERDESIGN",
+      "proven_defect_in_current_proposal": false,
+      "mandatory_proposal_revision": false,
+      "blocks_implementation_preparation_decision": false,
+      "evidence": [
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            38,
+            38
+          ]
+        },
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            69,
+            77
+          ]
+        },
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            103,
+            123
+          ]
+        },
+        {
+          "archive_path": "proposal.zh.md",
+          "lines": [
+            143,
+            143
+          ]
+        }
+      ],
+      "minimum_disposition": "可注明AdamW、检索指标先query再群；不增加比较清单或新审核循环；不加HPO/seed/全六顺序/全GPU资格/新平台。",
+      "impact_scope": "实施说明与研究范围",
+      "new_experiment_required": false,
+      "claim_restriction_is_sufficient": true,
+      "implementation_action_only_after_separate_authorization": false,
+      "detailed_review_markdown": "**分类：可选后续／过度设计；状态：均不作为当前准入条件。**\n\n证据：proposal.zh.md 第69、71、77、103—115、123、143行。\n\n可选文字精确化只有两点：第38行“Adam连续”在实施说明中写明继承原AdamW及其冻结设置；第111行“先query再群”注明适用于检索指标。这两点由所附旧合同和源码已有明确含义，不作为本稿必修或额外审查循环的理由。当前Full−A的限定问题已经成立，无须另外增加比较清单。\n\n不要求：额外纯LogMeanExp臂、重组×结构／rank×汇聚全网格、各变体重新HPO、更多seed、全部六顺序、英文Dream任务、为负结果另选数据、全epoch诊断、全套GPU资格重跑或通用平台。只有未来主动提出超出当前设计的更强主张时，才另论必要证据；本轮不把这些扩展塞入方案。",
+      "secondary_category": "过度设计"
+    }
+  ]
+}

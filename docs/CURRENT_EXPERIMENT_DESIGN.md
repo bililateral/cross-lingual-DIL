@@ -4,7 +4,7 @@ H/S评价补充（2026-11-02）：用户选择[方案A](../reports/seller_alias_
 
 ## 当前合同入口
 
-历史权重版H主实验消融方案（2026-11-06）：用户选定历史开发后的H并要求详细方案外审。[方案](../reports/documentation/20261106/h_history_ablation/proposal.zh.md)固定实际trial3参数、8配置、Full九轨迹条件复用与63新增、共同新120群、主要Full−ER O/F、零HPO；[本次范围](../reports/documentation/20261106/h_history_ablation/scope.zh.txt)仅设计/只读核对/方案审查和文件交付。3-worker、394h与数据/验证均为待批准执行安排，不因方案或外审授予实施、训练或新监听。外审原稿及后续处置从[审查提交](../reports/documentation/20261106/h_history_ablation/review/submission.json)定位，动态状态仅见当前交接。
+历史权重版H主实验消融方案（2026-11-06）：用户选定历史开发后的H并要求详细方案外审。[方案](../reports/documentation/20261106/h_history_ablation/proposal.zh.md)固定实际trial3参数、8配置、Full九轨迹条件复用与63新增、共同新120群、主要Full−ER O/F、零HPO；[本次范围](../reports/documentation/20261106/h_history_ablation/scope.zh.txt)仅设计/只读核对/方案审查和文件交付。3-worker、394h与数据/验证均为待批准执行安排，不因方案或外审授予实施、训练或新监听。审后方案为上述v1加[独立处置第2节精确化](../reports/documentation/20261106/h_history_ablation/review/primary_disposition.zh.md)，[完整外审](../reports/documentation/20261106/h_history_ablation/review/external/report.zh.md)及[提交身份](../reports/documentation/20261106/h_history_ablation/review/submission.json)保留。未增加配置、判据或预算，动态状态仅见当前交接。
 
 ABC自动接续补充（2026-11-05）：用户已确认[等待与正式接续范围](../reports/documentation/20261105/english_abc_wait/scope.zh.txt)，在H_pos_history整批有效完成及相关进程退出、原资源门满足后，由唯一监听自动进入旧ABC dev前置评价及条件有限开发。此决定替代下述历史准备阶段的“正式关闭/不得自动监听”，保留原科学方案、2-worker、55h与严格Dream门；新增监听接线审查/部署状态只见交接顶部。下述准备文件和冻结回执保持原时点含义，不回写旧许可。
 
