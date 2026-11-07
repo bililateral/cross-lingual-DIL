@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-07 调参后H消融实现审查与核验脚本收尾
+
+八配置实现、必要CPU核验及[13项实现外审处置](../reports/documentation/20261107/h_ablation_prepare/review/primary_disposition.zh.md)闭合后，按本任务已确认范围清理退役核验助手与重复包。Windows实际删除8文件、959079字节：4份本轮CPU测试/包装/必要中间源码，以及CPU传输包、送审ZIP、返回ZIP和浏览器重复下载各1份。Linux仅在本次独立准备目录删除13份退役源码/传输副本及51份可重建字节码，共64路径、1570061字节；其中旧通用模块/测试只清理本次临时部署的额外副本，根仓库普通测试与生产依赖不删。两端合计72路径、2529140逻辑字节；不是权重释放量。
+
+逐路径、字节、SHA、Git恢复映射与实际删除见[Windows计划及回执](../reports/documentation/20261107/h_ablation_prepare/cleanup_windows.json)、[Linux计划](../reports/documentation/20261107/h_ablation_prepare/cleanup_linux_plan.json)及[Linux回执](../reports/documentation/20261107/h_ablation_prepare/cleanup_linux.json)。删除前逐文件Git原始blob与当前原字节核对通过。最终CPU06测试、相关包装器/副本和外审整包可从本地提交`c97b5962c52ce9df34f00880c39e448ac296cd29`按清单路径精确恢复；CPU01/02初始版本保存在`6bdc419350bc62318ea3b8123dc87e1fcb60a817`的cpu_delivery.zip，原失败包装器同提交cpu01/cpu_check_source.py；CPU03测试在该提交，CPU04中间测试及CPU05版本在`af9bcd9c58dd98b1f29d4a38e18c720665de55dc`。字节码可由对应源码重新生成，恢复源码不授予重新执行权限。
+
+保留最终50项正式运行来源、全部原CPU通过/失败日志与回执、外审9份原文/支持材料、网页全文、主审处置、身份和预算。Linux删除前确认本任务无活动进程，清理前后50来源大小/SHA一致，正式目录和模型目录均不存在。本轮没有创建GPU核验脚本或监听，未读取或删除任何模型、正式数据和标签；原新H27/旧H27及其他实验资产仍按原决定保留。正式资产链接及权重现检被自动审批拒绝，未执行；已有权重元数据仅作关闭draft的准备，不能冒称本轮实体核验。必要准备证据56文件、530381字节及清单已通过SFTP同步到本次Linux准备目录，[最终同步回执](../reports/documentation/20261107/h_ablation_prepare/final_sync.json)逐项大小/SHA一致，并再次核实50来源、关闭门、退役脚本不存在及无本任务活动进程。根docs仅Windows维护，本轮局部收尾不重置大清理周期，下一到期仍为2026-11-21。
+
 ## 2026-11-07 H历史权重结果回传与传输副本收尾
 
 原调参正式结果回传5058份、305105336字节，另4份Linux保存字段核对/整理结果逐项大小与SHA匹配，见[来源清单](../reports/seller_alias_continual/20261107/history_result/receive_manifest.json)、[回传](../reports/seller_alias_continual/20261107/history_result/receive.json)和[分析回传](../reports/seller_alias_continual/20261107/history_result/analysis_receive.json)。正式结果按原路径保存；历史/ABC的状态及旧H引用完成原件保存在本轮source_receipts快照，不覆盖旧交付回执。新生成正文、pairs/owners、Memory及模型载荷留Linux，不进入此次回传或Git。
