@@ -244,8 +244,8 @@ def test_decisions(temp):
         return dict(P=pp, A=aa, G=aa-pp)
     cases = [(.5, .7, .7, .8, True), (.6, .65, .9, .65, False),
              (.5, .7, .68, .69, False), (.5, .7, .5, .69, True), (.5, .7, .8, .8, False)]
-    for p, a, pf, af, expected in cases:
-        assert policy.learning_paths(summary(pf, af), summary(p, a))['passed'] == expected
+    for pre, after, pf, af, expected in cases:
+        assert policy.learning_paths(summary(pf, af), summary(pre, after))['passed'] == expected
     mixed = summary(.7, .8)
     mixed['G'][1, 2] = -.001
     assert not policy.learning_paths(mixed, summary(.5, .7))['passed']
@@ -308,6 +308,19 @@ def test_boundaries(temp):
     assert ledger.used['training'] == 9 and ledger.cpu_tests == 10
     must_fail(lambda: ledger.reserve('training', policy.CAPS['training']), 'prior fees survive')
     must_fail(lambda: io.Budget(temp, time.monotonic()+5).check(), 'deadline actual callback')
+    # Real subprocess dispatch exits at the closed gate; the same Runner must
+    # retain failure costs and reject the next queued operation, not retry it.
+    runner_root = temp/'runner'
+    runner_root.mkdir()
+    failed_job = runner_root/'failed_worker'
+    failed_job.mkdir()
+    runner_ledger = io.Ledger(runner_root, dict(training=0, gpu=0, auxiliary=0), 0)
+    runner = control.Runner(dict(workspace=str(temp)), gate, runner_root, runner_ledger)
+    must_fail(lambda: runner.run('analyze', failed_job, 'auxiliary', 20, []), 'actual worker failure')
+    assert runner.failed and not io.read(failed_job/'dispatch_receipt.json')['success']
+    used = runner_ledger.used.copy()
+    must_fail(lambda: runner.run('analyze', runner_root/'forbidden_next', 'auxiliary', 20, []), 'no next dispatch')
+    assert not (runner_root/'forbidden_next').exists() and runner_ledger.used == used
     # Malformed blinded predictions are rejected before qrels loader is called.
     spec = policy.tasks('A')[0]
     score = temp/'scores.json'
@@ -329,7 +342,7 @@ def main():
     parser.add_argument('--sources', type=Path, required=True)
     parser.add_argument('--qualification', type=Path, required=True)
     parser.add_argument('--prior-seconds', type=int, default=0)
-    parser.add_argument('--only', choices=('all', 'data', 'updates', 'decisions', 'boundaries'), default='all')
+    parser.add_argument('--only', choices=('all', 'remaining', 'data', 'updates', 'decisions', 'boundaries'), default='all')
     args = parser.parse_args()
     if sys.platform != 'linux' or Path(sys.executable).resolve() != Path(io.PYTHON).resolve() or os.environ.get('CUDA_VISIBLE_DEVICES') != '':
         raise RuntimeError('Linux py310 with CUDA hidden required')
@@ -352,7 +365,7 @@ def main():
             for name, fn in (('data', lambda: test_data(temp, args.qualification)),
                              ('updates', lambda: test_updates(temp)), ('decisions', lambda: test_decisions(temp)),
                              ('boundaries', lambda: test_boundaries(temp))):
-                if args.only in ('all', name):
+                if args.only in ('all', name) or (args.only == 'remaining' and name in ('decisions', 'boundaries')):
                     result['checks'][name] = fn()
                     io.write(args.output/'progress.json', result)
                     print('PASS', name, flush=True)

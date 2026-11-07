@@ -231,7 +231,17 @@ def decision(rows: list[dict], selected: dict, phase: str, check=lambda: None) -
     if phase == 'B':
         return b
     c = mechanism(data)
+    contributions = {}
+    for label, before, after in (('english_recipe', 'H0_SEQ', 'H_SEQ'),
+                                  ('replay', 'H_SEQ', 'H_ER'), ('birth_preservation', 'H_ER', 'H_full')):
+        old = data.get(before, data['H_SEQ'])  # Exact H0 deduplication, not a new result.
+        new = data[after]
+        contributions[label] = dict(before=before, after=after,
+            delta={k: (new[k]-old[k]).tolist() for k in ('P', 'A', 'G', 'Q', 'O', 'N')},
+            forgetting_reduction=(old['F']-new['F']).tolist(),
+            same_configuration_reused=label == 'english_recipe' and selected['H'] == 'H0')
     out = dict(passed=b['passed'] and c['passed'], scenario=b, mechanism=c,
+               contributions=contributions,
                endpoints={m: {k: v.tolist() for k, v in x.items()} for m, x in data.items()})
     if phase == 'D':
         ci = bootstrap(rows, selected, check)
