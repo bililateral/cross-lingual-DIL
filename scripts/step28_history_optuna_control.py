@@ -141,11 +141,25 @@ def slot_admission(allowed, snapshot, capacity, occupied):
 
 
 def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, poll_seconds=2, observe=None,
-             admit=slot_admission):
+             admit=slot_admission, dispatch_paused=None, continuation=None):
     """Failed slots retire; healthy slots continue to claim pending trajectories."""
     active, pending, retired, receipts = {}, list(enumerate(rows)), set(), []
     capacity = None
     width = allowed["workers"] if rows[0]["bucket"] == "training" else 1
+    if continuation is not None:
+        if continuation["sources"] != allowed["sources"] or continuation["active"]:
+            raise ValueError("Only a fully drained, source-identical dispatch may be continued")
+        receipts = list(continuation["completed"])
+        indices = [r["index"] for r in receipts]
+        if len(set(indices)) != len(indices) or any(
+                not 0 <= r["index"] < len(rows) or rows[r["index"]]["id"] != r["id"]
+                or not r["released"] or not 0 <= r["slot"] < width for r in receipts):
+            raise ValueError("Continuation receipts do not match this fixed queue")
+        retired = {r["slot"] for r in receipts if not r["success"]}
+        pending = [(i, r) for i, r in enumerate(rows) if i not in indices]
+        if (sorted(retired) != continuation["retired_slots"]
+                or [r["id"] for _, r in pending] != continuation["pending"]):
+            raise ValueError("Continuation changes pending tasks or retired slots")
     cores = psutil.Process().cpu_affinity()
     if len(cores) < width:
         raise RuntimeError("Three distinct permitted CPU cores required")
@@ -182,7 +196,7 @@ def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, po
             retired.add(slot)
         ledger.control()
     try:
-        while pending or active:
+        while True:
             if observe is not None:
                 observe()
             ledger.control()
@@ -200,6 +214,8 @@ def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, po
             for slot in range(width):
                 if not pending or slot in active or slot in retired:
                     continue
+                if dispatch_paused is not None and dispatch_paused():
+                    break
                 index, row = pending[0]
                 bucket = row["bucket"]
                 reserved = sum(item["row"]["seconds"] for item in active.values() if item["row"]["bucket"] == bucket)
@@ -235,10 +251,13 @@ def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, po
                 data.write_json(job/"process.json", dict(pid=process.pid, created=child.create_time(),
                     owner=child.username(), command=argv, cwd=allowed["workspace"], slot=slot))
                 pending.pop(0)
-            saved("RUNNING")
+            paused = dispatch_paused is not None and dispatch_paused()
+            saved(("PAUSED_DRAINING" if active else "PAUSED_IDLE") if paused else "RUNNING")
             if pending and not active and len(retired) == width:
                 raise RuntimeError("All worker slots retired; no retry")
-            if pending or active:
+            if not pending and not active and not paused:
+                break
+            if pending or active or paused:
                 ledger.pause(poll_seconds, active=bool(active))
         complete = len(receipts) == len(rows) and all(r["success"] for r in receipts)
         result = saved("ALL_COMPLETE_RELEASED" if complete else "INCOMPLETE_NO_DOWNSTREAM")
