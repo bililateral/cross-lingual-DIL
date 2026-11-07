@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-07 Evolution预实验方案外审收尾
+
+本轮只有方案、来源核对、获准中文运行状态只读核实和具体包网页外审，没有Evolution正式数据构建、模型加载/训练、模型文件写出或Linux部署。最新提案中的124阶段端点、预计55—60GiB/64GiB上限是待用户确认的未来规划，不是实际存储占用，也没有改变中文消融的保存规则或资产。
+
+外审原文30939字节与网页声明SHA一致，完整网页文本、请求、许可、实际提交、载荷身份和独立主审处置保留于`reports/documentation/20261107/evolution_pilot/review/`，见[回收与清理记录](../reports/documentation/20261107/evolution_pilot/review/recovery.json)。原上传ZIP在实际读取并核验Git `78b98df5:reports/documentation/20261107/evolution_pilot/review/evolution_pilot_review.zip`的185931字节/SHA后退役；该恢复入口保留精确送审25载荷及清单，不用当前修订稿覆盖旧身份，也不授权恢复后直接重发。
+
+按科研纪律第9节处理本任务自行生成的一次性副本，Windows实际删除上述ZIP及本次8份浏览器下载副本/日志/快照，共9文件294691字节，逐路径/大小/SHA见同一回收记录；完整审查和必要来源仍保留。没有递归清理其他浏览器文件，没有清理或同步Linux资产，根docs和本次方案/审查证据只在Windows及本地Git保管。专用审查页在回答完成、无待发送操作、完整回收和主审处置后已关闭；未推送，不改变原大清理周期。
+
 ## 2026-11-07 Evolution资格完成与Windows副本清理
 
 用户明确允许本轮Windows盘点，并要求能继续则迁移Linux后删除Windows副本。最终正文/身份隔离盘点支持继续到有限遗忘预实验，见[报告](../reports/documentation/20261107/evolution_qualification/report.zh.md)。两个官方包保管在`/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_qualification/received_windows/`：`data-and-readme.zip` 332606424字节、SHA256 `5c8a321d51ca2f2dd10afbdc80a44c0c44498954f7c1ca604932b6667a8673bb`；`dataset-generation-code.zip` 48698字节、SHA256 `6143e525b0aa3b50415aff47dbde9b48ffbf793b23f75d0b021e7be9cac94792`。官方MD5也均一致。
