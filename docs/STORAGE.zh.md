@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-07 消融正式输入接入与开训证据
+
+用户明确“开始正式训练”后，在已有独立workspace接入18个精确逐文件符号链接：冻结BGE预训练12文件、数据manifest/validation/groups及train文本/train监督/development盲文本6文件。目标均解析为既有项目内的本用户普通文件；未连接旧development监督、owners、test或private_custody。逐路径和大小见[正式接入回执](../reports/documentation/20261107/h_ablation_start/preflight.json)。Full27继续直接引用原trial3复验权重，不复制、移动或删除；真实正式控制器已在派发前核对其当前SHA与必要恢复/来源证据，先前仅元数据观察的原记录不追改。
+
+新增状态目录为`reports/documentation/20261107/h_ablation_start`，实际运行目录为准备workspace下新建的`formal`。原prepare关闭draft和原审查/CPU回执保持；本次authorization/formal_gate/claim/launch独立保存并冻结，不用旧“关闭”记录否定新开训决定。原50生产来源无改动，不恢复退役CPU/GPU脚本。22份启动/首更/源身份及资源证据共99275字节经SFTP回传并[逐项核验](../reports/documentation/20261107/h_ablation_start/receive.json)，含三worker实际首更日志快照；没有传回模型、Memory或正式文本/标签。运行日志/状态由原控制器继续在Linux更新，本地仅保存具名时点快照，不双向覆盖活动文件。根docs仅Windows维护；本次未做资产清理，不改变大清理周期。
+
 ## 2026-11-07 调参后H消融实现审查与核验脚本收尾
 
 八配置实现、必要CPU核验及[13项实现外审处置](../reports/documentation/20261107/h_ablation_prepare/review/primary_disposition.zh.md)闭合后，按本任务已确认范围清理退役核验助手与重复包。Windows实际删除8文件、959079字节：4份本轮CPU测试/包装/必要中间源码，以及CPU传输包、送审ZIP、返回ZIP和浏览器重复下载各1份。Linux仅在本次独立准备目录删除13份退役源码/传输副本及51份可重建字节码，共64路径、1570061字节；其中旧通用模块/测试只清理本次临时部署的额外副本，根仓库普通测试与生产依赖不删。两端合计72路径、2529140逻辑字节；不是权重释放量。
