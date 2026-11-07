@@ -4,9 +4,9 @@
 
 ## Evolution后续接手任务
 
-已形成[具体英文适配与遗忘预实验提案](../reports/documentation/20261107/evolution_pilot/proposal.zh.md)。下一步先解释并确认其中的新科学选择：固定2014-Q3→Q4→2015-Q1、4条/账号、每域160/64/96及15候选；原已审英文H母体/既有BERT；H/V对等有限适配；先检查双顺序基线的5个百分点遗忘与初学/新域能力，再比较同配置回放及旧评分、外部回放，最后一次封存账号确认。16单域+最多36完整轨迹、1worker/48累计小时为待确认提议，不是已批准预算或训练合同。
+已形成[具体英文适配与遗忘预实验方案](../reports/documentation/20261107/evolution_pilot/proposal.zh.md)。用户已要求修正高起点正学习误拒，明确保留H_SEQ/V_SEQ双基线明显遗忘门，并确认“其余无需修改，保留现有安排”。方案已采用原G差门或受限高起点路径，Full平均G≥.01、逐seed非负及其余质量保护始终执行；Full−ER及其进入D条件保持。固定季度、4条/160-64-96/15候选、英文母体、有限适配、六系统与一次确认均沿用。下一步须先明确实施范围，不能再把已确认双基线门列为待决，也不能把方案选择理解成已授权构建/训练。16单域+最多36完整、1worker/48累计小时仍是后续承接的资源规划，不是启动指令。
 
-方案的成功/停止、三种访问权限、9格学习前后评价、固定种子、成本代理及边界见同一提案；不另复制进度。用户已批准[具体新包](../reports/documentation/20261107/evolution_pilot/review/authorization.json)按草案送审，本地Playwright网页GPT 6 Pro[完整报告](../reports/documentation/20261107/evolution_pilot/review/external_review.zh.txt)已回收并完成[独立处置](../reports/documentation/20261107/evolution_pilot/review/primary_disposition.zh.md)。修订明确真实cased分词、Full能力/净学习保护与内部/外部判定；这些科学取舍仍待用户接受。保存改为124必要阶段模型、起点引用，建议峰值55—60GiB/硬帽64GiB/空闲128GiB，未执行模型写入；不复制旧每epoch完整状态。旧未发Evolution包不恢复当新包上传。审查不授予实现、正式划分、数据/标签读取、训练或监听；后续实施需要明确范围，并只补新数据构建、V_ER及新完整入口/评价/保存/停止门的必要证据，复用未变旧证据，不重复GPU资格。
+方案的成功/停止、三种访问权限、9格学习前后评价、固定种子、成本代理及边界见同一方案；不另复制进度。用户批准的[具体新包](../reports/documentation/20261107/evolution_pilot/review/authorization.json)已完成本地Playwright网页GPT 6 Pro[外审](../reports/documentation/20261107/evolution_pilot/review/external_review.zh.txt)与[独立处置](../reports/documentation/20261107/evolution_pilot/review/primary_disposition.zh.md)。本次修正沿原EV-R02已给的受限高起点路径并按用户决定主审闭合，五类纸面反例覆盖正学习误拒和负/零学习放行，未运行科研测试或再发包。保存仍为124必要阶段模型/起点引用、55—60GiB峰值/64GiB帽/128GiB空闲，未写出模型。后续只补新构建、V_ER及新完整入口/评价/保存/停止门的必要证据；相对G规则须实际接入且分别处理域/对照，复用未变旧证据，不重复GPU资格。
 
 [最终资格报告](../reports/documentation/20261107/evolution_qualification/report.zh.md)及原始汇总支持有限预实验，不能证明遗忘、适配收益或H优势。342/144/20是每域划分前容量；PGP格式漏识别的零值不采用。原VendorLink有效负结果、ABC因dev前置未过且新候选训练为0的正常停止保持；不换门、重启旧监听或挪用55h余额。
 
