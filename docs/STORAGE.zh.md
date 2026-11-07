@@ -1,5 +1,15 @@
 # 科研文件存储与恢复
 
+## 2026-11-07 Evolution双路正式启动与核验收尾
+
+本次增量外审及独立主审已关闭三项必修，正式来源022e405a与11份部署脚本绑定在`execution/formal_gate.json`；Linux `execution/campaign`已实际运行。七份启动原件通过SFTP回传，大小/SHA与[启动清单](../reports/documentation/20261107/evolution_pilot/execution/start_evidence_manifest.json)全部一致；正文、标签、预测、Memory和正式权重仍只留Linux。动态运行状态只见交接唯一Evolution项，不以此处作为新的进度入口。
+
+按已确认执行补充第21行及科研纪律第9节，完成本轮核验临时资产收尾：[Windows清单及精确恢复入口](../reports/documentation/20261107/evolution_pilot/execution/cleanup.json)记录已删10文件401671字节，包括3个临时测试入口、2个传输ZIP、4份审查源码副本及被实际正式门替代的启动草稿。实际六个CPU/GPU核验版本已从01a1efb6、f4d938df、ce796506、a41a5ebf、0661a971、fdcca708读回原字节并逐份匹配原执行绑定；失败及中间修复版本均保留恢复入口。送审ZIP可从200ccc19恢复，返回ZIP可从022e405a恢复，六份返回原件和主审处置继续保留。浏览器记录的相对下载副本在工作区对应路径未找到，未作跨目录搜索或声称已删除。
+
+Linux 22:49:03[实际清理](../reports/documentation/20261107/evolution_pilot/execution/cleanup_linux.json)删除11文件2606236469逻辑字节：三个无正式依赖的核验入口，及单路手写GPU核验的8份临时模型2606203006字节（约2.427GiB）。所有模型在删除前与已保管路径/大小/SHA一致，完整核验与恢复评分证据、失败账和来源版本保留；SHA不能恢复已删模型，恢复脚本也不授权重跑。检查实际进程命令及正式11份源绑定，均不依赖本次删除对象，删除后正式源SHA保持。正式Evolution产物、固定数据、预训练、中文H及ABC资产均保留，未修改活动门或费用账。
+
+本次Linux定向核对和删除实际3.143秒，包含在已声明120秒筹备/收尾收费内，不退款或另开预算。根docs仍只在Windows维护，本地提交不推送；局部收尾不改变11月6日大清理完成日或11月21日下次到期日。
+
 ## 2026-11-07 Evolution实现结案与正式数据准备交付
 
 用户明确“把数据集准备好”后，实际生产构建在Linux独立`reports/documentation/20261107/evolution_pilot/data_preparation/dataset`完成一次，18文件、10291060逻辑字节，含960账号/3840记录/1920视图。官方四表来源仍直接复用既有qualification/received_windows包，未重下或复制官方包。正文、源映射、dev/test qrels、固定96条fit语言样本及逐条判断仅留Linux；private_custody目录0700，研究者只查看了本次明确获准的固定fit语言样本。Windows的dataset子目录只有17808字节manifest，没有正文或保管标签。实际范围、限制和费用见[数据交付](../reports/documentation/20261107/evolution_pilot/data_preparation/report.zh.md)。

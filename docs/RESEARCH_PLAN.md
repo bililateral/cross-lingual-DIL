@@ -6,7 +6,7 @@
 
 按[科学方案](../reports/documentation/20261107/evolution_pilot/proposal.zh.md)及用户新确认的[双worker执行补充](../reports/documentation/20261107/evolution_pilot/execution/scope.zh.md)推进。正式运行及最多两路已经授权，每槽整PID14GiB、allocator13GiB，足够一槽先开后补第二槽；失败槽退出，健康槽继续领取后续任务，阶段缺项则评分/标签/下一阶段关闭。原48小时累计预算接续，不能把并行工期当作累计费用；具体范围与最新纠正见补充及讨论记录，不重复询问已有开始许可。
 
-直接复用[固定数据](../reports/documentation/20261107/evolution_pilot/data_preparation/report.zh.md)、[已闭合实现主审](../reports/documentation/20261107/evolution_pilot/implementation/review/primary_disposition.zh.md)及[单路GPU证据](../reports/documentation/20261107/evolution_pilot/gpu_single/report.zh.md)。只补实际双路控制器、资源承诺/整PID门、并行记账和故障行为的必要CPU证据，不再追加GPU试跑或重复构建/划分。新增量包形成后核具体外发许可，经本地Playwright网页GPT 6 Pro定向审查与独立处置，满足资源和来源条件即正式执行。自动等待只服务该有限队列，首次更新后退役一次性等待副本，不重开旧ABC监听。
+直接复用[固定数据](../reports/documentation/20261107/evolution_pilot/data_preparation/report.zh.md)、[已闭合实现主审](../reports/documentation/20261107/evolution_pilot/implementation/review/primary_disposition.zh.md)及[单路GPU证据](../reports/documentation/20261107/evolution_pilot/gpu_single/report.zh.md)。双路控制器、资源承诺/整PID门、并行记账和故障行为已完成必要CPU核验及[增量外审独立处置](../reports/documentation/20261107/evolution_pilot/execution/review/primary_disposition.zh.md)，三项必修已闭合，未追加GPU试跑或重复构建/划分。正式运行沿[实际门](../reports/documentation/20261107/evolution_pilot/execution/formal_gate.json)与同一有限队列继续，整阶段齐全后才进入原评分/判据；后续依据完整阶段结果按冻结合同报告，具体新结果包再核外发许可，不重开本次实现外审。启动资源已足够两路，未创建初始等待副本或重开旧ABC监听；动态状态只见交接唯一对应项。
 
 固定三季度、每域160/64/96账号、四记录/八账号群/十五候选、英文母体及有限公平开发、六系统、种子和A/B/C/D保持。用户已决定保留H_SEQ与V_SEQ双明显遗忘门、Full−ER及进入D条件；新域判据沿已修正的原G差门或受限高起点路径，Full正学习/逐seed非负及全部质量保护仍共同执行。最多16单域加36完整轨迹；紧凑保存、64GiB目录帽、128GiB启动空闲保持，已审科研计算不因改并发而重写。
 
