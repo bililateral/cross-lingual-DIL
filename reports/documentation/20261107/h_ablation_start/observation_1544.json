@@ -1,0 +1,162 @@
+{
+  "observed_at": "2026-11-07T15:44:17.623949+08:00",
+  "scope": "Read-only process/source/resource and non-effect completion metadata; no model, data, Memory, labels or predictions loaded.",
+  "campaign": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal",
+  "gate_sha256": "d97652e9f11e0837363a5873266eb78648610deb11f8d1d6fb372c92f0a7c565",
+  "source_count": 50,
+  "source_mismatches": [],
+  "processes": [
+    {
+      "pid": 1335997,
+      "ppid": 1,
+      "owner": "yongpeng",
+      "created": 1794026791.82,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-u",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/scripts/step28_h_ablation_control.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_start/formal_gate.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace"
+    },
+    {
+      "pid": 1336100,
+      "ppid": 1335997,
+      "owner": "yongpeng",
+      "created": 1794026826.44,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/scripts/step28_h_ablation_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/ABC_s4_ER",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/ABC_s4_ER/spec.json",
+        "--deadline",
+        "1480443.447782927",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_start/formal_gate.json",
+        "--batch",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/batch.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace"
+    },
+    {
+      "pid": 1336101,
+      "ppid": 1335997,
+      "owner": "yongpeng",
+      "created": 1794026826.46,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/scripts/step28_h_ablation_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/ABC_s4_KD",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/ABC_s4_KD/spec.json",
+        "--deadline",
+        "1480443.464203804",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_start/formal_gate.json",
+        "--batch",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/batch.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace"
+    },
+    {
+      "pid": 1359120,
+      "ppid": 1335997,
+      "owner": "yongpeng",
+      "created": 1794034723.39,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/scripts/step28_h_ablation_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/ABC_s4_NoRegroup",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/ABC_s4_NoRegroup/spec.json",
+        "--deadline",
+        "1488340.396037867",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_start/formal_gate.json",
+        "--batch",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/batch.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace"
+    }
+  ],
+  "dispatch_status": "RUNNING",
+  "completed": [
+    {
+      "actual_seconds": 7893.946375065949,
+      "bucket": "training",
+      "error": null,
+      "id": "ABC_s4_SEQ",
+      "index": 2,
+      "released": true,
+      "slot": 2,
+      "success": true
+    }
+  ],
+  "pending_count": 59,
+  "retired_slots": [],
+  "runs": [
+    {
+      "id": "ABC_s4_ER",
+      "status": "RUNNING",
+      "saved_updates": 576,
+      "completion": false,
+      "failure": false
+    },
+    {
+      "id": "ABC_s4_KD",
+      "status": "RUNNING",
+      "saved_updates": 576,
+      "completion": false,
+      "failure": false
+    },
+    {
+      "id": "ABC_s4_NoRegroup",
+      "status": "RUNNING",
+      "saved_updates": 288,
+      "completion": false,
+      "failure": false
+    },
+    {
+      "id": "ABC_s4_SEQ",
+      "status": "COMPLETE_864_UPDATES_3_ENDPOINTS_VALID_BLIND",
+      "saved_updates": 864,
+      "completion": true,
+      "failure": false
+    }
+  ],
+  "campaign_completion": false,
+  "campaign_failure": false,
+  "budget": {
+    "caps": {
+      "auxiliary": 14400,
+      "confirmation": 43200,
+      "training": 1360800
+    },
+    "events": [
+      {
+        "bucket": "auxiliary",
+        "conservative_seconds": 30,
+        "id": "final_tail"
+      },
+      {
+        "actual_seconds": 7893.946375065949,
+        "bucket": "training",
+        "id": "ABC_s4_SEQ"
+      }
+    ],
+    "used_seconds": {
+      "auxiliary": 423.49152467702515,
+      "confirmation": 0,
+      "training": 7893.946375065949
+    }
+  },
+  "gpu": "NVIDIA GeForce RTX 5090, 32607 MiB, 23241 MiB, 8835 MiB, 88 %",
+  "ram_available_bytes": 249271099392,
+  "disk_free_bytes": 711715721216
+}
