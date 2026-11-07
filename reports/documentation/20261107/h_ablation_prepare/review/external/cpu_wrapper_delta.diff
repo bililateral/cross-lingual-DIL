@@ -1,0 +1,10 @@
+--- cpu01/cpu_check_source.py
++++ cpu_check.py
+@@ -23,6 +23,7 @@
+ args.out.mkdir()
+ env = {**os.environ, "CUDA_VISIBLE_DEVICES": "", "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1", "TOKENIZERS_PARALLELISM": "false",
++       "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+        "PYTHONPATH": str(args.workspace/"scripts")+":"+str(args.workspace/"tests"),
+        "ABLATION_TEST_ROOT": str(args.out)}
+ command = [sys.executable, str(args.workspace/"tests/test_step28_h_ablation.py"), "-v", *args.tests]

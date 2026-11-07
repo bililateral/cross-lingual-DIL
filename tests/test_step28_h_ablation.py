@@ -290,6 +290,10 @@ class AblationTests(unittest.TestCase):
 
     def test_observed_gpu_cost_record_without_gpu(self):
         root=self.root()
+        for task,pid,success in (("training/ABC_s4_ER",123,True),("training/ABC_s4_KD",124,False)):
+            job=root/task;job.mkdir(parents=True)
+            m.data.write_json(job/"process.json",dict(pid=pid,created=11.))
+            m.data.write_json(job/"dispatch_receipt.json",dict(id=job.name,success=success,actual_seconds=5.))
         inner=mock.Mock()
         samples=[dict(free=16*2**30,processes={123:size*2**30,999:40*2**30}) for size in (4,3,8)]
         inner.snapshot.side_effect=samples
@@ -301,9 +305,17 @@ class AblationTests(unittest.TestCase):
         saved=m.data.read_json(root/"gpu_observed_peaks.json")
         self.assertFalse(saved["continuous_lifetime_maximum"])
         self.assertEqual(saved["by_process"],{"123@11.0":dict(pid=123,created=11.,observed_peak_gpu_bytes=8*2**30)})
+        costs=m.data.read_json(root/"cost_records.json")
+        self.assertEqual(costs["poll_sleep_seconds"],2)
+        self.assertEqual(costs["tasks"][0]["observed_peak_gpu_bytes"],8*2**30)
+        self.assertTrue(costs["tasks"][0]["dispatch_receipt"]["success"])
+        self.assertIsNone(costs["tasks"][1]["observed_peak_gpu_bytes"])
+        self.assertEqual(costs["tasks"][1]["gpu_observation_status"],"NOT_OBSERVED")
+        self.assertFalse(costs["tasks"][1]["dispatch_receipt"]["success"])
         inner.close.assert_called_once()
         self.evidence("cost_record_delta",dict(real_gpu_calls=0,unchanged_admission_observations=True,
-            foreign_gpu_process_excluded=True,lower_sample_does_not_reduce_peak=True,persisted=saved))
+            foreign_gpu_process_excluded=True,lower_sample_does_not_reduce_peak=True,persisted=saved,
+            actual_task_mapping_and_missing_value=True,cost_records=costs))
 
 
     def test_actual_confirmation_restore_score_then_single_label_opening(self):

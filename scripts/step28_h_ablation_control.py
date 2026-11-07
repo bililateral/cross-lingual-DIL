@@ -38,7 +38,9 @@ class ObservedGpuMemory:
 
     def save(self):
         data.write_json(self.path, dict(kind="OWNED_PROCESS_PERIODIC_NVML_OBSERVED_PEAKS",
-            continuous_lifetime_maximum=False, by_process=self.peaks))
+            continuous_lifetime_maximum=False, poll_sleep_seconds=2,
+            sampling="Existing dispatch loop and additional admission snapshots; not continuous",
+            by_process=self.peaks))
 
     def snapshot(self):
         snapshot = self.inner.snapshot()
@@ -61,7 +63,26 @@ class ObservedGpuMemory:
         return snapshot
 
     def close(self):
-        self.inner.close()
+        try:
+            self.inner.close()
+        finally:
+            root, rows = self.path.parent, []
+            paths = list(root.glob("training/*/process.json"))
+            paths += [root/name/"process.json" for name in ("generation", "confirmation", "analysis")]
+            for path in sorted(p for p in paths if p.exists()):
+                process = data.read_json(path)
+                key = f"{process['pid']}@{process['created']}"
+                peak = self.peaks.get(key)
+                receipt_path = path.parent/"dispatch_receipt.json"
+                receipt = data.read_json(receipt_path) if receipt_path.exists() else None
+                rows.append(dict(task=str(path.parent.relative_to(root)), process=process,
+                    dispatch_receipt=receipt,
+                    observed_peak_gpu_bytes=None if peak is None else peak["observed_peak_gpu_bytes"],
+                    gpu_observation_status="NOT_OBSERVED" if peak is None else "OBSERVED"))
+            data.write_json(root/"cost_records.json", dict(tasks=rows,
+                gpu_measurement="Periodic NVML observed maximum process usage; missing is null, not zero",
+                poll_sleep_seconds=2, source="gpu_observed_peaks.json",
+                continuous_lifetime_maximum=False))
 
 
 def predecessors(allowed):

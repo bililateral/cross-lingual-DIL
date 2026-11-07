@@ -183,8 +183,8 @@
     },
     {
       "path": "scripts/step28_h_ablation_control.py",
-      "bytes": 6182,
-      "sha256": "2b9939ba6708a2b1628ac13a58ad009ee74b898c273206607dda4c2f1db844e5"
+      "bytes": 9333,
+      "sha256": "935fababef6efdcf4e93b8dfd6908d70fbc943be2e214e99ab0d5af2d03aedf0"
     },
     {
       "path": "scripts/step28_h_ablation_evaluate.py",
@@ -252,7 +252,7 @@
       "sha256": "1aa0a436aaf41d5db84d9ac401619b16e28a1f6a229e1ee2209b1c88b4271012"
     }
   ],
-  "cpu_seconds": 115,
+  "cpu_seconds": 121,
   "limit_seconds": 1200,
   "evidence": [
     {
@@ -269,14 +269,32 @@
       "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/cpu03/receipt.json",
       "bytes": 9466,
       "sha256": "c6dcc8b1e7398cc42eaf73a21511431df7ee5a62fb26bc49aa677865b0ca7c99"
+    },
+    {
+      "bytes": 9446,
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/cpu04/receipt.json",
+      "sha256": "554009c155b57c0aca6721b31ad7ee4faac232d5366ae18888998a5b2dde4d78"
+    },
+    {
+      "bytes": 9509,
+      "sha256": "e8c9a182b6dc319e7cf3fd71183892067343d269e8616c525ef33954939add17",
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/cpu05/receipt.json"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/cpu06/receipt.json",
+      "bytes": 9509,
+      "sha256": "1b33ae0900b8a92d74823d05dae6211ff3da7aeb990208fffd0280a4bf5d11b3"
     }
   ],
   "coverage": {
     "cpu01": "3 passed tests, environment failure before confirmation retained",
     "cpu02": "previously failed confirmation/summary test passed; 216 TinyEncoder restores,17280 handwritten forwards,1296 metric sets",
-    "cpu03": "changed field-construction only; actual-domain mapping,lower-loss F/F_first,N/A"
+    "cpu03": "changed field-construction only; actual-domain mapping,lower-loss F/F_first,N/A",
+    "cpu04": "Actual dispatch withheld CPU child at 71 GiB twice, starts at 72 GiB; actual whole entry passes same callback and 63 fixed rows. Handwritten GPU observations, no GPU calls; production sources unchanged.",
+    "cpu05": "New sampled GPU-cost recorder and controller calendar clock, plus changed actual entry/RAM dispatch path; handwritten observations/one real CPU sleeper; no GPU calls. Algorithm and evaluator unchanged.",
+    "cpu06": "Final HIMP-01 task-to-process cost mapping, successful/failed receipts, null for unobserved GPU use and explicit sampling semantics; actual controller/RAM path repeated. Two tests PASS, no GPU/formal data."
   },
-  "source_delta": "CPU03 changes only evaluation field construction; unchanged CPU01/02 evidence reused",
+  "source_delta": "CPU03 changes only evaluation field construction; CPU05/06 change only ablation controller cost records/calendar. Method/training/evaluation unchanged relative to submitted package. Original evidence and source versions retained.",
   "gpu": false,
   "formal_data": false
 }
