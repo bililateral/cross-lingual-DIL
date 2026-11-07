@@ -1,0 +1,126 @@
+{
+  "schema": "h_pos_history_result_external_review_findings_v1",
+  "date": "2026-11-07",
+  "input_sha256": "fd4438e7387fccf06ce16e93f353c8570f79b6a87810c294fd0a88031eb355b8",
+  "decision": "本批结果与解释可在已披露边界内结案；未发现必须修正的已证科学阻断或复现缺陷。",
+  "mandatory_corrections": [],
+  "new_execution_authorization": false,
+  "findings": [
+    {
+      "id": "HRES-01",
+      "category": "SCIENTIFIC_BLOCKER核查",
+      "status": "未发现已证项",
+      "blocking": false,
+      "title": "唯一主要门与保存原结果一致",
+      "evidence": [
+        "F/confirmation/summary.json: primary_final_map_improved / paired_intervals.raw.final_mean.map",
+        "E:279,282,285,293,297,298,299",
+        "statistics_audit.json"
+      ],
+      "reason": "最终RAW MAP差0.0016242849969608127，原95%条件区间[0.00039095326041652725,0.00284861532151042]；下界大于0，未替换为O/F或N/Z事后门。",
+      "minimum_action": "无必须修改。保留小幅收益、条件区间和辅助结果边界。"
+    },
+    {
+      "id": "HRES-02",
+      "category": "REPRODUCIBILITY_DEFECT核查",
+      "status": "未发现新增已证项",
+      "blocking": false,
+      "title": "所供执行、来源、选择与保存聚合相符",
+      "evidence": [
+        "F/completion.json",
+        "F/trials.json",
+        "F/selected.json",
+        "F/evaluation_access.json",
+        "F/replication/dispatch.json",
+        "F/confirmation/all_blind_complete.json",
+        "E:101,229,237,238,240",
+        "C:333,338,341,343",
+        "execution_audit.json",
+        "input_verification.json"
+      ],
+      "reason": "824载荷和58来源字节身份相符；45新完成/9原H完成、12候选保存反馈、trial3选择、9复验、54模型/108格/4320前向元数据及一次确认pairs开放无具体矛盾。",
+      "minimum_action": "无必须修改；不得把原生恢复布尔或缺席数组的SHA写成本轮亲自恢复／重算。"
+    },
+    {
+      "id": "HRES-B01",
+      "category": "未验证边界",
+      "status": "明确披露",
+      "blocking": false,
+      "title": "缺席模型、预测、query及真值未独立重验",
+      "evidence": [
+        "input_verification.json:not_included_or_not_independently_verified",
+        "D/saved_check.json",
+        "D/receive.json"
+      ],
+      "reason": "本轮独立读取648份群指标；544320 query行、1296数组身份、5058回传文件由主执行者原生核对支持，缺席载荷没有在本轮重验。",
+      "minimum_action": "保持证据层级措辞；不要求无指向重传或重算。"
+    },
+    {
+      "id": "HRES-B02",
+      "category": "未验证边界",
+      "status": "明确披露",
+      "blocking": false,
+      "title": "搜索细粒度执行与权重退役原件不齐",
+      "evidence": [
+        "F/trial_00…trial_11/evaluation/feedback.json",
+        "F/trial_00…trial_11/evaluation/summary.json",
+        "D/saved_check.json",
+        "C:267,338,343"
+      ],
+      "reason": "12搜索dispatch、evaluation/result、逐文件退役manifest/receipt和SQLite缺席。保存反馈/summary/完成与生产接线相符，但未亲自从搜索query重新求U或重演TPE，也未独立确认搜索权重删除。",
+      "minimum_action": "保持该限制；本轮没有材料证实需补跑或补删。"
+    },
+    {
+      "id": "HRES-B03",
+      "category": "合理解释边界",
+      "status": "报告已基本遵守",
+      "blocking": false,
+      "title": "最终收益不等于全面抗遗忘或独立系数因果",
+      "evidence": [
+        "D/report.zh.md:51,100,104,121,127,129,131,133",
+        "F/confirmation/summary.json",
+        "D/slices.json",
+        "E:297,298,299",
+        "H:124,125"
+      ],
+      "reason": "ΔA_acq、ΔN点值负，BCA旧域及实际域C有代价；两方法平均F已负；固定轨迹群bootstrap不覆盖重新训练/HPO/机制转移，辅助22指标不构成多重校正全面优势。",
+      "minimum_action": "继续保持这些限定，不增门、不把两个系数比值解释成参数位移比例。"
+    },
+    {
+      "id": "HRES-S01",
+      "category": "合理后续建议",
+      "status": "可选文字增强",
+      "blocking": false,
+      "title": "明确ABC绝对F仍为正",
+      "evidence": [
+        "F/confirmation/summary.json: per_run",
+        "D/slices.json: confirmation",
+        "statistics_audit.json"
+      ],
+      "reason": "ABC三seed平均F原H=0.02275379098138477，新H=0.02046292271562444；改善但仍正。报告没有声称每顺序消除遗忘，因此不是已证错误。",
+      "minimum_action": "可加一句“ABC平均F虽降低，仍为正；总体平均后向改善不代表每种顺序均无遗忘。”无需新统计或实验。"
+    },
+    {
+      "id": "HRES-O01",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "status": "不要求",
+      "blocking": false,
+      "title": "不扩展本轮结果审查为新研究或平台",
+      "evidence": [
+        "当前用户范围",
+        "D/review/request.zh.txt"
+      ],
+      "reason": "未发现需要新增HPO、候选、seed、GPU资格、标签读取、全量重算、重采样或平台才能解决的具体缺陷。下一轮消融母体有条件性依据，不等于Full−ER已验证或实施已获准。",
+      "minimum_action": "结果审查结案不触发任何新执行。"
+    }
+  ],
+  "path_aliases": {
+    "D": "reports/seller_alias_continual/20261107/history_result/",
+    "W": "reports/documentation/20261103/history_wait/workspace/",
+    "F": "reports/documentation/20261103/history_wait/workspace/formal/",
+    "H": "W/scripts/step28_history_optuna.py",
+    "C": "W/scripts/step28_history_optuna_control.py",
+    "E": "W/scripts/step28_history_optuna_evaluate.py"
+  }
+}
+

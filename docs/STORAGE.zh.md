@@ -6,7 +6,7 @@
 
 Windows与Linux各删除本轮两份已验收传输ZIP，每端161264619字节，合计322529238逻辑字节；原5058份来源前后SHA、4份整理结果、54份新旧H权重存在/大小/属主核对通过。详见[Windows清理](../reports/seller_alias_continual/20261107/history_result/cleanup_windows.json)及[Linux清理与权重位置](../reports/seller_alias_continual/20261107/history_result/cleanup_linux.json)。未重新哈希或加载这些大权重，原记录SHA不冒充此次重测；全部54份保留，新H27用于拟议消融Full复用。没有新建CPU/GPU核验脚本；冻结运行来源及绑定的旧测试源码保留用于审查身份，未因文件名而删除。
 
-HPO和英文ABC活动监听副本均已依原规则自删/正常退役，本次只核实不存在，未重复删除或创建监听。原搜索108份推理权重的自动退役属于原合同执行，逐候选清单/回执已回传，不记为本次人工删除。结果外审输入包当前用于审查；原始指标、必要分数/query、日志及来源保管不变。根docs仅Windows；本次局部收尾不重置11月6日大清理日期，下一周期仍11月21日。
+HPO和英文ABC活动监听副本均已依原规则自删/正常退役，本次只核实不存在，未重复删除或创建监听。原搜索108份推理权重的自动退役属于原合同执行，逐候选清单/回执已回传，不记为本次人工删除。结果外审和7项独立处置已闭合；Windows按[审查收尾清单](../reports/seller_alias_continual/20261107/history_result/review/cleanup.json)删除本轮输入ZIP、重复返回ZIP、临时快照/浏览器日志共9文件、9160362字节。输入包原字节已从Git提交d7f9394d实际读出并验证大小/SHA；完整外审10份原件、网页全文、主审和身份清单保留，未为删除重复包另造备份。原始指标、必要分数/query、日志及来源保管不变；结果和审查正式材料210项、15837471字节及清单/回执双端大小/SHA匹配，见[最终同步](../reports/seller_alias_continual/20261107/history_result/final_sync.json)。最终delivery.zip传输副本3816906字节在两端核验后删除，各1文件；输入/返回外审ZIP没有为了删除而额外传到Linux。根docs仅Windows；本次局部收尾不重置11月6日大清理日期，下一周期仍11月21日。
 
 **11月7日权重保管决定补充：** 用户先要求删除此次H调参权重，获知后续消融的Full复用依赖后，明确选择“保留这27份，维持消融Full复用（推荐）”。服务器10:43:56（北京时间）只读核实本批formal已有completion、无failure及相关活动进程；随后遍历该formal目录，全部27份`.pt`均位于`reports/documentation/20261103/history_wait/workspace/formal/replication/`，共35,218,033,608字节（32.799350GiB），均为当前用户所有的普通文件、nlink=1，解析后路径仍在该replication目录内。formal其余位置无`.pt`；Windows本批工作目录及结果回传目录未发现`.pt`、`.bin`或`.safetensors`副本。本次仅核实元数据，未重新计算大权重SHA或载模；实际删除权重0份、0字节。原H基线27份继续按既有安排保留；本次决定不授权新训练或扩大消融预算。逐文件位置及原记录SHA仍见上述`cleanup_linux.json`，原回执不改写。
 

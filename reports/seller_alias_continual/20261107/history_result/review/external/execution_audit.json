@@ -1,0 +1,414 @@
+{
+  "schema": "independent_static_result_review.execution.v1",
+  "reviewer_role": "执行、来源、有限搜索、费用及盲门分审",
+  "review_date": "2026-11-07",
+  "conclusion": {
+    "scientific_blockers": [],
+    "reproducibility_defects": [],
+    "statement": "在本分审实际阅读及保存元数据交叉核对范围内，未发现新增已证科学阻断或复现缺陷；本结论不是对缺席数组、模型、真值、SQLite或全部运行系统的重新执行验证。",
+    "implementation_status": "沿用两轮已关闭实现结论；实际58来源逐文件身份核对后，controller仅有批准的observe透传增量，未发现数学或评价源变化。",
+    "permission": "仅结果外审；不授予新训练、数据、加载、删除或后续消融执行权限。"
+  },
+  "input": {
+    "package_bytes": 7781316,
+    "package_members": 825,
+    "payload_members": 824,
+    "sha256": "fd4438e7387fccf06ce16e93f353c8570f79b6a87810c294fd0a88031eb355b8",
+    "manifest_verification": "完整ZIP和824载荷字节/SHA由主审执行并汇报；本分审独立核对实际formal gate列出的58源码字节/SHA与所供文件，并对照可访问的第二轮源码。",
+    "source_commit": "3badedc43a2770660650b401724e20324a67591c"
+  },
+  "executed_review_operations": [
+    "只读文本、stdlib JSON/字节/SHA和元数据结构核对。",
+    "对保存summary中的最终三域RAW MAP作两层等权简单算术，核对12份feedback/trials/selected。",
+    "未导入或运行任何项目模块、测试、指标、NNLS、模型、bootstrap、生成器或训练。",
+    "未访问Linux服务器、正式数据、标签、owners、Memory或外部研究。"
+  ],
+  "checks": [
+    {
+      "id": "EXEC-SOURCE",
+      "result": "一致",
+      "evidence": [
+        "reports/seller_alias_continual/20261107/history_result/source_receipts/history_state/formal_gate.json",
+        "reports/documentation/20261103/history_wait/workspace/scripts/*",
+        "reports/documentation/20261103/history_wait/workspace/schema/*",
+        "reports/documentation/20261103/history_wait/workspace/tests/*",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py"
+      ],
+      "checked": "58/58源码的实际bytes/SHA与当前gate一致；与上一轮4215c066所供源码相比，只有controller变更。",
+      "precise_change": "dispatch增加observe=None；循环调用observe；execute增加observe=None；train_batch将observe透传给dispatch。",
+      "locations": [
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py:143",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py:185–186",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py:288",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py:309"
+      ],
+      "limit": "这不是重新语义审计全部58文件；完整重读范围另列。"
+    },
+    {
+      "id": "EXEC-AUTH",
+      "result": "授权与运行状态相容",
+      "evidence": [
+        "reports/documentation/20261103/history_wait/authorization.json",
+        "reports/documentation/20261103/history_wait/scope.zh.txt",
+        "reports/documentation/20261103/history_wait/primary_disposition.zh.txt",
+        "reports/seller_alias_continual/20261107/history_result/source_receipts/history_state/formal_gate.json"
+      ],
+      "checked": "11月3日授权明确前序完整结束后的自动完整执行；实际gate批准3 worker、6 actions、270+6+4小时、无自动重试。早先scope或gate中的历史待批准说明不能推翻后续明确授权。",
+      "locations": [
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_run.py:52–76",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py:288–300"
+      ],
+      "limit": "以前序链源回执及运行代码/完成记录为证，不把当时的进程观察当作现在的实时状态。"
+    },
+    {
+      "id": "EXEC-45",
+      "result": "45条身份与完成元数据一致",
+      "evidence": [
+        "reports/documentation/20261103/history_wait/workspace/formal/trial_00…trial_11/*/run/completion.json",
+        "reports/documentation/20261103/history_wait/workspace/formal/replication/*/run/completion.json"
+      ],
+      "checked": {
+        "search_runs": 36,
+        "search_orders": [
+          "ABC",
+          "BCA",
+          "CAB"
+        ],
+        "search_seed": 7,
+        "replication_runs": 9,
+        "replication_orders": [
+          "ABC",
+          "BCA",
+          "CAB"
+        ],
+        "replication_seeds": [
+          4,
+          5,
+          6
+        ],
+        "unique_trajectory_identities": 45,
+        "status": "COMPLETE_864_UPDATES_3_ENDPOINTS_VALID_BLIND",
+        "updates_per_run": 864,
+        "saved_total_updates": 38880,
+        "gradient_group_presentations_per_run": 1440,
+        "saved_total_gradient_group_presentations": 64800,
+        "endpoints": 135,
+        "source_files_match": 45,
+        "access_per_run": {
+          "train": 1,
+          "worker_train_reads": 1,
+          "valid": 0,
+          "heldout": 0,
+          "owners": 0
+        },
+        "adam_steps_by_stage": [
+          288,
+          576,
+          864
+        ],
+        "memory_members_per_endpoint": 6,
+        "memory_seen_by_stage": [
+          48,
+          96,
+          96
+        ],
+        "memory_bytes_min": 283641,
+        "memory_bytes_max": 377981
+      },
+      "locations": [
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_run.py:129–179",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_continual_five.py:239–251"
+      ],
+      "explanation": "第三阶段不为后续不存在的训练更新Memory，seen保持96是明确代码行为，不是漏更新。",
+      "limit": "恢复布尔及保存的原始/完整恢复/推理恢复分数SHA一致，是运行原生证据；本轮没有加载任何模型或数组。"
+    },
+    {
+      "id": "EXEC-PAIR9",
+      "result": "9个新旧配对来源和初始条件一致",
+      "evidence": [
+        "reports/seller_alias_continual/20261107/history_result/source_receipts/reference/*/completion.json",
+        "reports/seller_alias_continual/20261107/history_result/source_receipts/history_state/formal_gate.json",
+        "reports/documentation/20261103/history_wait/workspace/formal/replication/*/run/completion.json"
+      ],
+      "checked": "9份旧H完成元数据的实际bytes/SHA匹配gate钉住的原件；三顺序×s4/5/6无重复。每对initial模型/Adam摘要、partition、pretrained_archive、public_inputs、spec.roots一致；旧端点27个恢复声明为true；各配对第一阶段旧dev RAW分数SHA一致。",
+      "locations": [
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_run.py:188–207",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna.py:66–71"
+      ],
+      "limit": "原H gate完整文件及实际模型/输入没有在本包提供；这是所供完成原件和固定身份的核对。"
+    },
+    {
+      "id": "EXEC-SEARCH",
+      "result": "12候选、锚点、反馈、选择一致",
+      "evidence": [
+        "reports/documentation/20261103/history_wait/workspace/formal/trial_00…trial_11/evaluation/summary.json",
+        "reports/documentation/20261103/history_wait/workspace/formal/trial_00…trial_11/evaluation/feedback.json",
+        "reports/documentation/20261103/history_wait/workspace/formal/trials.json",
+        "reports/documentation/20261103/history_wait/workspace/formal/selected.json",
+        "reports/documentation/20261103/history_wait/workspace/formal/completion.json"
+      ],
+      "checked": "12个number 0…11齐全、全部COMPLETE、参数在冻结对数范围内；锚点为trial0(.1,.5)。每候选三循环最终三个域RAW MAP保存点值先域等权再顺序等权，与feedback和trials的U相符；selected完整等于trial3记录，亦等于formal completion.selected。",
+      "max_arithmetic_disagreement_about": 2e-16,
+      "selected_trial": 3,
+      "selected_alpha": 0.07049361507739538,
+      "selected_beta": 0.767438161798796,
+      "selected_U": 0.5054677381816549,
+      "anchor_U": 0.5007364042248122,
+      "selected_order_values": {
+        "ABC": 0.4997644378964062,
+        "BCA": 0.4982408100366818,
+        "CAB": 0.518397966611877
+      },
+      "saved_trials": [
+        {
+          "number": 0,
+          "alpha": 0.1,
+          "beta": 0.5,
+          "U": 0.5007364042248122
+        },
+        {
+          "number": 1,
+          "alpha": 0.04362202813717693,
+          "beta": 0.12898849767894044,
+          "U": 0.49668673345850484
+        },
+        {
+          "number": 2,
+          "alpha": 0.2936366610061612,
+          "beta": 0.2685264839151269,
+          "U": 0.49396571676126194
+        },
+        {
+          "number": 3,
+          "alpha": 0.07049361507739538,
+          "beta": 0.767438161798796,
+          "U": 0.5054677381816549
+        },
+        {
+          "number": 4,
+          "alpha": 0.06647893300343943,
+          "beta": 0.984528077661528,
+          "U": 0.5037256436176161
+        },
+        {
+          "number": 5,
+          "alpha": 0.12893777123943645,
+          "beta": 0.9866883984251029,
+          "U": 0.504795296734286
+        },
+        {
+          "number": 6,
+          "alpha": 0.03292963575861004,
+          "beta": 0.4503961786159236,
+          "U": 0.5011060654767693
+        },
+        {
+          "number": 7,
+          "alpha": 0.21505127210270975,
+          "beta": 0.22269912462002206,
+          "U": 0.49596437565869794
+        },
+        {
+          "number": 8,
+          "alpha": 0.06039932952202117,
+          "beta": 0.5637752198069659,
+          "U": 0.5039628530243158
+        },
+        {
+          "number": 9,
+          "alpha": 0.13413054063192695,
+          "beta": 0.10940913391972129,
+          "U": 0.4934397954100647
+        },
+        {
+          "number": 10,
+          "alpha": 0.06569401970290749,
+          "beta": 0.5762758904677265,
+          "U": 0.5046468657372484
+        },
+        {
+          "number": 11,
+          "alpha": 0.14755789075590156,
+          "beta": 0.9660845627680262,
+          "U": 0.5041562924616362
+        }
+      ],
+      "production_path": [
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py:333–343：ask→完整训练→search-evaluate→verified_feedback→tell→留存trials→退役搜索权重",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py:346–353：再次核对完整反馈后选定",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna.py:139–145：最大值；精确平局锚点优先，再较小trial号",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna.py:149–185：Optuna4.6.0/TPE固定种子/12候选/NopPruner/完整三顺序反馈",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_evaluate.py:101–130：生产verified_feedback绑定各实际域、最终RAW分数身份及query-backed matrix"
+      ],
+      "critical_limit": "本包未提供12次搜索evaluation/result.json及raw/query数组，亦无SQLite。独立核对只基于保存summary/feedback/trials和生产代码接线；没有亲自从query重求U，不能独立证明实际TPE随机序列或缺席查询载荷内容。"
+    },
+    {
+      "id": "EXEC-BLIND",
+      "result": "所供盲门记录及静态接线无矛盾",
+      "evidence": [
+        "reports/documentation/20261103/history_wait/workspace/formal/evaluation_access.json",
+        "reports/documentation/20261103/history_wait/workspace/formal/generation/result.json",
+        "reports/documentation/20261103/history_wait/workspace/formal/confirmation/all_blind_complete.json",
+        "reports/documentation/20261103/history_wait/workspace/formal/confirmation/result.json",
+        "reports/documentation/20261103/history_wait/workspace/formal/replication/evaluation/result.json"
+      ],
+      "checked": {
+        "access_events": 16,
+        "search_development_joint_events": 12,
+        "replication_development_joint_events": 1,
+        "generation_events": 1,
+        "blind_inference_events": 1,
+        "confirmation_pairs_events": 1,
+        "generated_groups": 120,
+        "per_domain_groups": {
+          "A": 40,
+          "B": 40,
+          "C": 40
+        },
+        "namespace": "h_history_confirmation_20261102",
+        "root": 2026110201,
+        "bootstrap_seed": 2026110202,
+        "confirmation_runs": 18,
+        "inference_states": 54,
+        "learned_cells": 108,
+        "group_forwards": 4320,
+        "generation_time": 1793983357.79726,
+        "blind_inference_access_time": 1793983364.4439907,
+        "confirmation_pairs_access_time": 1793989040.2915022
+      },
+      "locations": [
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_evaluate.py:133–171：新身份生成、既有群排除、owners封存及receipt",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_evaluate.py:174–187：18轨迹/108格/120群/4320前向结构",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_evaluate.py:190–237：54推理状态、所有分数有限和校准排序检查后写all_blind_complete",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_evaluate.py:238–254：盲门后单次pairs读取并评价"
+      ],
+      "limit": "本分审读取并结构核对总体18/108/4320字段、示例格及生产顺序；没有重新加载分数、标签或逐格计算指标，也没有将生成身份回执当作本轮亲自重跑生成器。"
+    },
+    {
+      "id": "EXEC-REPLICATION-DISPATCH",
+      "result": "9复验真实派发记录闭合",
+      "evidence": [
+        "reports/documentation/20261103/history_wait/workspace/formal/replication/dispatch.json"
+      ],
+      "checked": "ALL_COMPLETE_RELEASED；9个唯一索引0…8，全部success=true/released=true/error=null，pending=[]、active={}、retired_slots=[]，三个健康槽续领完成9项。",
+      "limit": "12搜索批次dispatch原件未包含于本包；搜索完整性另由36完成元数据、顺序预算事件、反馈及controller接线支撑，不能声称逐批读了缺席dispatch。"
+    },
+    {
+      "id": "EXEC-BUDGET",
+      "result": "原生完成账与保存预算相符，未超270+6+4累计小时",
+      "evidence": [
+        "reports/documentation/20261103/history_wait/workspace/formal/budget.json",
+        "reports/documentation/20261103/history_wait/workspace/formal/completion.json",
+        "reports/seller_alias_continual/20261107/history_result/budget.json",
+        "reports/seller_alias_continual/20261107/history_result/source_receipts/history_state/start.json",
+        "reports/seller_alias_continual/20261107/history_result/source_receipts/history_state/completion.json"
+      ],
+      "checked": {
+        "caps_seconds": {
+          "training": 972000,
+          "confirmation": 21600,
+          "auxiliary": 14400
+        },
+        "formal_used_seconds": {
+          "training": 547021.6019808224,
+          "confirmation": 5687.878802293912,
+          "auxiliary": 7224.055690337671
+        },
+        "formal_used_total_hours": 155.53709346484834,
+        "training_search_36_sum_hours": 120.77469681460178,
+        "training_replication_9_sum_hours": 31.17574818007111,
+        "training_events": 45,
+        "total_budget_events": 62,
+        "training_event_wall_min_seconds": 11122.45837211702,
+        "training_event_wall_max_seconds": 14095.235169135034,
+        "formal_prior_auxiliary_seconds": 445.2190632948186,
+        "final_conservative_tail_seconds": 30,
+        "result_preparation_conservative_seconds": 900,
+        "postpreparation_auxiliary_seconds": 8124.055690337671,
+        "postpreparation_total_hours": 155.78709346484834,
+        "process_elapsed_hours": 55.77770331078106
+      },
+      "explanation": "训练按三个进程的累计墙钟收费，不以总经过时间替代；auxiliary含control、继承费用及保守尾部，不能要求其仅等于action事件和。新增900秒是明确保守结果整理费用，不是精确计时，也未改写formal原账。",
+      "limit": "本轮没有重新采集资源或复原全部waiter计费tick；保存资源峰值及已支出时间为运行原生记录。"
+    },
+    {
+      "id": "EXEC-RETIREMENT",
+      "result": "生产顺序正确；实际逐文件删除证据仅有限复用",
+      "evidence": [
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py:267–285",
+        "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py:338–343",
+        "reports/seller_alias_continual/20261107/history_result/saved_check.json",
+        "reports/seller_alias_continual/20261107/history_result/source_receipts/abc_state/retirement.json"
+      ],
+      "checked": "搜索权重退役在完整反馈核对/tell/trials保存之后；生产函数先验证完成、文件身份/所有权/单链接，再写manifest，逐文件校验后unlink并写receipt。saved_check报告12搜索退役回执。",
+      "critical_limit": "本包没有12份搜索weight_retirement_manifest/receipt逐文件原件。不能称本轮独立检查了108个搜索权重的删除或服务器存在性。英文ABC仅附停止/退役回执，不评其算法或数据结果。"
+    }
+  ],
+  "exact_reading_scope": {
+    "full_prose": [
+      "reports/seller_alias_continual/20261107/history_result/review/request.zh.txt",
+      "reports/seller_alias_continual/20261107/history_result/report.zh.md",
+      "reports/documentation/20261102/history_optuna/scope.zh.txt",
+      "reports/documentation/20261103/history_wait/authorization.json",
+      "reports/documentation/20261103/history_wait/scope.zh.txt",
+      "reports/documentation/20261103/history_wait/primary_disposition.zh.txt"
+    ],
+    "full_source_read": [
+      "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna.py",
+      "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_run.py"
+    ],
+    "source_portions_read": [
+      "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_control.py:250–386及与第二轮4215c066的完整差异",
+      "reports/documentation/20261103/history_wait/workspace/scripts/step28_history_optuna_evaluate.py:1–254",
+      "reports/documentation/20261103/history_wait/workspace/scripts/step28_continual_five_run.py:124–187",
+      "reports/documentation/20261103/history_wait/workspace/scripts/step28_continual_five.py:220–257"
+    ],
+    "json_parsed_and_reviewed_for_assigned_fields": [
+      "reports/documentation/20261103/history_wait/workspace/formal/budget.json（62事件）",
+      "reports/documentation/20261103/history_wait/workspace/formal/evaluation_access.json（16事件）",
+      "reports/documentation/20261103/history_wait/workspace/formal/completion.json",
+      "reports/documentation/20261103/history_wait/workspace/formal/trials.json",
+      "reports/documentation/20261103/history_wait/workspace/formal/selected.json",
+      "reports/documentation/20261103/history_wait/workspace/formal/replication/dispatch.json",
+      "reports/documentation/20261103/history_wait/workspace/formal/trial_00…trial_11/evaluation/feedback.json",
+      "reports/documentation/20261103/history_wait/workspace/formal/trial_00…trial_11/evaluation/summary.json",
+      "reports/seller_alias_continual/20261107/history_result/source_receipts/history_state/formal_gate.json",
+      "reports/seller_alias_continual/20261107/history_result/source_receipts/history_state/process.json",
+      "reports/seller_alias_continual/20261107/history_result/source_receipts/history_state/start.json",
+      "reports/seller_alias_continual/20261107/history_result/source_receipts/history_state/completion.json",
+      "reports/seller_alias_continual/20261107/history_result/source_receipts/abc_state/completion.json",
+      "reports/seller_alias_continual/20261107/history_result/source_receipts/abc_state/retirement.json",
+      "reports/seller_alias_continual/20261107/history_result/receive.json",
+      "reports/seller_alias_continual/20261107/history_result/analysis_receive.json",
+      "reports/seller_alias_continual/20261107/history_result/budget.json",
+      "reports/seller_alias_continual/20261107/history_result/saved_check.json"
+    ],
+    "parsed_field_crosschecks": [
+      "45实际run/completion.json全部完成/身份/分区/来源/更新/Memory/point字段；未逐字分析大RNG状态数值",
+      "9旧H完成元数据及其gate bytes/SHA",
+      "generation/result、confirmation/all_blind_complete、confirmation/result、replication/evaluation/result结构及示例格",
+      "58来源实际bytes/SHA与上一轮逐文件比较",
+      "observation字段结构及总体，不把全部观察行声明为完整语义重读"
+    ],
+    "not_read_or_not_present": [
+      "本分审未重新通读未变论文、全部旧实现/GPU资格或旧45条完整历史。",
+      "本分审未独立审全部648群指标JSON及462区间；这些属于主审/统计分审。",
+      "本分审未读E第255行后summary/analyze主体；主审负责。",
+      "原预测/查询数组、模型、标签/pairs/owners、Memory、SQLite、全部更新日志缺席。",
+      "12搜索evaluation/result、搜索batch/dispatch、搜索逐文件退役manifest/receipt未包含。",
+      "report引用的receive_manifest原件及历史CPU/input/gate完整原件部分缺席，所供来源回执可读不等于全部原件重验。"
+    ]
+  },
+  "necessary_corrections": [],
+  "optional_suggestions": [
+    "结果正文保持：U核查是保存summary/反馈的一致性及生产接线静态核对；saved_check的缺席数组核验归属于主执行者Linux证据。",
+    "保持恢复、资源、停止/退役均为原生回执或历史观察的表述，不升级为本次外审重新载模、实时NVML或远程删除存在性证明。"
+  ],
+  "out_of_scope": [
+    "新增HPO/候选/seed/实验臂或新成功门",
+    "重新加载模型、读取labels/owners或重算指标/bootstrap",
+    "重复GPU资格、三worker组合运行或通用账务/调度平台",
+    "重审英文VendorLink算法、旧45条或未变文献",
+    "以SHA声称可恢复模型或要求所有不再依赖的搜索权重永久保留"
+  ]
+}

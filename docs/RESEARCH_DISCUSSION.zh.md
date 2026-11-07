@@ -10,7 +10,7 @@
 
 原唯一主要门通过，但收益幅度、初学代价、域C/BCA及分类负项按原口径保留。用户既有“历史权重开发后正式选定的版本”消融母体决定不变；不因本轮主门通过把未实施的消融写成已验证。新H27与原H27均保留；没有删除权重。原英文ABC自动接续实际止于dev前置条件未通过，未启动正式候选，原监听正常退役；该状态不修改先前留出集的观察事实。
 
-具体结果审查包完成后，用户明确确认“允许发送并完成本轮结果外审（建议）”。许可对象为7,781,316字节、824载荷加清单、SHA256 `fd4438e7387fccf06ce16e93f353c8570f79b6a87810c294fd0a88031eb355b8`，向原ChatGPT网页GPT-6 Pro会话审查结果及解释；不含模型、文本、关系/owners标签、Memory、凭据或预测/query数组。见[许可](../reports/seller_alias_continual/20261107/history_result/review/authorization.json)和[单次提交](../reports/seller_alias_continual/20261107/history_result/review/submission.json)。该许可不扩成新实验或全部项目材料的外发。
+具体结果审查包完成后，用户明确确认“允许发送并完成本轮结果外审（建议）”。许可对象为7,781,316字节、824载荷加清单、SHA256 `fd4438e7387fccf06ce16e93f353c8570f79b6a87810c294fd0a88031eb355b8`，向原ChatGPT网页GPT-6 Pro会话审查结果及解释；不含模型、文本、关系/owners标签、Memory、凭据或预测/query数组。见[许可](../reports/seller_alias_continual/20261107/history_result/review/authorization.json)和[单次提交](../reports/seller_alias_continual/20261107/history_result/review/submission.json)。该许可不扩成新实验或全部项目材料的外发。客户端10:41观察完整外审完成，返回10成员包大小/SHA及内部9载荷核验通过，7项意见经[独立处置](../reports/seller_alias_continual/20261107/history_result/review/primary_disposition.zh.md)结案。无开放科学阻断/复现必修或补实验；仅补中文ABC平均绝对F仍正及证据层级说明，原结果不改。新旧54权重继续保留，消融实施与英文后续目标仍是独立待决定范围；本轮本地提交，不推送。
 
 ## 2026-11-06：选定历史权重版H作为主实验消融母体并提交方案外审
 
