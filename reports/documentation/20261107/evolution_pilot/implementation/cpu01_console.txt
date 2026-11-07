@@ -1,0 +1,17 @@
+PASS data
+PASS updates
+{"status": "FAIL", "charged_seconds": 5, "cumulative_cpu_seconds": 5}
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/implementation/workspace/tests/step30_evolution_cpu.py", line 372, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/implementation/workspace/tests/step30_evolution_cpu.py", line 356, in main
+    result['checks'][name] = fn()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/implementation/workspace/tests/step30_evolution_cpu.py", line 353, in <lambda>
+    ('updates', lambda: test_updates(temp)), ('decisions', lambda: test_decisions(temp)),
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/implementation/workspace/tests/step30_evolution_cpu.py", line 278, in test_decisions
+    result = control.pipeline(phase_stop, lambda *args: None)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/implementation/workspace/scripts/step30_evolution_control.py", line 150, in pipeline
+    a = choose(a_rows)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/implementation/workspace/scripts/step30_evolution_policy.py", line 83, in select_a
+    if {r['spec']['id'] for r in rows} != {s['id'] for s in expected} or len(rows) != 16:
+TypeError: 'float' object is not iterable

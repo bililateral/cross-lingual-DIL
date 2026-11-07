@@ -1,0 +1,335 @@
+diff --git a/scripts/step30_evolution_control.py b/scripts/step30_evolution_control.py
+index fe58254a..aa44cfdd 100644
+--- a/scripts/step30_evolution_control.py
++++ b/scripts/step30_evolution_control.py
+@@ -20,6 +20,7 @@ from step30_evolution_policy import CAPS, DOMAINS, LIMITS, decision, select_a, t
+ 
+ def resource_observation(allowed: dict, root: Path, gpu: bool) -> dict:
+     import shutil
++    root = Path(allowed['experiment_root'])
+     observation = dict(ram_available=psutil.virtual_memory().available,
+                        disk_free=shutil.disk_usage(root).free, experiment_bytes=directory_bytes(root))
+     observation['ready'] = (observation['ram_available'] >= LIMITS['free_ram_bytes'] and
+@@ -112,7 +113,7 @@ class Runner:
+                             raise TimeoutError('Full worker lifecycle deadline')
+                         if p.memory_info().rss > LIMITS['rss_bytes']:
+                             raise RuntimeError('Worker RAM limit')
+-                        if directory_bytes(self.root) > LIMITS['disk_bytes']:
++                        if directory_bytes(Path(self.allowed['experiment_root'])) > LIMITS['disk_bytes']:
+                             raise RuntimeError('Experiment disk limit')
+                     finally:
+                         # Parent monitoring is auxiliary active work; pure sleep
+@@ -215,7 +216,7 @@ def campaign(allowed: dict, gate_path: Path):
+                 return select_a(rows)
+         def judge(rows, selected, phase):
+             with ledger.active(phase+'_decision'):
+-                budget = Budget(root, time.monotonic()+CAPS['auxiliary']-ledger.used['auxiliary'])
++                budget = Budget(Path(allowed['experiment_root']), time.monotonic()+CAPS['auxiliary']-ledger.used['auxiliary'])
+                 return decision(rows, selected, phase, budget.check)
+         result = pipeline(run_phase, lambda phase, result: write(root/phase/'decision.json', result), choose, judge)
+         with ledger.active('complete'):
+@@ -245,11 +246,19 @@ def worker(allowed: dict, gate_path: Path, action: str, target: Path, batch_path
+     batch = read(batch_path)
+     if batch['gate'] != record(gate_path) or batch['specs'] != tasks(batch['phase'], batch.get('selected')):
+         raise ValueError('Batch gate/tasks differ')
+-    budget = Budget(root, deadline)
++    budget = Budget(Path(allowed['experiment_root']), deadline)
+     budget.check()
+     manifest = dataset(allowed)
+     binding = allowed['model_binding']
+     if action in ('train', 'score'):
++        directory = Path(binding['directory']).resolve()
++        if directory != Path('/home/yongpeng/cross-lingual/models/step29/bert_base_cased').resolve():
++            raise ValueError('Use the already approved local English backbone')
++        model_sources = {Path(r['path']).resolve() for r in binding['files']}
++        actual = {p.resolve() for p in directory.iterdir() if p.is_file() and p.suffix in ('.json', '.txt', '.bin', '.safetensors')}
++        if (model_sources != actual or not {'config.json', 'vocab.txt'} <= {p.name for p in actual}
++                or not {'pytorch_model.bin', 'model.safetensors'} & {p.name for p in actual}):
++            raise ValueError('Complete actual model/tokenizer file identities required')
+         for source in binding['files']:
+             verify(source)
+         configure_gpu()
+@@ -286,7 +295,10 @@ def build(allowed: dict):
+     accounting.mkdir(parents=True)
+     ledger = Ledger(accounting, allowed['prior_seconds'], allowed['cpu_test_seconds'])
+     begin, ok = time.monotonic(), False
+-    budget = Budget(accounting, begin+CAPS['auxiliary']-ledger.used['auxiliary'], 8*2**30)
++    experiment = Path(allowed['experiment_root']).resolve()
++    if not target.resolve().is_relative_to(experiment):
++        raise ValueError('New build output must be inside the experiment disk cap')
++    budget = Budget(experiment, begin+CAPS['auxiliary']-ledger.used['auxiliary'], 8*2**30)
+     try:
+         access(accounting, 'official_four_table_build', [allowed['archive']])
+         archive = verify(allowed['archive'])
+diff --git a/scripts/step30_evolution_evaluate.py b/scripts/step30_evolution_evaluate.py
+index 1ea29718..f5df7e2d 100644
+--- a/scripts/step30_evolution_evaluate.py
++++ b/scripts/step30_evolution_evaluate.py
+@@ -14,16 +14,16 @@ from step30_evolution_policy import DOMAINS, METRICS, SPLITS, cells, tasks
+ from step30_evolution_run import restore
+ 
+ 
+-def training_complete(task: dict, completion: dict, expected_identity: dict) -> None:
++def training_complete(task: dict, completion: dict, expected_identity: dict, *, fit_groups: int = 20) -> None:
+     stages, epochs = task['stages'], task['epochs']
+-    expected_updates = 20*epochs*stages
++    expected_updates = fit_groups*epochs*stages
+     work = completion['workload']
+     replay = task['system'] in ('H_ER', 'H_full', 'V_ER')
+     if (completion['status'] != 'TRAINING_COMPLETE_EVALUATION_CLOSED' or completion['task'] != task
+             or completion['identity'] != expected_identity or completion['updates'] != expected_updates
+             or set(completion['endpoints']) != {str(i) for i in range(stages+1)}
+             or work['current_updates'] != expected_updates or work['current_records'] != 32*expected_updates
+-            or work['stage_model_saves'] != stages or work['history_groups'] != (1600 if replay else 0)
++            or work['stage_model_saves'] != stages or work['history_groups'] != ((stages-1)*epochs*fit_groups if replay else 0)
+             or work['history_records'] != 32*work['history_groups']):
+         raise ValueError('Incomplete or mismatched trajectory; downstream remains closed')
+     if (work['teacher_groups'] > (12 if task['system'] in ('H_ER', 'H_full') else 0)
+@@ -31,16 +31,18 @@ def training_complete(task: dict, completion: dict, expected_identity: dict) ->
+         raise ValueError('Teacher workload differs from contract')
+ 
+ 
+-def score_batch(root: Path, batch: dict, manifest: dict, factory, model_binding: dict, check) -> dict:
++def score_batch(root: Path, batch: dict, manifest: dict, factory, model_binding: dict, check,
++                *, fixture_specs=None, fixture_groups=None) -> dict:
+     phase, specs = batch['phase'], batch['specs']
+-    if specs != tasks(phase, batch.get('selected')) or len(batch['completed']) != len(specs):
++    expected_specs = tasks(phase, batch.get('selected')) if fixture_specs is None else fixture_specs
++    if specs != expected_specs or len(batch['completed']) != len(specs):
+         raise ValueError('Complete fixed training batch required before blind scoring')
+     completed = {r['task_id']: r for r in batch['completed']}
+     if set(completed) != {s['id'] for s in specs}:
+         raise ValueError('Missing/duplicate batch identities')
+     for task in specs:
+         row = completed[task['id']]
+-        training_complete(task, pinned(row['completion']), row['identity'])
++        training_complete(task, pinned(row['completion']), row['identity'], fit_groups=20 if fixture_groups is None else fixture_groups)
+     split = 'test' if phase == 'D' else 'dev'
+     domains = DOMAINS[:1] if phase == 'A' else DOMAINS
+     sources = [manifest['files'][d+':'+split] for d in domains]
+@@ -48,7 +50,7 @@ def score_batch(root: Path, batch: dict, manifest: dict, factory, model_binding:
+     public, inventory = {}, {}
+     for d, source in zip(domains, sources):
+         groups = [Group.from_dict(x) for x in pinned(source)]
+-        if (len(groups) != SPLITS[split]//8 or len({g.uid for g in groups}) != len(groups)
++        if (len(groups) != (SPLITS[split]//8 if fixture_groups is None else fixture_groups) or len({g.uid for g in groups}) != len(groups)
+                 or any(g.domain != d or g.split != split for g in groups)):
+             raise ValueError('Blind quota/domain/partition differs')
+         for g in groups:
+@@ -138,17 +140,18 @@ def query_metrics(scores, labels, ids: list[str]) -> dict:
+     return result
+ 
+ 
+-def analyze_batch(root: Path, batch: dict, manifest: dict) -> list[dict]:
++def analyze_batch(root: Path, batch: dict, manifest: dict, *, fixture_specs=None, fixture_groups=None) -> list[dict]:
+     phase, specs = batch['phase'], batch['specs']
+     blind = read(root/'blind_complete.json')
+-    if specs != tasks(phase, batch.get('selected')) or blind['phase'] != phase:
++    expected_specs = tasks(phase, batch.get('selected')) if fixture_specs is None else fixture_specs
++    if specs != expected_specs or blind['phase'] != phase:
+         raise ValueError('Label release phase/configuration differs')
+     validate_blind(blind, specs)  # ALL scores checked before ANY qrels access.
+     split = 'test' if phase == 'D' else 'dev'
+     domains = DOMAINS[:1] if phase == 'A' else DOMAINS
+     if (set(blind['inventory']) != set(domains) or
+             blind['blind_sources'] != [manifest['files'][d+':'+split] for d in domains] or
+-            any(len(blind['inventory'][d]) != SPLITS[split]//8 for d in domains)):
++            any(len(blind['inventory'][d]) != (SPLITS[split]//8 if fixture_groups is None else fixture_groups) for d in domains)):
+         raise ValueError('Blind dataset sources/domains/quotas differ before qrels opening')
+     sources = [manifest['files'][d+':'+split+':qrels'] for d in domains]
+     access(root.parent, phase+'_qrels', sources)
+diff --git a/scripts/step30_evolution_io.py b/scripts/step30_evolution_io.py
+index ebd8f255..4a8c79f6 100644
+--- a/scripts/step30_evolution_io.py
++++ b/scripts/step30_evolution_io.py
+@@ -75,6 +75,9 @@ def permit(path: Path, action: str) -> dict:
+     verify(value['authorization'])
+     verify(value['proposal'])
+     workspace = Path(value['workspace']).resolve()
++    experiment = Path(value['experiment_root']).resolve()
++    if not workspace.is_relative_to(experiment) or not Path(value['campaign']).resolve().is_relative_to(experiment):
++        raise ValueError('All new source/data/output belong to the bound experiment directory')
+     actual = Path(__file__).resolve().parent
+     bindings = {Path(r['path']).resolve(): r for r in value['sources']}
+     required = {actual/name for name in SOURCES}
+@@ -88,6 +91,8 @@ def permit(path: Path, action: str) -> dict:
+ 
+ 
+ def dataset(allowed: dict) -> dict:
++    if not Path(allowed['dataset_manifest']['path']).resolve().is_relative_to(Path(allowed['experiment_root']).resolve()):
++        raise ValueError('New dataset must count against the same experiment disk cap')
+     manifest = pinned(allowed['dataset_manifest'])
+     if (manifest['protocol'] != 'evolution-pilot-v1' or manifest['counts'] != {'fit': 160, 'dev': 64, 'test': 96}
+             or manifest['domains'] != ['2014-Q3', '2014-Q4', '2015-Q1']):
+diff --git a/scripts/step30_evolution_policy.py b/scripts/step30_evolution_policy.py
+index c9779fd0..5842e8f4 100644
+--- a/scripts/step30_evolution_policy.py
++++ b/scripts/step30_evolution_policy.py
+@@ -231,7 +231,17 @@ def decision(rows: list[dict], selected: dict, phase: str, check=lambda: None) -
+     if phase == 'B':
+         return b
+     c = mechanism(data)
++    contributions = {}
++    for label, before, after in (('english_recipe', 'H0_SEQ', 'H_SEQ'),
++                                  ('replay', 'H_SEQ', 'H_ER'), ('birth_preservation', 'H_ER', 'H_full')):
++        old = data.get(before, data['H_SEQ'])  # Exact H0 deduplication, not a new result.
++        new = data[after]
++        contributions[label] = dict(before=before, after=after,
++            delta={k: (new[k]-old[k]).tolist() for k in ('P', 'A', 'G', 'Q', 'O', 'N')},
++            forgetting_reduction=(old['F']-new['F']).tolist(),
++            same_configuration_reused=label == 'english_recipe' and selected['H'] == 'H0')
+     out = dict(passed=b['passed'] and c['passed'], scenario=b, mechanism=c,
++               contributions=contributions,
+                endpoints={m: {k: v.tolist() for k, v in x.items()} for m, x in data.items()})
+     if phase == 'D':
+         ci = bootstrap(rows, selected, check)
+diff --git a/tests/step30_evolution_cpu.py b/tests/step30_evolution_cpu.py
+index b4d2e655..9e06f8d1 100644
+--- a/tests/step30_evolution_cpu.py
++++ b/tests/step30_evolution_cpu.py
+@@ -87,9 +87,9 @@ def test_data(temp, qualification):
+                 same_snapshot_source_row=selected[2], language_boundary=[29, 28])
+ 
+ 
+-def test_updates(temp):
++def tiny_factory(temp):
+     model_dir = temp/'tiny_model'
+-    model_dir.mkdir()
++    model_dir.mkdir(parents=True)
+     vocab = ['[PAD]', '[UNK]', '[CLS]', '[SEP]', '[MASK]', 'Apple', 'apple', 'the', 'and', 'with', 'offer']+[str(i) for i in range(8)]
+     (model_dir/'vocab.txt').write_text('\n'.join(vocab)+'\n')
+     tokenizer = BertTokenizer(vocab_file=str(model_dir/'vocab.txt'), do_lower_case=False)
+@@ -102,6 +102,11 @@ def test_updates(temp):
+     binding = dict(directory=str(model_dir), files=[io.record(p) for p in sorted(model_dir.iterdir())])
+     def factory(task):
+         return run.make_model(model_dir, task, 'cpu', expected_hidden=8)
++    return factory, binding
++
++
++def test_updates(temp):
++    factory, binding = tiny_factory(temp/'updates_fixture')
+     task = policy.spec('B', 'H_SEQ', 'H3', 13)
+     m = factory(task)
+     assert m.tokenizer(['Apple', 'apple'])['input_ids'][0] != m.tokenizer(['Apple', 'apple'])['input_ids'][1]
+@@ -217,6 +222,52 @@ def test_updates(temp):
+                 paired_history_draws=True, teacher_calls=len(teacher.calls), teacher_refreshes=0)
+ 
+ 
++def test_evaluation(temp):
++    factory, binding = tiny_factory(temp/'evaluation_fixture')
++    root = temp/'evaluation'
++    root.mkdir()
++    manifest = dict(files={})
++    for d in policy.DOMAINS:
++        g = group(d, split='test').evaluation_order()
++        path, truth = root/(d+'_blind.json'), root/(d+'_qrels.json')
++        io.write(path, [asdict(g.blind())])
++        io.write(truth, {g.uid: dict(view_ids=[v.uid for v in g.views], labels=g.labels())})
++        manifest['files'][d+':test'] = io.record(path)
++        manifest['files'][d+':test:qrels'] = io.record(truth)
++    specs = [dict(policy.spec('D', m, 'H3' if m == 'H_full' else 'V0', 21), epochs=2) for m in ('H_full', 'V_ER')]
++    batch = dict(phase='D', specs=specs, selected=dict(H='H3', V='V0'), completed=[])
++    for task in specs:
++        identity = dict(fixture=True, system=task['system'])
++        job = root/task['id']
++        result = run.execute(factory(task), lambda d: [group(d)], job, task, identity,
++                             binding, io.write, io.record, expected_groups=1)
++        evaluate.training_complete(task, result, identity, fit_groups=1)
++        batch['completed'].append(dict(task_id=task['id'], identity=identity, completion=io.record(job/'completion.json')))
++    blind = evaluate.score_batch(root, batch, manifest, factory, binding, lambda: None,
++                                 fixture_specs=specs, fixture_groups=1)
++    assert blind['forwards'] == 18
++    label_access = root.parent/'access/D_qrels.json'
++    assert not label_access.exists()
++    first = blind['runs'][0]['cells']['0_1']
++    path = Path(first['path'])
++    good = io.read(path)
++    bad = copy.deepcopy(good)
++    next(iter(bad.values()))['scores'].pop()
++    io.write(path, bad)
++    blind['runs'][0]['cells']['0_1'] = io.record(path)
++    io.write(root/'blind_complete.json', blind)
++    must_fail(lambda: evaluate.analyze_batch(root, batch, manifest, fixture_specs=specs, fixture_groups=1), 'no label open after incomplete blind output')
++    assert not label_access.exists()
++    io.write(path, good)
++    blind['runs'][0]['cells']['0_1'] = io.record(path)
++    io.write(root/'blind_complete.json', blind)
++    metrics = evaluate.analyze_batch(root, batch, manifest, fixture_specs=specs, fixture_groups=1)
++    assert len(metrics) == 2 and all(len(r['cells']) == 9 for r in metrics) and label_access.exists()
++    must_fail(lambda: evaluate.analyze_batch(root, batch, manifest, fixture_specs=specs, fixture_groups=1), 'no second D label open')
++    return dict(actual_trajectories=2, blind_cells=18, label_open_after_all_scores=True,
++                missing_score_blocks_open=True, second_open_rejected=True, metrics_per_cell=10)
++
++
+ def fake_row(task, P=(.3, .3, .3), A=(.7, .7, .7), final=(.6, .6, .7), groups=12):
+     # Paper metrics for decision tests only: never claimed to be model output.
+     entries = {}
+@@ -244,8 +295,8 @@ def test_decisions(temp):
+         return dict(P=pp, A=aa, G=aa-pp)
+     cases = [(.5, .7, .7, .8, True), (.6, .65, .9, .65, False),
+              (.5, .7, .68, .69, False), (.5, .7, .5, .69, True), (.5, .7, .8, .8, False)]
+-    for p, a, pf, af, expected in cases:
+-        assert policy.learning_paths(summary(pf, af), summary(p, a))['passed'] == expected
++    for pre, after, pf, af, expected in cases:
++        assert policy.learning_paths(summary(pf, af), summary(pre, after))['passed'] == expected
+     mixed = summary(.7, .8)
+     mixed['G'][1, 2] = -.001
+     assert not policy.learning_paths(mixed, summary(.5, .7))['passed']
+@@ -291,6 +342,14 @@ def test_decisions(temp):
+     for m in policy.REFERENCES:
+         for endpoint in ('F', 'O'):
+             assert abs(d['intervals'][m][endpoint][0]-d['intervals'][m][endpoint][1]) < 1e-12
++    noisy = copy.deepcopy(drows)
++    for row in noisy:
++        if row['spec']['system'] == 'V_ER':
++            for key in ('3_1', '3_2'):
++                for i, g in enumerate(row['cells'][key]['groups']):
++                    g['queries']['map'] = [.45 if i < 6 else .85]*16
++    uncertain = policy.decision(noisy, selected, 'D')
++    assert uncertain['internal_support'] and not uncertain['support']['V_ER'] and not uncertain['passed']
+     must_fail(lambda: policy.decision(drows[:-1], selected, 'D'), 'missing confirm seed')
+     return dict(paper_cases=len(cases)+2, stop_dispatch=['A_only_capability', 'B_joint', 'C_full'],
+                 no_d_after_c_failure=True, paired_bootstrap_replicates=5000, all_internal_external_support_checked=True)
+@@ -308,6 +367,19 @@ def test_boundaries(temp):
+     assert ledger.used['training'] == 9 and ledger.cpu_tests == 10
+     must_fail(lambda: ledger.reserve('training', policy.CAPS['training']), 'prior fees survive')
+     must_fail(lambda: io.Budget(temp, time.monotonic()+5).check(), 'deadline actual callback')
++    # Real subprocess dispatch exits at the closed gate; the same Runner must
++    # retain failure costs and reject the next queued operation, not retry it.
++    runner_root = temp/'runner'
++    runner_root.mkdir()
++    failed_job = runner_root/'failed_worker'
++    failed_job.mkdir()
++    runner_ledger = io.Ledger(runner_root, dict(training=0, gpu=0, auxiliary=0), 0)
++    runner = control.Runner(dict(workspace=str(temp), experiment_root=str(temp)), gate, runner_root, runner_ledger)
++    must_fail(lambda: runner.run('analyze', failed_job, 'auxiliary', 20, []), 'actual worker failure')
++    assert runner.failed and not io.read(failed_job/'dispatch_receipt.json')['success']
++    used = runner_ledger.used.copy()
++    must_fail(lambda: runner.run('analyze', runner_root/'forbidden_next', 'auxiliary', 20, []), 'no next dispatch')
++    assert not (runner_root/'forbidden_next').exists() and runner_ledger.used == used
+     # Malformed blinded predictions are rejected before qrels loader is called.
+     spec = policy.tasks('A')[0]
+     score = temp/'scores.json'
+@@ -329,7 +401,7 @@ def main():
+     parser.add_argument('--sources', type=Path, required=True)
+     parser.add_argument('--qualification', type=Path, required=True)
+     parser.add_argument('--prior-seconds', type=int, default=0)
+-    parser.add_argument('--only', choices=('all', 'data', 'updates', 'decisions', 'boundaries'), default='all')
++    parser.add_argument('--only', choices=('all', 'remaining', 'final', 'data', 'updates', 'evaluation', 'decisions', 'boundaries'), default='all')
+     args = parser.parse_args()
+     if sys.platform != 'linux' or Path(sys.executable).resolve() != Path(io.PYTHON).resolve() or os.environ.get('CUDA_VISIBLE_DEVICES') != '':
+         raise RuntimeError('Linux py310 with CUDA hidden required')
+@@ -350,9 +422,11 @@ def main():
+         with tempfile.TemporaryDirectory(dir=args.output) as directory:
+             temp = Path(directory)
+             for name, fn in (('data', lambda: test_data(temp, args.qualification)),
+-                             ('updates', lambda: test_updates(temp)), ('decisions', lambda: test_decisions(temp)),
++                             ('updates', lambda: test_updates(temp)), ('evaluation', lambda: test_evaluation(temp)),
++                             ('decisions', lambda: test_decisions(temp)),
+                              ('boundaries', lambda: test_boundaries(temp))):
+-                if args.only in ('all', name):
++                if (args.only in ('all', name) or (args.only == 'remaining' and name in ('decisions', 'boundaries'))
++                        or (args.only == 'final' and name in ('evaluation', 'decisions', 'boundaries'))):
+                     result['checks'][name] = fn()
+                     io.write(args.output/'progress.json', result)
+                     print('PASS', name, flush=True)

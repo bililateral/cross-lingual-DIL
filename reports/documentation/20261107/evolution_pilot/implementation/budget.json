@@ -1,0 +1,46 @@
+{
+  "experiment": "Evolution_pilot_v1",
+  "status": "IMPLEMENTATION_CPU_COMPLETE_FORMAL_EXECUTION_CLOSED",
+  "used_seconds": {
+    "training": 0,
+    "gpu": 0,
+    "auxiliary": 622
+  },
+  "caps": {
+    "training": 144000,
+    "gpu": 14400,
+    "auxiliary": 14400
+  },
+  "cpu_test_seconds": 22,
+  "cpu_test_cap_seconds": 1200,
+  "cpu_lifecycles": [
+    {
+      "id": "cpu01",
+      "source_commit": "628e7311",
+      "receipt": "cpu01_lifecycle.json",
+      "status": "FAIL_AFTER_DATA_AND_UPDATES_PASS",
+      "seconds": 8
+    },
+    {
+      "id": "cpu02",
+      "source_commit": "594c726e",
+      "receipt": "cpu02_lifecycle.json",
+      "status": "PASS",
+      "seconds": 6
+    },
+    {
+      "id": "cpu03",
+      "source_commit": "d1949200",
+      "receipt": "cpu03_lifecycle.json",
+      "status": "PASS",
+      "seconds": 8
+    }
+  ],
+  "preparation": {
+    "charged_seconds": 600,
+    "basis": "Explicit conservative allowance for active connection/synchronization/file-identity/package preparation and this implementation closeout; excludes human editing and pure waiting. Not measured compute."
+  },
+  "gpu_training_started": false,
+  "formal_data_opened": false,
+  "automatic_retry": false
+}
