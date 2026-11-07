@@ -1,5 +1,17 @@
 # 科研文件存储与恢复
 
+## 2026-11-07 Evolution资格完成与Windows副本清理
+
+用户明确允许本轮Windows盘点，并要求能继续则迁移Linux后删除Windows副本。最终正文/身份隔离盘点支持继续到有限遗忘预实验，见[报告](../reports/documentation/20261107/evolution_qualification/report.zh.md)。两个官方包保管在`/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_qualification/received_windows/`：`data-and-readme.zip` 332606424字节、SHA256 `5c8a321d51ca2f2dd10afbdc80a44c0c44498954f7c1ca604932b6667a8673bb`；`dataset-generation-code.zip` 48698字节、SHA256 `6143e525b0aa3b50415aff47dbde9b48ffbf793b23f75d0b021e7be9cac94792`。官方MD5也均一致。
+
+同目录另存实际audit/followup源码、报告、README、范围、原始汇总/日志及来源清单26文件。两包加这些材料共28文件、332983607字节，全部通过SFTP回读实际远端字节，与拟保管来源逐文件核对大小/SHA；详见[回读核验](../reports/documentation/20261107/evolution_qualification/transfer_verified.json)。不是仅凭远端同名或旧哈希推定一致。旧Linux下载失败/手写核验目录未覆盖，没有在Linux执行新科研计算、载模或触动其他作业。SFTP末次核实两包大小/路径后正常退出。
+
+Windows实际删除用户指定`C:/Users/35734/Downloads/Compressed/`中的两份上述ZIP，共332655122字节（317.24MiB），以及本轮28份临时回读副本；第一次获准清理共30文件、665638729字节，见[原始清理回执](../reports/documentation/20261107/evolution_qualification/cleanup.json)。临时回读副本是本次核验额外产生的副本，不把其空间计成用户原有两包大小；没有在Windows解压市场表到磁盘。保留实际分析源码、官方README和全部汇总/费用/失败/通过证据。
+
+最初含退役PGP助手和旧外审包的32文件联合清理被自动审批以范围不足拒绝，未执行；随后先收窄完成上述30文件。用户又明确点选这两项，要求“一起删掉，这是科研纪律中规定的”，才完成另2文件45535字节清理，见[新增明确许可与删除回执](../reports/documentation/20261107/evolution_qualification/cleanup_retired.json)，原拒绝历史见[范围记录](../reports/documentation/20261107/evolution_qualification/cleanup_scope.json)。`pgp_format.py`原字节可从Git `6f62121c:reports/documentation/20261107/evolution_qualification/pgp_format.py`恢复，旧未发送外审ZIP可从`dee6233a:reports/documentation/20261107/evolution_qualification/review/evolution_review.zip`恢复，删除前已实际读取Git blob核对大小/SHA，见[恢复核验](../reports/documentation/20261107/evolution_qualification/retired_recovery.json)。两者均未上传本次Linux目录；主盘点/补充源码是实际结果依据，仍需保留，不按CPU脚本名称一并删除。恢复源码不授权重跑。
+
+合计32文件、665684264逻辑字节已清理。旧外审包未发送且不涵盖最终增量，不可恢复后直接当最新送审包。根docs、最终状态和保管/删除回执仅Windows与本地Git保存；上面的28项是本次实际远端同步范围，不宣称全部项目文件双端同步。本次为局部收尾，不重置11月6日大清理日期或11月21日到期日；未推送。
+
 ## 2026-11-07 消融正式输入接入与开训证据
 
 用户明确“开始正式训练”后，在已有独立workspace接入18个精确逐文件符号链接：冻结BGE预训练12文件、数据manifest/validation/groups及train文本/train监督/development盲文本6文件。目标均解析为既有项目内的本用户普通文件；未连接旧development监督、owners、test或private_custody。逐路径和大小见[正式接入回执](../reports/documentation/20261107/h_ablation_start/preflight.json)。Full27继续直接引用原trial3复验权重，不复制、移动或删除；真实正式控制器已在派发前核对其当前SHA与必要恢复/来源证据，先前仅元数据观察的原记录不追改。

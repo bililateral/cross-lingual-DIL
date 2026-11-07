@@ -44,6 +44,29 @@ def jaccard(a, b):
     return len(a & b) / len(a | b) if a or b else 1.0
 
 
+def cross_account_exclusions(records, grams_by_index):
+    indexes, excluded, comparisons = defaultdict(set), set(), 0
+    for i, r in records.items():
+        base.guard()
+        grams = grams_by_index[i]
+        fp = fingerprint(grams)
+        candidates = set().union(*(indexes[(j, x)] for j, x in enumerate(fp)))
+        for c in sorted(candidates):
+            if records[c][0] == r[0]:
+                continue
+            other = grams_by_index[c]
+            if min(len(grams), len(other)) < .8*max(len(grams), len(other)):
+                continue
+            comparisons += 1
+            if comparisons % 2000 == 0:
+                base.guard()
+            if jaccard(grams, other) >= .8:
+                excluded.update((i, c))
+        for j, x in enumerate(fp):
+            indexes[(j, x)].add(i)
+    return excluded, comparisons
+
+
 def disjoint_capacity(rows, domain_fn, domain_names, threshold):
     """Hall condition for equal per-domain quotas; emits counts, not an assignment."""
     counts = {d: Counter(r[0] for r in rows if domain_fn(r) == d) for d in domain_names}
@@ -95,7 +118,10 @@ def fixture():
     rows += [("z", 0, 0, "2014-07-01", "A")]
     assert disjoint_capacity(rows, quarter, QUARTERS, 1)["maximum_equal_disjoint_vid_quota"] == 1
     assert not public_key_armor_shape("no key")
-    return {"passed": True, "checks": ["body normalization", "exact Jaccard", "identity overlap constrains joint quota", "invalid key field"]}
+    bad, _ = cross_account_exclusions({0: ("a",), 1: ("b",), 2: ("a",)},
+                                      {0: {1, 2, 3}, 1: {1, 2, 3}, 2: {6, 7, 8}})
+    assert bad == {0, 1}
+    return {"passed": True, "checks": ["body normalization", "exact Jaccard", "identity overlap constrains joint quota", "invalid key field", "actual cross-account copy exclusion"]}
 
 
 def run(archive):
@@ -183,15 +209,20 @@ def run(archive):
         kept.append(r)
         for j, x in enumerate(fp):
             indexes[(r[0], j, x)].add(i)
-    counts = Counter(r[0] for r in kept)
+    records_by_index = {i: r for i, r in enumerate(rich) if i in representatives}
+    cross_bad, cross_comparisons = cross_account_exclusions(records_by_index, representatives)
+    cross_kept = [r for i, r in records_by_index.items() if i not in cross_bad]
+    counts = Counter(r[0] for r in cross_kept)
     shared = {k: vs for k, vs in pgps.items() if len(vs) > 1}
     supported = {k: {v for v in vs if counts[v] >= 8} for k, vs in shared.items() if k in shaped}
     supported = {k: vs for k, vs in supported.items() if len(vs) >= 2}
     return {"base_reconciled": True, "base_capacity": scanned["conservative_capacity"],
             "body_unique_and_not_shared_capacity": base.capacity(body_distinct),
             "body_quality_screen_capacity": base.capacity(rich), "near_copy_screen_capacity": base.capacity(kept),
+            "cross_account_screen_capacity": base.capacity(cross_kept),
+            "cross_account_near_copy_removed_records": len(cross_bad), "cross_account_exact_comparisons": cross_comparisons,
             "near_copy_comparisons": comparisons, "within_account_near_copies_removed": removed,
-            "domains_after_body_and_near_copy_screen": domain_summary(kept),
+            "domains_after_body_and_near_copy_screen": domain_summary(cross_kept),
             "domains_before_screens": domain_summary(retained),
             "identity_clues": {"literal_case_sensitive_names_with_multiple_vids": sum(len(v)>1 for v in exact_names.values()),
                 "shared_pgp_text_fields": len(shared), "shared_fields_with_decodable_public_key_armor": sum(k in shaped for k in shared),
@@ -200,10 +231,10 @@ def run(archive):
                 "verified_real_controller_labels": 0},
             "limits": ["Body screen is a transparent sensitivity rule, not a validated language detector or approved dataset protocol.",
                 "Near-copy candidate retrieval is approximate; exact Jaccard applies only to retrieved within-account pairs.",
-                "Cross-account exact normalized bodies excluded; cross-account near-copy independence not established.",
+                "Cross-account exact normalized bodies and retrieved near copies excluded; exhaustive cross-account near-copy independence not established.",
                 "MinHash retains earliest representatives globally; future-aware exclusions are offline inventory only.",
                 "Hall quotas use observed vid, not true controllers, and construct no train/dev/test or stage assignment.",
-                "PGP armor shape/base64 is not signature or control verification.",
+                "PGP armor check does not handle author-deleted line breaks; decodable-field/supported-field counts are NOT USED as evidence. Raw shared-field counts remain valid.",
                 "Category variation is descriptive, not a measure of model forgetting."]}
 
 
