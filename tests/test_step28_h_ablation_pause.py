@@ -132,6 +132,18 @@ class PauseTests(unittest.TestCase):
             self.assertLess(abs(allocated["deadline_remaining"]-530.), .2)
             self.assertEqual(result[0]["status"], "ALL_COMPLETE_RELEASED")
 
+    def test_followup_stops_when_current_allowance_is_insufficient(self):
+        with tempfile.TemporaryDirectory() as d:
+            root, flag, ledger = Path(d), threading.Event(), Ledger()
+            ledger.used["auxiliary"] = 850.  # 150 remaining cannot cover 120 margin + 60 shutdown.
+            _, _, errors = self.run_dispatch(root,
+                [dict(id="analysis", bucket="auxiliary", seconds=0, remaining_bucket_margin=120,
+                      gpu=False)], flag, ledger=ledger)
+            self.assertIsInstance(errors[0], TimeoutError)
+            self.assertIn("at actual dispatch", str(errors[0]))
+            self.assertFalse((root/"analysis").exists())
+            self.assertEqual(ledger.events, [])
+
     def test_three_slots_finish_without_taking_pending(self):
         with tempfile.TemporaryDirectory() as d:
             root, flag = Path(d), threading.Event()
@@ -256,12 +268,17 @@ time.sleep(20)
                     run=SimpleNamespace(BUDGETS=control.run.BUDGETS, LIMITS=control.run.LIMITS,
                         gate=lambda *a: {}, validate_completion=validate),
                     queue=SimpleNamespace(GpuMemory=Gpu, check_running=lambda *a: checks.append(True)))
-                (root/"training/job3").mkdir()
-                with self.assertRaisesRegex(RuntimeError, "Pending task path"):
-                    bridge.freeze(fake, request, root, root/"state")
-                self.wait_until(lambda: bridge.proc_stat(parent.pid)["state"] != "T")
-                self.assertFalse((root/"state/frozen.json").exists())
-                (root/"training/job3").rmdir()
+                for partial in (root/"training/job3", root/"generation_dispatch"):
+                    partial.mkdir()
+                    original_dispatch = (root/"training/dispatch.json").read_bytes()
+                    original_budget = (root/"budget.json").read_bytes()
+                    with self.assertRaisesRegex(RuntimeError, "Pending task path|Postprocessing already prepared"):
+                        bridge.freeze(fake, request, root, root/"state")
+                    self.wait_until(lambda: bridge.proc_stat(parent.pid)["state"] != "T")
+                    self.assertFalse((root/"state/frozen.json").exists())
+                    self.assertEqual((root/"training/dispatch.json").read_bytes(), original_dispatch)
+                    self.assertEqual((root/"budget.json").read_bytes(), original_budget)
+                    partial.rmdir()
                 snap, before, rows = bridge.freeze(fake, request, root, root/"state")
                 self.assertEqual(bridge.proc_stat(parent.pid)["state"], "T")
                 result = bridge.drain(fake, request, root, root/"state", snap, before, rows)

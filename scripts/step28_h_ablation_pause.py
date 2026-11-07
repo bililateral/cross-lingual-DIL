@@ -120,6 +120,9 @@ def freeze(controller, request, campaign, state):
         if any((campaign/"training"/name).exists() or (campaign/"training"/name).is_symlink()
                for name in snapshot["pending"]):
             raise RuntimeError("Pending task path already exists; dispatcher is between mkdir and launch")
+        if any((campaign/name).exists() or (campaign/name).is_symlink() for phase in
+               ("generation", "confirmation", "analysis") for name in (phase, phase+"_dispatch")):
+            raise RuntimeError("Postprocessing already prepared; training-only handover no longer applies")
         rows = []
         for slot, item in snapshot["active"].items():
             process = same_process(expected[item["pid"]])

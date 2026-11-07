@@ -164,8 +164,12 @@ def execute(gate_path, *, continuation=None, dispatch_impl=None, dispatch_paused
             index = campaign/(name+"_dispatch")
             index.mkdir()
             local = {**allowed, "dispatch_index": str(index)}
-            row = dict(id=name, bucket=bucket, seconds=0, remaining_bucket_margin=120,
+            row = dict(id=name, bucket=bucket, seconds=ledger.caps[bucket]-ledger.used[bucket]-120,
                        gpu=action == "confirmation")
+            if bucket == "auxiliary":
+                row.update(seconds=0, remaining_bucket_margin=120)
+            elif row["seconds"] <= 60:
+                raise TimeoutError("Insufficient followup allowance")
             def action_command(row, job, deadline):
                 return [sys.executable, str(data.ROOT/"scripts/step28_h_ablation_evaluate.py"), action,
                     "--gate", str(gate_path), "--deadline", str(deadline), "--batch", str(batch_path), "--job", str(job)]

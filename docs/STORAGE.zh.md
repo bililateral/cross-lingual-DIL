@@ -1,10 +1,14 @@
 # 科研文件存储与恢复
 
-## 2026-11-07 H消融暂停派发准备
+## 2026-11-07 H消融暂停派发部署与外审收尾
 
-用户已确认暂停/恢复派发及当前控制器接入，范围与边界见[本轮方案](../reports/documentation/20261107/h_ablation_pause/scope.zh.md)。更新版控制器、派发实现和一次性桥接入口部署在Linux独立的reports/documentation/20261107/h_ablation_pause/sources，未覆盖活动workspace的50份冻结来源、原formal_gate或batch。原控制器和三条在跑任务继续，尚未发送控制信号或建立暂停标志。
+用户已确认暂停/显式恢复、当前控制器接入，并明确“核对完成就直接部署吧”。完整定向外审9项、两项必修已按[独立主审](../reports/documentation/20261107/h_ablation_pause/review/primary_disposition.zh.md)关闭；原报告及2项OPEN_REQUIRED原件保留。最终CPU05十一项PASS，五次核验共34.648642秒，均包含在600秒保守筹备值内，已经在冻结后的原辅助账加一次；不重提final_tail或清零原费用。
 
-三个Linux CPU回执及日志已回传，最终attempt03九项通过；初版七项源码可从Git提交941dc8bb恢复，CPU02两份独有中间源码位于cpu02_sources.zip，其他两份与最终来源相同。当前测试及来源仍用于必要定向审查，暂不清理；审查/核验完成且无运行绑定后按第9节收尾。没有加载模型、读取正式数据、使用GPU或删除权重。600秒保守筹备费用已含累计19.724904秒CPU，待交接一次性并入原辅助桶，不增加额度；原活动账尚未写入该项。用户随后明确批准64,029字节、25成员、SHA256 f463faae97642d63de08298f5ff3d8dea5c95b54fa0505f871fe005d32f8f0a1的本包外发；19:00已在原Pro会话单次提交，许可与实际提交保存在本轮review/authorization.json及submission.json，等待完整意见，不提前执行交接。随后按阶段性两处具体问题作最小修复，独立repair/sources四来源与CPU04回执/日志已同步核对，10项通过；新增7.370104秒CPU，累计27.095008秒仍包含在同一600秒保守筹备额内，不重复加费。初版及原送审来源继续由既有Git和原包精确保管，原50活动来源未覆盖；最终审查尚未交付，不把阶段性意见写成正式结案。根docs仅Windows，本地提交不推送，本次不重置大清理周期。
+新监管入口、控制器及派发器位于Linux独立的reports/documentation/20261107/h_ablation_pause/repair/final_sources；原活动workspace的50来源、原formal_gate/batch未覆盖，模型/数据/Memory及Full27不动。19:41:42启动后19:46:37[实际核实](../reports/documentation/20261107/h_ablation_pause/deployment_verified.json)PAUSED_DRAINING，旧父停止派发、原三worker继续，未补领下一条；源身份、冻结快照、授权/request、启动、监管阶段、费用及两次进程观察均留在同一本轮目录。初次交接尚在排空，当前源和CPU绑定保留；不为清理改活动request。初版从Git941dc8bb、送审版从07b2b6f2、CPU04从5b006780精确恢复；CPU02两份独有中间源码在cpu02_sources.zip，CPU05来源见repair/source_manifest05.json。
+
+输入24载荷逐份验证可从既有Git精确恢复，九份返回原件及8项SHA核对保留；因此[定向删除三个无用传输ZIP](../reports/documentation/20261107/h_ablation_pause/review/cleanup.json)，141647逻辑字节（不冒称磁盘净增），包含Windows送审ZIP、返回ZIP和浏览器下载副本。输入恢复commit:path/换行模式见transport_recovery.json，原包身份/授权/提交/回收回执不追改。没有新建冗余模型备份或删除权重。Playwright关闭本轮网页时返回浏览器已占用；完整意见已回收且无待发送/生成操作，未终止浏览器或其他页面，该工具限制不阻断已获授权交接。
+
+19:54[最终同步核对](../reports/documentation/20261107/h_ablation_pause/final_sync.json)18份审查/结案材料大小和SHA全部一致，原50来源及更新四来源保持；实际state和活动账没有被Windows快照覆盖。本轮仅Linux独立准备/交接材料及必要回执同步，根docs仅Windows，本地提交不推送，不重置11月6日大清理完成日及11月21日下次到期。后续实际控制阶段和唯一进度见交接，不将本存储记录当实时进程监视。
 
 ## 2026-11-07 Evolution预实验方案外审收尾
 

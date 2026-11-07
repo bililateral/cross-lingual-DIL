@@ -1,0 +1,89 @@
+{
+  "observed": "2026-11-07T19:42:13.317909+08:00",
+  "bridge_pid": 1412412,
+  "bridge_status": "sleeping",
+  "old_parent_status": "stopped",
+  "dispatch_status": "PAUSED_DRAINING",
+  "active": {
+    "0": {
+      "id": "ABC_s4_StandardRank",
+      "pid": 1373296
+    },
+    "1": {
+      "id": "ABC_s4_MeanPool",
+      "pid": 1372832
+    },
+    "2": {
+      "id": "ABC_s4_AccountPool",
+      "pid": 1396928
+    }
+  },
+  "completed": 4,
+  "pending": 56,
+  "retired_slots": [],
+  "pause_marker_exists": true,
+  "failure": false,
+  "budget": {
+    "caps": {
+      "auxiliary": 14400,
+      "confirmation": 43200,
+      "training": 1360800
+    },
+    "events": [
+      {
+        "bucket": "auxiliary",
+        "conservative_seconds": 30,
+        "id": "final_tail"
+      },
+      {
+        "actual_seconds": 7893.946375065949,
+        "bucket": "training",
+        "id": "ABC_s4_SEQ"
+      },
+      {
+        "actual_seconds": 12641.481215405976,
+        "bucket": "training",
+        "id": "ABC_s4_KD"
+      },
+      {
+        "actual_seconds": 12813.579732947052,
+        "bucket": "training",
+        "id": "ABC_s4_ER"
+      },
+      {
+        "actual_seconds": 12620.684027596842,
+        "bucket": "training",
+        "id": "ABC_s4_NoRegroup"
+      },
+      {
+        "bucket": "auxiliary",
+        "conservative_seconds": 600,
+        "id": "pause_preparation"
+      }
+    ],
+    "used_seconds": {
+      "auxiliary": 1293.9061283904593,
+      "confirmation": 0,
+      "training": 45969.69135101582
+    }
+  },
+  "controller_state": {
+    "identity": {
+      "pid": 1412412,
+      "start_ticks": 148371782,
+      "owner": "yongpeng",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "-u",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_pause/repair/final_sources/step28_h_ablation_pause.py",
+        "takeover",
+        "--request",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_pause/request.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace"
+    },
+    "phase": "DRAINING",
+    "request": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_pause/request.json"
+  }
+}
