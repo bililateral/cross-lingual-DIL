@@ -127,22 +127,16 @@ def build_and_language(root, qualification):
     budget = eio.read(root/'dataset_accounting/budget.json')
     assert budget['events'][-1]['success'] is True and budget['used_seconds']['auxiliary'] >= 652
 
-    clean_done = False
-
-    class StopAfterCleaning(original_budget):
+    class StopDuringExport(original_budget):
         def check(self, force=False):
-            if clean_done:
-                raise TimeoutError('post-clean resource stop')
+            if (root/'resource_stop/2014-Q3_fit.json').exists():
+                raise TimeoutError('resource stop after first exported file')
             return super().check(force=force)
 
-    def fixture_scanner(*args):
-        nonlocal clean_done
-        clean_done = True
-        return records, {'handwritten': True}
-
     stopped = dict(allowed, build_output=str(root/'resource_stop'))
-    with patch.object(data, 'clean_archive', side_effect=fixture_scanner), patch.object(control, 'Budget', StopAfterCleaning):
-        rejects(lambda: control.build(stopped), TimeoutError, 'post-clean resource stop')
+    with patch.object(data, 'clean_archive', return_value=(records, {'handwritten': True})), patch.object(control, 'Budget', StopDuringExport):
+        rejects(lambda: control.build(stopped), TimeoutError, 'after first exported file')
+    assert (root/'resource_stop/2014-Q3_fit.json').exists()
     assert not (root/'resource_stop/manifest.json').exists()
     assert eio.read(root/'resource_stop_accounting/budget.json')['events'][-1]['success'] is False
 
