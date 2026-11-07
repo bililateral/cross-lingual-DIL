@@ -1,0 +1,41 @@
+{
+  "started_utc": "2026-11-07T06:47:36.585835+00:00",
+  "status": "COMPLETE",
+  "self_check": {
+    "passed": true,
+    "formats": [
+      "real newlines",
+      "flattened spaces",
+      "literal escapes",
+      "HTML breaks",
+      "absent marker"
+    ]
+  },
+  "counts": {
+    "vendor_rows": 133843,
+    "distinct_fields": 4781,
+    "field_format_counts": {
+      "has_public_key_marker": 4740,
+      "contains_real_newline": 0,
+      "contains_literal_newline_escape": 0,
+      "contains_html_break": 0
+    },
+    "fields_with_decodable_armor_payload": 15,
+    "shared_fields": 94,
+    "shared_fields_with_decodable_armor_payload": 0,
+    "accounts_sharing_decodable_fields": 0,
+    "shared_decodable_fields_seen_on_multiple_vids_in_same_scrape": 0,
+    "shared_decodable_fields_covering_different_casefold_names": 0
+  },
+  "correction": "Earlier followup.py armor check discarded flattened Version/header and payload together. Its zero decodable-field count is withdrawn; text/capacity results are independent.",
+  "limits": [
+    "Base64 decoding does not verify OpenPGP packets, signatures or control.",
+    "No positive/negative controller labels created."
+  ],
+  "wall_seconds": 2.125,
+  "peak_memory_bytes": 44904448,
+  "source_sha256": {
+    "pgp_format.py": "b511595d68199ce3e20c8582bb81b24633a2307369efec26fcac62526a8f5e0f",
+    "audit.py": "e9b396601ad72e46365c856804b6fe6bf0f233190ff3d2661475173d6bdf369c"
+  }
+}
