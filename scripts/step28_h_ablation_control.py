@@ -110,6 +110,8 @@ def execute(gate_path, *, continuation=None, dispatch_impl=None, dispatch_paused
         raise ValueError("Whole future chain must be explicitly authorized")
     predecessors(allowed)
     allowed["_gate_sha256"] = data.sha256(gate_path)
+    if continuation is not None:
+        allowed["_controller_update"] = continuation["controller_update"]
     campaign = Path(allowed["campaign"])
     if campaign.is_symlink() or not campaign.resolve().is_relative_to(data.ROOT):
         raise ValueError("Fresh independent campaign must be within its workspace")
@@ -193,9 +195,11 @@ def execute(gate_path, *, continuation=None, dispatch_impl=None, dispatch_paused
             data.write_json(campaign/"execution_time.json", dict(started_epoch=started_epoch,
                 finished_epoch=time.time(), elapsed_calendar_seconds=time.monotonic()-started,
                 prior_controller=None if continuation is None else continuation["prior_controller"],
+                controller_update=allowed.get("_controller_update"),
                 meaning="This controller segment including waits and cleanup; prior segment is separate after handover; distinct from cumulative task fees"))
     data.write_json(campaign/"completion.json", dict(status="COMPLETE_PENDING_RESULT_REVIEW_MODELS_RETAINED",
-        sources=allowed["sources"], used_seconds=ledger.used, new_trajectories=63, full_reused=9))
+        sources=allowed["sources"], used_seconds=ledger.used, new_trajectories=63, full_reused=9,
+        controller_update=allowed.get("_controller_update")))
 
 
 if __name__ == "__main__":

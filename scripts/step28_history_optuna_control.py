@@ -169,6 +169,8 @@ def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, po
         value = dict(status=status, sources=allowed["sources"], completed=receipts,
             retired_slots=sorted(retired), pending=[r["id"] for _, r in pending],
             active={str(k): dict(id=v["row"]["id"], pid=v["process"].pid) for k, v in active.items()})
+        if "_controller_update" in allowed:
+            value["controller_update"] = allowed["_controller_update"]
         data.write_json(Path(allowed.get("dispatch_index", root))/"dispatch.json", value)
         return value
     def finish(slot, error=None):

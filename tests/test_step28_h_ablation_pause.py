@@ -12,6 +12,7 @@ import tempfile
 import threading
 import time
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 
@@ -162,6 +163,15 @@ class PauseTests(unittest.TestCase):
             self.assertEqual(sum(e["id"] == "final_tail" for e in ledger.events), 1)
             self.assertEqual(budget["used_seconds"]["auxiliary"], 80.)
 
+    def test_closed_handover_cannot_touch_processes(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d)/"request.json"
+            bridge.write(path, dict(approved=False))
+            with patch.object(bridge, "same_process", side_effect=AssertionError("Process access before approval")):
+                with self.assertRaisesRegex(ValueError, "approval required"):
+                    bridge.takeover(path)
+            self.assertFalse((Path(d)/"state").exists())
+
     def test_held_child_exit_status_and_release(self):
         with tempfile.TemporaryDirectory() as d:
             child_file = Path(d)/"child.json"
@@ -178,6 +188,67 @@ class PauseTests(unittest.TestCase):
                 self.assertEqual(held.wait(4), 7)
                 self.assertFalse(dispatch.release(held))
                 self.assertEqual(held.returncode, 7)
+            finally:
+                parent.kill()
+                parent.wait()
+
+    def test_actual_freeze_and_drain_three_cpu_children(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root/"state").mkdir()
+            (root/"training").mkdir()
+            bridge.write(root/"gate.json", {})
+            bridge.write(root/"gpu_observed_peaks.json", dict(by_process={}))
+            budget = dict(caps=control.run.BUDGETS,
+                used_seconds=dict(training=12., confirmation=0., auxiliary=40.), events=[])
+            bridge.write(root/"budget.json", budget)
+            program = '''import os,pathlib,subprocess,sys,time,json
+r=pathlib.Path(sys.argv[1]);active={}
+for i in range(3):
+    job=r/'training'/f'job{i}';job.mkdir()
+    child="import pathlib,sys,time;time.sleep(1);pathlib.Path(sys.argv[1]).write_text('done');raise SystemExit(int(sys.argv[2]))"
+    argv=[sys.executable,'-c',child,str(job/'done'),str(7 if i==1 else 0),'--deadline',str(time.monotonic()+21600)]
+    p=subprocess.Popen(argv,start_new_session=True)
+    (job/'process.json').write_text(json.dumps(dict(command=['taskset','-c','0',*argv],slot=i)))
+    active[str(i)]=dict(id=f'job{i}',pid=p.pid)
+(r/'training/dispatch.json').write_text(json.dumps(dict(sources=['frozen'],status='RUNNING',active=active,completed=[],retired_slots=[],pending=['job3'])))
+time.sleep(20)
+'''
+            parent = subprocess.Popen([sys.executable, "-c", program, str(root)], cwd=root, start_new_session=True)
+            try:
+                self.wait_until(lambda: (root/"training/dispatch.json").exists())
+                request = dict(old_controller=bridge.identity(parent.pid), workspace=str(root),
+                               original_gate=str(root/"gate.json"), preparation_seconds=2,
+                               original_launch="synthetic CPU fixture")
+                (root/"pause_dispatch").touch()
+                validations, checks = [], []
+                class Gpu:
+                    def snapshot(self):
+                        return dict(processes={}, free=100)
+                    def close(self):
+                        pass
+                def validate(path, spec, allowed):
+                    self.assertTrue((path.parent/"done").exists())
+                    validations.append(spec.run_id)
+                fake = SimpleNamespace(inherited=dispatch, Ledger=control.Ledger,
+                    ObservedGpuMemory=control.ObservedGpuMemory, data=control.data,
+                    m=SimpleNamespace(specifications=lambda: [SimpleNamespace(run_id=f"job{i}") for i in range(4)]),
+                    run=SimpleNamespace(BUDGETS=control.run.BUDGETS, LIMITS=control.run.LIMITS,
+                        gate=lambda *a: {}, validate_completion=validate),
+                    queue=SimpleNamespace(GpuMemory=Gpu, check_running=lambda *a: checks.append(True)))
+                snap, before, rows = bridge.freeze(fake, request, root, root/"state")
+                self.assertEqual(bridge.proc_stat(parent.pid)["state"], "T")
+                result = bridge.drain(fake, request, root, root/"state", snap, before, rows)
+                self.assertEqual(result["dispatch"]["status"], "PAUSED_IDLE")
+                self.assertEqual(result["dispatch"]["active"], {})
+                self.assertEqual(result["dispatch"]["pending"], ["job3"])
+                self.assertEqual(result["dispatch"]["retired_slots"], [1])
+                self.assertCountEqual(validations, ["job0", "job2"])
+                self.assertEqual(len(result["dispatch"]["completed"]), 3)
+                self.assertFalse((root/"training/job3").exists())
+                self.assertGreater(result["budget"]["used_seconds"]["training"], 12.)
+                self.assertGreaterEqual(result["budget"]["used_seconds"]["auxiliary"], 42.)
+                self.assertTrue(checks)
             finally:
                 parent.kill()
                 parent.wait()

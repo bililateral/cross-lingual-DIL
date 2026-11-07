@@ -142,19 +142,21 @@ def freeze(controller, request, campaign, state):
 def drain(controller, request, campaign, state, snapshot, budget, rows):
     """Keep original workers monitored, validate their exits, and never dispatch new work."""
     old, queue, run = controller.inherited, controller.queue, controller.run
-    ledger = restored_ledger(controller, campaign, budget, request["preparation_seconds"])
-    allowed = run.gate(Path(request["original_gate"]), "train")
-    allowed["_gate_sha256"] = controller.data.sha256(Path(request["original_gate"]))
+    ledger, monitor, committed = None, None, False
     specs = {s.run_id: s for s in controller.m.specifications()}
     active = {r["slot"]: {**r, "process": HeldChild(r["identity"], request["old_controller"]["pid"])} for r in rows}
-    monitor = controller.ObservedGpuMemory(queue.GpuMemory(), campaign, resume=True)
     def save():
         snapshot["active"] = {str(k): dict(id=v["id"], pid=v["process"].pid) for k, v in active.items()}
         snapshot["status"] = "PAUSED_DRAINING" if active else "PAUSED_IDLE"
         write(campaign/"training/dispatch.json", snapshot)
         ledger.save()
-    save()
     try:
+        ledger = restored_ledger(controller, campaign, budget, request["preparation_seconds"])
+        allowed = run.gate(Path(request["original_gate"]), "train")
+        allowed["_gate_sha256"] = controller.data.sha256(Path(request["original_gate"]))
+        monitor = controller.ObservedGpuMemory(queue.GpuMemory(), campaign, resume=True)
+        committed = True
+        save()
         while active:
             same_process(request["old_controller"])
             if proc_stat(request["old_controller"]["pid"])["state"] != "T":
@@ -213,16 +215,29 @@ def drain(controller, request, campaign, state, snapshot, budget, rows):
                     original_launch=request["original_launch"],
                     ended_epoch=time.time(), stop_reason="USER_REQUESTED_DRAIN_AND_CONTROL_HANDOVER"))
     except BaseException as error:
+        if not committed:
+            # Initialization has not changed the original queue or budget; safely return ownership.
+            same_process(request["old_controller"]).send_signal(signal.SIGCONT)
+            (campaign/"pause_dispatch").unlink(missing_ok=True)
+            raise
         # Never leave live workers without a supervisor on bridge failure.
+        cleanup_errors = []
         for slot, item in list(active.items()):
-            old.release(item["process"])
-            ledger.finish("training", item["id"], item["started"], time.monotonic())
+            try:
+                old.release(item["process"])
+                ledger.finish("training", item["id"], item["started"], time.monotonic())
+            except BaseException as cleanup:
+                cleanup_errors.append(dict(pid=item["process"].pid, error=repr(cleanup)))
         write(campaign/"failure.json", dict(status="STOP_NO_RETRY", error=repr(error),
-              used_seconds=ledger.used, handover_failure=True))
-        write(state/"failure.json", dict(error=repr(error), phase="DRAIN", no_automatic_retry=True))
+              used_seconds=ledger.used, handover_failure=True, cleanup_errors=cleanup_errors))
+        write(state/"failure.json", dict(error=repr(error), phase="DRAIN", no_automatic_retry=True,
+              cleanup_errors=cleanup_errors))
+        if not cleanup_errors:
+            same_process(request["old_controller"]).send_signal(signal.SIGKILL)
         raise
     finally:
-        monitor.inner.close()
+        if monitor is not None:
+            monitor.inner.close()
 
 
 def takeover(request_path):
@@ -249,10 +264,19 @@ def takeover(request_path):
     controller.predecessors(allowed)
     # Default to paused; only an explicit later resume removes this marker.
     (campaign/"pause_dispatch").touch(exist_ok=False)
-    snapshot, budget, rows = freeze(controller, request, campaign, state)
-    write(state/"controller.json", dict(identity=identity(os.getpid()), phase="DRAINING", request=str(request_path)))
     try:
+        snapshot, budget, rows = freeze(controller, request, campaign, state)
+    except BaseException as error:
+        (campaign/"pause_dispatch").unlink(missing_ok=True)
+        write(state/"failure.json", dict(error=repr(error), phase="FREEZE_ROLLED_BACK", no_automatic_retry=True))
+        raise
+    drain_called = False
+    try:
+        write(state/"controller.json", dict(identity=identity(os.getpid()), phase="DRAINING", request=str(request_path)))
+        drain_called = True
         continuation = drain(controller, request, campaign, state, snapshot, budget, rows)
+        continuation["controller_update"] = dict(request=str(request_path), updated_sources=request["updated_sources"],
+                                                 review=request["review"])
         write(state/"continuation.json", continuation)
         # All original child groups have released. Only the old parent is retired.
         same_process(request["old_controller"]).send_signal(signal.SIGKILL)
@@ -268,6 +292,12 @@ def takeover(request_path):
                            dispatch_paused=lambda: (campaign/"pause_dispatch").exists())
         write(state/"completion.json", dict(status="CONTROLLED_CAMPAIGN_COMPLETE", epoch=time.time()))
     except BaseException as error:
+        if not drain_called:
+            same_process(request["old_controller"]).send_signal(signal.SIGCONT)
+            (campaign/"pause_dispatch").unlink(missing_ok=True)
+        elif not (campaign/"failure.json").exists() and (state/"continuation.json").exists():
+            write(campaign/"failure.json", dict(status="STOP_NO_RETRY", error=repr(error),
+                  phase="CONTROLLER_CONTINUATION", used_seconds=read(campaign/"budget.json")["used_seconds"]))
         write(state/"failure.json", dict(error=repr(error), no_automatic_retry=True))
         raise
 
@@ -275,7 +305,10 @@ def takeover(request_path):
 def change(request_path, paused):
     request = read(request_path)
     state = Path(request_path).parent/"state"
-    same_process(read(state/"controller.json")["identity"])
+    current = read(state/"controller.json")
+    same_process(current["identity"])
+    if not paused and current["phase"] != "PAUSED_CONTINUATION":
+        raise ValueError("Initial handover is still draining; resume only after PAUSED_CONTINUATION")
     marker = Path(request["campaign"])/"pause_dispatch"
     if paused:
         marker.touch(exist_ok=True)

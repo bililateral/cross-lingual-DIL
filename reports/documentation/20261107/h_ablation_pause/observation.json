@@ -1,0 +1,143 @@
+{
+  "observed": "2026-11-07T18:50:39.221822+08:00",
+  "original_sources_50_match": true,
+  "controller_and_workers": [
+    {
+      "pid": 1335997,
+      "start_ticks": 145880882,
+      "owner": "yongpeng",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-u",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/scripts/step28_h_ablation_control.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_start/formal_gate.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace",
+      "status": "sleeping"
+    },
+    {
+      "pid": 1373296,
+      "start_ticks": 147165997,
+      "owner": "yongpeng",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/scripts/step28_h_ablation_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/ABC_s4_StandardRank",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/ABC_s4_StandardRank/spec.json",
+        "--deadline",
+        "1493259.972736866",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_start/formal_gate.json",
+        "--batch",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/batch.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace",
+      "status": "sleeping"
+    },
+    {
+      "pid": 1372832,
+      "start_ticks": 147148776,
+      "owner": "yongpeng",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/scripts/step28_h_ablation_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/ABC_s4_MeanPool",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/ABC_s4_MeanPool/spec.json",
+        "--deadline",
+        "1493087.762939559",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_start/formal_gate.json",
+        "--batch",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/batch.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace",
+      "status": "sleeping"
+    },
+    {
+      "pid": 1396928,
+      "start_ticks": 147936428,
+      "owner": "yongpeng",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/scripts/step28_h_ablation_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/ABC_s4_AccountPool",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/ABC_s4_AccountPool/spec.json",
+        "--deadline",
+        "1500964.282690978",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_start/formal_gate.json",
+        "--batch",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/batch.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace",
+      "status": "sleeping"
+    }
+  ],
+  "completed": 4,
+  "pending": 56,
+  "retired_slots": [],
+  "active": {
+    "0": {
+      "id": "ABC_s4_StandardRank",
+      "pid": 1373296
+    },
+    "1": {
+      "id": "ABC_s4_MeanPool",
+      "pid": 1372832
+    },
+    "2": {
+      "id": "ABC_s4_AccountPool",
+      "pid": 1396928
+    }
+  },
+  "pause_marker_exists": false,
+  "failure": false,
+  "budget": {
+    "caps": {
+      "auxiliary": 14400,
+      "confirmation": 43200,
+      "training": 1360800
+    },
+    "events": [
+      {
+        "bucket": "auxiliary",
+        "conservative_seconds": 30,
+        "id": "final_tail"
+      },
+      {
+        "actual_seconds": 7893.946375065949,
+        "bucket": "training",
+        "id": "ABC_s4_SEQ"
+      },
+      {
+        "actual_seconds": 12641.481215405976,
+        "bucket": "training",
+        "id": "ABC_s4_KD"
+      },
+      {
+        "actual_seconds": 12813.579732947052,
+        "bucket": "training",
+        "id": "ABC_s4_ER"
+      },
+      {
+        "actual_seconds": 12620.684027596842,
+        "bucket": "training",
+        "id": "ABC_s4_NoRegroup"
+      }
+    ],
+    "used_seconds": {
+      "auxiliary": 634.4371619957965,
+      "confirmation": 0,
+      "training": 45969.69135101582
+    }
+  },
+  "scope": "Read-only metadata/source hash observation; no takeover or pause signal sent"
+}
