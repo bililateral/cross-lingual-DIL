@@ -3,6 +3,7 @@
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)，本页仅列后续动作和授权边界。有效合同及增量修复从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)进入，不复制PID、计数或过期工期。
 
 ## Evolution后续接手任务
+用户在数据交付后已发出正式运行及2-worker指令，并确认先按[单worker GPU核验具体许可](../reports/documentation/20261107/evolution_pilot/gpu_single/authorization.json)实施。该增量优先于下文原单路/未开训时点的叙述：先完成H_full/V_ER各60次手写输入实际GPU更新及保存恢复、资源实测，再处置双路资源与控制器接线，必要外审及具体包外发许可仍履行。原17GiB每槽门不能直接容纳两槽于32607MiB卡；不得隐式下调或借H暂停跳过资源承诺核对。正式启动意向不再重复询问，未解决的资源/新增实际行为须说明具体差异，全部费用接续，不修改已冻结提案、数据或旧原件。
 
 已形成[具体英文适配与遗忘预实验方案](../reports/documentation/20261107/evolution_pilot/proposal.zh.md)。用户已要求修正高起点正学习误拒，明确保留H_SEQ/V_SEQ双基线明显遗忘门，并确认“其余无需修改，保留现有安排”。方案已采用原G差门或受限高起点路径，Full平均G≥.01、逐seed非负及其余质量保护始终执行；Full−ER及其进入D条件保持。固定季度、4条/160-64-96/15候选、英文母体、有限适配、六系统与一次确认均沿用。用户随后明确开始具体实现；下一步按[实现说明](../reports/documentation/20261107/evolution_pilot/implementation.zh.md)承接已完成实际入口与必要Linux CPU证据，承接[已闭合的实现主审](../reports/documentation/20261107/evolution_pilot/implementation/review/primary_disposition.zh.md)及五项局部修复。用户随后明确“把数据集准备好”，按[最新许可](../reports/documentation/20261107/evolution_pilot/data_preparation/authorization.json)完成的[固定数据交付](../reports/documentation/20261107/evolution_pilot/data_preparation/report.zh.md)及费用原件直接承接，不重复构建/划分/语言抽样。不能再把已确认双基线门或实现范围列为待决，数据准备已完成，训练与评分仍需其执行指令；后续沿绑定数据和累计费用，不替换账号/时期/种子。16单域+最多36完整、1worker/48累计小时仍是后续承接的资源规划，不是启动指令。
 

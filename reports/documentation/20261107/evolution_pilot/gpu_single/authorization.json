@@ -1,0 +1,48 @@
+{
+  "operation": "Evolution_single_worker_gpu_qualification",
+  "user_confirmation": "确认，按这份单路GPU核验范围实施",
+  "prior_user_instructions": [
+    "你可以正式运行vendor-link实验了，改成2-worker。",
+    "GPU核验先按单woker实现"
+  ],
+  "scope": "One sequential GPU process: H_full/H3 then V_ER/V0, existing bert-base-cased, handwritten English only, three domains x twenty groups x one epoch = sixty actual updates each. Formal 256/512 token bounds and complete history mechanisms remain.",
+  "allowed": [
+    "implement bounded GPU qualification",
+    "necessary handwritten CPU fixture validation",
+    "one GPU attempt",
+    "full lifecycle/resource receipts",
+    "existing project record maintenance and local commit"
+  ],
+  "excluded": [
+    "real Evolution text or qrels in this probe",
+    "automatic GPU retry",
+    "concurrent GPU qualification",
+    "formal two-worker launch before resource feasibility and implementation/review closure",
+    "new external upload without exact-package permission",
+    "push"
+  ],
+  "gpu_cap_seconds": 900,
+  "inherited_budget": "../data_preparation/budget.json",
+  "inherited_used_seconds": {
+    "training": 0,
+    "gpu": 0,
+    "auxiliary": 890
+  },
+  "cpu_cap_seconds": 1200,
+  "prior_cpu_seconds": 27,
+  "accounting": "GPU complete subprocess lifetime consumes the original 14400-second GPU bucket; total 48-hour cap unchanged. CPU validation and a separately declared 60-second preparation/closeout allowance consume original auxiliary budget. No fee reset.",
+  "resources": {
+    "free_gpu_bytes": 18253611008.0,
+    "cpu_cores": 2,
+    "free_ram_bytes": 42949672960.0,
+    "experiment_disk_cap": 68719476736.0,
+    "allocator_bytes": 17179869184.0,
+    "startup_free_disk": 137438953472.0,
+    "process_gpu_bytes": 18253611008.0,
+    "rss_bytes": 34359738368.0,
+    "workers": 1
+  },
+  "failure": "Preserve original logs, completed endpoints, smallest available failure diagnostics and costs. OOM, nonfinite values, resource limit, timeout, binding or validation failure stops this attempt without automatic retry or size/token changes.",
+  "success": "Both 60-update trajectories complete through actual production execute; finite nonzero gradients and encoder change, forty replay updates each, H birth penalty invoked, six compact stage saves total, exact initial/final score recovery and eighteen prescribed restored cells; resource/lifecycle receipts complete. This is not effect evidence or two-worker qualification.",
+  "pending": "Formal two-worker feasibility and concrete execution supplement remain to be resolved using this measurement; H ablation controlled drain is untouched."
+}
