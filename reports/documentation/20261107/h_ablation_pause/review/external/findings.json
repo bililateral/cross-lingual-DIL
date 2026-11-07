@@ -1,0 +1,408 @@
+{
+  "schema_version": "1.0",
+  "review_date": "2026-11-07 Asia/Shanghai",
+  "review_type": "targeted_single_instance_pause_resume_and_oneoff_handover_implementation_review",
+  "input_archive": {
+    "name": "h_ablation_pause_review.zip",
+    "bytes": 64029,
+    "members": 25,
+    "sha256": "f463faae97642d63de08298f5ff3d8dea5c95b54fa0505f871fe005d32f8f0a1"
+  },
+  "verdict_zh": "当前版不宜进入实际交接；两项局部实现必修，旧科学实现/已有效正式运行授权不撤销。修后定向CPU证据及主审闭合再决定现场接入。",
+  "open_counts": {
+    "SCIENTIFIC_BLOCKER": 0,
+    "REPRODUCIBILITY_DEFECT": 2
+  },
+  "new_scientific_experiments_required": 0,
+  "new_GPU_qualifications_required": 0,
+  "optional_expansions_required": 0,
+  "review_authorizes_signals_or_handover": false,
+  "findings": [
+    {
+      "id": "HPAUSE-01",
+      "severity": "REPRODUCIBILITY_DEFECT",
+      "status": "OPEN_REQUIRED",
+      "title_zh": "冻结边界漏检Popen之前已经创建的pending任务目录",
+      "evidence": [
+        {
+          "path": "frozen_context/step28_history_optuna_control.py",
+          "location": "lines 219–238",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "scripts/step28_h_ablation_pause.py",
+          "location": "lines 102–139,200–216,280–292",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "scripts/step28_history_optuna_control.py",
+          "location": "lines 238–255",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "tests/test_step28_h_ablation_pause.py",
+          "location": "lines 205–219",
+          "origin": "current_attachment"
+        }
+      ],
+      "full_reasoning_zh": "确证实现必修｜冻结检查不能排除半完成的派发准备\n\n**严重度：REPRODUCIBILITY_DEFECT；阻断当前版本的实际一次性交接，不否定原科学实现。**\n\n旧父派发的顺序是：`job.mkdir()` → 打开 console → command 写 spec → `Popen` → 登记 active/process → 移除 pending → 保存 dispatch。`freeze` 只比较前后 dispatch、实际 children 和已保存活动 workers，没有检查 pending 对应目录是否已被旧父创建。\n\n**精确静态反例：**在一个合法的两 worker 在跑、一个健康槽空闲的状态下，旧 dispatch 已保存两条 active 和下一条 pending。下一轮资源满足，旧父为该 pending 创建目录后、Popen 前被 SIGSTOP。此时：\n\n1. 保存的 dispatch 没变；\n2. 旧父的 children 仍正好是两条保存的 active；\n3. 两条 worker 的身份、命令、父进程和 cwd 都正确；\n4. 没有 campaign failure/completion。\n\n因此当前 `freeze` 可以通过，原 workers 随后正常排空，下一条仍留在 pending。旧父被退役后，显式恢复触发新版 `job.mkdir()`，已有目录造成 `FileExistsError`，继而进入 STOP_NO_RETRY。这个结果由源码执行顺序决定；**本审查没有在正式进程或新建本地进程上演练此反例，也不声称 18:50 的三 worker 快照已发生该状态。**\n\n**证据位置：**`frozen_context/step28_history_optuna_control.py:219–238`；`scripts/step28_h_ablation_pause.py:102–139,200–216,280–292`；`scripts/step28_history_optuna_control.py:238–255`。最终三子进程 CPU 测试是在三个 child 及 dispatch 都写完后让假父 sleep，不覆盖该中间窗口：`tests/test_step28_h_ablation_pause.py:205–219`。\n\n**最小修正：**在旧父已 STOPPED、尚未提交 frozen/账本之前，将“队列边界”同时与任务目录状态核对：pending 的作业目录不得已存在，且不能已进入后处理准备。发现半完成准备就走现有 SIGCONT 回滚，保留旧父继续完成自己的动作，并明确本次未成功接管；不自动重试、删除半建目录或放宽新任务目录创建规则。当前用途只需一个小范围边界拒绝检查，不需要事务平台或任意断点恢复。\n\n**最小核验：**受控 CPU 夹具把旧父停在 mkdir 后/Popen 前，断言交接拒绝、旧父恢复、原队列/账本未被桥接提交；也可对等地模拟这些已固定的边界状态。不能仅再次运行“三个子进程已稳定启动”的成功例。\n\n**影响范围：**一次性交接在合法派发边界的可恢复性、同一队列连续性。仅限制论文主张不能修复运行错误；不需要科学实验。",
+      "minimal_disposition_zh": "旧父STOPPED后且提交交接之前，检查pending任务目录不存在且仍在支持的训练交接阶段；发现半完成准备则走原SIGCONT回滚并拒绝接管，不删除目录、不放宽mkdir、不自动重试。",
+      "necessary_verification_zh": "控制旧父停在mkdir后/Popen前的CPU边界反例，检查拒绝、回滚及原账/队列未提交；不是再跑稳定三child成功例。",
+      "impact_scope_zh": "同队列交接后可能因FileExistsError错误停止整个批次；原在跑科学任务本身未被否定。",
+      "mandatory_source_change": true,
+      "blocks_current_live_handover_approval": true,
+      "blocks_report_delivery": false,
+      "requires_new_scientific_experiment": false,
+      "requires_new_GPU_qualification": false,
+      "recommends_stopping_existing_workers": false,
+      "static_counterexample_not_executed": true
+    },
+    {
+      "id": "HPAUSE-02",
+      "severity": "REPRODUCIBILITY_DEFECT",
+      "status": "OPEN_REQUIRED",
+      "title_zh": "暂停主动费用使generation/analyze预先算出的辅助时限过时",
+      "evidence": [
+        {
+          "path": "scripts/step28_h_ablation_control.py",
+          "location": "lines 16–23,162–181",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "scripts/step28_history_optuna_control.py",
+          "location": "lines 204,219–225,237–246,256–263",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "tests/test_step28_h_ablation_pause.py",
+          "location": "lines 34–45,82–96",
+          "origin": "current_attachment"
+        }
+      ],
+      "full_reasoning_zh": "确证实现必修｜长暂停会使生成/分析的整桶余额预留失效\n\n**严重度：REPRODUCIBILITY_DEFECT；影响普通显式恢复后的辅助后处理。**\n\n控制器进入后处理前一次性计算 `seconds = caps[bucket] - used[bucket] - 120`，再把固定 row 交给可能长时间暂停的 dispatch。问题发生在暂停于后处理 row 已形成、尚未启动的窗口被接收时，并非每次暂停都会失败。暂停中的主动检查按合同计辅助费。恢复时仍用旧 row.seconds 检查“已用＋预留”，生成和分析恰好与这些检查共用辅助桶。\n\n**机械反例：**辅助 cap=14400 秒，构造 generation row 时 used=1000，于是 row.seconds=13280。暂停中的主动检查累计121秒，恢复时 used=1121，实际余额仍13279秒；但旧预留检查得到 `1121+13280=14401>14400`，因此在尚未启动该任务时就失败。若按实际派发时的余额使用原公式，任务限额应为13159秒，仍满足原120秒余量且远大于60秒。这里的121秒是主动检查累计费用，不是纯 sleep；反例没有扩大或豁免预算。\n\n**证据位置：**`scripts/step28_h_ablation_control.py:16–23,162–181`；`scripts/step28_history_optuna_control.py:204,219–225,237–246,256–263`。测试中的 `Ledger.control()` 是空操作，初始 CPU 后处理等待例用固定10秒任务，不模拟暂停期间辅助余额变化：`tests/test_step28_h_ablation_pause.py:34–45,82–96`。\n\n**最小修正：**只对原本使用“剩余桶余额”的 generation/analyze，把该时限计算移到最终真正派发前，并让预留检查、传给子进程的 deadline 和回执的任务时限使用同一个新值。训练仍固定21600秒；确认的独立桶及全部 cap 不变；余额确实不足仍停止，不跨桶借用或自动加预算。\n\n**最小核验：**一个 CPU 可控账本反例，在 paused 时累加121秒主动费用、桶尚充足，再显式恢复，确认按当前余额预留且可派发；另保留余额真正不足时停止。无需等待真实长时间或启动生成器。\n\n**影响范围：**长暂停后的生成/分析连续性和停止原因准确性。单靠说明“长等待不豁免预算”不能消除这个错误，因为反例中的桶没有耗尽。不是新增科研实验需求。",
+      "minimal_disposition_zh": "把原本动态使用余额的generation/analyze时限移到最终派发点计算；预留、deadline及任务限时用同一新值。训练21600秒、确认桶和所有cap不变。",
+      "necessary_verification_zh": "CPU可控账本在暂停时增加121秒主动费、余额仍充足，恢复后重算预留并派发；真正不足仍拒绝。无需真实等待或运行生成器。",
+      "impact_scope_zh": "辅助桶未耗尽时也可能被过时的完整任务预留拒绝，破坏长暂停后的显式恢复。",
+      "mandatory_source_change": true,
+      "blocks_current_live_handover_approval": true,
+      "blocks_report_delivery": false,
+      "requires_new_scientific_experiment": false,
+      "requires_new_GPU_qualification": false,
+      "recommends_stopping_existing_workers": false,
+      "static_counterexample_not_executed": true
+    },
+    {
+      "id": "HPAUSE-03",
+      "severity": "INTERPRETATION_BOUNDARY",
+      "status": "ACCEPTED_EXCEPT_LINKED_FINDING",
+      "title_zh": "暂停覆盖训练与后处理派发；完成最后任务仍等恢复",
+      "evidence": [
+        {
+          "path": "scripts/step28_history_optuna_control.py",
+          "location": "lines 200–277",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "scripts/step28_h_ablation_control.py",
+          "location": "lines 157–181",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "scripts/step28_h_ablation_pause.py",
+          "location": "lines 305–318",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "tests/test_step28_h_ablation_pause.py",
+          "location": "lines 82–129",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "pause/scope.zh.md",
+          "location": "line 7",
+          "origin": "current_attachment"
+        }
+      ],
+      "full_reasoning_zh": "核对通过及解释边界｜暂停确实覆盖派发，最后任务完成后也等待\n\n主体暂停逻辑放在派发点，没有用暂停替代监测循环；训练与三个后处理均实际传入回调。`PAUSED_DRAINING` 表示仍有活动任务，`PAUSED_IDLE` 表示该 dispatch 已无活动任务；后二者都不是整个 campaign 科学成功。完全完成仍暂停的情形不会越过下游门，失败/预算上限也不会因等待而豁免。\n\n**证据：**`scripts/step28_history_optuna_control.py:200–277`；`scripts/step28_h_ablation_control.py:157–181`；最终测试 `:82–129`。CLI `change` 的身份核对、阶段限制及请求回执见 pause 源码 `:305–318`；九项测试使用 Event 模拟暂停信号，没有实际调用该 CLI 的完整 pause/resume 正向路径，后者是本次静态接线判断。\n\n**最小处置：**除 HPAUSE-02 外无额外必修。继续以保存的 dispatch 状态确认生效；不把“已发请求”写成“从这一时刻绝无一条在途启动”。影响范围：用户可见暂停语义。无需追求跨全部指令的瞬时零窗口保证。",
+      "minimal_disposition_zh": "除HPAUSE-02外无新增必修；依据dispatch状态确认，承认单条在途派发窗口。",
+      "necessary_verification_zh": "保留现有适用CPU证据；无需额外测试门。",
+      "impact_scope_zh": "暂停状态不是科学成功，也不是瞬时无窗口的全局屏障。",
+      "mandatory_source_change": false,
+      "blocks_current_live_handover_approval": false,
+      "blocks_report_delivery": false,
+      "requires_new_scientific_experiment": false,
+      "requires_new_GPU_qualification": false,
+      "recommends_stopping_existing_workers": false,
+      "static_counterexample_not_executed": false
+    },
+    {
+      "id": "HPAUSE-04",
+      "severity": "INTERPRETATION_BOUNDARY",
+      "status": "ACCEPTED_WITH_EVIDENCE_LIMIT",
+      "title_zh": "保留旧父读取真实退出状态，桥接显式监测旧worker并保留失败规则",
+      "evidence": [
+        {
+          "path": "scripts/step28_h_ablation_pause.py",
+          "location": "lines 38–79,160–240",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "frozen_context/step28_formal_queue.py",
+          "location": "lines 65–98,139–168",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "frozen_context/step28_history_optuna_control.py",
+          "location": "lines 47–79",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "tests/test_step28_h_ablation_pause.py",
+          "location": "lines 175–254",
+          "origin": "current_attachment"
+        }
+      ],
+      "full_reasoning_zh": "核对通过及证据边界｜旧父保留、真实退出码、监测与失败规则\n\n只冻结旧父；当前 workers 使用原 PID、进程组、参数、模型和截止时间。保持旧父停止，使其不能提前回收 zombie；`HeldChild.poll()` 校验 start_ticks 和 parent，从 `/proc/<pid>/stat` 提取退出状态，并用 `waitstatus_to_exitcode` 解释。completion 存在不等于 exit=0：真实退出非零优先成为失败，只有退出/释放成功才执行原验收。\n\n桥接直接对旧 worker PID 获取 NVML 使用值并续存旧峰值记录，不能使用“桥接自己的 children”来代替这些旧子进程；代码实际显式枚举 rows。RSS 合计包含桥接、旧父和原 worker 家族，补足普通 `check_running` 只遍历当前父系的限制；共享磁盘门、单条 deadline−60秒、进程10.25GiB门仍执行。个别失败退休槽位，不重跑；共享故障清理本批活动组，清理错误明确留账。\n\n**证据：**`scripts/step28_h_ablation_pause.py:38–79,160–240`；`frozen_context/step28_formal_queue.py:65–98,139–168`；`frozen_context/step28_history_optuna_control.py:47–79`；测试 `:175–254`。非零退出7的真实 CPU child 证据支持退出状态读取；三 child 排空例也保留失败槽1，只验收成功的0、2。\n\n**最小处置：**无独立新增必修。`released=True` 在这条路径表示已无存活 worker 进程组、资源已释放，不表示旧父仍持有的 zombie PID 已从 `/proc` 消失。GPU/RSS超限和异常清理分支本轮主要由源码检查支持；CPU 夹具将 GPU 对象换成空进程表，并没有验证正式 NVML/显卡行为。影响范围：监管连续性和退出证据的正确解释。",
+      "minimal_disposition_zh": "无独立必修；released按无存活进程组解释，CPU/静态监管证据不升级为正式NVML/GPU验证。",
+      "necessary_verification_zh": "复用现有真实CPU child退出7和三child排空证据；不新增GPU资格。",
+      "impact_scope_zh": "退出码、监测、资源释放和异常清理的可支持程度。",
+      "mandatory_source_change": false,
+      "blocks_current_live_handover_approval": false,
+      "blocks_report_delivery": false,
+      "requires_new_scientific_experiment": false,
+      "requires_new_GPU_qualification": false,
+      "recommends_stopping_existing_workers": false,
+      "static_counterexample_not_executed": false
+    },
+    {
+      "id": "HPAUSE-05",
+      "severity": "INTERPRETATION_BOUNDARY",
+      "status": "ACCEPTED_WITH_SITE_PRECONDITION",
+      "title_zh": "排空后保留完成/退休/pending清单及原账尾费",
+      "evidence": [
+        {
+          "path": "scripts/step28_h_ablation_pause.py",
+          "location": "lines 89–99,128–135,188–216",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "scripts/step28_history_optuna_control.py",
+          "location": "lines 149–162,176–199,264–277",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "scripts/step28_h_ablation_control.py",
+          "location": "lines 119–160",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "tests/test_step28_h_ablation_pause.py",
+          "location": "lines 131–164",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "pause/budget.json",
+          "location": "all fields",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "pause/observation.json",
+          "location": "budget,completed,active,pending",
+          "origin": "current_attachment"
+        }
+      ],
+      "full_reasoning_zh": "核对通过及现场前提｜排空后的同一队列、失败槽和费用承接\n\ncontinuation 只接受 active 为空、sources 一致的 dispatch，逐项检查完成回执 index/id/released/slot，拒绝重复 index；用原行号重建 pending，并要求与保存列表完全一致；失败回执重建的退休集合必须等于原集合。因此已完成轨迹不重派、失败槽不复活；存在失败时，即使健康槽完成余下任务，整批仍不通过下游门。\n\n桥接和新控制器都用 `Ledger.__new__` 承接原 caps、used 和 events，不重调构造器、不再收一次 final_tail。原 worker 费用从其命令 deadline−21600 推得原启动点，到释放时计 training；验证及控制按辅助账。纯轮询/资源等待 sleep 排除，主动检查仍计费。新控制器重新使用原科学入口、原 gate、原63清单，batch 结构核对后不覆盖原文件。\n\n**证据：**`scripts/step28_h_ablation_pause.py:89–99,128–135,188–216`；`scripts/step28_history_optuna_control.py:149–162,176–199,264–277`；`scripts/step28_h_ablation_control.py:119–160`；测试 `:131–164`。\n\n三轮 CPU elapsed 合计 **19.724903613096103秒**。600秒是包含这些 CPU 的保守准备记账值，属于原辅助14400秒，不是新增额度；包内明确尚未写入活动控制器账。本轮观察中四条完成 training 事件求和 **45969.69135101582秒**，与 used.training 一致。600只应在实际接管结算时加入一次；如果现场后续准备超过这一保守数，应更新真实费用，不能截断或清零。\n\n**最小处置：**上述承接机制无独立必修；后处理动态预留按 HPAUSE-02 修。现场继续用冻结后最新账，不拿18:50快照覆盖后续已发生费用。影响范围：队列连续性和预算解释。原启动30秒准备费、既有final_tail和本次600秒不得混成同一项反复收费。",
+      "minimal_disposition_zh": "用冻结后的最新账承接；600包含CPU且只加一次，超出保守值则更新真实账；HPAUSE-02单独修。",
+      "necessary_verification_zh": "已有队列/账本CPU证据可复用；现场核对不等于新增实验。",
+      "impact_scope_zh": "不重派完成轨迹、不复活失败槽、不清零费用；当前600尚待结算。",
+      "mandatory_source_change": false,
+      "blocks_current_live_handover_approval": false,
+      "blocks_report_delivery": false,
+      "requires_new_scientific_experiment": false,
+      "requires_new_GPU_qualification": false,
+      "recommends_stopping_existing_workers": false,
+      "static_counterexample_not_executed": false
+    },
+    {
+      "id": "HPAUSE-06",
+      "severity": "INTERPRETATION_BOUNDARY",
+      "status": "ACCEPTED_WITH_AUTHORIZATION_LIMIT",
+      "title_zh": "新控制器与冻结科学来源分别绑定，原开训授权和交接批准分开",
+      "evidence": [
+        {
+          "path": "scripts/step28_h_ablation_pause.py",
+          "location": "lines 243–279,290–302",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "scripts/step28_h_ablation_control.py",
+          "location": "lines 108–114,194–202",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "scripts/step28_history_optuna_control.py",
+          "location": "lines 168–174",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "frozen_context/step28_h_ablation_run.py",
+          "location": "lines 22–67",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "context/h_ablation_start_authorization.json",
+          "location": "status,actions,budget",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "context/h_ablation_start_formal_gate.json",
+          "location": "approved,review_closed,sources,runs",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "tests/test_step28_h_ablation_pause.py",
+          "location": "lines 166–173",
+          "origin": "current_attachment"
+        }
+      ],
+      "full_reasoning_zh": "核对通过及授权边界｜冻结科学来源与新控制器来源分开保管\n\n新版控制模块从独立路径加载，依赖仍来自固定 workspace；`run.gate()`继续检验原50来源、63身份、预算及原授权。新 controller_update 另存更新来源和审查绑定，进入 dispatch、最终 completion 和 execution_time；不伪称新控制代码早已包括在原50项中。旧父日历段保留 original_launch 引用及结束信息，新段另有开始/结束/含等待日历；累计任务费用不分段清零。\n\n交接 `approved=false` 在 `takeover` 最前面拒绝，早于源码加载、状态目录和进程检查；最终第九项负例覆盖这条路径。原正式 gate 则是 approved=true、review_closed=true，且包含四动作，其有效开训授权不能被前次历史“训练关闭”覆盖。\n\n**证据：**`scripts/step28_h_ablation_pause.py:243–279,290–302`；`scripts/step28_h_ablation_control.py:108–114,194–202`；`scripts/step28_history_optuna_control.py:168–174`；`frozen_context/step28_h_ablation_run.py:22–67`；`context/h_ablation_start_authorization.json`；`context/h_ablation_start_formal_gate.json`；测试 `:166–173`。\n\n**最小处置：**无额外代码必修；HPAUSE-01/02修改后应重新绑定实际更新来源及定向证据，由主执行者独立处置，再决定是否填写交接批准。当前报告交付不自动把 draft 改 true。影响范围：来源可追溯性、历史授权与本次动作边界。",
+      "minimal_disposition_zh": "修两项后重新绑定真正更新来源与证据并由主执行者处置；当前交接draft保持false，不覆盖原已有效的正式开训授权。",
+      "necessary_verification_zh": "已有关闭门负例适用；无需新的正式接管演练作为本轮审查前提。",
+      "impact_scope_zh": "来源可追溯、历史授权及当前关闭门。",
+      "mandatory_source_change": false,
+      "blocks_current_live_handover_approval": false,
+      "blocks_report_delivery": false,
+      "requires_new_scientific_experiment": false,
+      "requires_new_GPU_qualification": false,
+      "recommends_stopping_existing_workers": false,
+      "static_counterexample_not_executed": false
+    },
+    {
+      "id": "HPAUSE-07",
+      "severity": "SITE_PRECONDITION",
+      "status": "NOT_A_NEW_EXPERIMENT_REQUIREMENT",
+      "title_zh": "现场身份、队列边界及接管阶段必须用当时实际状态确认",
+      "evidence": [
+        {
+          "path": "pause/observation.json",
+          "location": "observed,controller_and_workers,active,budget",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "pause/request.draft.json",
+          "location": "old_controller,workspace,campaign,approved",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "scripts/step28_h_ablation_pause.py",
+          "location": "lines 102–139,243–318",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "pause/scope.zh.md",
+          "location": "lines 13–19,29",
+          "origin": "current_attachment"
+        }
+      ],
+      "full_reasoning_zh": "现场前提｜不能把静态审查和18:50观察当成功交接\n\n实际接入必须使用同一活动旧父及其当前 PID/start_ticks/属主/命令/cwd、当前保存 dispatch/worker/process/账本对应；旧父停稳后再确认一致边界，包含 HPAUSE-01补齐的未完成派发准备排除。实际状态仍应处于本实现支持的训练队列交接阶段，没有已经开始的后处理或封闭 campaign。若现场已变，不应凭旧快照继续发信号。\n\n桥接要能持续运行到排空并承担监管；全组释放后才退役旧父。初始交接排空尚未完成时，不应直接删除 marker 绕过阶段检查；显式恢复应经既定入口。仅看到 PAUSED_IDLE 也不证明新控制器已完成来源验证、接管和记录；应同时看 state/controller 的交接阶段及活动进程身份。\n\n**证据：**`pause/observation.json`、`pause/request.draft.json`；`scripts/step28_h_ablation_pause.py:102–139,243–318`；`pause/scope.zh.md:13–19,29`。\n\n**最小处置：**这些是后续实际接入前提，不要求本次外审连接 Linux、冻结正式父进程或追加正式演练。影响范围：本次静态结论能否用于稍后的具体进程。现有观察支持“当时尚未暂停”，不支持“此刻已成功交接”。",
+      "minimal_disposition_zh": "未来现场核当前旧父/worker/来源/队列/账和支持的训练交接阶段；边界不合不继续发信号。排空、旧父退休与新控制器接管分别留证。",
+      "necessary_verification_zh": "本审查不连接Linux或操作正式进程；不要求提前正式演练。",
+      "impact_scope_zh": "18:50快照及静态PASS均不证明稍后实际交接成功。",
+      "mandatory_source_change": false,
+      "blocks_current_live_handover_approval": false,
+      "blocks_report_delivery": false,
+      "requires_new_scientific_experiment": false,
+      "requires_new_GPU_qualification": false,
+      "recommends_stopping_existing_workers": false,
+      "static_counterexample_not_executed": false
+    },
+    {
+      "id": "HPAUSE-08",
+      "severity": "INTERPRETATION_BOUNDARY",
+      "status": "EVIDENCE_SCOPE_LIMIT",
+      "title_zh": "最终九项绑定当前四来源，但不是完整正式接管或GPU验证",
+      "evidence": [
+        {
+          "path": "pause/attempt03.json",
+          "location": "sources,status,returncode,elapsed_seconds,command",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "pause/attempt03.log",
+          "location": "all nine tests and unittest timing",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "pause/source_manifest.json",
+          "location": "all four sources",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "tests/test_step28_h_ablation_pause.py",
+          "location": "lines 34–254",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "pause/attempt01.json",
+          "location": "source/version/timing",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "pause/attempt02.json",
+          "location": "source/version/timing",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "pause/scope.zh.md",
+          "location": "lines 23–27",
+          "origin": "current_attachment"
+        }
+      ],
+      "full_reasoning_zh": "证据边界｜最终 attempt03 九项有用，但不覆盖两项新缺口\n\n| 最终测试 | 可支持的结论 | 明确边界 |\n|---|---|---|\n| initial_pause_then_resume_cpu_followup | 初始暂停阻止CPU后处理，解除后只派一次 | 假Ledger.control不计费，不覆盖HPAUSE-02 |\n| running_job_drains_and_last_job_waits | 在跑任务正常退出，最后一条完成仍等恢复 | 手写短进程，无模型/GPU |\n| three_slots_finish_without_taking_pending | 三槽排空时不领取第4/5条，恢复续领 | 暂停在三条均已启动后 |\n| continue_preserves_completed_and_retired_slots | 完成不重派、失败槽保留、健康槽续领、原失败仍挡整批成功 | 构造的continuation，验收被替代 |\n| continue_rejects_changed_queue | 错pending清单被拒 | 不覆盖半建目录状态 |\n| ledger_does_not_reset_or_double_final_tail | 原费用/事件保留，只加一次准备费，不重提尾费 | 是构造账本核对，不是正式总账审计 |\n| closed_handover_cannot_touch_processes | approved=false时takeover不接触进程、不建state | 只测关闭负例，不是完整批准接管正例 |\n| held_child_exit_status_and_release | 停止假父后仍读取真实child退出7并释放 | 真实Linux CPU进程；不是正式worker |\n| actual_freeze_and_drain_three_cpu_children | 实际SIGSTOP假父、三CPU child原地运行至排空、失败槽和费用保留 | GPU空表、gate/验收/资源检查替代；不执行正向takeover→退役旧父→新controller.execute整链，不覆盖mkdir/Popen窗口 |\n\n代码位置为 `tests/test_step28_h_ablation_pause.py:82–254`。attempt03日志九个名称与当前 AST 中九个测试逐一对应，四来源全匹配，状态PASS/returncode0，外层 elapsed=6.982622978975996秒；日志内测试计时5.522秒是另一层口径，并不矛盾。\n\nattempt01/02分别7项、8项PASS，外层4.768837294075638秒和7.973443340044469秒；它们有旧版本身份，不能改写为对最终四来源全部执行的证据。最终九项本身已覆盖其适用行为。scope所说cpu02_sources.zip未入当前25成员包，本审查不声称读过它，也不要求为旧中间版再扩包/重测来替代最终证据。\n\n**最小处置：**保留这九项适用证据，只针对HPAUSE-01/02补能区分错误的边界反例；不自动重做全部旧科学或GPU资格。影响范围：实现资格的可支持程度。CPU玩具确实执行了Linux进程/信号的部分接线，但不是正式进程或GPU验证。",
+      "minimal_disposition_zh": "保留九项实际覆盖，按版本和mock边界引用；只补HPAUSE-01/02反例。未附旧中间源码不冒称已读，不强制补包替代最终证据。",
+      "necessary_verification_zh": "除两项必要边界反例，不追加全量重测。",
+      "impact_scope_zh": "资格与证据强度，不推断正式worker/GPU/模型效果。",
+      "mandatory_source_change": false,
+      "blocks_current_live_handover_approval": false,
+      "blocks_report_delivery": false,
+      "requires_new_scientific_experiment": false,
+      "requires_new_GPU_qualification": false,
+      "recommends_stopping_existing_workers": false,
+      "static_counterexample_not_executed": false
+    },
+    {
+      "id": "HPAUSE-09",
+      "severity": "OUT_OF_SCOPE_OVERDESIGN",
+      "status": "REJECTED_AS_PREREQUISITE",
+      "title_zh": "不扩成通用恢复平台、GPU资格或新科学实验",
+      "evidence": [
+        {
+          "path": "pause/review/request.zh.md",
+          "location": "lines 3–14",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "pause/scope.zh.md",
+          "location": "lines 3–19,21–29",
+          "origin": "current_attachment"
+        },
+        {
+          "path": "pause/authorization.json",
+          "location": "scope",
+          "origin": "current_attachment"
+        }
+      ],
+      "full_reasoning_zh": "过度设计｜本轮不应扩成通用恢复或新实验\n\n不要求把暂停扩展成任意训练checkpoint恢复、跨主机容灾、通用事务队列、应对任意外部管理员改信号的防护系统；不要求改变63条队列、失败不重试、394小时桶、八配置、seed或科学主判据；不要求新增GPU压力/资格、BGE短测或科研实验。\n\n两项必修都来自本次新增暂停/交接对现有操作时序的具体影响；它们不是要求系统对所有可能故障提供自动恢复。修正后的“边界不一致就回滚/拒绝，仍然不自动重试”符合本轮范围。没有另外必须列出的可选扩展项目。\n\n**证据：**`pause/review/request.zh.md:3–14`、`pause/scope.zh.md:3–19,21–29`、`pause/authorization.json`。最小处置是不追加上述范围。影响范围：保持研究与运行边界。",
+      "minimal_disposition_zh": "不增加checkpoint恢复/跨机容灾/通用事务平台或任意外部信号威胁模型，不改科学与预算，不追加GPU资格。",
+      "necessary_verification_zh": "无额外可选扩展必须执行。",
+      "impact_scope_zh": "保持本轮定向范围。",
+      "mandatory_source_change": false,
+      "blocks_current_live_handover_approval": false,
+      "blocks_report_delivery": false,
+      "requires_new_scientific_experiment": false,
+      "requires_new_GPU_qualification": false,
+      "recommends_stopping_existing_workers": false,
+      "static_counterexample_not_executed": false
+    }
+  ]
+}

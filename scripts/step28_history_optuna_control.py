@@ -221,7 +221,8 @@ def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, po
                 index, row = pending[0]
                 bucket = row["bucket"]
                 reserved = sum(item["row"]["seconds"] for item in active.values() if item["row"]["bucket"] == bucket)
-                if ledger.used[bucket]+reserved+row["seconds"] > ledger.caps[bucket]:
+                if ("remaining_bucket_margin" not in row
+                        and ledger.used[bucket]+reserved+row["seconds"] > ledger.caps[bucket]):
                     raise TimeoutError("Remaining allowance cannot reserve the complete next task")
                 if row.get("gpu", True):
                     if monitor is None:
@@ -235,6 +236,11 @@ def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, po
                     if not observation["ready"]:
                         break
                 ledger.control()
+                if "remaining_bucket_margin" in row:
+                    seconds = ledger.caps[bucket]-ledger.used[bucket]-reserved-row["remaining_bucket_margin"]
+                    if seconds <= row.get("shutdown_reserve", 60):
+                        raise TimeoutError("Insufficient followup allowance at actual dispatch")
+                    row = {**row, "seconds": seconds}
                 job = root/row["id"]
                 job.mkdir()
                 begin = time.monotonic()

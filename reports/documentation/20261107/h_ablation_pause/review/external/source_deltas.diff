@@ -1,0 +1,186 @@
+--- frozen_context/step28_history_optuna_control.py
++++ scripts/step28_history_optuna_control.py
+@@ -141,11 +141,25 @@
+ 
+ 
+ def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, poll_seconds=2, observe=None,
+-             admit=slot_admission):
++             admit=slot_admission, dispatch_paused=None, continuation=None):
+     """Failed slots retire; healthy slots continue to claim pending trajectories."""
+     active, pending, retired, receipts = {}, list(enumerate(rows)), set(), []
+     capacity = None
+     width = allowed["workers"] if rows[0]["bucket"] == "training" else 1
++    if continuation is not None:
++        if continuation["sources"] != allowed["sources"] or continuation["active"]:
++            raise ValueError("Only a fully drained, source-identical dispatch may be continued")
++        receipts = list(continuation["completed"])
++        indices = [r["index"] for r in receipts]
++        if len(set(indices)) != len(indices) or any(
++                not 0 <= r["index"] < len(rows) or rows[r["index"]]["id"] != r["id"]
++                or not r["released"] or not 0 <= r["slot"] < width for r in receipts):
++            raise ValueError("Continuation receipts do not match this fixed queue")
++        retired = {r["slot"] for r in receipts if not r["success"]}
++        pending = [(i, r) for i, r in enumerate(rows) if i not in indices]
++        if (sorted(retired) != continuation["retired_slots"]
++                or [r["id"] for _, r in pending] != continuation["pending"]):
++            raise ValueError("Continuation changes pending tasks or retired slots")
+     cores = psutil.Process().cpu_affinity()
+     if len(cores) < width:
+         raise RuntimeError("Three distinct permitted CPU cores required")
+@@ -155,6 +169,8 @@
+         value = dict(status=status, sources=allowed["sources"], completed=receipts,
+             retired_slots=sorted(retired), pending=[r["id"] for _, r in pending],
+             active={str(k): dict(id=v["row"]["id"], pid=v["process"].pid) for k, v in active.items()})
++        if "_controller_update" in allowed:
++            value["controller_update"] = allowed["_controller_update"]
+         data.write_json(Path(allowed.get("dispatch_index", root))/"dispatch.json", value)
+         return value
+     def finish(slot, error=None):
+@@ -182,7 +198,7 @@
+             retired.add(slot)
+         ledger.control()
+     try:
+-        while pending or active:
++        while True:
+             if observe is not None:
+                 observe()
+             ledger.control()
+@@ -200,6 +216,8 @@
+             for slot in range(width):
+                 if not pending or slot in active or slot in retired:
+                     continue
++                if dispatch_paused is not None and dispatch_paused():
++                    break
+                 index, row = pending[0]
+                 bucket = row["bucket"]
+                 reserved = sum(item["row"]["seconds"] for item in active.values() if item["row"]["bucket"] == bucket)
+@@ -235,10 +253,13 @@
+                 data.write_json(job/"process.json", dict(pid=process.pid, created=child.create_time(),
+                     owner=child.username(), command=argv, cwd=allowed["workspace"], slot=slot))
+                 pending.pop(0)
+-            saved("RUNNING")
++            paused = dispatch_paused is not None and dispatch_paused()
++            saved(("PAUSED_DRAINING" if active else "PAUSED_IDLE") if paused else "RUNNING")
+             if pending and not active and len(retired) == width:
+                 raise RuntimeError("All worker slots retired; no retry")
+-            if pending or active:
++            if not pending and not active and not paused:
++                break
++            if pending or active or paused:
+                 ledger.pause(poll_seconds, active=bool(active))
+         complete = len(receipts) == len(rows) and all(r["success"] for r in receipts)
+         result = saved("ALL_COMPLETE_RELEASED" if complete else "INCOMPLETE_NO_DOWNSTREAM")
+
+--- frozen_context/step28_h_ablation_control.py
++++ scripts/step28_h_ablation_control.py
+@@ -32,8 +32,10 @@
+ 
+ class ObservedGpuMemory:
+     """Retain sampled NVML peaks for owned workers, using dispatch's observations."""
+-    def __init__(self, inner, root):
++    def __init__(self, inner, root, *, resume=False):
+         self.inner, self.path, self.peaks = inner, root/"gpu_observed_peaks.json", {}
++        if resume:
++            self.peaks = data.read_json(self.path)["by_process"]
+         self.save()
+ 
+     def save(self):
+@@ -100,7 +102,7 @@
+             raise ValueError("Predecessor process has not exited")
+ 
+ 
+-def execute(gate_path):
++def execute(gate_path, *, continuation=None, dispatch_impl=None, dispatch_paused=None):
+     started = time.monotonic()
+     started_epoch = time.time()
+     allowed = run.gate(gate_path, "train")
+@@ -108,34 +110,54 @@
+         raise ValueError("Whole future chain must be explicitly authorized")
+     predecessors(allowed)
+     allowed["_gate_sha256"] = data.sha256(gate_path)
++    if continuation is not None:
++        allowed["_controller_update"] = continuation["controller_update"]
+     campaign = Path(allowed["campaign"])
+     if campaign.is_symlink() or not campaign.resolve().is_relative_to(data.ROOT):
+         raise ValueError("Fresh independent campaign must be within its workspace")
+-    campaign.mkdir()
+-    ledger = Ledger(campaign, allowed["prior_used_seconds"], run.BUDGETS)
++    campaign.mkdir(exist_ok=continuation is not None)
++    if continuation is None:
++        ledger = Ledger(campaign, allowed["prior_used_seconds"], run.BUDGETS)
++    else:
++        budget = continuation["budget"]
++        if (budget["caps"] != run.BUDGETS or (campaign/"failure.json").exists()
++                or (campaign/"completion.json").exists()):
++            raise ValueError("Invalid budget or already closed campaign")
++        ledger = Ledger.__new__(Ledger)
++        ledger.root, ledger.caps = campaign, dict(run.BUDGETS)
++        ledger.used, ledger.events = dict(budget["used_seconds"]), list(budget["events"])
++        ledger.check()  # Preserve the existing final-tail charge, failures and all used fees.
+     ledger.tick = started
++    dispatch_impl = dispatch_impl or inherited.dispatch
++    if dispatch_paused is None:
++        dispatch_paused = lambda: (campaign/"pause_dispatch").exists()
+     monitor = None
+     try:
+         ledger.control()
+         run.references(allowed)
+         ledger.control()
+         training = campaign/"training"
+-        training.mkdir()
++        training.mkdir(exist_ok=continuation is not None)
+         batch_path = training/"batch.json"
+         specs = m.specifications()
+-        data.write_json(batch_path, dict(status="APPROVED_IMPLEMENTATION_AND_RESOURCES",
++        batch = dict(status="APPROVED_IMPLEMENTATION_AND_RESOURCES",
+             sources=allowed["sources"], runs=[s.identity() for s in specs],
+-            allocator_bytes=run.LIMITS["allocator_bytes"], main_gate_sha256=data.sha256(gate_path)))
+-        monitor = ObservedGpuMemory(queue.GpuMemory(), campaign)
++            allocator_bytes=run.LIMITS["allocator_bytes"], main_gate_sha256=data.sha256(gate_path))
++        if continuation is None:
++            data.write_json(batch_path, batch)
++        elif data.read_json(batch_path) != batch:
++            raise ValueError("The original fixed batch must remain byte-identical")
++        monitor = ObservedGpuMemory(queue.GpuMemory(), campaign, resume=continuation is not None)
+         rows = [dict(id=s.run_id, spec=s.identity(), bucket="training", seconds=21600) for s in specs]
+         def command(row, job, deadline):
+             data.write_json(job/"spec.json", row["spec"])
+             return [sys.executable, str(data.ROOT/"scripts/step28_h_ablation_run.py"),
+                 "--job", str(job), "--spec", str(job/"spec.json"), "--deadline", str(deadline),
+                 "--gate", str(gate_path), "--batch", str(batch_path)]
+-        inherited.dispatch(training, rows, command,
++        dispatch_impl(training, rows, command,
+             lambda row, job: run.validate_completion(job/"run", m.Spec.from_dict(row["spec"]), allowed),
+-            allowed, ledger, monitor=monitor, admit=admission)
++            allowed, ledger, monitor=monitor, admit=admission, dispatch_paused=dispatch_paused,
++            continuation=None if continuation is None else continuation["dispatch"])
+         # One dispatch above owns all 63 trajectories, so retirement spans the entire list.
+         for action, name in (("generate", "generation"), ("confirmation", "confirmation"), ("analyze", "analysis")):
+             bucket = "confirmation" if action == "confirmation" else "auxiliary"
+@@ -155,8 +177,8 @@
+                     confirmation="ALL_ABLATION_CONFIRMATION_METRICS_COMPLETE", analyze="ANALYSIS_COMPLETE")[action]
+                 if result.get("status") != expected:
+                     raise ValueError("Incomplete followup result")
+-            inherited.dispatch(campaign, [row], action_command, validate_action,
+-                local, ledger, monitor=monitor, admit=admission)
++            dispatch_impl(campaign, [row], action_command, validate_action,
++                local, ledger, monitor=monitor, admit=admission, dispatch_paused=dispatch_paused)
+         ledger.control()
+     except BaseException as error:
+         data.write_json(campaign/"failure.json", dict(status="STOP_NO_RETRY", error=repr(error), used_seconds=ledger.used))
+@@ -172,9 +194,12 @@
+         finally:
+             data.write_json(campaign/"execution_time.json", dict(started_epoch=started_epoch,
+                 finished_epoch=time.time(), elapsed_calendar_seconds=time.monotonic()-started,
+-                meaning="Controller wall time including resource waits and cleanup; distinct from cumulative task fees"))
++                prior_controller=None if continuation is None else continuation["prior_controller"],
++                controller_update=allowed.get("_controller_update"),
++                meaning="This controller segment including waits and cleanup; prior segment is separate after handover; distinct from cumulative task fees"))
+     data.write_json(campaign/"completion.json", dict(status="COMPLETE_PENDING_RESULT_REVIEW_MODELS_RETAINED",
+-        sources=allowed["sources"], used_seconds=ledger.used, new_trajectories=63, full_reused=9))
++        sources=allowed["sources"], used_seconds=ledger.used, new_trajectories=63, full_reused=9,
++        controller_update=allowed.get("_controller_update")))
+ 
+ 
+ if __name__ == "__main__":
+

@@ -117,6 +117,9 @@ def freeze(controller, request, campaign, state):
         children = {p.pid for p in parent.children()}
         if children != set(expected):
             raise RuntimeError("A child was launched/reaped outside the saved dispatch boundary")
+        if any((campaign/"training"/name).exists() or (campaign/"training"/name).is_symlink()
+               for name in snapshot["pending"]):
+            raise RuntimeError("Pending task path already exists; dispatcher is between mkdir and launch")
         rows = []
         for slot, item in snapshot["active"].items():
             process = same_process(expected[item["pid"]])

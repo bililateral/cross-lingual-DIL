@@ -46,11 +46,13 @@ class Ledger:
 
 
 class PauseTests(unittest.TestCase):
-    def run_dispatch(self, root, rows, flag, *, prior=None, during=None):
-        ledger = Ledger()
+    def run_dispatch(self, root, rows, flag, *, prior=None, during=None, ledger=None):
+        ledger = ledger or Ledger()
         allowed = dict(workers=3, sources=["frozen-science"], workspace=str(root), campaign=str(root))
         errors, result = [], []
         def command(row, job, deadline):
+            bridge.write(job/"allocated.json", dict(seconds=row["seconds"],
+                         deadline_remaining=deadline-time.monotonic()))
             return [sys.executable, "-c", "import time,sys;time.sleep(.12);sys.exit(int(sys.argv[1]))", str(row.get("exit", 0))]
         def worker():
             try:
@@ -111,6 +113,24 @@ class PauseTests(unittest.TestCase):
                 [dict(id="only", bucket="training", seconds=10, shutdown_reserve=0, gpu=False)], flag, during=during)
             self.assertFalse(errors)
             self.assertEqual(ledger.events, ["only"])
+
+    def test_followup_reserves_latest_budget_after_pause(self):
+        with tempfile.TemporaryDirectory() as d:
+            root, flag, ledger = Path(d), threading.Event(), Ledger()
+            flag.set()
+            ledger.used["auxiliary"] = 100.
+            def during(thread):
+                self.wait_until(lambda: (root/"dispatch.json").exists())
+                ledger.used["auxiliary"] = 350.  # Active checks incurred while paused.
+                flag.clear()
+            _, result, errors = self.run_dispatch(root,
+                [dict(id="analysis", bucket="auxiliary", seconds=0, remaining_bucket_margin=120,
+                      shutdown_reserve=0, gpu=False)], flag, during=during, ledger=ledger)
+            self.assertFalse(errors)
+            allocated = bridge.read(root/"analysis/allocated.json")
+            self.assertEqual(allocated["seconds"], 530.)
+            self.assertLess(abs(allocated["deadline_remaining"]-530.), .2)
+            self.assertEqual(result[0]["status"], "ALL_COMPLETE_RELEASED")
 
     def test_three_slots_finish_without_taking_pending(self):
         with tempfile.TemporaryDirectory() as d:
@@ -236,6 +256,12 @@ time.sleep(20)
                     run=SimpleNamespace(BUDGETS=control.run.BUDGETS, LIMITS=control.run.LIMITS,
                         gate=lambda *a: {}, validate_completion=validate),
                     queue=SimpleNamespace(GpuMemory=Gpu, check_running=lambda *a: checks.append(True)))
+                (root/"training/job3").mkdir()
+                with self.assertRaisesRegex(RuntimeError, "Pending task path"):
+                    bridge.freeze(fake, request, root, root/"state")
+                self.wait_until(lambda: bridge.proc_stat(parent.pid)["state"] != "T")
+                self.assertFalse((root/"state/frozen.json").exists())
+                (root/"training/job3").rmdir()
                 snap, before, rows = bridge.freeze(fake, request, root, root/"state")
                 self.assertEqual(bridge.proc_stat(parent.pid)["state"], "T")
                 result = bridge.drain(fake, request, root, root/"state", snap, before, rows)

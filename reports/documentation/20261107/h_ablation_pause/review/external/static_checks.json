@@ -1,0 +1,370 @@
+{
+  "review_actions": {
+    "single_instance": true,
+    "subagents": 0,
+    "connected_project_linux": false,
+    "executed_project_code_or_tests": false,
+    "signalled_any_process": false,
+    "created_pause_marker": false,
+    "modified_gate_or_request": false,
+    "loaded_model_or_data": false,
+    "called_GPU": false,
+    "performed_only_local_text_AST_JSON_hash_and_arithmetic": true
+  },
+  "source_manifest": [
+    {
+      "path": "scripts/step28_history_optuna_control.py",
+      "matches_current": true,
+      "matches_draft": true
+    },
+    {
+      "path": "scripts/step28_h_ablation_control.py",
+      "matches_current": true,
+      "matches_draft": true
+    },
+    {
+      "path": "scripts/step28_h_ablation_pause.py",
+      "matches_current": true,
+      "matches_draft": true
+    },
+    {
+      "path": "tests/test_step28_h_ablation_pause.py",
+      "matches_current": true,
+      "matches_draft": true
+    }
+  ],
+  "source_manifest_equals_attempt03": true,
+  "current_tests_equal_attempt03_log": true,
+  "test_function_locations": [
+    {
+      "name": "test_initial_pause_then_resume_cpu_followup",
+      "lines": [
+        82,
+        96
+      ]
+    },
+    {
+      "name": "test_running_job_drains_and_last_job_waits",
+      "lines": [
+        98,
+        113
+      ]
+    },
+    {
+      "name": "test_three_slots_finish_without_taking_pending",
+      "lines": [
+        115,
+        129
+      ]
+    },
+    {
+      "name": "test_continue_preserves_completed_and_retired_slots",
+      "lines": [
+        131,
+        146
+      ]
+    },
+    {
+      "name": "test_continue_rejects_changed_queue",
+      "lines": [
+        148,
+        154
+      ]
+    },
+    {
+      "name": "test_ledger_does_not_reset_or_double_final_tail",
+      "lines": [
+        156,
+        164
+      ]
+    },
+    {
+      "name": "test_closed_handover_cannot_touch_processes",
+      "lines": [
+        166,
+        173
+      ]
+    },
+    {
+      "name": "test_held_child_exit_status_and_release",
+      "lines": [
+        175,
+        193
+      ]
+    },
+    {
+      "name": "test_actual_freeze_and_drain_three_cpu_children",
+      "lines": [
+        195,
+        254
+      ]
+    }
+  ],
+  "attempts": {
+    "attempt01": {
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed_seconds": 4.768837294075638,
+      "observed": "2026-11-07T18:46:16.249998+08:00",
+      "tests_in_log": [
+        "test_continue_preserves_completed_and_retired_slots",
+        "test_continue_rejects_changed_queue",
+        "test_held_child_exit_status_and_release",
+        "test_initial_pause_then_resume_cpu_followup",
+        "test_ledger_does_not_reset_or_double_final_tail",
+        "test_running_job_drains_and_last_job_waits",
+        "test_three_slots_finish_without_taking_pending"
+      ],
+      "test_count": 7,
+      "unittest_reported_seconds": 3.197,
+      "model_loads": 0,
+      "gpu_calls": 0,
+      "formal_data_reads": 0,
+      "source_binding": [
+        {
+          "path": "scripts/step28_history_optuna_control.py",
+          "recorded_bytes": 21298,
+          "recorded_sha256": "f1689ddb1d0b11fe0c155a564d133021782cab10d2a16b4cb96bf224cec58d8c",
+          "current_bytes": 21413,
+          "current_sha256": "e25028ab854f3aae7cf92f95cd97c6db1c55b6bb1f18b797093e93a1be353d4b",
+          "matches_current": false
+        },
+        {
+          "path": "scripts/step28_h_ablation_control.py",
+          "recorded_bytes": 10811,
+          "recorded_sha256": "414a23a98e0b04c65baf34ff54eda6b3ac8936ea856ab82c16e479417b1e145f",
+          "current_bytes": 11048,
+          "current_sha256": "09827333764312d56582453104dd432d65846f4bf661460950067ba23f64aaf6",
+          "matches_current": false
+        },
+        {
+          "path": "scripts/step28_h_ablation_pause.py",
+          "recorded_bytes": 14601,
+          "recorded_sha256": "c1622c641b1ec9b98b82d5dc627d4fd9a90a1a1c86e4b7952d2546038b657e21",
+          "current_bytes": 16542,
+          "current_sha256": "ea07225df0e9537ab7079eba28e12955e1360ebc77e650d02eebf0beff84e88b",
+          "matches_current": false
+        },
+        {
+          "path": "tests/test_step28_h_ablation_pause.py",
+          "recorded_bytes": 8936,
+          "recorded_sha256": "47419d2a29149a8ac0bce59cc4f2133f85e944cd471e80e753dcc00d3c626384",
+          "current_bytes": 13335,
+          "current_sha256": "336f3a28b4b1cf2ed6eb4241a290d720957bf53c1137af1490d368a86607360e",
+          "matches_current": false
+        }
+      ]
+    },
+    "attempt02": {
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed_seconds": 7.973443340044469,
+      "observed": "2026-11-07T18:49:44.111332+08:00",
+      "tests_in_log": [
+        "test_actual_freeze_and_drain_three_cpu_children",
+        "test_continue_preserves_completed_and_retired_slots",
+        "test_continue_rejects_changed_queue",
+        "test_held_child_exit_status_and_release",
+        "test_initial_pause_then_resume_cpu_followup",
+        "test_ledger_does_not_reset_or_double_final_tail",
+        "test_running_job_drains_and_last_job_waits",
+        "test_three_slots_finish_without_taking_pending"
+      ],
+      "test_count": 8,
+      "unittest_reported_seconds": 6.22,
+      "model_loads": 0,
+      "gpu_calls": 0,
+      "formal_data_reads": 0,
+      "source_binding": [
+        {
+          "path": "scripts/step28_history_optuna_control.py",
+          "recorded_bytes": 21413,
+          "recorded_sha256": "e25028ab854f3aae7cf92f95cd97c6db1c55b6bb1f18b797093e93a1be353d4b",
+          "current_bytes": 21413,
+          "current_sha256": "e25028ab854f3aae7cf92f95cd97c6db1c55b6bb1f18b797093e93a1be353d4b",
+          "matches_current": true
+        },
+        {
+          "path": "scripts/step28_h_ablation_control.py",
+          "recorded_bytes": 11048,
+          "recorded_sha256": "09827333764312d56582453104dd432d65846f4bf661460950067ba23f64aaf6",
+          "current_bytes": 11048,
+          "current_sha256": "09827333764312d56582453104dd432d65846f4bf661460950067ba23f64aaf6",
+          "matches_current": true
+        },
+        {
+          "path": "scripts/step28_h_ablation_pause.py",
+          "recorded_bytes": 16016,
+          "recorded_sha256": "578c86ce7b47173544c175cac23ad59ea362e4695fdfe74025b4c5fa7bfc6b2f",
+          "current_bytes": 16542,
+          "current_sha256": "ea07225df0e9537ab7079eba28e12955e1360ebc77e650d02eebf0beff84e88b",
+          "matches_current": false
+        },
+        {
+          "path": "tests/test_step28_h_ablation_pause.py",
+          "recorded_bytes": 12837,
+          "recorded_sha256": "ff69fea13011fe22d7cd07c63348d546955076e25b4aa690d5f0cff77a6f06bb",
+          "current_bytes": 13335,
+          "current_sha256": "336f3a28b4b1cf2ed6eb4241a290d720957bf53c1137af1490d368a86607360e",
+          "matches_current": false
+        }
+      ]
+    },
+    "attempt03": {
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed_seconds": 6.982622978975996,
+      "observed": "2026-11-07T18:53:08.057105+08:00",
+      "tests_in_log": [
+        "test_actual_freeze_and_drain_three_cpu_children",
+        "test_closed_handover_cannot_touch_processes",
+        "test_continue_preserves_completed_and_retired_slots",
+        "test_continue_rejects_changed_queue",
+        "test_held_child_exit_status_and_release",
+        "test_initial_pause_then_resume_cpu_followup",
+        "test_ledger_does_not_reset_or_double_final_tail",
+        "test_running_job_drains_and_last_job_waits",
+        "test_three_slots_finish_without_taking_pending"
+      ],
+      "test_count": 9,
+      "unittest_reported_seconds": 5.522,
+      "model_loads": 0,
+      "gpu_calls": 0,
+      "formal_data_reads": 0,
+      "source_binding": [
+        {
+          "path": "scripts/step28_history_optuna_control.py",
+          "recorded_bytes": 21413,
+          "recorded_sha256": "e25028ab854f3aae7cf92f95cd97c6db1c55b6bb1f18b797093e93a1be353d4b",
+          "current_bytes": 21413,
+          "current_sha256": "e25028ab854f3aae7cf92f95cd97c6db1c55b6bb1f18b797093e93a1be353d4b",
+          "matches_current": true
+        },
+        {
+          "path": "scripts/step28_h_ablation_control.py",
+          "recorded_bytes": 11048,
+          "recorded_sha256": "09827333764312d56582453104dd432d65846f4bf661460950067ba23f64aaf6",
+          "current_bytes": 11048,
+          "current_sha256": "09827333764312d56582453104dd432d65846f4bf661460950067ba23f64aaf6",
+          "matches_current": true
+        },
+        {
+          "path": "scripts/step28_h_ablation_pause.py",
+          "recorded_bytes": 16542,
+          "recorded_sha256": "ea07225df0e9537ab7079eba28e12955e1360ebc77e650d02eebf0beff84e88b",
+          "current_bytes": 16542,
+          "current_sha256": "ea07225df0e9537ab7079eba28e12955e1360ebc77e650d02eebf0beff84e88b",
+          "matches_current": true
+        },
+        {
+          "path": "tests/test_step28_h_ablation_pause.py",
+          "recorded_bytes": 13335,
+          "recorded_sha256": "336f3a28b4b1cf2ed6eb4241a290d720957bf53c1137af1490d368a86607360e",
+          "current_bytes": 13335,
+          "current_sha256": "336f3a28b4b1cf2ed6eb4241a290d720957bf53c1137af1490d368a86607360e",
+          "matches_current": true
+        }
+      ]
+    }
+  },
+  "frozen_sources_against_formal_gate": [
+    {
+      "package_path": "frozen_context/step28_formal_queue.py",
+      "gate_source_path": "scripts/step28_formal_queue.py",
+      "bytes": 17132,
+      "sha256": "f928e91f6f0cb82860e2b4bbb202fd1788cac56457dacdf61f91d4671b6803ef",
+      "matches_gate": true
+    },
+    {
+      "package_path": "frozen_context/step28_h_ablation_control.py",
+      "gate_source_path": "scripts/step28_h_ablation_control.py",
+      "bytes": 9333,
+      "sha256": "935fababef6efdcf4e93b8dfd6908d70fbc943be2e214e99ab0d5af2d03aedf0",
+      "matches_gate": true
+    },
+    {
+      "package_path": "frozen_context/step28_h_ablation_run.py",
+      "gate_source_path": "scripts/step28_h_ablation_run.py",
+      "bytes": 12303,
+      "sha256": "eecc8ca173682b044fe9e485385c25aab9132ddd8aee0f69924ce70de2726536",
+      "matches_gate": true
+    },
+    {
+      "package_path": "frozen_context/step28_history_optuna_control.py",
+      "gate_source_path": "scripts/step28_history_optuna_control.py",
+      "bytes": 19960,
+      "sha256": "18df5618f183f87c2a93380ec9ec4ac9384eb8550d5eb7ae005d929b52bcf7a0",
+      "matches_gate": true
+    }
+  ],
+  "gate_source_count": 50,
+  "gate_run_count": 63,
+  "full_reference_metadata_count": 9,
+  "original_formal_gate_approved": true,
+  "original_formal_gate_review_closed": true,
+  "handover_draft_approved": false,
+  "handover_draft_review": null,
+  "observation": {
+    "at": "2026-11-07T18:50:39.221822+08:00",
+    "completed": 4,
+    "active": 3,
+    "pending": 56,
+    "sum": 63,
+    "retired": [],
+    "pause_marker_exists": false,
+    "failure": false,
+    "request_old_controller_matches_observation": true,
+    "training_events_sum": 45969.69135101582,
+    "training_used_seconds": 45969.69135101582,
+    "independently_observed_live_by_reviewer": false
+  },
+  "budget": {
+    "cpu_attempts_sum": 19.724903613096103,
+    "budget_record_cpu": 19.724903613096103,
+    "conservative_preparation_seconds": 600,
+    "CPU_included_not_added_again": true,
+    "new_allowance": 0,
+    "preparation_settlement": "Pending handover; not yet part of active ledger in supplied observation",
+    "new_ledger_carries_original_final_tail_by_copy": true
+  },
+  "counterexamples": [
+    {
+      "id": "HPAUSE-01",
+      "kind": "deductive_static_interleaving_not_executed",
+      "precondition": "One healthy slot idle; persisted active children match the two running workers; next pending job not yet dispatched.",
+      "freeze_point": "Original dispatcher after job.mkdir(), before subprocess.Popen()",
+      "checks_that_still_pass": [
+        "dispatch JSON unchanged",
+        "parent.children equals saved active PIDs",
+        "active worker identity/command/cwd/parent match",
+        "no campaign failure/completion"
+      ],
+      "unrecorded_state": "Next pending job directory exists; freeze does not inspect it",
+      "later_result": "On explicit resume, new dispatch job.mkdir() raises FileExistsError; no automatic retry."
+    },
+    {
+      "id": "HPAUSE-02",
+      "kind": "mechanical_budget_arithmetic_not_project_execution",
+      "bucket": "auxiliary generation/analyze",
+      "cap": 14400,
+      "used_at_row_creation": 1000,
+      "row_seconds": 13280,
+      "pause_active_check_fee": 121,
+      "used_at_resume": 1121,
+      "reservation_total": 14401,
+      "current_rejection": true,
+      "actual_remaining_budget": 13279,
+      "valid_recomputed_task_seconds": 13159,
+      "scope": "Training 21600 fixed task limits unchanged; confirmation bucket does not share this auxiliary-fee mechanism.",
+      "precondition": "Pause is accepted after the auxiliary followup row has been constructed but before it launches; this is not a claim that every pause triggers failure."
+    }
+  ],
+  "not_provided": [
+    "cpu02_sources.zip mentioned in scope but not a member of this 25-member package",
+    "Git 941dc8bb initial source contents",
+    "Original launch.json payload",
+    "Current remote campaign/dispatch/budget/model/data assets",
+    "Other 46 files in original scientific runtime sources"
+  ],
+  "support_diff": "source_deltas.diff"
+}
