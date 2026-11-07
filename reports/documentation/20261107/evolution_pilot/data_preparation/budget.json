@@ -1,0 +1,65 @@
+{
+  "used_seconds": {
+    "training": 0,
+    "gpu": 0,
+    "auxiliary": 890
+  },
+  "caps": {
+    "training": 144000,
+    "gpu": 14400,
+    "auxiliary": 14400
+  },
+  "cpu_test_seconds": 27,
+  "conservative_tail_seconds": 30,
+  "events": [
+    {
+      "operation": "official_build",
+      "bucket": "auxiliary",
+      "actual_seconds": 167.25587036996149,
+      "charged_seconds": 168,
+      "success": true
+    },
+    {
+      "operation": "validation_attempt01",
+      "bucket": "auxiliary",
+      "charged_seconds": 2,
+      "conservative": true,
+      "success": false
+    },
+    {
+      "operation": "validation_attempt02",
+      "bucket": "auxiliary",
+      "actual_seconds": 0.6214651791378856,
+      "charged_seconds": 2,
+      "conservative_extra_seconds": 1,
+      "success": true
+    },
+    {
+      "operation": "fixed_fit_language_display_and_decision_preparation",
+      "bucket": "auxiliary",
+      "charged_seconds": 30,
+      "actual_seconds": null,
+      "conservative_allowance": true,
+      "success": true,
+      "scope": "Existing 96 fixed fit bodies only; display/import/decision-save preparation, no resampling; human/agent deliberation and idle wait excluded."
+    },
+    {
+      "operation": "language_entry_lifecycle",
+      "internal_budget": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/data_preparation/language/budget.json",
+        "bytes": 432,
+        "sha256": "1d6003bc9bf0b564c95fe8e8b0d7a277814892ba695a266e085576539565aa03"
+      },
+      "lifecycle": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/data_preparation/language_lifecycle.json",
+        "bytes": 316,
+        "sha256": "ba66a53ba57da6cc1f0b7719b8fc27a5854cce48f04b2cb43c856e53d87ee36b"
+      },
+      "charged_seconds": 31,
+      "success": true
+    }
+  ],
+  "outer_overhead_seconds": 0,
+  "outer_full_lifecycle_seconds": 167.80207969015464,
+  "inner_budget_path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/data_preparation/dataset_accounting/budget.json"
+}

@@ -1,5 +1,17 @@
 # 科研文件存储与恢复
 
+## 2026-11-07 Evolution实现结案与正式数据准备交付
+
+用户明确“把数据集准备好”后，实际生产构建在Linux独立`reports/documentation/20261107/evolution_pilot/data_preparation/dataset`完成一次，18文件、10291060逻辑字节，含960账号/3840记录/1920视图。官方四表来源仍直接复用既有qualification/received_windows包，未重下或复制官方包。正文、源映射、dev/test qrels、固定96条fit语言样本及逐条判断仅留Linux；private_custody目录0700，研究者只查看了本次明确获准的固定fit语言样本。Windows的dataset子目录只有17808字节manifest，没有正文或保管标签。实际范围、限制和费用见[数据交付](../reports/documentation/20261107/evolution_pilot/data_preparation/report.zh.md)。
+
+34份聚合验收、访问/费用原件及CPU04/05证据共59993字节已经SFTP回传，[逐文件大小/SHA](../reports/documentation/20261107/evolution_pilot/data_preparation/receive.json)全部匹配。真实数据文件不纳入Git；清洗、导出和语言门完成不表示已训练或确认H效果。Linux使用独立workspace九生产源码及两资格来源，原官方资料、中文作业来源/权重、Memory、ABC资产均未改变。
+
+实现外审完整四载荷及清单保留于implementation/review/external，五项修复及三项解释边界按[独立主审](../reports/documentation/20261107/evolution_pilot/implementation/review/primary_disposition.zh.md)闭合；专用网页已关闭，无待发送/生成操作。输入ZIP可从Git d6194e4a精确恢复；原包许可、身份、上传过程与返回SHA不追改。核对保留原文及恢复来源后，按本任务常规收尾删除输入ZIP、重复返回ZIP和浏览器下载副本，不为删除另建备份或上传Linux。
+
+CPU01—05的五个实际脚本版本已分别从Git 628e7311、594c726e、d1949200、2ba0f685、8ff15015读取原字节并核对各执行清单大小/SHA；[恢复与删除清单](../reports/documentation/20261107/evolution_pilot/implementation/cleanup.json)记录精确commit:path。当前两个一次性CPU脚本均无活动/待派依赖，不在build/language生产门九来源内，故两端退役；不是删除生产模块或改写冻结清单。Windows共删5文件245213字节，Linux2文件36280字节，合计281493逻辑字节，见同目录cleanup_windows.json/cleanup_linux.json。原CPU01失败、修复中间版本、各原始回执与费用均可追溯，恢复源码不授权重跑。
+
+本轮只同步具名数据准备证据与收尾材料；20:50:36[最终同步](../reports/documentation/20261107/evolution_pilot/data_preparation/final_sync.json)的14份交付说明、审查原文/处置、费用索引及清理材料共108077字节，双端大小/SHA均一致。根docs仍仅Windows维护，本地提交不推送。局部核验脚本/传输副本清理不改变11月6日大清理完成日及11月21日下次到期日。
+
 ## 2026-11-07 H消融暂停派发部署与外审收尾
 
 用户已确认暂停/显式恢复、当前控制器接入，并明确“核对完成就直接部署吧”。完整定向外审9项、两项必修已按[独立主审](../reports/documentation/20261107/h_ablation_pause/review/primary_disposition.zh.md)关闭；原报告及2项OPEN_REQUIRED原件保留。最终CPU05十一项PASS，五次核验共34.648642秒，均包含在600秒保守筹备值内，已经在冻结后的原辅助账加一次；不重提final_tail或清零原费用。
