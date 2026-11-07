@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/execution/workspace/tests/step30_evolution_dispatch.py", line 166, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/execution/workspace/tests/step30_evolution_dispatch.py", line 133, in main
+    runner.run('train', over, 'training', 60, [])
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/execution/workspace/scripts/step30_evolution_control.py", line 271, in run
+    self.run_many([dict(action=action, target=target, bucket=bucket, seconds=seconds, extra=extra)], 1, lambda job: None)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/execution/workspace/scripts/step30_evolution_control.py", line 169, in run_many
+    self.retire_waiter(active)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/execution/workspace/scripts/step30_evolution_control.py", line 113, in retire_waiter
+    script = verify(binding)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/execution/workspace/scripts/step30_evolution_io.py", line 48, in verify
+    if path.stat().st_size != row['bytes'] or sha(path) != row['sha256']:
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/pathlib.py", line 1097, in stat
+    return self._accessor.stat(self, follow_symlinks=follow_symlinks)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/execution/cpu02/workspace/scripts/once_wait.py'
