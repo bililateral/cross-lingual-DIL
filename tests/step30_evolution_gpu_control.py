@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import importlib.util
 import math
 import os
 from pathlib import Path
@@ -11,7 +12,6 @@ import sys
 import time
 
 import psutil
-import pynvml as nv
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
             or allowed['approved'] is not True or allowed['workers'] != 1
             or allowed['automatic_retry'] is not False or allowed['gpu_cap_seconds'] != 900):
         raise ValueError('Approved bounded one-worker qualification only')
-    for row in [allowed['authorization'], allowed['entry'], allowed['control_entry'],
+    for row in [allowed['authorization'], allowed['entry'], allowed['control_entry'], allowed['gpu_reader_source'],
                 allowed['cpu_receipt'], allowed['starting_budget'], *allowed['sources']]:
         verify(row)
     if verify(allowed['control_entry']).resolve() != Path(__file__).resolve():
@@ -43,10 +43,12 @@ def main():
         raise ValueError('Cannot reserve the complete GPU attempt')
     if (root/'gpu01').exists() or (root/'gpu_launch.json').exists():
         raise ValueError('One GPU attempt; no automatic retry')
-    nv.nvmlInit()
-    device = nv.nvmlDeviceGetHandleByIndex(0)
-    memory = nv.nvmlDeviceGetMemoryInfo(device)
-    observed = {p.pid: int(p.usedGpuMemory) for p in nv.nvmlDeviceGetComputeRunningProcesses(device)}
+    module_spec = importlib.util.spec_from_file_location('existing_gpu_reader', verify(allowed['gpu_reader_source']))
+    gpu_module = importlib.util.module_from_spec(module_spec)
+    module_spec.loader.exec_module(gpu_module)
+    nv = gpu_module.GpuMemory()
+    memory = nv.snapshot()
+    observed = memory['processes']
     h_root = Path('/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_pause')
     h_request = read(h_root/'request.json')
     h_campaign = Path(h_request['campaign'])
@@ -71,15 +73,15 @@ def main():
     if set(observed) - {r['pid'] for r in commitments if not r.get('exited')}:
         raise ValueError('Unknown GPU process requires its own commitment check')
     admission = dict(observed_at=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat(),
-        gpu_total_bytes=memory.total, gpu_free_bytes=memory.free, unreflected_bytes=unreflected,
+        gpu_total_bytes=memory['total'], gpu_free_bytes=memory['free'], unreflected_bytes=unreflected,
         other_commitments=commitments, ram_available=psutil.virtual_memory().available,
         disk_free=shutil.disk_usage(root).free, experiment_bytes=directory_bytes(Path(allowed['experiment_root'])),
         h_dispatch_status=h_dispatch['status'], permit=record(args.permit))
-    ready = (memory.free-unreflected >= 17*2**30 and admission['ram_available'] >= 40*2**30
+    ready = (memory['free']-unreflected >= 17*2**30 and admission['ram_available'] >= 40*2**30
              and admission['disk_free'] >= 128*2**30 and admission['experiment_bytes']+3*2**30 <= 64*2**30)
     write(root/'gpu_admission.json', dict(**admission, ready=ready))
     if not ready:
-        nv.nvmlShutdown()
+        nv.close()
         raise RuntimeError('Resource gate closed; no automatic wait or retry')
 
     process, error, ok, parent_active = None, None, False, 0.
@@ -103,7 +105,7 @@ def main():
                 active_start = time.monotonic()
                 try:
                     peak_rss = max(peak_rss, child.memory_info().rss)
-                    current = {p.pid: int(p.usedGpuMemory) for p in nv.nvmlDeviceGetComputeRunningProcesses(device)}
+                    current = nv.snapshot()['processes']
                     peak_gpu = max(peak_gpu, current.get(child.pid, 0))
                     if (time.monotonic() >= deadline-15 or peak_rss > 32*2**30
                             or peak_gpu > allowed['process_gpu_bytes']):
@@ -143,7 +145,7 @@ def main():
         budget['events'].append(dict(operation='single_gpu01', success=ok, receipt=record(root/'gpu_lifecycle.json'),
             gpu_seconds=gpu_charge, auxiliary_seconds=parent_charge))
         write(root/'budget.json', budget)
-        nv.nvmlShutdown()
+        nv.close()
     print(json.dumps(receipt), flush=True)
     if not ok:
         raise RuntimeError(error)
