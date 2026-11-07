@@ -30,6 +30,40 @@ def admission(allowed, snapshot, capacity, occupied):
     return result
 
 
+class ObservedGpuMemory:
+    """Retain sampled NVML peaks for owned workers, using dispatch's observations."""
+    def __init__(self, inner, root):
+        self.inner, self.path, self.peaks = inner, root/"gpu_observed_peaks.json", {}
+        self.save()
+
+    def save(self):
+        data.write_json(self.path, dict(kind="OWNED_PROCESS_PERIODIC_NVML_OBSERVED_PEAKS",
+            continuous_lifetime_maximum=False, by_process=self.peaks))
+
+    def snapshot(self):
+        snapshot = self.inner.snapshot()
+        changed = False
+        for process in inherited.psutil.Process().children():
+            try:
+                if process.pid not in snapshot["processes"]:
+                    continue
+                created = process.create_time()
+                key = f"{process.pid}@{created}"
+                value = snapshot["processes"][process.pid]
+                previous = self.peaks.get(key)
+                if previous is None or value > previous["observed_peak_gpu_bytes"]:
+                    self.peaks[key] = dict(pid=process.pid, created=created, observed_peak_gpu_bytes=value)
+                    changed = True
+            except inherited.psutil.NoSuchProcess:
+                pass
+        if changed:
+            self.save()  # Persist new peaks also when a later task/monitor fails.
+        return snapshot
+
+    def close(self):
+        self.inner.close()
+
+
 def predecessors(allowed):
     rows = allowed["predecessors"]
     if {r["name"] for r in rows} != {"H_pos_history", "english_abc"} or len(rows) != 2:
@@ -47,6 +81,7 @@ def predecessors(allowed):
 
 def execute(gate_path):
     started = time.monotonic()
+    started_epoch = time.time()
     allowed = run.gate(gate_path, "train")
     if set(allowed["actions"]) != set(run.ACTIONS):
         raise ValueError("Whole future chain must be explicitly authorized")
@@ -70,7 +105,7 @@ def execute(gate_path):
         data.write_json(batch_path, dict(status="APPROVED_IMPLEMENTATION_AND_RESOURCES",
             sources=allowed["sources"], runs=[s.identity() for s in specs],
             allocator_bytes=run.LIMITS["allocator_bytes"], main_gate_sha256=data.sha256(gate_path)))
-        monitor = queue.GpuMemory()
+        monitor = ObservedGpuMemory(queue.GpuMemory(), campaign)
         rows = [dict(id=s.run_id, spec=s.identity(), bucket="training", seconds=21600) for s in specs]
         def command(row, job, deadline):
             data.write_json(job/"spec.json", row["spec"])
@@ -113,6 +148,10 @@ def execute(gate_path):
             previous = data.read_json(path) if path.exists() else {}
             data.write_json(path, {**previous, "cleanup_error": repr(error), "used_seconds": ledger.used})
             raise
+        finally:
+            data.write_json(campaign/"execution_time.json", dict(started_epoch=started_epoch,
+                finished_epoch=time.time(), elapsed_calendar_seconds=time.monotonic()-started,
+                meaning="Controller wall time including resource waits and cleanup; distinct from cumulative task fees"))
     data.write_json(campaign/"completion.json", dict(status="COMPLETE_PENDING_RESULT_REVIEW_MODELS_RETAINED",
         sources=allowed["sources"], used_seconds=ledger.used, new_trajectories=63, full_reused=9))
 

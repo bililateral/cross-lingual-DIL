@@ -243,6 +243,68 @@ class AblationTests(unittest.TestCase):
         self.evidence("field_delta",dict(actual_domain_mapping=True,lower_loss_forgetting_reversed=True,
             undefined_propagates=True,independent_handwritten_points=evidence))
 
+    def test_ram_gate_is_in_actual_dispatch(self):
+        root = self.root()
+        limits = {**run.LIMITS, "rss_bytes":4*2**30, "disk_bytes":2**30, "free_reserve_bytes":0}
+        allowed = dict(workers=3,sources=[],campaign=str(root),workspace=str(root),limits=limits)
+        ledger = control.Ledger(root,dict(training=0.,auxiliary=0.),dict(training=100.,auxiliary=100.))
+        observations = []
+        real_resources = run.queue.resources
+        def resources(*args,**kwargs):
+            value = real_resources(*args,**kwargs)
+            value["free_ram_bytes"] = (71 if len(observations)<2 else 72)*2**30
+            self.assertFalse((root/"handwritten_child").exists())
+            observations.append(value["free_ram_bytes"])
+            return value
+        class HandwrittenGpuObservation:
+            def snapshot(self): return dict(free=32*2**30,processes={})
+        rows=[dict(id="handwritten_child",bucket="training",seconds=10.,shutdown_reserve=.1,gpu=True)]
+        with mock.patch.object(run.queue,"resources",side_effect=resources):
+            result=control.inherited.dispatch(root,rows,
+                lambda row,job,deadline:[sys.executable,"-c","import time;time.sleep(.05)"],
+                lambda row,job:None,allowed,ledger,monitor=HandwrittenGpuObservation(),
+                poll_seconds=.01,admit=control.admission)
+        self.assertEqual(observations,[71*2**30,71*2**30,72*2**30])
+        self.assertEqual(result["status"],"ALL_COMPLETE_RELEASED")
+        # Check that the real whole-campaign entry supplies this same admission callback.
+        with tempfile.TemporaryDirectory(dir=m.data.ROOT) as temporary:
+            campaign=Path(temporary)/"closed_fixture"
+            gate=Path(temporary)/"handwritten_gate.json";m.data.write_json(gate,{})
+            handwritten={**allowed,"campaign":str(campaign),"actions":list(run.ACTIONS),
+                "prior_used_seconds":dict(training=0.,confirmation=0.,auxiliary=0.)}
+            monitor=mock.Mock()
+            def dispatch(*args,**kwargs):
+                self.assertIs(kwargs["admit"],control.admission)
+                self.assertEqual(len(args[1]),63)
+                raise RuntimeError("HANDWRITTEN_STOP_BEFORE_FORMAL_WORK")
+            with mock.patch.object(run,"gate",return_value=handwritten),mock.patch.object(control,"predecessors"),mock.patch.object(run,"references"),mock.patch.object(run.queue,"GpuMemory",return_value=monitor),mock.patch.object(control.inherited,"dispatch",side_effect=dispatch):
+                with self.assertRaisesRegex(RuntimeError,"HANDWRITTEN_STOP_BEFORE_FORMAL_WORK"):
+                    control.execute(gate)
+            timing=m.data.read_json(campaign/"execution_time.json")
+            self.assertGreaterEqual(timing["elapsed_calendar_seconds"],0.)
+            self.assertGreaterEqual(timing["finished_epoch"],timing["started_epoch"])
+        self.evidence("dispatch_admission_delta",dict(actual_cpu_child_processes=1,
+            observed_ram_bytes=observations,withheld_until_72GiB=True,whole_entry_injects_same_callback=True,
+            whole_entry_fixed_list=63,production_sources_unchanged=True,real_gpu_calls=0,
+            substitutes=["handwritten GPU resource observation","available-RAM observation","formal entry authorization/reference and dispatch capture"]))
+
+    def test_observed_gpu_cost_record_without_gpu(self):
+        root=self.root()
+        inner=mock.Mock()
+        samples=[dict(free=16*2**30,processes={123:size*2**30,999:40*2**30}) for size in (4,3,8)]
+        inner.snapshot.side_effect=samples
+        child=mock.Mock(pid=123);child.create_time.return_value=11.
+        with mock.patch.object(control.inherited.psutil.Process,"children",return_value=[child]):
+            tracker=control.ObservedGpuMemory(inner,root)
+            for sample in samples:self.assertEqual(tracker.snapshot(),sample)
+            tracker.close()
+        saved=m.data.read_json(root/"gpu_observed_peaks.json")
+        self.assertFalse(saved["continuous_lifetime_maximum"])
+        self.assertEqual(saved["by_process"],{"123@11.0":dict(pid=123,created=11.,observed_peak_gpu_bytes=8*2**30)})
+        inner.close.assert_called_once()
+        self.evidence("cost_record_delta",dict(real_gpu_calls=0,unchanged_admission_observations=True,
+            foreign_gpu_process_excluded=True,lower_sample_does_not_reduce_peak=True,persisted=saved))
+
 
     def test_actual_confirmation_restore_score_then_single_label_opening(self):
         from contextlib import ExitStack
