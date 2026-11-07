@@ -1,0 +1,31 @@
+{
+  "pid": 1449379,
+  "owner": "yongpeng",
+  "created": 1794060725.29,
+  "command": [
+    "/home/yongpeng/miniconda3/envs/py310/bin/python",
+    "-B",
+    "-c",
+    "import json,os,sys,time\nfrom pathlib import Path\np=Path(sys.argv[1]); bad=sys.argv[2]=='1'; duration=float(sys.argv[3]); action=sys.argv[4]\nstart=time.monotonic()\n(p/'started.json').write_text(json.dumps(dict(start=start,pid=os.getpid(),action=action)))\nif action=='train':\n    (p/'run').mkdir(exist_ok=True)\n    (p/'run/updates.jsonl').write_text(json.dumps(dict(optimizer_updates=1,total_updates=1))+'\\n')\ntime.sleep(duration)\nif bad: sys.exit(3)\nif (p/'spec.json').exists():\n    r=json.loads((p/'spec.json').read_text());t=r['task'];n=t['stages']*t['epochs']*20\n    w=dict(current_updates=n,current_records=32*n,history_groups=0,history_records=0,teacher_groups=0,teacher_records=0,stage_model_saves=t['stages'])\n    c=dict(status='TRAINING_COMPLETE_EVALUATION_CLOSED',task=t,identity=r['identity'],updates=n,workload=w,endpoints={str(i):{} for i in range(t['stages']+1)})\n    (p/'run/completion.json').write_text(json.dumps(c))\n(p/'finished.json').write_text(json.dumps(dict(start=start,end=time.monotonic(),pid=os.getpid())))\n",
+    "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/execution/cpu04/external_hold/one",
+    "0",
+    "1.0",
+    "train"
+  ],
+  "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/execution/cpu04/workspace",
+  "reserved_bytes": 15032385536,
+  "launch_command": [
+    "taskset",
+    "-c",
+    "44,45",
+    "/home/yongpeng/miniconda3/envs/py310/bin/python",
+    "-B",
+    "-c",
+    "import json,os,sys,time\nfrom pathlib import Path\np=Path(sys.argv[1]); bad=sys.argv[2]=='1'; duration=float(sys.argv[3]); action=sys.argv[4]\nstart=time.monotonic()\n(p/'started.json').write_text(json.dumps(dict(start=start,pid=os.getpid(),action=action)))\nif action=='train':\n    (p/'run').mkdir(exist_ok=True)\n    (p/'run/updates.jsonl').write_text(json.dumps(dict(optimizer_updates=1,total_updates=1))+'\\n')\ntime.sleep(duration)\nif bad: sys.exit(3)\nif (p/'spec.json').exists():\n    r=json.loads((p/'spec.json').read_text());t=r['task'];n=t['stages']*t['epochs']*20\n    w=dict(current_updates=n,current_records=32*n,history_groups=0,history_records=0,teacher_groups=0,teacher_records=0,stage_model_saves=t['stages'])\n    c=dict(status='TRAINING_COMPLETE_EVALUATION_CLOSED',task=t,identity=r['identity'],updates=n,workload=w,endpoints={str(i):{} for i in range(t['stages']+1)})\n    (p/'run/completion.json').write_text(json.dumps(c))\n(p/'finished.json').write_text(json.dumps(dict(start=start,end=time.monotonic(),pid=os.getpid())))\n",
+    "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/execution/cpu04/external_hold/one",
+    "0",
+    "1.0",
+    "train"
+  ],
+  "slot": 0
+}

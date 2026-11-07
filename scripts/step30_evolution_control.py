@@ -137,10 +137,11 @@ class Runner:
         if not 1 <= slots <= LIMITS['workers']:
             raise ValueError('Unapproved slot count')
         active, retired, failures = {}, set(), []
+        unreleased = {}
         next_job, parent_active, budget_stop = 0, 0., None
         controller_error = None
         gpu = any(j['bucket'] in ('training', 'gpu') for j in jobs)
-        nv = GpuMemory() if gpu else None
+        nv = None
         def finish(slot, error=None):
             item = active.pop(slot)
             p, job = item['process'], item['job']
@@ -148,6 +149,8 @@ class Runner:
                 release(p)
             except BaseException as exc:
                 error = error or repr(exc)
+            if p.poll() is None:
+                unreleased[slot] = dict(item['identity'], release_unconfirmed=True)
             elapsed = time.monotonic()-item['started']
             if p.returncode or elapsed > job['seconds']:
                 error = error or f'Worker exit {p.returncode} or lifecycle cap exceeded'
@@ -164,6 +167,11 @@ class Runner:
                 retired.add(slot)
                 failures.append(dict(task=job['target'].name, slot=slot, error=error))
         try:
+            initialized = time.monotonic()
+            try:
+                nv = GpuMemory() if gpu else None
+            finally:
+                parent_active += time.monotonic()-initialized
             while active or (next_job < len(jobs) and len(retired) < slots and budget_stop is None):
                 tick = time.monotonic()
                 try:
@@ -248,7 +256,7 @@ class Runner:
                                 self.ledger.charge(job['bucket'], job['target'].name, elapsed, False)
                                 retired.add(slot)
                                 failures.append(dict(task=job['target'].name, slot=slot, error=repr(exc)))
-                    write(self.root/'dispatch.json', dict(active={s: x['identity'] for s, x in active.items()},
+                    write(self.root/'dispatch.json', dict(active={**unreleased, **{s: x['identity'] for s, x in active.items()}},
                           retired=sorted(retired), failures=failures, pending=[j['target'].name for j in jobs[next_job:]],
                           budget_stop=budget_stop, status='RUNNING' if active else 'WAITING_RESOURCES'))
                 finally:
@@ -286,7 +294,7 @@ class Runner:
                     cleanup_errors.append(repr(exc))
                 self.failed |= bool(failures or budget_stop or controller_error or cleanup_errors or next_job != len(jobs))
                 write(self.root/'dispatch.json', dict(status='INCOMPLETE' if self.failed else 'COMPLETE',
-                      active={s: x['identity'] for s, x in active.items()}, retired=sorted(retired), failures=failures,
+                      active={**unreleased, **{s: x['identity'] for s, x in active.items()}}, retired=sorted(retired), failures=failures,
                       pending=[j['target'].name for j in jobs[next_job:]], budget_stop=budget_stop,
                       controller_error=controller_error, cleanup_errors=cleanup_errors))
                 if cleanup_errors and controller_error is None:

@@ -1,0 +1,260 @@
+# Evolution 14GiB双worker增量独立审查报告
+
+审查日期：2026-11-07（Asia/Shanghai）
+审查者可自述身份：GPT-6 Astra Pro。未独立核验界面选择器或后台路由，不把自述身份作为后台证明。
+审查方式：附件静态阅读、大小/SHA256核对、JSON检查、源码文本/语法结构比较，以及保存数值的简单算术。没有运行或导入包内项目程序、测试、模型、科研指标或统计重采样；没有连接项目Linux/GPU，没有访问证据中记录的包外私有路径。
+
+## 一、结论
+
+裁决：CHANGES_REQUIRED_LIMITED_INCREMENT——本次双路实现需作三项局部修复后再闭合。
+
+未发现需要改变数据、H/V目标、随机流、候选、种子、A/B/C/D门或统计方法的SCIENTIFIC_BLOCKER。发现三项必须在本轮实现闭合前修复的REPRODUCIBILITY_DEFECT：
+
+1. EV2W-R01：补槽时未知或身份变化的外部GPU作业，会触发全局清理并提前终止本队列健康槽。
+2. EV2W-R02：分析阶段第一次资源准入需要等待后，冻结的辅助任务帽会导致下一轮必然误报预算不足。
+3. EV2W-R03：外层异常清理后没有保证写入最终dispatch状态，可能留下已经失真的RUNNING/active；CPU02已有直接原件。
+
+三项修复都属于落实已确认行为，不需要用户重新决定科学方案，也不需要新GPU试跑、扩大搜索或一般开训确认。当前包不能无条件判通过；本审不代为修改生产源码、生成正式gate或启动任务。用户已有正式授权继续有效，但它不替代本轮实现闭合。
+
+可保留的主体实现包括：真实campaign进入双槽run_many；普通任务失败只退役对应槽；健康槽继续固定队列；缺项阻断阶段下游；14GiB准入承诺及整PID监测；载模前13GiB allocator设置；训练完整帽预约；失败收费；同一控制器资源等待；真实更新日志之后的wrapper删除触发。上述通过项均有下文定位，不能扩大为正式训练效果或双路全程资源保证。
+
+## 二、附件身份、来源和授权时点
+
+### 2.1 实际核包
+
+- 文件：evolution_two_worker_review.zip。
+- 实测大小：266,517字节。
+- 实测SHA256：daeadf2d4c43bea17b2bcb7ca850ca8c0cb04d4efaa4d55f7d1eb5c64f0391ef。
+- ZIP成员：193；其中192份载荷和1份package_manifest.json。
+- 192份载荷的实际大小与SHA256全部匹配清单，无缺项、无重复载荷路径、无未列载荷；载荷合计578,318字节。清单自身另计。
+- execution/evidence_manifest.json的141份回传对象、124,309字节全部可在包内找到并核对一致，与execution/receive.json一致。
+
+这是真正读取字节后的核对，不是引用清单的自述。它证明收到的包及其内部来源对应，不等于独立认证远端执行环境。
+
+### 2.2 旧、新来源对应
+
+以reports/documentation/20261107/evolution_pilot/为下文文档根P；E表示P/execution/。代码路径均相对ZIP根，行号对应本包当前源码。
+
+已机械核对36条来源绑定：E/cpu_permit.json的12条、E/cpu_ready.json的12条、P/gpu_single/gpu_ready.json的9条生产来源及entry/control_entry/gpu_reader_source三条。全部匹配包内对应文件。
+
+- CPU01/02旧夹具绑定对应E/review/cpu01_source.py，9,029字节；当前夹具为tests/step30_evolution_dispatch.py，9,126字节。实际差异只有新增scope.pop('waiter')一行（当前116行）。生产源码不随CPU03修夹具而变化。
+- 单GPU旧control/io/policy分别由E/review/gpu_sources/中的三份原版恢复；未把旧GPU许可冒接到当前变化后的源码。
+- 当前run/data/evaluate及三份VendorLink科研依赖，共六份文件，与单GPU许可记录的大小/SHA全部一致。
+- source_diff.patch可以在内存中从上述旧文件/空白新文件重建当前control、io、policy、wait四份文件，结果逐字节一致。没有执行这个补丁或修改输入文件。
+- policy的实际变化限于workers及显存资源常量；科学任务、选择、场景门、机制门、bootstrap代码没有变化。control中的pipeline、worker、build、adjudicate_language和main的语法结构保持一致。
+
+包中a41a5ebf、0661a971等Git标签作为原件的来源标记使用。本审没有访问仓库验证这些提交对象；独立核到的是具体文件字节及来源记录。
+
+### 2.3 当前授权的解释
+
+E/authorization.json和scope第3、11—15行明确确认：最多两槽；整PID14GiB/allocator13GiB；失败槽退出，健康槽继续本阶段后续任务；阶段缺必要轨迹不评分、不开放标签、不进入下一阶段。
+
+P/proposal.zh.md、data_ready.json或旧主审中的“训练关闭/单worker”等文字属于对应历史时点，不覆盖后续明确执行补充。与此同时，E/implementation.zh.md第3行明确本次尚未形成审后正式运行门、未开始正式Evolution。许可、代码实现、原生证据和正式已执行必须分开陈述。
+
+原VendorLink负结果、ABC前置停止、数据准备及旧五项实现修复继续按未变范围复用。本轮没有重新判断全部科学方案，也没有查看未提供的真实正文、账号映射、标签、预测或Memory。
+
+## 三、必须修复的结构化发现
+
+### EV2W-R01：外部GPU准入问题错误传播为全局终止
+
+分类：REPRODUCIBILITY_DEFECT。
+严重程度：高，影响一次性有限队列中的健康轨迹。
+是否必须：是，在本轮实现闭合前修复。
+是否需要新科学决定：否。
+
+代码位置：
+
+- scripts/step30_evolution_control.py:49—52：声明进程创建时间、用户、外部命令或cwd变化时抛ValueError。
+- 同文件58—59：观测到未列入承诺的GPU PID时抛ValueError。
+- 同文件205—209：补槽调用resource_observation，没有把上述准入关闭状态局部处理。
+- 同文件251—258：逸出异常进入finally，对全部active执行finish(..., 'Controller interrupted; no automatic retry')。
+- 同文件142—146、68—76：finish调用release，仍在运行的本队列进程组会收到SIGTERM，必要时SIGKILL。
+
+证据与确定路径：槽0健康训练，槽1空闲准备补位；此时出现一个未经核实的外部GPU PID。即使槽0没有超过14GiB、32GiB RSS或磁盘门，58—59行仍会抛异常，继而终止槽0。外部声明身份发生变化的49—52行同理。无需运行GPU即可从控制流确认。
+
+实际后果：原本只是“不能确认新任务的资源准入”，却导致已获额度承诺的健康轨迹提前失败，campaign不完整且不能自动重试。代码没有终止那个外部作业；错误在于终止了本队列健康槽。这与scope第11—14行的先核实、健康任务继续及仅资源不足等待的要求不一致。
+
+最小修法：把未知/身份变化的外部作业明确表达为带原因的“新增准入关闭”结果，暂停新派发并保留核实原因，同时继续已在跑健康槽的PID显存、RSS、磁盘和生命周期监测。只有后续观测能够按已核实承诺满足门时才派发；不能把未知作业当零承诺，也不能因此直接销毁健康槽。不必设计自动接纳陌生作业的机制、跨项目锁或通用资源服务。
+
+边界：此修法只针对“外部作业承诺尚不能确认”。不建议吞掉所有ValueError，也不要求在NVML根本不可读、真实共享磁盘保护触发等其他故障下无条件继续。
+
+证据限制：CPU03没有覆盖这条分支，其campaign scope的other_gpu_commitments为空，合成快照没有此类未知外部PID。五项PASS不能反证该源码路径。本报告不声称正式GPU已发生这一事故。
+
+### EV2W-R02：分析阶段等待一轮后必然误报辅助预算不足
+
+分类：REPRODUCIBILITY_DEFECT。
+严重程度：中，影响资源暂缺时阶段可完成性。
+是否必须：是，在本轮实现闭合前修复。
+是否需要新科学决定：否。
+
+代码位置：
+
+- scripts/step30_evolution_control.py:346：分析任务seconds预先固定为CAPS['auxiliary']−ledger.used['auxiliary']−60。
+- 同文件194—204：预约子进程完整帽及ceil(parent_active)+60的父活动/收尾余量。
+- 同文件208—209：资源暂不满足时continue。
+- 同文件245—246：本轮真实监测时间进入parent_active。
+- scripts/step30_evolution_io.py:174—176：超过可用桶即TimeoutError。
+
+确定的代数反例：令调用analyze时辅助剩余额度为R，且R>60。任务帽s=R−60。首轮parent_active=0，辅助合并预约为s+60=R，可通过。如果首次RAM或磁盘准入暂不满足，没有子进程启动，但已发生监测活动t>0；纯sleep虽然不计费，t仍必须计费。第二轮预约变为s+60+ceil(t)=R+ceil(t)>R。由于active为空，201—203行直接设置budget_stop，而不是继续等待资源。
+
+例如剩余10,000秒，分析帽9,940秒；第一次检查实际耗时0.01秒后，下一轮要求10,001秒，于是关闭阶段，尽管辅助预算远未真正耗尽。
+
+实际后果：已完成训练和盲评分的阶段，仅因分析启动时一次短暂资源不足，就不能继续分析和决策。该分支没有越权开放标签，问题是错误提前停止。此结论不表示每次分析都会失败；首次准入立即满足时不会触发这一反例。
+
+最小修法：在真正派发分析子进程时，根据当时剩余额度、已发生且尚待入账的父监测费用及收尾预约，确定一次性的可用生命周期帽；或用等价方式分开等待与分析的预约，避免把全部余量预先占满后又加同桶监测费。保留完整计费、辅助总帽、无自动重试和固定统计计算，不忽略监测费、不增加预算、不减少bootstrap次数。训练的900/3600秒固定帽无需改变。
+
+证据限制：这是源码和代数证明，未执行新测试。CPU03的“剩100秒、两条60秒训练任务”验证的是训练同桶预约，不覆盖这种分析任务占满辅助剩余量后等待的情形。
+
+### EV2W-R03：异常清理后最终调度状态没有持久化
+
+分类：REPRODUCIBILITY_DEFECT。
+严重程度：中，影响真实退出状态、失败归属和证据一致性。
+是否必须：是，在本轮实现闭合前修复。
+是否需要新科学决定：否。
+
+代码位置：scripts/step30_evolution_control.py:251—263负责finally清理和收费；264—268的最终self.failed更新及dispatch.json写入位于整个try/finally之后。try中的异常在finally结束后继续抛出，264—268不会执行。
+
+已有原件同时显示：
+
+- E/cpu02/over/dispatch_receipt.json：success=false，error='Controller interrupted; no automatic retry'，seconds=0.23720554308965802，slot=0，released=true。
+- E/cpu02/limit_state/budget.json：该子进程失败费已计1秒，父监测失败费已计1秒。
+- E/cpu02/limit_state/dispatch.json：却仍为status='RUNNING'，active中保留PID1445219，retired=[]、failures=[]。
+- E/cpu02_console.log：触发异常为独立夹具场景再次核验已删除waiter产生的FileNotFoundError。
+
+实际后果：子进程已经清理、释放并收费，但最后调度文件仍表示运行且无退役/失败。本轮不能仅凭这份dispatch判断该CPU任务仍在运行，也不能称其最终调度状态完整一致。正式campaign遇到外层异常会有failure.json补充，仍不能使失真的dispatch自动变正确。
+
+CPU03在夹具116行删除已消费waiter绑定，正确修复了那个独立测试根的输入错误；没有移动生产源码的最终状态写入位置。因此这里不是要求恢复错误夹具，而是修复当前生产通用异常退出路径的具体留证遗漏。EV2W-R01的外部作业异常同样可触发这条路径。
+
+最小修法：把最终调度状态持久化放进保证执行的清理路径，保留最初控制器异常、逐槽清理/收费结果和待派任务，再继续抛出原异常。成功排空后写active={}、退役/失败及INCOMPLETE；若某个进程未确认释放，应如实保留“仍活动/释放未确认”，不能为了清空文件而虚报。收费或reader.close失败也不应无声跳过终态记录。无需自动恢复、重新派发或新状态平台。
+
+证据等级：本项既有当前源码定位，又有CPU02实际轻量子进程原件；不冒称在正式科研运行或GPU中复现。
+
+## 四、实际调度、同时完成/失败和阶段屏障
+
+campaign先冻结该阶段完整spec列表与各任务身份，然后在control第340行真实调用runner.run_many(jobs, LIMITS['workers'], completed)，不是存在一个未被入口使用的并发helper。单轨迹仍由worker进入原execute；科学随机流由task seed、domain、stage、update等本地派生，未使用槽号或完成次序作为新随机因素。来源：control:316—340、374—413；run:22、108、140—159。
+
+普通退出/超限的处理顺序为：先遍历本轮全部active，完成/失败则finish；再遍历可用槽补位。finish先核真实进程退出，成功时再执行training_complete；验收异常同样进入retired和failures。retired槽不再派发，健康槽继续固定列表。一个成功一个失败在同一轮被观测到时，也遵循该顺序；这是静态控制流结论，不称CPU03覆盖了所有时间排列。来源：control:142—163、170—241。
+
+本阶段结束时，只要failures、budget_stop或next_job未到列表末尾任一成立，就抛Incomplete phase。两槽均退役会停止补位；预算暂被在跑完整帽占住时等待释放，全部排空后仍不足才停止。预算不足不会把已有承诺的健康任务直接当新任务取消。EV2W-R01是外层异常误传播的例外，EV2W-R02是分析辅助额度的例外，不能用普通路径通过掩盖它们。
+
+下游有两层明确屏障：
+
+1. control:340正常返回后才执行342行score；346行analyze在score成功之后。pipeline:274—296严格按A→B→C→D及原科学门前进。
+2. evaluate:37—45再次要求完整固定训练批并核验每条completion；analyze_batch在149—157行验证全部盲分数、候选和来源后才记录及打开qrels。
+
+本轮未发现“缺少必要训练轨迹仍评分/开标签/进入下一阶段”的新增路径。CPU02/03的失败campaign都为INCOMPLETE，即便健康槽成功三条也没有变成整批成功。上述结论限定本次新增调度，不重新宣称审遍全部旧科学实现。
+
+## 五、显存、RAM、磁盘及保存占用
+
+### 5.1 14GiB和13GiB的真实接线
+
+policy:17—21固定workers=2、free_gpu_bytes=14GiB、process_gpu_bytes=14GiB、allocator_bytes=13GiB、RSS=32GiB、RAM准入40GiB。新子进程identity在control:223—224记录14GiB reserved_bytes。
+
+实际GPU准入算式是：观测free减去所有已核实其他作业与本队列在跑槽的max(0, reserved_bytes−该PID观测占用)，结果至少14GiB，才允许新槽。位置control:46—61。该算式没有把“尚未分配、但已承诺给运行中任务的显存”再次用于补槽。
+
+CPU03的直接例子是free=20GiB、现有槽占用7GiB/承诺14GiB：未体现承诺7GiB，准入有效余量13GiB，小于14GiB，ready=false。定位tests/dispatch:118—126。它是对真实函数的合成观测测试，不是实物显存消耗。
+
+活动循环使用实际GpuMemory.snapshot读取整PID显存，并分别监测RSS，超14GiB或32GiB时停止对应槽；见control:168—182、step28_formal_queue:65—98。活动轮询sleep为0.2秒，实际采样间隔还含检查开销，不能称连续时间绝不越界。
+
+configure_gpu在control:371真实调用set_per_process_memory_fraction(13GiB/total, 0)。worker于400行执行它，408行才调用factory载模；run:20—29的BERT加载和设备迁移因此位于allocator设置之后。源码接线成立，但本包没有在新14/13配置下实测双路模型。
+
+### 5.2 其他GPU作业
+
+已声明外部进程的PID、创建时间、用户、命令及cwd均核对；未知GPU PID拒绝准入。检查本身应保留。须修正的是EV2W-R01所述拒绝准入后的异常传播范围，不是删除身份核验或放宽显存门。
+
+### 5.3 RAM与保存临时占用
+
+control:24—36对每个在跑槽扣除max(0,40GiB−RSS)的未体现RAM，再要求新槽40GiB；相对于32GiB RSS帽是保守预留。补第二槽时save_reserve为2GiB，同时检查实验目录64GiB和共享空闲64GiB；campaign启动仍要求128GiB空闲。运行父监测与worker Budget继续保留目录/磁盘检查。来源control:30—36、183—185、312—313；io:145—156。
+
+没有依据要求本轮另做全局保存令牌。该判断结合了实际保存结构：run:87—94使用.partial同卷rename，不复制第二份大模型；182—186只写encoder/head及小元数据，不写optimizer/classifier。GPU保存元数据显示最大H阶段文件434,891,224字节，两份合计869,782,448字节，低于1GiB，尚余203,959,376字节。H候选head尺寸相同（methods:164—165），本次结构未变；两槽准入另有2GiB保留。因此未发现可定位的保存容量新增必修。这里使用的是保存体积记录与源码结构，不是重新读取权重，也不是对任意模型大小作保证。
+
+## 六、预算、完整子进程计费和等待器
+
+### 6.1 完整帽预约与失败收费
+
+control:194—199把同桶所有在跑任务完整seconds与新任务完整seconds相加后预约；不会只给新任务留额度，也不将重叠时间除以worker数。预约暂时不足而active非空时等待其完成、实耗收费及释放未用额度；active为空仍不足才停止。CPU03的reservation原件支持此行为。
+
+计时从command/Popen前的started开始（control:211），finish先release/wait再取elapsed（145—150），包含启动、导入、许可/来源核验、载模、运算、保存、退出及父亲观察到退出前的延迟。普通失败在160行收费，启动失败在239行收费；没有成功才计费或失败归零路径。计费略保守地包括收尾/观察延迟。
+
+父监测时间在每轮tick累计，0.2/30秒sleep在计时块之外，纯资源等待睡眠不收费。不要将这个结论扩大到EV2W-R02的分析帽问题；该问题正是同桶真实监测费与预先占满余量的任务帽相冲突。
+
+### 6.2 保存账的独立算术
+
+CPU01：完整2.0196273858秒，exit1，向上计3秒。
+CPU02：完整5.4289225501秒，exit1，向上计6秒。
+CPU03：完整7.9857081680秒，exit0，向上计8秒。
+实测生命周期合计15.4342581038秒，按逐次取整合计17秒。
+
+承接关系正确：辅助956+保守准备120+3+6+8=1093秒；CPU子账29+3+6+8=46/1200秒。训练仍0秒，GPU仍130秒，CPU46已经包含在辅助1093中。失败费用保留，40h/4h/4h总桶未改。来源E/starting_budget.json、budget.json、三份lifecycle及P/gpu_single/budget.json。
+
+CPU03隔离campaign中的“training=7”等是手写子进程控制器夹具账，不是正式科研训练7秒。外层CPU03的8秒作为本次真实辅助费承接；包内没有把合成完成元数据充作正式训练。
+
+### 6.3 一次性等待wrapper
+
+step30_evolution_wait.py只有导入并执行同一control.main，不建立第二派发器。campaign拒绝已存在的根目录（control:303—304）；后续worker直接执行control文件（126行），不依赖已删除的once_wait.py。
+
+retire_waiter仅在活动训练任务第一条updates.jsonl满足optimizer_updates==1且total_updates>=1后，验证绑定文件及准确的workspace/scripts/once_wait.py路径并删除，留下回执。来源control:97—119。
+
+生产日志时点可追到真实更新之后：H在methods:263—264的optimizer.step之后返回optimizer_updates=1；V在run:83—84同样如此；execute在run:158—171先完成更新调用、增加累计计数，再落盘日志。因此静态接线符合“首次真实更新后自删”。CPU03只手写该日志并验证触发、删除和队列继续，不能替代真实训练更新证据。
+
+包内尚未提供审后正式campaign gate或实际once_wait部署，符合其“等实现审查”状态。后续由主执行者绑定最终源码、同一数据/语言回执和续记费用完成部署；本审不因该待完成部署动作另造缺陷，也不会代为启用。
+
+## 七、CPU01/02/03及单GPU原件支持的具体主张
+
+### 7.1 CPU失败与通过的准确解释
+
+CPU01外层taskset只给44,45两个核。旧夹具71—73行按槽各切两个核，slot1得到空列表，子进程console明确报CPU列表解析失败。dispatch记录两个槽退役、两任务未派；receipt整轮FAIL，只保留先前只读NVML子项通过。生产command本身已有四核检查（control:122—124）；此处被夹具替换，不应把CPU01解释为正式训练实现失败或正式模型失败。
+
+CPU02改外层为44—47，四任务槽序列为0/1/1/1：首槽失败、健康槽成功三条，阶段仍INCOMPLETE；已通过承诺扣除检查。之后独立over场景错误携带已删除waiter绑定，FileNotFoundError使整轮FAIL，完整计6秒。它没有通过该轮15GiB超限测试。CPU03仅删除这个跨独立夹具场景的旧绑定，生产不变。来源E/cpu01/02的console、lifecycle、receipt、campaign状态及旧/新夹具差异。
+
+CPU03五项主张与实际材料对应：
+
+1. 真实现有NVML读取器在替换为Snapshot之前被实例化并读取一次（tests:76—80）；不创建CUDA上下文。
+2. 实际campaign/Runner重叠运行真实轻量子进程。首两任务started时刻差约0.00854051秒；健康槽后续开始均晚于前一健康任务finished.end；失败槽不复用。batch完成3条，最终INCOMPLETE，无评分console、analysis或B目录。来源tests:94—115及E/cpu03/campaign原件。
+3. 20GiB free、14GiB承诺、7GiB已体现占用的例子直接进入真实resource_observation并拒绝第二槽（tests:118—126）。
+4. 注入15GiB观测后，over/dispatch_receipt记录Worker RAM/GPU limit、released=true、0.2318003229秒，无finished文件；真正停止的是测试创建的轻量CPU子进程（tests:128—140）。
+5. 训练剩余100秒时，两条60秒帽不能同时启动。reservation/one的finished.end=1491435.083945587，two的started.start=1491435.330958499；第一完成释放后第二才启动，最终训练账143900+2+2=143904秒（tests:143—154）。
+
+重要限制：夹具替换了Runner.command、NVML观测、任务集合及数据提供者，campaign仅取A阶段前四个spec。子程序直接写一条更新日志，再按spec计算n=stages*epochs*20并写合成completion，端点值为空字典（tests:50—65、81—95）。因此其“800更新”字段不代表800次真实训练。包内已明确标注，不应新增伪实现指控；也不能把PASS扩写成生产worker命令体、16/36任务全程或模型正确性已经验证。
+
+### 7.2 单GPU证据
+
+P/gpu_single/gpu01/receipt.json、gpu_lifecycle.json、completion_observation.json与绑定的两个测试入口对应支持：同一进程先后执行H_full/H3与V_ER/V0，各60次更新；各当前1,920记录、历史40群/1,280记录；H教师11群/352记录；encoder参数变化分别0.0005921488627791405和0.0008395705372095108；各恢复九个规定格，每格120对，起点和末态保存前后分数一致。
+
+完整GPU子进程129.594044512秒计130秒；父监测1.015660717秒计辅助2秒。整PID采样峰值13,086,228,480字节=12.1875GiB。其历史配置是17GiB准入/整PID、16GiB allocator，不能追写成当前14/13配置资格。源码tests/gpu:99—101明确按旧permit设置allocator；135—185为顺序执行和释放后恢复，未同时运行两个模型。
+
+上述是保存回执和其检查程序支持的工程结论。本包没有提供真实模型内容、GPU每步日志或逐值恢复分数供本审重新验证；本审没有重载模型。八文件2,606,203,006字节的总量只对其保存元数据做了算术核对。
+
+原pynvml导入失败保留在preflight_failure01.json，明确在GPU child创建前失败，保守辅助2秒未清零；不能称一次失败GPU训练被隐藏。旧Vendor14.1504GiB观察仍由冻结报告保留，不作为本次重新测量。
+
+单GPU手写文本证据可复用为训练/保存/恢复入口的工程支持，不提供Evolution适配、遗忘或H优势结论，也不保证全部正式40轮任务和两槽峰值低于14GiB。本轮不要求追加双路GPU试跑。
+
+## 八、合理后续建议与不应扩大的事项
+
+EV2W-A01，合理后续建议，非必修：control:141的GpuMemory初始化在tick及try/finally计时之前，初始化耗时/失败未单独进入这次dispatch_monitor事件；completed中的ledger.active(validate)又发生在父tick内，有小段辅助时间保守重复计入（control:335—339、166—246）。可在修清理路径时顺手统一初始化计时，并准确说明或消除验证费重叠。前者不是子进程完整计费丢失，后者是多计而非少报；不据此新增科研阻断或GPU核验。
+
+EV2W-O01，OUT_OF_SCOPE_OVERDESIGN：不要求通用恢复/重试平台、跨项目资源锁、模型缓存重构、一般网络安全加固、新GPU试跑、额外骨干/方法/种子/HPO、重做数据划分/语言抽样、降低遗忘/新域质量门，或全历史回归。来源边界为E/scope:7、21—25及本次request。当前可定位问题只需修改局部准入异常、辅助预约时点和终态写入。
+
+## 九、最小闭合路径
+
+由主执行者修复R01—R03，更新受影响源码身份和主审处置；已有科学代码、数据、单GPU及CPU03适用子项直接复用。必要新增验证应限于三处具体风险：
+
+1. 有健康轻量子进程在跑时，注入未知/变更外部GPU身份：新派发关闭，健康进程不中断；资源随后满足才按原队列继续。
+2. 分析首次资源观察不就绪、随后就绪：仅按实际监测费收缩待启动分析可用帽，能够正常派发且不超过辅助总额。
+3. active存在时产生一个可控父异常：进程清理与最终dispatch、失败回执、收费一致，原异常保留；未确认释放的进程不得虚报退出。
+
+这些都是既有CPU额度内的手写控制器场景建议，不授权本审运行项目，也不要求重测训练数学。关闭这三项后，本轮未见另需用户科学选择的阻断；可沿现有授权和当时实际资源条件推进，而非重新索取一般开训许可。
+
+## 十、实际阅读范围与证据限制
+
+先读并完整处理：E/review/request.zh.md、scope.zh.md、implementation.zh.md及authorization、budget、starting_budget。
+
+逐段完整阅读当前入口：scripts/step30_evolution_control.py、io.py、policy.py、run.py、evaluate.py、wait.py；tests/step30_evolution_dispatch.py和单GPU两个测试入口。对step28_formal_queue只审实际复用的GpuMemory及相关上下文；对VendorLink methods只定向追载模/head与optimizer更新日志位置；其余未变科研依赖以来源匹配复用，不重做数学审查。
+
+原始证据：CPU01/02/03的总receipt、lifecycle、console、campaign dispatch/budget/failure/batch、各任务启动/完成/派发/更新样本；CPU02 over/limit_state异常；CPU03 over/reservation的状态、预算、时刻和回执；cpu_permit/cpu_ready、evidence_manifest/receive。没有将其中每条重复spec/合成completion描述成独立训练证据。
+
+旧证据复用材料：数据准备report/data_ready/language_receipt；原实现findings与primary_disposition；单GPUreport、authorization、gpu_ready、receipt、lifecycle、admission、monitor_cpu、preflight_failure、completion_observation及相关账；proposal关于固定任务、随机流、科学门、预算、停止及资源的相关段。旧外审完整长报告和未变数据算法没有全量重新审查。
+
+全部192载荷以及清单完成身份检查；身份核对不等于每份文件全部作了语义重审。evolution_two_worker_reading_scope.tsv逐文件区分完整阅读、定向/结构化检查、源码差异核对和仅身份复用；evolution_two_worker_verification.json保存独立核对结果。
+
+本轮未读取真实账号/正文/标签、正式预测、模型、真实Memory或凭据，未验证远端实时进程状态、实时空闲或Git仓库。关于Linux/GPU执行的事实均来自附件原件；本审新增的判断明确属于静态实现分析。对正式实验是否出现有效遗忘、H是否获益及最终科学门是否通过，本包不提供结果，本报告不作结论。

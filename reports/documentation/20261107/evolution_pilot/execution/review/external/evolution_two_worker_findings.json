@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-11-07",
+  "timezone": "Asia/Shanghai",
+  "reviewer_self_description": "GPT-6 Astra Pro",
+  "backend_routing_independently_verified": false,
+  "input": {
+    "filename": "evolution_two_worker_review.zip",
+    "bytes": 266517,
+    "sha256": "daeadf2d4c43bea17b2bcb7ca850ca8c0cb04d4efaa4d55f7d1eb5c64f0391ef",
+    "zip_members": 193,
+    "payload_count": 192,
+    "all_payload_sizes_and_sha256_match": true
+  },
+  "verdict": "CHANGES_REQUIRED_LIMITED_INCREMENT",
+  "scientific_blockers_found": 0,
+  "required_reproducibility_defects": 3,
+  "project_programs_or_tests_executed_by_reviewer": false,
+  "model_or_gpu_execution_by_reviewer": false,
+  "outside_private_paths_accessed": false,
+  "input_sources_modified": false,
+  "existing_formal_authorization_recognized": true,
+  "formal_execution_inferred_from_authorization": false,
+  "findings": [
+    {
+      "id": "EV2W-R01",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "HIGH",
+      "confidence": "HIGH",
+      "title": "外部GPU准入问题错误传播为全局终止",
+      "required": true,
+      "required_before": "本轮增量实现闭合及据此形成正式执行gate",
+      "requires_new_scientific_decision": false,
+      "locations": [
+        {"file": "scripts/step30_evolution_control.py", "function": "resource_observation", "start_line": 49, "end_line": 59},
+        {"file": "scripts/step30_evolution_control.py", "function": "Runner.run_many", "start_line": 205, "end_line": 209},
+        {"file": "scripts/step30_evolution_control.py", "function": "Runner.run_many finally", "start_line": 251, "end_line": 258},
+        {"file": "scripts/step30_evolution_control.py", "function": "finish / release", "start_line": 142, "end_line": 146},
+        {"file": "scripts/step30_evolution_control.py", "function": "release", "start_line": 68, "end_line": 76}
+      ],
+      "contract_evidence": [
+        {"file": "reports/documentation/20261107/evolution_pilot/execution/scope.zh.md", "start_line": 11, "end_line": 14}
+      ],
+      "evidence_basis": "当前源码确定控制流；没有声称在正式GPU上发生过",
+      "evidence": "未知GPU PID或已声明外部进程身份变化抛ValueError；补位调用未局部处理；异常进入finally，对全部active调用finish，而finish调用release终止在跑本队列进程组。",
+      "static_counterexample": "槽0健康运行、槽1待补位；新出现未经核实的外部GPU PID；本队列槽0没有显存、RSS或磁盘超限；resource_observation仍抛异常，finally终止槽0。",
+      "actual_consequence": "单纯新增准入无法核实，被升级为健康轨迹提前失败；有限队列缺项并关闭下游，不能自动重试。没有声称代码终止了外部作业。",
+      "minimal_fix": "把未知或身份变化的外部作业变为带原因的准入关闭状态；停止新增派发，继续现有健康槽监测；仅在后续观测可按已核实承诺满足门时派发。保留身份核验、实际资源超限停止，不吞掉所有ValueError或NVML故障。",
+      "minimal_followup": "在既有CPU额度内用真实轻量子进程和注入快照，证明外部身份变化只阻断新派发且不终止健康槽；本审不执行该验证。",
+      "evidence_limit": "CPU03没有覆盖未知/变化外部作业分支。",
+      "observed_formal_incident": false
+    },
+    {
+      "id": "EV2W-R02",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "MEDIUM",
+      "confidence": "HIGH",
+      "title": "分析阶段等待一轮后必然误报辅助预算不足",
+      "required": true,
+      "required_before": "本轮增量实现闭合及据此形成正式执行gate",
+      "requires_new_scientific_decision": false,
+      "locations": [
+        {"file": "scripts/step30_evolution_control.py", "function": "campaign.run_phase", "start_line": 346, "end_line": 346},
+        {"file": "scripts/step30_evolution_control.py", "function": "Runner.run_many reservation", "start_line": 194, "end_line": 209},
+        {"file": "scripts/step30_evolution_control.py", "function": "Runner.run_many parent timing", "start_line": 245, "end_line": 250},
+        {"file": "scripts/step30_evolution_io.py", "function": "Ledger.reserve", "start_line": 174, "end_line": 176}
+      ],
+      "contract_evidence": [
+        {"file": "reports/documentation/20261107/evolution_pilot/execution/scope.zh.md", "start_line": 13, "end_line": 19}
+      ],
+      "evidence_basis": "当前源码及代数反例，未运行新增测试",
+      "evidence": "分析任务帽在进入等待前固定为辅助剩余R减60；第一轮合并预约恰为R。若资源未就绪，实际监测时间t>0进入parent_active；第二轮合并预约R+ceil(t)>R，active为空导致直接budget_stop。",
+      "static_counterexample": "R=10000秒，分析帽9940秒，首轮准入不就绪而监测0.01秒；第二轮要求10001秒，预算门关闭，尽管实际仍有大量额度。纯睡眠未计费也不消除此问题。",
+      "actual_consequence": "训练与盲评分已完成的阶段，因分析启动时一次短暂RAM/磁盘不足而被提前终止，无法继续分析及决策；没有越权开标签。首次准入立即满足时不触发此反例。",
+      "minimal_fix": "在实际派发分析子进程时，按当时辅助剩余、已发生未入账父监测时间和收尾预约确定一次性生命周期帽，或等价分离预约。保持辅助总帽、完整计费、固定统计计算和不重试；不改训练900/3600秒帽、不减少重采样次数。",
+      "minimal_followup": "手写CPU场景令分析首次准入false、随后true，验证可正确派发且累计额度不超帽；本审不执行该验证。",
+      "evidence_limit": "CPU03验证的是两个固定60秒训练帽与剩余100秒，未覆盖辅助分析帽等待路径。",
+      "observed_formal_incident": false
+    },
+    {
+      "id": "EV2W-R03",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "MEDIUM",
+      "confidence": "HIGH",
+      "title": "外层异常清理后未持久化最终dispatch状态",
+      "required": true,
+      "required_before": "本轮增量实现闭合及据此形成正式执行gate",
+      "requires_new_scientific_decision": false,
+      "locations": [
+        {"file": "scripts/step30_evolution_control.py", "function": "Runner.run_many finally and terminal state", "start_line": 251, "end_line": 268}
+      ],
+      "contract_evidence": [
+        {"file": "reports/documentation/20261107/evolution_pilot/execution/scope.zh.md", "start_line": 13, "end_line": 13}
+      ],
+      "evidence_basis": "当前源码加CPU02保存原件的直接矛盾",
+      "evidence_files": [
+        "reports/documentation/20261107/evolution_pilot/execution/cpu02/over/dispatch_receipt.json",
+        "reports/documentation/20261107/evolution_pilot/execution/cpu02/limit_state/dispatch.json",
+        "reports/documentation/20261107/evolution_pilot/execution/cpu02/limit_state/budget.json",
+        "reports/documentation/20261107/evolution_pilot/execution/cpu02_console.log",
+        "tests/step30_evolution_dispatch.py"
+      ],
+      "evidence": "over回执success=false、released=true、生命周期0.23720554308965802秒，失败费已计1秒；limit_state/dispatch仍为RUNNING，active保留PID1445219，retired和failures为空。当前最终dispatch写入在try/finally之后，原异常继续抛出时跳过它。",
+      "actual_consequence": "实际子进程已清理、释放、收费，但最后调度文件仍称运行，退出状态及失败归属失真。campaign failure.json的补充不能使dispatch自动一致。",
+      "minimal_fix": "将最终调度状态写入纳入保证执行的清理路径，保留原异常及逐槽清理/费用结果；成功排空才写active为空和INCOMPLETE，未确认释放则如实记录，最后继续抛出原异常。避免收费或reader.close异常跳过终态记录。",
+      "minimal_followup": "使用受控父异常验证轻量子进程清理、dispatch终态、失败回执和费用一致，并保留原异常；不需要模型、GPU或恢复平台。",
+      "evidence_limit": "CPU02触发原因是独立夹具错误携带已删除waiter；CPU03修复该夹具输入，未改变生产异常终态位置。本项不声称正式运行或GPU已复现。",
+      "observed_in_saved_cpu_evidence": true,
+      "observed_formal_incident": false
+    },
+    {
+      "id": "EV2W-A01",
+      "classification": "REASONABLE_FOLLOWUP",
+      "severity": "LOW",
+      "title": "父活动计时可局部统一并明确保守重叠",
+      "required": false,
+      "requires_new_scientific_decision": false,
+      "locations": [
+        {"file": "scripts/step30_evolution_control.py", "function": "Runner.run_many NVML initialization", "start_line": 141, "end_line": 166},
+        {"file": "scripts/step30_evolution_control.py", "function": "Runner.run_many parent timing", "start_line": 245, "end_line": 263},
+        {"file": "scripts/step30_evolution_control.py", "function": "campaign.completed", "start_line": 335, "end_line": 339}
+      ],
+      "evidence": "GpuMemory初始化位于tick及外层try之前；completed的独立validate收费又发生在父tick内部。",
+      "actual_consequence": "小段初始化活动没有独立进入dispatch_monitor；验证活动有保守重复计费。这不否定子进程完整寿命收费，后者也不是低报费用。",
+      "minimal_fix": "可在修R03时顺手把初始化纳入统一计时/清理，说明或去除验证费重叠；不为此增加科研测试或GPU核验。"
+    },
+    {
+      "id": "EV2W-O01",
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "NOT_APPLICABLE",
+      "title": "不扩展为GPU复测、科学重设计或通用调度平台",
+      "required": false,
+      "requires_new_scientific_decision": false,
+      "locations": [
+        {"file": "reports/documentation/20261107/evolution_pilot/execution/scope.zh.md", "start_line": 7, "end_line": 7},
+        {"file": "reports/documentation/20261107/evolution_pilot/execution/scope.zh.md", "start_line": 21, "end_line": 25},
+        {"file": "reports/documentation/20261107/evolution_pilot/execution/review/request.zh.md", "section": "本次限定增量与最小充分改动"}
+      ],
+      "evidence": "用户及执行补充明确复用已闭合科学实现、数据和单路GPU，不要求新增GPU试跑或扩大方法搜索。",
+      "actual_consequence": "通用恢复/重试平台、跨项目锁、一般安全加固、额外方法/种子/HPO、重划数据或放宽门均超出当前三个局部实现问题。",
+      "minimal_fix": "不将这些扩展列为本轮闭合条件；只修R01—R03并定向留证。"
+    }
+  ],
+  "accepted_paths": [
+    {"topic": "真实双槽入口及普通失败隔离", "locations": ["scripts/step30_evolution_control.py:142-163", "scripts/step30_evolution_control.py:170-241", "scripts/step30_evolution_control.py:340"], "qualification": "R01外层准入异常例外需修"},
+    {"topic": "缺项关闭评分、标签和下一阶段", "locations": ["scripts/step30_evolution_control.py:264-296", "scripts/step30_evolution_control.py:340-347", "scripts/step30_evolution_evaluate.py:37-45", "scripts/step30_evolution_evaluate.py:143-158"]},
+    {"topic": "14GiB承诺/整PID及载模前13GiBallocator", "locations": ["scripts/step30_evolution_policy.py:17-21", "scripts/step30_evolution_control.py:46-61", "scripts/step30_evolution_control.py:175-182", "scripts/step30_evolution_control.py:223-224", "scripts/step30_evolution_control.py:363-408"]},
+    {"topic": "训练同桶完整帽预约与生命周期收费", "locations": ["scripts/step30_evolution_control.py:145-160", "scripts/step30_evolution_control.py:194-204", "scripts/step30_evolution_control.py:211-239"], "qualification": "分析辅助帽等待的R02例外需修"},
+    {"topic": "同一控制器等待和更新后wrapper删除", "locations": ["scripts/step30_evolution_wait.py:1-10", "scripts/step30_evolution_control.py:97-128", "scripts/step30_evolution_run.py:158-171", "scripts/step29_vendorlink_methods.py:263-264"], "qualification": "CPU日志为合成夹具，未证明正式模型更新已执行"}
+  ],
+  "evidence_boundaries": [
+    "CPU01/02整轮FAIL保留；CPU03PASS只支持其五项控制器工程场景。",
+    "CPU fixture替换NVML、Runner.command、tasks及dataset；合成完成元数据不代表800次真实训练。",
+    "单GPU工程核验采用历史17GiB/16GiB配置和顺序H_full/V_ER，不代表新14GiB/13GiB双路全程资格。",
+    "六份未变科研源及旧control/io/policy身份可对应，不重新宣称旧数学全部已重审。",
+    "没有正式Evolution效果、遗忘或H优势结论。",
+    "所有正式授权判断依用户当前请求；本报告不新增执行授权，也不代为执行。"
+  ]
+}
