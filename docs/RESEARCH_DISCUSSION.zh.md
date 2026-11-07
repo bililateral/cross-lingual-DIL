@@ -1,5 +1,13 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-07：H历史两系数调参结果回传与分析
+
+用户要求：“H的调参实验已经结束，同步结果回来仔细分析”。本轮承接11月3日已批准完整调参合同的结果回传与收尾，只用已开放保存结果核对和解释，不重训、扩候选、重新读取标签或重新bootstrap。原45条/135端点、选定trial3及新旧18轨迹共同新120群确认完整；运行现场与结果入口见[本轮分析](../reports/seller_alias_continual/20261107/history_result/report.zh.md)、[回传](../reports/seller_alias_continual/20261107/history_result/receive.json)、[核对](../reports/seller_alias_continual/20261107/history_result/saved_check.json)。
+
+原唯一主要门通过，但收益幅度、初学代价、域C/BCA及分类负项按原口径保留。用户既有“历史权重开发后正式选定的版本”消融母体决定不变；不因本轮主门通过把未实施的消融写成已验证。新H27与原H27均保留；没有删除权重。原英文ABC自动接续实际止于dev前置条件未通过，未启动正式候选，原监听正常退役；该状态不修改先前留出集的观察事实。
+
+具体结果审查包完成后，用户明确确认“允许发送并完成本轮结果外审（建议）”。许可对象为7,781,316字节、824载荷加清单、SHA256 `fd4438e7387fccf06ce16e93f353c8570f79b6a87810c294fd0a88031eb355b8`，向原ChatGPT网页GPT-6 Pro会话审查结果及解释；不含模型、文本、关系/owners标签、Memory、凭据或预测/query数组。见[许可](../reports/seller_alias_continual/20261107/history_result/review/authorization.json)和[单次提交](../reports/seller_alias_continual/20261107/history_result/review/submission.json)。该许可不扩成新实验或全部项目材料的外发。
+
 ## 2026-11-06：选定历史权重版H作为主实验消融母体并提交方案外审
 
 用户对上一轮八配置建议中的“历史权重开发后正式选定的版本”明确批注：“选定这个版本的”，并要求：“确定好详细的方案，提交外审审核”。本轮据此完成[详细方案](../reports/documentation/20261106/h_history_ablation/proposal.zh.md)，范围为设计、只读身份/源码核对、必要背景外审、独立处置与本地交付；不是实现、训练、新数据开放或自动等待授权。

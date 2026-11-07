@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-07 H历史权重结果回传与传输副本收尾
+
+原调参正式结果回传5058份、305105336字节，另4份Linux保存字段核对/整理结果逐项大小与SHA匹配，见[来源清单](../reports/seller_alias_continual/20261107/history_result/receive_manifest.json)、[回传](../reports/seller_alias_continual/20261107/history_result/receive.json)和[分析回传](../reports/seller_alias_continual/20261107/history_result/analysis_receive.json)。正式结果按原路径保存；历史/ABC的状态及旧H引用完成原件保存在本轮source_receipts快照，不覆盖旧交付回执。新生成正文、pairs/owners、Memory及模型载荷留Linux，不进入此次回传或Git。
+
+Windows与Linux各删除本轮两份已验收传输ZIP，每端161264619字节，合计322529238逻辑字节；原5058份来源前后SHA、4份整理结果、54份新旧H权重存在/大小/属主核对通过。详见[Windows清理](../reports/seller_alias_continual/20261107/history_result/cleanup_windows.json)及[Linux清理与权重位置](../reports/seller_alias_continual/20261107/history_result/cleanup_linux.json)。未重新哈希或加载这些大权重，原记录SHA不冒充此次重测；全部54份保留，新H27用于拟议消融Full复用。没有新建CPU/GPU核验脚本；冻结运行来源及绑定的旧测试源码保留用于审查身份，未因文件名而删除。
+
+HPO和英文ABC活动监听副本均已依原规则自删/正常退役，本次只核实不存在，未重复删除或创建监听。原搜索108份推理权重的自动退役属于原合同执行，逐候选清单/回执已回传，不记为本次人工删除。结果外审输入包当前用于审查；原始指标、必要分数/query、日志及来源保管不变。根docs仅Windows；本次局部收尾不重置11月6日大清理日期，下一周期仍11月21日。
+
 ## 2026-11-06 两端项目大清理完成
 
 用户确认完整范围，并进一步明确“继续保留这20份权重”“允许核实后删除旧失败权重”。Windows删除9文件1,009,323字节；Linux删除171份重复包/下载缓存及9个旧失败权重路径，9路径对应3底层文件。总189路径，硬链接去重载荷6,593,774,946字节（6.14GiB），Linux分配空间释放6,593,273,856字节；不将共享磁盘波动计入收益。具体逐文件保管映射、SHA、删除和保护核验见[本轮汇总](../reports/maintenance/20261106/summary.zh.txt)、windows.json、linux.json及failed_weights.json。

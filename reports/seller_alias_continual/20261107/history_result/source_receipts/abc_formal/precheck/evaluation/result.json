@@ -1,0 +1,1950 @@
+{
+  "status": "COMPLETE_DEV_ROUND",
+  "name": "precheck",
+  "columns": [
+    "map",
+    "mrr",
+    "recall@1",
+    "recall@3",
+    "recall@5",
+    "recall@10",
+    "ndcg@1",
+    "ndcg@3",
+    "ndcg@5",
+    "ndcg@10"
+  ],
+  "runs": {
+    "ABC_s4_H_full": {
+      "spec": {
+        "id": "ABC_s4_H_full",
+        "seed": 4,
+        "order": "ABC",
+        "settings": {
+          "method": "H_full",
+          "lambda_rank": 1.3051794547562026,
+          "lr_multiplier": 1.2832655111666686,
+          "encoder_lr": 1e-05,
+          "head_lr": 0.001,
+          "vendor_lr": 4e-05,
+          "weight_decay": 0.01,
+          "vendor_weight_decay": 0.0,
+          "microbatch": 8,
+          "vendor_batch": 32,
+          "channel_tokens": 256,
+          "vendor_tokens": 512,
+          "memory_groups": 6,
+          "memory_bytes": 1048576,
+          "pooling": "cls",
+          "head_schedule": "constant",
+          "bce_weight": 1.0,
+          "hard_weight": 0.5
+        }
+      },
+      "cells": {
+        "1_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.828183632717311,
+            0.828183632717311,
+            0.7383419689119171,
+            0.9041450777202072,
+            0.9455958549222798,
+            0.9870466321243523,
+            0.7383419689119171,
+            0.8358289621854218,
+            0.85299964204071,
+            0.8663160183761196
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_full_1_1_queries.json",
+            "bytes": 61086,
+            "sha256": "c78965811de86d917cca0cc18ca46033a80e3b20ecb36591dc3a79a2229238fe"
+          }
+        },
+        "2_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8137448044183793,
+            0.8137448044183793,
+            0.7253886010362695,
+            0.883419689119171,
+            0.9404145077720207,
+            0.9870466321243523,
+            0.7253886010362695,
+            0.8166152101776488,
+            0.8400262121704628,
+            0.855086263747221
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_full_2_1_queries.json",
+            "bytes": 61169,
+            "sha256": "284a6176c513c576dc81868608d88280bb3466b4ae3dd71343c037a1a5d50d50"
+          }
+        },
+        "2_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8218943325193326,
+            0.8218943325193326,
+            0.7416666666666667,
+            0.875,
+            0.95,
+            0.9833333333333333,
+            0.7416666666666667,
+            0.8181530648511922,
+            0.8493582129357252,
+            0.8602418412098175
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_full_2_2_queries.json",
+            "bytes": 19059,
+            "sha256": "99faa1193302765c97465d51c8bc8a1ea62152bad5a0e8fc661327bea0daac3c"
+          }
+        },
+        "3_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8137779822365312,
+            0.8137779822365312,
+            0.7253886010362695,
+            0.9067357512953368,
+            0.9378238341968912,
+            0.9792746113989638,
+            0.7253886010362695,
+            0.8269164562546285,
+            0.8395106335629413,
+            0.852951445589518
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_full_3_1_queries.json",
+            "bytes": 61098,
+            "sha256": "a4e1ada948be3a8adbf5b9e7f8be5772141350a6bb748957954100158fc1f1d0"
+          }
+        },
+        "3_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8368253968253968,
+            0.8368253968253968,
+            0.7666666666666667,
+            0.9166666666666666,
+            0.9416666666666667,
+            0.9833333333333333,
+            0.7666666666666667,
+            0.8471220730654774,
+            0.857523789093655,
+            0.8716156201017823
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_full_3_2_queries.json",
+            "bytes": 18903,
+            "sha256": "ac04c7adf87170e4fbc8391ac696df0fa5fd62f5be2a878cbd7d7dff05597b72"
+          }
+        },
+        "3_3": {
+          "domain": "Agora",
+          "metrics": [
+            0.8063327000577994,
+            0.8063327000577994,
+            0.7250996015936255,
+            0.850597609561753,
+            0.9143426294820717,
+            0.9860557768924303,
+            0.7250996015936255,
+            0.7980204390224839,
+            0.8244263450947596,
+            0.8486182226762392
+          ],
+          "query_count": 502,
+          "groups": 31,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_full_3_3_queries.json",
+            "bytes": 79550,
+            "sha256": "92cc5b537775c07a2def83204283979d60152fa56960e4e46aaf2202ed9faa08"
+          }
+        }
+      }
+    },
+    "ABC_s4_H_ER": {
+      "spec": {
+        "id": "ABC_s4_H_ER",
+        "seed": 4,
+        "order": "ABC",
+        "settings": {
+          "method": "H_ER",
+          "lambda_rank": 1.3051794547562026,
+          "lr_multiplier": 1.2832655111666686,
+          "encoder_lr": 1e-05,
+          "head_lr": 0.001,
+          "vendor_lr": 4e-05,
+          "weight_decay": 0.01,
+          "vendor_weight_decay": 0.0,
+          "microbatch": 8,
+          "vendor_batch": 32,
+          "channel_tokens": 256,
+          "vendor_tokens": 512,
+          "memory_groups": 6,
+          "memory_bytes": 1048576,
+          "pooling": "cls",
+          "head_schedule": "constant",
+          "bce_weight": 1.0,
+          "hard_weight": 0.5
+        }
+      },
+      "cells": {
+        "1_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.828183632717311,
+            0.828183632717311,
+            0.7383419689119171,
+            0.9041450777202072,
+            0.9455958549222798,
+            0.9870466321243523,
+            0.7383419689119171,
+            0.8358289621854218,
+            0.85299964204071,
+            0.8663160183761196
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_ER_1_1_queries.json",
+            "bytes": 61086,
+            "sha256": "c78965811de86d917cca0cc18ca46033a80e3b20ecb36591dc3a79a2229238fe"
+          }
+        },
+        "2_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8258914085338953,
+            0.8258914085338953,
+            0.7435233160621761,
+            0.8860103626943006,
+            0.9352331606217616,
+            0.9922279792746114,
+            0.7435233160621761,
+            0.826299511972616,
+            0.8467038859299282,
+            0.8657240564504475
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_ER_2_1_queries.json",
+            "bytes": 61097,
+            "sha256": "41f48a5b4c279ec168e30f8afe73a64a2856c7def174cc1238e2786389be0249"
+          }
+        },
+        "2_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8583270202020201,
+            0.8583270202020201,
+            0.7833333333333333,
+            0.925,
+            0.9583333333333334,
+            0.9916666666666667,
+            0.7833333333333333,
+            0.8661685607440499,
+            0.8794288522421918,
+            0.8904033862198555
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_ER_2_2_queries.json",
+            "bytes": 18887,
+            "sha256": "d981a284abdb5d97fbdea02c23a565a0a325743afbbc133405fef9e3da55b636"
+          }
+        },
+        "3_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8361016358425685,
+            0.8361016358425685,
+            0.7564766839378239,
+            0.9015544041450777,
+            0.9533678756476683,
+            0.9870466321243523,
+            0.7564766839378239,
+            0.8398698241302763,
+            0.8615034734992784,
+            0.872138850687765
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_ER_3_1_queries.json",
+            "bytes": 60776,
+            "sha256": "cd1341b525cb290bef60cf825e6acc36ab05ab3cf2c833efa173b01f2ff23204"
+          }
+        },
+        "3_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8690509259259258,
+            0.8690509259259258,
+            0.8083333333333333,
+            0.9166666666666666,
+            0.975,
+            0.9916666666666667,
+            0.8083333333333333,
+            0.8690464876785727,
+            0.8934388910522063,
+            0.8985763483226206
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_ER_3_2_queries.json",
+            "bytes": 18732,
+            "sha256": "57199ad17ecf8818e79ee1c8ef81134743b65d6106e518dc6113853296879f04"
+          }
+        },
+        "3_3": {
+          "domain": "Agora",
+          "metrics": [
+            0.8737074291357158,
+            0.8737074291357158,
+            0.8167330677290837,
+            0.9143426294820717,
+            0.952191235059761,
+            0.9900398406374502,
+            0.8167330677290837,
+            0.8733623358708045,
+            0.8888771582728857,
+            0.9012431987421098
+          ],
+          "query_count": 502,
+          "groups": 31,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_ER_3_3_queries.json",
+            "bytes": 77761,
+            "sha256": "306189efc982f3a6f9ab4a7cc761a82947f595208a25c292e3b27c0a713d2657"
+          }
+        }
+      }
+    },
+    "ABC_s4_H_SEQ": {
+      "spec": {
+        "id": "ABC_s4_H_SEQ",
+        "seed": 4,
+        "order": "ABC",
+        "settings": {
+          "method": "H_SEQ",
+          "lambda_rank": 1.3051794547562026,
+          "lr_multiplier": 1.2832655111666686,
+          "encoder_lr": 1e-05,
+          "head_lr": 0.001,
+          "vendor_lr": 4e-05,
+          "weight_decay": 0.01,
+          "vendor_weight_decay": 0.0,
+          "microbatch": 8,
+          "vendor_batch": 32,
+          "channel_tokens": 256,
+          "vendor_tokens": 512,
+          "memory_groups": 6,
+          "memory_bytes": 1048576,
+          "pooling": "cls",
+          "head_schedule": "constant",
+          "bce_weight": 1.0,
+          "hard_weight": 0.5
+        }
+      },
+      "cells": {
+        "1_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.828183632717311,
+            0.828183632717311,
+            0.7383419689119171,
+            0.9041450777202072,
+            0.9455958549222798,
+            0.9870466321243523,
+            0.7383419689119171,
+            0.8358289621854218,
+            0.85299964204071,
+            0.8663160183761196
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_SEQ_1_1_queries.json",
+            "bytes": 61086,
+            "sha256": "c78965811de86d917cca0cc18ca46033a80e3b20ecb36591dc3a79a2229238fe"
+          }
+        },
+        "2_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8309781108356236,
+            0.8309781108356236,
+            0.7538860103626943,
+            0.8963730569948186,
+            0.9300518134715026,
+            0.9818652849740933,
+            0.7538860103626943,
+            0.8356446175148065,
+            0.8492410041682864,
+            0.866466144961863
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_SEQ_2_1_queries.json",
+            "bytes": 60781,
+            "sha256": "64e4cdd0d9895da60f5783b9e94e864b13705ee50a7067bdfd12285ec44b030c"
+          }
+        },
+        "2_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8486965811965811,
+            0.8486965811965811,
+            0.7666666666666667,
+            0.925,
+            0.975,
+            0.9916666666666667,
+            0.7666666666666667,
+            0.8578352274107165,
+            0.878638659467072,
+            0.88345640657237
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_SEQ_2_2_queries.json",
+            "bytes": 18918,
+            "sha256": "fe38b29758c9b99b569122b34452f1d105a92926de32a330282e9d049e784cc8"
+          }
+        },
+        "3_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.7971680162094669,
+            0.7971680162094669,
+            0.6917098445595855,
+            0.8963730569948186,
+            0.9507772020725389,
+            0.9896373056994818,
+            0.6917098445595855,
+            0.8089660858993375,
+            0.8309207464139394,
+            0.843736506309404
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_SEQ_3_1_queries.json",
+            "bytes": 61736,
+            "sha256": "7c3e8a7623124496ea45749c5bca5a5625ea6c21f7bd2795310609bf1087896a"
+          }
+        },
+        "3_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8478571428571426,
+            0.8478571428571426,
+            0.7666666666666667,
+            0.925,
+            0.975,
+            0.9916666666666667,
+            0.7666666666666667,
+            0.8567441461309546,
+            0.8771823802636528,
+            0.8829285512673307
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_SEQ_3_2_queries.json",
+            "bytes": 18965,
+            "sha256": "7fea6e221e983aa8867fb54a248119ed9bc7a9c51b05d6097fa44510db10d64c"
+          }
+        },
+        "3_3": {
+          "domain": "Agora",
+          "metrics": [
+            0.846714440937548,
+            0.846714440937548,
+            0.7788844621513944,
+            0.8944223107569721,
+            0.9362549800796812,
+            0.9820717131474104,
+            0.7788844621513944,
+            0.8460427711724554,
+            0.863098839818499,
+            0.8782664320433506
+          ],
+          "query_count": 502,
+          "groups": 31,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_H_SEQ_3_3_queries.json",
+            "bytes": 78530,
+            "sha256": "03c2fef6d142b567b97486e1f3e7a4c0ea8d007b82f96c1a81218d2dc68ac00c"
+          }
+        }
+      }
+    },
+    "ABC_s4_VendorLink_SEQ": {
+      "spec": {
+        "id": "ABC_s4_VendorLink_SEQ",
+        "seed": 4,
+        "order": "ABC",
+        "settings": {
+          "method": "VendorLink_SEQ",
+          "lambda_rank": 1.3051794547562026,
+          "lr_multiplier": 1.2832655111666686,
+          "encoder_lr": 1e-05,
+          "head_lr": 0.001,
+          "vendor_lr": 4e-05,
+          "weight_decay": 0.01,
+          "vendor_weight_decay": 0.0,
+          "microbatch": 8,
+          "vendor_batch": 32,
+          "channel_tokens": 256,
+          "vendor_tokens": 512,
+          "memory_groups": 6,
+          "memory_bytes": 1048576,
+          "pooling": "cls",
+          "head_schedule": "constant",
+          "bce_weight": 1.0,
+          "hard_weight": 0.5
+        }
+      },
+      "cells": {
+        "1_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8227636856522865,
+            0.8227636856522865,
+            0.7487046632124352,
+            0.8808290155440415,
+            0.9145077720207254,
+            0.9818652849740933,
+            0.7487046632124352,
+            0.8242643344559607,
+            0.837974254142702,
+            0.8598697223936828
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_VendorLink_SEQ_1_1_queries.json",
+            "bytes": 60836,
+            "sha256": "1b98369c317a8b9cd501c9cb438136859ad1343e36f7902538ad727330a9715e"
+          }
+        },
+        "2_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8293138101104421,
+            0.8293138101104421,
+            0.7538860103626943,
+            0.8756476683937824,
+            0.9352331606217616,
+            0.9792746113989638,
+            0.7538860103626943,
+            0.8256211194670638,
+            0.8496937317052611,
+            0.8644453812311317
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_VendorLink_SEQ_2_1_queries.json",
+            "bytes": 60888,
+            "sha256": "8be7ea58bc30dd81bccef4066be25c51ae5e161850a67f3ccc4f1a325479e580"
+          }
+        },
+        "2_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8658862433862435,
+            0.8658862433862435,
+            0.8083333333333333,
+            0.8916666666666667,
+            0.9333333333333333,
+            0.9833333333333333,
+            0.8083333333333333,
+            0.858728650238097,
+            0.8763083089008311,
+            0.8930870119831646
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_VendorLink_SEQ_2_2_queries.json",
+            "bytes": 18853,
+            "sha256": "8754c0782dbc7efcd7549e0f823b3c6c4321a0ac8154c4eb3067de411ae42605"
+          }
+        },
+        "3_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8452092740305172,
+            0.8452092740305172,
+            0.7823834196891192,
+            0.8886010362694301,
+            0.9430051813471503,
+            0.9792746113989638,
+            0.7823834196891192,
+            0.8422761530347905,
+            0.8642308135493922,
+            0.8762796703400982
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_VendorLink_SEQ_3_1_queries.json",
+            "bytes": 60292,
+            "sha256": "ed144a7f7ff0c10df82d0bf28ae0f6999da6bb9676d1508cd28ef365fd635a98"
+          }
+        },
+        "3_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8805390211640212,
+            0.8805390211640212,
+            0.8333333333333334,
+            0.9083333333333333,
+            0.9416666666666667,
+            0.9833333333333333,
+            0.8333333333333334,
+            0.877379821011906,
+            0.8906401125100479,
+            0.9041109031137954
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_VendorLink_SEQ_3_2_queries.json",
+            "bytes": 18681,
+            "sha256": "e58233dd623cd2a37f184440e9fb095e153108e168e1a2084979123109f81d95"
+          }
+        },
+        "3_3": {
+          "domain": "Agora",
+          "metrics": [
+            0.8519802906257089,
+            0.8519802906257089,
+            0.7908366533864541,
+            0.898406374501992,
+            0.9183266932270916,
+            0.9701195219123506,
+            0.7908366533864541,
+            0.853750082420321,
+            0.8617182085654645,
+            0.8785417748359643
+          ],
+          "query_count": 502,
+          "groups": 31,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s4_VendorLink_SEQ_3_3_queries.json",
+            "bytes": 78176,
+            "sha256": "cc26211005d4e0cf1dc1a359397efc3c94380468ecfe04aef02836433f49586a"
+          }
+        }
+      }
+    },
+    "ABC_s5_H_full": {
+      "spec": {
+        "id": "ABC_s5_H_full",
+        "seed": 5,
+        "order": "ABC",
+        "settings": {
+          "method": "H_full",
+          "lambda_rank": 1.3051794547562026,
+          "lr_multiplier": 1.2832655111666686,
+          "encoder_lr": 1e-05,
+          "head_lr": 0.001,
+          "vendor_lr": 4e-05,
+          "weight_decay": 0.01,
+          "vendor_weight_decay": 0.0,
+          "microbatch": 8,
+          "vendor_batch": 32,
+          "channel_tokens": 256,
+          "vendor_tokens": 512,
+          "memory_groups": 6,
+          "memory_bytes": 1048576,
+          "pooling": "cls",
+          "head_schedule": "constant",
+          "bce_weight": 1.0,
+          "hard_weight": 0.5
+        }
+      },
+      "cells": {
+        "1_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8061846544359498,
+            0.8061846544359498,
+            0.6994818652849741,
+            0.8911917098445595,
+            0.9378238341968912,
+            0.9870466321243523,
+            0.6994818652849741,
+            0.8143317777202115,
+            0.8337339423323565,
+            0.8498495262050794
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_full_1_1_queries.json",
+            "bytes": 61867,
+            "sha256": "65a05f00adac4980bd171d1e48a69edcf934e814661e116c7e1f83b68d4d6bbc"
+          }
+        },
+        "2_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8229129103481436,
+            0.8229129103481436,
+            0.727979274611399,
+            0.9015544041450777,
+            0.9455958549222798,
+            0.9870466321243523,
+            0.727979274611399,
+            0.8300306707531495,
+            0.84865769208665,
+            0.862574044594633
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_full_2_1_queries.json",
+            "bytes": 61354,
+            "sha256": "0316373e3e488812cec3691f7c28abefa9f19cd797a9b989c998e2d33fc8a74e"
+          }
+        },
+        "2_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8415839947089947,
+            0.8415839947089947,
+            0.775,
+            0.9,
+            0.9416666666666667,
+            0.9916666666666667,
+            0.775,
+            0.8440464876785725,
+            0.8608957504939926,
+            0.8772563552911847
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_full_2_2_queries.json",
+            "bytes": 18908,
+            "sha256": "bdeefed70fb63dced22cecf2780eba2c577add3d02bcf390df7ec89e68a90962"
+          }
+        },
+        "3_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8334896249404015,
+            0.8334896249404015,
+            0.7461139896373057,
+            0.9145077720207254,
+            0.9481865284974094,
+            0.9870466321243523,
+            0.7461139896373057,
+            0.8432003384344959,
+            0.8571373241877597,
+            0.8705070088690611
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_full_3_1_queries.json",
+            "bytes": 61036,
+            "sha256": "7d41e10a5ba27eee2d2f53c8b47ab49dcd31d480c04c96bbccfec117ac7bf3ec"
+          }
+        },
+        "3_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8596957671957671,
+            0.8596957671957671,
+            0.7916666666666666,
+            0.9166666666666666,
+            0.9583333333333334,
+            0.9916666666666667,
+            0.7916666666666666,
+            0.8639863981845255,
+            0.8808356609999456,
+            0.8913086734053499
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_full_3_2_queries.json",
+            "bytes": 18856,
+            "sha256": "8b94cbb7e99aa44788ec795b51bb6475fd19f3425e4fdd5f6717b3ce6172f09c"
+          }
+        },
+        "3_3": {
+          "domain": "Agora",
+          "metrics": [
+            0.8282198047636291,
+            0.8282198047636291,
+            0.7609561752988048,
+            0.8705179282868526,
+            0.9223107569721115,
+            0.9840637450199203,
+            0.7609561752988048,
+            0.823039906573707,
+            0.8447347756056518,
+            0.8644421831463404
+          ],
+          "query_count": 502,
+          "groups": 31,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_full_3_3_queries.json",
+            "bytes": 78605,
+            "sha256": "4bfb6151898b583c0cdbfb3baac7548547752deb7ccacdfba9d87352c3cfb892"
+          }
+        }
+      }
+    },
+    "ABC_s5_H_ER": {
+      "spec": {
+        "id": "ABC_s5_H_ER",
+        "seed": 5,
+        "order": "ABC",
+        "settings": {
+          "method": "H_ER",
+          "lambda_rank": 1.3051794547562026,
+          "lr_multiplier": 1.2832655111666686,
+          "encoder_lr": 1e-05,
+          "head_lr": 0.001,
+          "vendor_lr": 4e-05,
+          "weight_decay": 0.01,
+          "vendor_weight_decay": 0.0,
+          "microbatch": 8,
+          "vendor_batch": 32,
+          "channel_tokens": 256,
+          "vendor_tokens": 512,
+          "memory_groups": 6,
+          "memory_bytes": 1048576,
+          "pooling": "cls",
+          "head_schedule": "constant",
+          "bce_weight": 1.0,
+          "hard_weight": 0.5
+        }
+      },
+      "cells": {
+        "1_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8061846544359498,
+            0.8061846544359498,
+            0.6994818652849741,
+            0.8911917098445595,
+            0.9378238341968912,
+            0.9870466321243523,
+            0.6994818652849741,
+            0.8143317777202115,
+            0.8337339423323565,
+            0.8498495262050794
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_ER_1_1_queries.json",
+            "bytes": 61867,
+            "sha256": "65a05f00adac4980bd171d1e48a69edcf934e814661e116c7e1f83b68d4d6bbc"
+          }
+        },
+        "2_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8405103963394115,
+            0.8405103963394115,
+            0.7616580310880829,
+            0.8963730569948186,
+            0.9559585492227979,
+            0.9896373056994818,
+            0.7616580310880829,
+            0.840887412888604,
+            0.8653006242265849,
+            0.8761870636249373
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_ER_2_1_queries.json",
+            "bytes": 60767,
+            "sha256": "8f5fd3d8bb964fa6a9163bf6042ff398bc4f71e8594c2851ddbcef61dc1af1c2"
+          }
+        },
+        "2_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.86372964997965,
+            0.86372964997965,
+            0.8,
+            0.9166666666666666,
+            0.975,
+            0.9916666666666667,
+            0.8,
+            0.8648798210119061,
+            0.8892722243855397,
+            0.8945585854605173
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_ER_2_2_queries.json",
+            "bytes": 18789,
+            "sha256": "e5c84b2e5bd84029e47e43532fa3797619a0b383aab17efa119f3b93ebc2c5c1"
+          }
+        },
+        "3_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8340714984497368,
+            0.8340714984497368,
+            0.7564766839378239,
+            0.9015544041450777,
+            0.9326424870466321,
+            0.9896373056994818,
+            0.7564766839378239,
+            0.8402090203830521,
+            0.8528031976913651,
+            0.8708991127203977
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_ER_3_1_queries.json",
+            "bytes": 60656,
+            "sha256": "40355f84551e7fdbe342ba063eafb999fce6a43e9053c7d529e63aa856306757"
+          }
+        },
+        "3_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8854558404558406,
+            0.8854558404558406,
+            0.8333333333333334,
+            0.9333333333333333,
+            0.9666666666666667,
+            0.9916666666666667,
+            0.8333333333333334,
+            0.8887887397321439,
+            0.9024142291539428,
+            0.9108595989029431
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_ER_3_2_queries.json",
+            "bytes": 18659,
+            "sha256": "1060e001d39d678257c6d417054423d3e281f25bcd0d64901a5d1e1d8fec9731"
+          }
+        },
+        "3_3": {
+          "domain": "Agora",
+          "metrics": [
+            0.8686477754206835,
+            0.8686477754206835,
+            0.8087649402390438,
+            0.9083665338645418,
+            0.9402390438247012,
+            0.9920318725099602,
+            0.8087649402390438,
+            0.8679551217700647,
+            0.880896179880871,
+            0.8976911228297652
+          ],
+          "query_count": 502,
+          "groups": 31,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_ER_3_3_queries.json",
+            "bytes": 78027,
+            "sha256": "eec07cd0143b6e35935cd41ffbfa995461149c3515be45bec477d3d7093180bb"
+          }
+        }
+      }
+    },
+    "ABC_s5_H_SEQ": {
+      "spec": {
+        "id": "ABC_s5_H_SEQ",
+        "seed": 5,
+        "order": "ABC",
+        "settings": {
+          "method": "H_SEQ",
+          "lambda_rank": 1.3051794547562026,
+          "lr_multiplier": 1.2832655111666686,
+          "encoder_lr": 1e-05,
+          "head_lr": 0.001,
+          "vendor_lr": 4e-05,
+          "weight_decay": 0.01,
+          "vendor_weight_decay": 0.0,
+          "microbatch": 8,
+          "vendor_batch": 32,
+          "channel_tokens": 256,
+          "vendor_tokens": 512,
+          "memory_groups": 6,
+          "memory_bytes": 1048576,
+          "pooling": "cls",
+          "head_schedule": "constant",
+          "bce_weight": 1.0,
+          "hard_weight": 0.5
+        }
+      },
+      "cells": {
+        "1_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8061846544359498,
+            0.8061846544359498,
+            0.6994818652849741,
+            0.8911917098445595,
+            0.9378238341968912,
+            0.9870466321243523,
+            0.6994818652849741,
+            0.8143317777202115,
+            0.8337339423323565,
+            0.8498495262050794
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_SEQ_1_1_queries.json",
+            "bytes": 61867,
+            "sha256": "65a05f00adac4980bd171d1e48a69edcf934e814661e116c7e1f83b68d4d6bbc"
+          }
+        },
+        "2_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8356498927094779,
+            0.8356498927094779,
+            0.7538860103626943,
+            0.8989637305699482,
+            0.961139896373057,
+            0.9844559585492227,
+            0.7538860103626943,
+            0.8379575430606986,
+            0.8636000298103698,
+            0.8711622165167106
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_SEQ_2_1_queries.json",
+            "bytes": 60813,
+            "sha256": "ead9060694a0781c3f2f8e6f6c8f54bd2fc505c896375e4ad70b4abe368a0b98"
+          }
+        },
+        "2_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8729166666666667,
+            0.8729166666666667,
+            0.8083333333333333,
+            0.95,
+            0.95,
+            0.9916666666666667,
+            0.8083333333333333,
+            0.8878953169047635,
+            0.8878953169047635,
+            0.9014987248556416
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_SEQ_2_2_queries.json",
+            "bytes": 18732,
+            "sha256": "241b3cd02616b32d9b43f2619243a10723f9b0cdd26768fdb0f95ba0f235dfee"
+          }
+        },
+        "3_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8313993576946942,
+            0.8313993576946942,
+            0.7435233160621761,
+            0.9119170984455959,
+            0.9585492227979274,
+            0.9870466321243523,
+            0.7435233160621761,
+            0.8406096648593668,
+            0.8595576973384668,
+            0.8688843958266429
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_SEQ_3_1_queries.json",
+            "bytes": 60976,
+            "sha256": "c6580eede7733a06ec915cdce4285fd8df44d9b23428487b3ef32952e9b98d02"
+          }
+        },
+        "3_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8727946127946128,
+            0.8727946127946128,
+            0.8083333333333333,
+            0.925,
+            0.95,
+            0.9833333333333333,
+            0.8083333333333333,
+            0.877577479464288,
+            0.8879791954924658,
+            0.8988334387941151
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_SEQ_3_2_queries.json",
+            "bytes": 18809,
+            "sha256": "9e0b8bc8ed7a5b92303b3e4ff7a3f3981b31ec743a0bd24e5333ee70a22e83e3"
+          }
+        },
+        "3_3": {
+          "domain": "Agora",
+          "metrics": [
+            0.8556758535842199,
+            0.8556758535842199,
+            0.7908366533864541,
+            0.896414342629482,
+            0.9482071713147411,
+            0.9900398406374502,
+            0.7908366533864541,
+            0.8524932502418916,
+            0.8738389260400609,
+            0.8874330439444437
+          ],
+          "query_count": 502,
+          "groups": 31,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_H_SEQ_3_3_queries.json",
+            "bytes": 78240,
+            "sha256": "d95fef2339719db3b22ec0290f0bc99068c6864d01de4b9ac37dfbdf5b59422c"
+          }
+        }
+      }
+    },
+    "ABC_s5_VendorLink_SEQ": {
+      "spec": {
+        "id": "ABC_s5_VendorLink_SEQ",
+        "seed": 5,
+        "order": "ABC",
+        "settings": {
+          "method": "VendorLink_SEQ",
+          "lambda_rank": 1.3051794547562026,
+          "lr_multiplier": 1.2832655111666686,
+          "encoder_lr": 1e-05,
+          "head_lr": 0.001,
+          "vendor_lr": 4e-05,
+          "weight_decay": 0.01,
+          "vendor_weight_decay": 0.0,
+          "microbatch": 8,
+          "vendor_batch": 32,
+          "channel_tokens": 256,
+          "vendor_tokens": 512,
+          "memory_groups": 6,
+          "memory_bytes": 1048576,
+          "pooling": "cls",
+          "head_schedule": "constant",
+          "bce_weight": 1.0,
+          "hard_weight": 0.5
+        }
+      },
+      "cells": {
+        "1_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8606978010475415,
+            0.8606978010475415,
+            0.805699481865285,
+            0.8963730569948186,
+            0.9300518134715026,
+            0.9766839378238342,
+            0.805699481865285,
+            0.8581593907383434,
+            0.8720963764916074,
+            0.8870559411890119
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_VendorLink_SEQ_1_1_queries.json",
+            "bytes": 60053,
+            "sha256": "cd0bfbe5a1ba847d681787343e984c860a73ec61ed57a2b7d22bb255a05773ae"
+          }
+        },
+        "2_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8538791699089625,
+            0.8538791699089625,
+            0.7849740932642487,
+            0.9145077720207254,
+            0.9481865284974094,
+            0.9844559585492227,
+            0.7849740932642487,
+            0.8588992314674337,
+            0.8729497502539588,
+            0.8849057844167825
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_VendorLink_SEQ_2_1_queries.json",
+            "bytes": 60316,
+            "sha256": "874f49ae546cb077b7de5645de3a5cb6d916ea2fee7108665e34f73764748430"
+          }
+        },
+        "2_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8626190476190477,
+            0.8626190476190477,
+            0.8,
+            0.9083333333333333,
+            0.9416666666666667,
+            0.9916666666666667,
+            0.8,
+            0.8628953169047636,
+            0.8768860042502195,
+            0.8932671899788757
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_VendorLink_SEQ_2_2_queries.json",
+            "bytes": 18793,
+            "sha256": "afdc35d3057af17968add969119e036072a564b25a7e10a5f8d1811c5c3eba28"
+          }
+        },
+        "3_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8550554511694405,
+            0.8550554511694405,
+            0.7901554404145078,
+            0.9015544041450777,
+            0.9404145077720207,
+            0.9715025906735751,
+            0.7901554404145078,
+            0.8560308098630667,
+            0.8717451482401424,
+            0.88176529277256
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_VendorLink_SEQ_3_1_queries.json",
+            "bytes": 60271,
+            "sha256": "fbd6bfa0383789b73e3656361ce663b267e039c9578bc67a6c85932f519f6c5d"
+          }
+        },
+        "3_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8633862433862431,
+            0.8633862433862431,
+            0.8166666666666667,
+            0.8916666666666667,
+            0.9416666666666667,
+            0.9833333333333333,
+            0.8166666666666667,
+            0.8563488292261908,
+            0.8771522612825464,
+            0.8909625711389797
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_VendorLink_SEQ_3_2_queries.json",
+            "bytes": 18718,
+            "sha256": "a8e33274ed402e6bb6d327bb5003643b6e1fd7835d5dc2fe77a0917119d8600e"
+          }
+        },
+        "3_3": {
+          "domain": "Agora",
+          "metrics": [
+            0.8752093800400574,
+            0.8752093800400574,
+            0.8227091633466136,
+            0.9143426294820717,
+            0.9382470119521913,
+            0.9840637450199203,
+            0.8227091633466136,
+            0.8758287511952211,
+            0.8858619134349903,
+            0.9003323182293053
+          ],
+          "query_count": 502,
+          "groups": 31,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s5_VendorLink_SEQ_3_3_queries.json",
+            "bytes": 77629,
+            "sha256": "1d9213a6ebee66b43e8e7a15bb0595474dbf2f209c87aa40e60a20b54cbad213"
+          }
+        }
+      }
+    },
+    "ABC_s6_H_full": {
+      "spec": {
+        "id": "ABC_s6_H_full",
+        "seed": 6,
+        "order": "ABC",
+        "settings": {
+          "method": "H_full",
+          "lambda_rank": 1.3051794547562026,
+          "lr_multiplier": 1.2832655111666686,
+          "encoder_lr": 1e-05,
+          "head_lr": 0.001,
+          "vendor_lr": 4e-05,
+          "weight_decay": 0.01,
+          "vendor_weight_decay": 0.0,
+          "microbatch": 8,
+          "vendor_batch": 32,
+          "channel_tokens": 256,
+          "vendor_tokens": 512,
+          "memory_groups": 6,
+          "memory_bytes": 1048576,
+          "pooling": "cls",
+          "head_schedule": "constant",
+          "bce_weight": 1.0,
+          "hard_weight": 0.5
+        }
+      },
+      "cells": {
+        "1_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8398747194083981,
+            0.8398747194083981,
+            0.7538860103626943,
+            0.9041450777202072,
+            0.9404145077720207,
+            0.9922279792746114,
+            0.7538860103626943,
+            0.8442793754163619,
+            0.8596727026478383,
+            0.8765745551926847
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_full_1_1_queries.json",
+            "bytes": 61020,
+            "sha256": "4b9ee11f6991a48b796e8df59ad3be6cc4bb1233db3099596d5fa23fe09b0b05"
+          }
+        },
+        "2_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8271153357293252,
+            0.8271153357293252,
+            0.7461139896373057,
+            0.8937823834196891,
+            0.9430051813471503,
+            0.9870466321243523,
+            0.7461139896373057,
+            0.8301240741117714,
+            0.8505284480690837,
+            0.865317493660037
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_full_2_1_queries.json",
+            "bytes": 60941,
+            "sha256": "9ff8b1a62e6d6521769e8b4bb8fe10e615a5839ee8bfe781b79691b009701236"
+          }
+        },
+        "2_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8747453703703704,
+            0.8747453703703704,
+            0.8166666666666667,
+            0.9166666666666666,
+            0.95,
+            0.9916666666666667,
+            0.8166666666666667,
+            0.8753953169047635,
+            0.8890208063265624,
+            0.9025039236014261
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_full_2_2_queries.json",
+            "bytes": 18739,
+            "sha256": "2bcb04252fb3cf83a1881127c895337ea8fee2d5f9720918284f8c451155b4ea"
+          }
+        },
+        "3_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8313535054467697,
+            0.8313535054467697,
+            0.7564766839378239,
+            0.883419689119171,
+            0.9404145077720207,
+            0.9870466321243523,
+            0.7564766839378239,
+            0.8294456816062198,
+            0.852970216632295,
+            0.8681759513084354
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_full_3_1_queries.json",
+            "bytes": 60753,
+            "sha256": "ca5af122ea51c30e83357e17be77274383c3eb9c7e571b9fb3a0c9bdbc054853"
+          }
+        },
+        "3_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8854794973544974,
+            0.8854794973544974,
+            0.8333333333333334,
+            0.9166666666666666,
+            0.9666666666666667,
+            0.9916666666666667,
+            0.8333333333333334,
+            0.8815464876785727,
+            0.9027151176585853,
+            0.9108209681548995
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_full_3_2_queries.json",
+            "bytes": 18657,
+            "sha256": "c1864326b0c9b24fc7d1f739fa545eb6146d4a136c63a338d20ba4954d1a6265"
+          }
+        },
+        "3_3": {
+          "domain": "Agora",
+          "metrics": [
+            0.8244078741090689,
+            0.8244078741090689,
+            0.7549800796812749,
+            0.8565737051792829,
+            0.9262948207171314,
+            0.9820717131474104,
+            0.7549800796812749,
+            0.8143838284220284,
+            0.8427524106264722,
+            0.8609856054738797
+          ],
+          "query_count": 502,
+          "groups": 31,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_full_3_3_queries.json",
+            "bytes": 78930,
+            "sha256": "b87d1a34fd97fc17652a8c19149e71830751b3a37d9376e4fbaa4321e99eecc2"
+          }
+        }
+      }
+    },
+    "ABC_s6_H_ER": {
+      "spec": {
+        "id": "ABC_s6_H_ER",
+        "seed": 6,
+        "order": "ABC",
+        "settings": {
+          "method": "H_ER",
+          "lambda_rank": 1.3051794547562026,
+          "lr_multiplier": 1.2832655111666686,
+          "encoder_lr": 1e-05,
+          "head_lr": 0.001,
+          "vendor_lr": 4e-05,
+          "weight_decay": 0.01,
+          "vendor_weight_decay": 0.0,
+          "microbatch": 8,
+          "vendor_batch": 32,
+          "channel_tokens": 256,
+          "vendor_tokens": 512,
+          "memory_groups": 6,
+          "memory_bytes": 1048576,
+          "pooling": "cls",
+          "head_schedule": "constant",
+          "bce_weight": 1.0,
+          "hard_weight": 0.5
+        }
+      },
+      "cells": {
+        "1_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8398747194083981,
+            0.8398747194083981,
+            0.7538860103626943,
+            0.9041450777202072,
+            0.9404145077720207,
+            0.9922279792746114,
+            0.7538860103626943,
+            0.8442793754163619,
+            0.8596727026478383,
+            0.8765745551926847
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_ER_1_1_queries.json",
+            "bytes": 61020,
+            "sha256": "4b9ee11f6991a48b796e8df59ad3be6cc4bb1233db3099596d5fa23fe09b0b05"
+          }
+        },
+        "2_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8275546272955598,
+            0.8275546272955598,
+            0.7461139896373057,
+            0.8782383419689119,
+            0.9430051813471503,
+            0.9922279792746114,
+            0.7461139896373057,
+            0.8240480346502622,
+            0.8503521316453165,
+            0.867002103820253
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_ER_2_1_queries.json",
+            "bytes": 61053,
+            "sha256": "59952c62eaf259840a5fa90f9ad78789e84ccfe3e4e2351ac602b07815b91eb3"
+          }
+        },
+        "2_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8555191798941796,
+            0.8555191798941796,
+            0.7916666666666666,
+            0.9083333333333333,
+            0.9333333333333333,
+            0.9833333333333333,
+            0.7916666666666666,
+            0.858728650238097,
+            0.8691303662662747,
+            0.8853912613189159
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_ER_2_2_queries.json",
+            "bytes": 18846,
+            "sha256": "e54616d13224b0d3fe0ee3303a2a5cf5c4fb9940449fbba605fc004d1cd67c1d"
+          }
+        },
+        "3_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8438192348814106,
+            0.8438192348814106,
+            0.7642487046632125,
+            0.9067357512953368,
+            0.9404145077720207,
+            0.9922279792746114,
+            0.7642487046632125,
+            0.8480424893319792,
+            0.8622065411517658,
+            0.8794728411009487
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_ER_3_1_queries.json",
+            "bytes": 60826,
+            "sha256": "0329302a5438fa7fdfef0100b140fd7ad357ea4a2eb8d05938024a925e3481a0"
+          }
+        },
+        "3_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8850854700854703,
+            0.8850854700854703,
+            0.8166666666666667,
+            0.95,
+            0.9583333333333334,
+            0.9916666666666667,
+            0.8166666666666667,
+            0.8964263086904787,
+            0.8996500820840999,
+            0.9109641353144494
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_ER_3_2_queries.json",
+            "bytes": 18801,
+            "sha256": "d120615481e659c5c4946742a7ce1c310693c2c9ad440f55b61694a54521e032"
+          }
+        },
+        "3_3": {
+          "domain": "Agora",
+          "metrics": [
+            0.856032220325049,
+            0.856032220325049,
+            0.7948207171314741,
+            0.8904382470119522,
+            0.950199203187251,
+            0.9940239043824701,
+            0.7948207171314741,
+            0.8496715206104173,
+            0.8744488821302867,
+            0.8888504153661586
+          ],
+          "query_count": 502,
+          "groups": 31,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_ER_3_3_queries.json",
+            "bytes": 78073,
+            "sha256": "66eeddeea4e8b3a8dbdd96ebcba56b52e38237cfc81936320d6bc841a24a7cae"
+          }
+        }
+      }
+    },
+    "ABC_s6_H_SEQ": {
+      "spec": {
+        "id": "ABC_s6_H_SEQ",
+        "seed": 6,
+        "order": "ABC",
+        "settings": {
+          "method": "H_SEQ",
+          "lambda_rank": 1.3051794547562026,
+          "lr_multiplier": 1.2832655111666686,
+          "encoder_lr": 1e-05,
+          "head_lr": 0.001,
+          "vendor_lr": 4e-05,
+          "weight_decay": 0.01,
+          "vendor_weight_decay": 0.0,
+          "microbatch": 8,
+          "vendor_batch": 32,
+          "channel_tokens": 256,
+          "vendor_tokens": 512,
+          "memory_groups": 6,
+          "memory_bytes": 1048576,
+          "pooling": "cls",
+          "head_schedule": "constant",
+          "bce_weight": 1.0,
+          "hard_weight": 0.5
+        }
+      },
+      "cells": {
+        "1_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8398747194083981,
+            0.8398747194083981,
+            0.7538860103626943,
+            0.9041450777202072,
+            0.9404145077720207,
+            0.9922279792746114,
+            0.7538860103626943,
+            0.8442793754163619,
+            0.8596727026478383,
+            0.8765745551926847
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_SEQ_1_1_queries.json",
+            "bytes": 61020,
+            "sha256": "4b9ee11f6991a48b796e8df59ad3be6cc4bb1233db3099596d5fa23fe09b0b05"
+          }
+        },
+        "2_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8225266170214348,
+            0.8225266170214348,
+            0.7435233160621761,
+            0.8704663212435233,
+            0.9455958549222798,
+            0.9896373056994818,
+            0.7435233160621761,
+            0.8171707062361236,
+            0.8477107066783697,
+            0.8622665496409168
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_SEQ_2_1_queries.json",
+            "bytes": 60959,
+            "sha256": "03ba660a11b9acf2fd1ea37df1e86d52ad1b03af73d4cbe225f8a860b3d5ee08"
+          }
+        },
+        "2_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8533923483923481,
+            0.8533923483923481,
+            0.7833333333333333,
+            0.925,
+            0.925,
+            0.9833333333333333,
+            0.7833333333333333,
+            0.8650774794642878,
+            0.8650774794642878,
+            0.8837766330420211
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_SEQ_2_2_queries.json",
+            "bytes": 18886,
+            "sha256": "292a26d6191f5d1b86c8e709a31d76fcfb14054c45a1ce9a2d42840216a1a476"
+          }
+        },
+        "3_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8580270981177713,
+            0.8580270981177713,
+            0.7901554404145078,
+            0.9041450777202072,
+            0.9352331606217616,
+            0.9896373056994818,
+            0.7901554404145078,
+            0.858682931661735,
+            0.8715041750365705,
+            0.8890055558795984
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_SEQ_3_1_queries.json",
+            "bytes": 60461,
+            "sha256": "4bf34875ddef4081664584c80c09c1533a4eca273a9d5cfb37cfdd16b0c0957a"
+          }
+        },
+        "3_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8923708236208238,
+            0.8923708236208238,
+            0.8416666666666667,
+            0.925,
+            0.95,
+            0.9833333333333333,
+            0.8416666666666667,
+            0.8909709022916682,
+            0.9017378162435029,
+            0.9136113891471037
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_SEQ_3_2_queries.json",
+            "bytes": 18680,
+            "sha256": "a0ea5afa310b2e0c7424a779cb32e02b3c31f9a55941b4401218e9650fbcc3a0"
+          }
+        },
+        "3_3": {
+          "domain": "Agora",
+          "metrics": [
+            0.8736215311912522,
+            0.8736215311912522,
+            0.8207171314741036,
+            0.9063745019920318,
+            0.952191235059761,
+            0.9940239043824701,
+            0.8207171314741036,
+            0.8692837740609006,
+            0.8882302821846826,
+            0.9021747167189481
+          ],
+          "query_count": 502,
+          "groups": 31,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_H_SEQ_3_3_queries.json",
+            "bytes": 77630,
+            "sha256": "4abbe1371e941f7fe7441ce228fd3145258393956c4f565eb7f27c310602274f"
+          }
+        }
+      }
+    },
+    "ABC_s6_VendorLink_SEQ": {
+      "spec": {
+        "id": "ABC_s6_VendorLink_SEQ",
+        "seed": 6,
+        "order": "ABC",
+        "settings": {
+          "method": "VendorLink_SEQ",
+          "lambda_rank": 1.3051794547562026,
+          "lr_multiplier": 1.2832655111666686,
+          "encoder_lr": 1e-05,
+          "head_lr": 0.001,
+          "vendor_lr": 4e-05,
+          "weight_decay": 0.01,
+          "vendor_weight_decay": 0.0,
+          "microbatch": 8,
+          "vendor_batch": 32,
+          "channel_tokens": 256,
+          "vendor_tokens": 512,
+          "memory_groups": 6,
+          "memory_bytes": 1048576,
+          "pooling": "cls",
+          "head_schedule": "constant",
+          "bce_weight": 1.0,
+          "hard_weight": 0.5
+        }
+      },
+      "cells": {
+        "1_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8192096691449022,
+            0.8192096691449022,
+            0.7435233160621761,
+            0.8601036269430051,
+            0.9145077720207254,
+            0.9715025906735751,
+            0.7435233160621761,
+            0.8133461440969677,
+            0.8358684697778759,
+            0.8540854682752793
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_VendorLink_SEQ_1_1_queries.json",
+            "bytes": 60846,
+            "sha256": "74be0cc8f33056ee594fd2705066654e99675eb235308a05bb1f709d51ae1052"
+          }
+        },
+        "2_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8374533569481756,
+            0.8374533569481756,
+            0.7694300518134715,
+            0.8808290155440415,
+            0.927461139896373,
+            0.9766839378238342,
+            0.7694300518134715,
+            0.8342878325037029,
+            0.8535764640825866,
+            0.8695967282713386
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_VendorLink_SEQ_2_1_queries.json",
+            "bytes": 60514,
+            "sha256": "12f292e2443479033ff810c13ce7ba18276ee97dbf1aebdcd504886c9eb6df63"
+          }
+        },
+        "2_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.8662065018315019,
+            0.8662065018315019,
+            0.825,
+            0.8666666666666667,
+            0.9166666666666666,
+            0.9916666666666667,
+            0.825,
+            0.8491065771726196,
+            0.8699100092289752,
+            0.8949763742147664
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_VendorLink_SEQ_2_2_queries.json",
+            "bytes": 18680,
+            "sha256": "3ee5193f9a82e5076000cddc44c5c8975b08f9f8e24f6cd42f4673918b7ed007"
+          }
+        },
+        "3_1": {
+          "domain": "AlphaBay",
+          "metrics": [
+            0.8379088743726048,
+            0.8379088743726048,
+            0.7746113989637305,
+            0.8678756476683938,
+            0.9248704663212435,
+            0.9740932642487047,
+            0.7746113989637305,
+            0.8293842333826812,
+            0.8530223014420177,
+            0.8689484079332406
+          ],
+          "query_count": 386,
+          "groups": 24,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_VendorLink_SEQ_3_1_queries.json",
+            "bytes": 60557,
+            "sha256": "e681e947f5eb1977917e8731ca3b505f5edb98f0adee6e2b46248109028ba21e"
+          }
+        },
+        "3_2": {
+          "domain": "Dream",
+          "metrics": [
+            0.9011544011544012,
+            0.9011544011544012,
+            0.8666666666666667,
+            0.9166666666666666,
+            0.95,
+            0.975,
+            0.8666666666666667,
+            0.8960309917857151,
+            0.9092912832838568,
+            0.9173268090080634
+          ],
+          "query_count": 120,
+          "groups": 8,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_VendorLink_SEQ_3_2_queries.json",
+            "bytes": 18474,
+            "sha256": "9d2b4a4d818c3c2c179b810df38106cd6b68410b8d8bee054b72c01c033d098c"
+          }
+        },
+        "3_3": {
+          "domain": "Agora",
+          "metrics": [
+            0.8507011359600994,
+            0.8507011359600994,
+            0.7808764940239044,
+            0.9023904382470119,
+            0.9382470119521913,
+            0.9800796812749004,
+            0.7808764940239044,
+            0.8523269320646013,
+            0.8672457279615896,
+            0.8809613356217061
+          ],
+          "query_count": 502,
+          "groups": 31,
+          "queries": {
+            "path": "/home/yongpeng/cross-lingual/reports/documentation/20261105/english_abc_formal_prepare/workspace/formal/precheck/evaluation/ABC_s6_VendorLink_SEQ_3_3_queries.json",
+            "bytes": 78529,
+            "sha256": "441351842931c0a5344da42f20be9336384cc65714411d41d85e50484b53b6a3"
+          }
+        }
+      }
+    }
+  }
+}
