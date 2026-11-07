@@ -133,7 +133,7 @@ def layers(records):
             "exclusive_root_category_capacity": exclusive_capacity}
 
 
-def scan(rows, categories, parents, dates, patterns):
+def scan(rows, categories, parents, dates, patterns, return_records=False):
     quality = Counter()
     lid_owners = defaultdict(set)
     raw_owners, clean_owners = defaultdict(set), defaultdict(set)
@@ -235,7 +235,7 @@ def scan(rows, categories, parents, dates, patterns):
                     "raw_text_pairs_shared_across_accounts": sum(len(x) > 1 for x in raw_owners.values()),
                     "masked_text_pairs_shared_across_accounts": sum(len(x) > 1 for x in clean_owners.values()),
                     "strict_records_before_shared_text_exclusion": len(strict_before_shared)})
-    return {"quality": dict(quality), "raw_rows_by_scrape_month": dict(per_month),
+    result = {"quality": dict(quality), "raw_rows_by_scrape_month": dict(per_month),
             "account_distinct_complete_raw_text_capacity": capacity(unique_raw),
             "conservative_capacity": capacity(retained),
             "conservative_layers": layers(retained),
@@ -250,6 +250,9 @@ def scan(rows, categories, parents, dates, patterns):
                        "Account overlap uses observed vid, not verified controllers.",
                        "No actual train/dev/test split or pair labels created.",
                        "No forgetting, performance, or model advantage measured."]}
+    if return_records:
+        result["_records"] = retained  # In-memory follow-up only; no account records are exported.
+    return result
 
 
 def read_table(z, member, receipts):
