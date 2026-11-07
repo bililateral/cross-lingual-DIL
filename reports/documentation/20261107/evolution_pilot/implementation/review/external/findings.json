@@ -1,0 +1,270 @@
+{
+  "review_date": "2026-11-07",
+  "timezone": "UTC+8",
+  "reviewer_self_description": "GPT-6 Astra Pro",
+  "backend_routing_independently_verified": false,
+  "input_sha256": "affb8eadab7f853694bfc2c3ea1ed2956bdabd927848b867bfff0ec5992c789d",
+  "verdict": "CHANGES_REQUIRED_LIMITED_IMPLEMENTATION",
+  "scientific_blockers_found": 0,
+  "required_reproducibility_defects": [
+    {
+      "id": "EV-IMP-R01",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "required_before": "formal_campaign",
+      "title": "目录统计与正常原子保存竞态",
+      "locations": [
+        {
+          "file": "scripts/step30_evolution_io.py",
+          "function": "directory_bytes",
+          "lines": [
+            106,
+            107
+          ]
+        },
+        {
+          "file": "scripts/step30_evolution_control.py",
+          "function": "Runner.run",
+          "lines": [
+            109,
+            116,
+            126,
+            127,
+            132
+          ]
+        },
+        {
+          "file": "scripts/step30_evolution_run.py",
+          "function": "atomic_tensor",
+          "lines": [
+            91,
+            93
+          ]
+        }
+      ],
+      "evidence": "两次stat相关访问之间，worker将.tmp/.partial原子改名可引起FileNotFoundError，被父控制判为失败并终止健康worker。",
+      "static_counterexample": "is_file返回true；临时路径replace成最终路径；对原临时路径stat失败；Runner停止整链。",
+      "impact": "健康任务被误杀，消耗不可自动重试的正式机会。",
+      "minimal_fix": "逐路径一次stat并局部容忍FileNotFoundError，保留其他错误、真实目录帽及保存预留。",
+      "minimal_followup": "受控路径消失及真实超帽小夹具；无需模型/GPU。",
+      "observed_formal_incident": false
+    },
+    {
+      "id": "EV-IMP-R02",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "required_before": "official_data_build",
+      "title": "新构建未继承原资格CSV字段上限",
+      "locations": [
+        {
+          "file": "scripts/step30_evolution_data.py",
+          "function": "qualification_modules / clean_archive",
+          "lines": [
+            45,
+            53,
+            84,
+            89,
+            102,
+            108
+          ]
+        },
+        {
+          "file": "reports/documentation/20261107/evolution_qualification/audit.py",
+          "function": "main / read_table",
+          "lines": [
+            258,
+            260,
+            315
+          ]
+        },
+        {
+          "file": "reports/documentation/20261107/evolution_qualification/followup.py",
+          "function": "main",
+          "lines": [
+            249
+          ]
+        }
+      ],
+      "evidence": "原字段上限只在被绕过的两个main设置；新真实构建没有等价设置。",
+      "static_counterexample": "默认131072字段限制下，131073字符合法TSV字段为原16*1024**2设置允许，新入口拒绝。",
+      "impact": "原资格可解析范围与正式构建范围不同，可能在清洗前非预期失败。",
+      "minimal_fix": "四表读取前恢复csv.field_size_limit(16 * 1024**2)。",
+      "minimal_followup": "通过实际read_table的一条手写长字段；不扫描官方包。",
+      "observed_formal_incident": false,
+      "real_archive_trigger_unknown": true
+    },
+    {
+      "id": "EV-IMP-R03",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "required_before": "official_data_build",
+      "title": "资格来源列表未覆盖实际动态导入文件",
+      "locations": [
+        {
+          "file": "scripts/step30_evolution_control.py",
+          "function": "build",
+          "lines": [
+            305,
+            306,
+            307,
+            308
+          ]
+        },
+        {
+          "file": "scripts/step30_evolution_data.py",
+          "function": "qualification_modules",
+          "lines": [
+            49,
+            50,
+            53
+          ]
+        },
+        {
+          "file": "scripts/step30_evolution_io.py",
+          "function": "SOURCES / permit",
+          "lines": [
+            19,
+            20,
+            82,
+            83,
+            84,
+            89
+          ]
+        }
+      ],
+      "evidence": "verify(qualification_sources)与qualification_directory实际导入路径之间没有集合覆盖校验。",
+      "static_counterexample": "校验A目录脚本而qualification_directory指向B目录；或资格来源列表为空，仍进入实际动态导入。",
+      "impact": "入口可使用未绑定的清洗代码，聚合数相同不能证明来源相同。",
+      "minimal_fix": "在打开官方数据前要求真正导入的audit.py/followup.py resolved路径位于批准来源记录中，并核大小/SHA。",
+      "minimal_followup": "A/B目录错配及缺实际依赖在数据访问前拒绝。",
+      "observed_formal_incident": false
+    },
+    {
+      "id": "EV-IMP-R04",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "required_before": "official_build_schema_and_language_gate",
+      "title": "固定语言样本未绑定冻结数据manifest",
+      "locations": [
+        {
+          "file": "scripts/step30_evolution_data.py",
+          "function": "partition / export_dataset / language_result",
+          "lines": [
+            270,
+            271,
+            292,
+            293,
+            295,
+            299,
+            304,
+            305,
+            308
+          ]
+        },
+        {
+          "file": "scripts/step30_evolution_control.py",
+          "function": "main: language",
+          "lines": [
+            337,
+            338,
+            339
+          ]
+        },
+        {
+          "file": "scripts/step30_evolution_io.py",
+          "function": "dataset",
+          "lines": [
+            100,
+            101,
+            102
+          ]
+        }
+      ],
+      "evidence": "manifest没有样本record；language只核samples/decisions相互一致，并把另一个manifest绑定直接复制进回执。",
+      "static_counterexample": "新M2 manifest加旧S1样本与J1合格判断，当前入口可产生passed=true,manifest=M2，dataset随后接受。",
+      "impact": "可将另一份数据的语言抽查错误归属为当前数据门通过。",
+      "minimal_fix": "manifest纳入实际样本file record；language核manifest并比对样本record；回执及dataset保留验证该关联。",
+      "minimal_followup": "旧样本+新manifest拒绝，正确绑定接受；复用29/32与28/32。",
+      "observed_formal_incident": false
+    },
+    {
+      "id": "EV-IMP-R05",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "required_before": "official_data_build",
+      "title": "匹配分区导出末段无资源回调和终检",
+      "locations": [
+        {
+          "file": "scripts/step30_evolution_control.py",
+          "function": "build",
+          "lines": [
+            301,
+            308,
+            309,
+            310,
+            312
+          ]
+        },
+        {
+          "file": "scripts/step30_evolution_data.py",
+          "function": "match_accounts / partition / export_dataset",
+          "lines": [
+            177,
+            220,
+            275,
+            279,
+            283,
+            287,
+            291,
+            292,
+            295
+          ]
+        },
+        {
+          "file": "scripts/step30_evolution_io.py",
+          "function": "Budget.check",
+          "lines": [
+            115,
+            117,
+            119,
+            121,
+            124,
+            125
+          ]
+        }
+      ],
+      "evidence": "check仅交给clean_archive，后半程无回调，直接build又不经Runner父监测。",
+      "static_counterexample": "最后清洗check通过，导出期间其他正常作业使共享空闲低于预留，仍可写完manifest并返回成功；或导出越过截止后才由charge事后拒绝。",
+      "impact": "既定构建资源边界没有贯通完整动作，时间仍计费但磁盘/RSS无完成前终检。",
+      "minimal_fix": "传入既有check至匹配/分区/导出边界；成功前执行不被节流跳过的磁盘终检，保留失败收费。",
+      "minimal_followup": "手写导出途中回调失败应中止且不发布成功状态，费用保留。",
+      "observed_formal_incident": false
+    }
+  ],
+  "explanation_corrections": [
+    {
+      "id": "EV-IMP-C01",
+      "classification": "NECESSARY_EXPLANATION_CORRECTION",
+      "title": "CPU03资源证据应限定正常准入及失败派发",
+      "detail": "未实测64GiB超帽、低共享空闲/RSS阈值或原子改名竞态，不要求额外GPU。"
+    },
+    {
+      "id": "EV-IMP-C02",
+      "classification": "NECESSARY_EXPLANATION_CORRECTION",
+      "title": "直接build/language计时边界不同于Runner",
+      "detail": "前置导入/permit验源须明确计入准备账或完整外层回执；原archive及资格SHA已在build计时内，不称构建费丢失。"
+    },
+    {
+      "id": "EV-IMP-C03",
+      "classification": "NECESSARY_EXPLANATION_CORRECTION",
+      "title": "来源与证据措辞",
+      "detail": "source_row为解析记录序号；source_sha为解码行JSON摘要；CPU01整轮FAIL；receive_manifest本审独立验证包内15/18，三份progress未提供并非顶层清单缺项。"
+    }
+  ],
+  "execution_authorized_by_review": false,
+  "scientific_execution_performed": false,
+  "scope_exclusions": [
+    "new backbones",
+    "additional seeds or periods",
+    "HPO",
+    "additional GPU qualification",
+    "automatic waiting or recovery",
+    "reopening unchanged historical reviews",
+    "official data/model access by reviewer"
+  ]
+}

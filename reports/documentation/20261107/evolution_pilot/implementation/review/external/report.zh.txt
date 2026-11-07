@@ -1,0 +1,529 @@
+# Evolution英文适配与遗忘预实验：实际实现定向外审报告
+
+审查日期：2026-11-07（UTC+8）
+审查对象：evolution_implementation_review.zip
+可自述模型身份：GPT-6 Astra Pro。无法独立核验前端选择器或后台实际路由。
+审查性质：本轮实际实现、既有CPU证据及冻结方案的静态对应审查。
+
+## 一、裁决
+
+当前实现不宜直接关闭审查并进入真实数据构建或正式运行；有5项具体、局部、可用静态反例说明的REPRODUCIBILITY_DEFECT需要先修复。
+
+这5项是：
+1. EV-IMP-R01：活跃目录统计与正常原子保存存在竞态，可误杀健康worker。
+2. EV-IMP-R02：新构建绕过原资格main后，漏继承CSV字段长度上限设置。
+3. EV-IMP-R03：资格来源校验列表未强制覆盖实际动态导入的audit/followup文件。
+4. EV-IMP-R04：语言样本与冻结数据manifest之间缺少实际来源关联校验。
+5. EV-IMP-R05：构建的匹配、分区、导出末段没有贯通既有资源回调及完成前终检。
+
+未发现需要推翻既定代理任务、方法目标、候选、种子或科学门的SCIENTIFIC_BLOCKER。H核心、V_ER实际更新、共同cased工厂、单域A、紧凑保存、九格评价、整批开标签、A选择、H0去重、B双遗忘门、C阻断D以及D内外分层，均有明确实际调用链；现有手写CPU证据在其覆盖范围内可以复用。
+
+上述缺陷不等于已经发生了正式数据污染、真实构建失败、GPU故障或效果错误：本轮正式构建和正式训练尚未执行。特别是R02是否遇到真实长字段、R03/R04是否会发生实际旧路径误接，本包没有现场证据；确定的是当前代码存在相应兼容性或验证缺口。修法不需要新增骨干、季度、seed、HPO、GPU资格或通用恢复平台。
+
+本报告只给出审查裁决和最小处置要求。主执行者应独立复核；修复完成也不自动授予数据构建、人工真实文本查看、预训练加载、GPU训练/评分或等待许可。
+
+## 二、身份核验、授权时点与证据边界
+
+### 2.1 实际核包
+
+实际附件字节数：153495。
+实际SHA256：affb8eadab7f853694bfc2c3ea1ed2956bdabd927848b867bfff0ec5992c789d。
+ZIP成员：39个唯一成员，38份载荷及package_manifest.json。
+38份载荷实际合计405787字节。
+包内清单的每一份载荷大小、SHA256和实际文件集合均一致；没有重复ZIP名称、清单缺项、未列载荷或越界解包路径。
+
+用户本轮随后授权已明确覆盖这个具体包。package_manifest.json中的upload_authorized:false保留制作时状态，不覆盖用户当前恢复送审的直接授权，也无需改写或重打包。formal_execution_authorized:false与当前正式执行仍关闭一致。
+
+### 2.2 本审实际做了什么
+
+完整读取38份载荷和包清单：文档、源码、diff、日志全文读取；JSON读取全部字段和值，CPU来源清单另与回执内嵌sources做完整对象比对。对三个独立主题作静态交叉复核后，主审回读相关代码并独立形成以下裁决。
+
+独立完成的机械核对包括ZIP/载荷哈希、CPU来源对应、diff反向文本还原和原来源哈希、回传清单在包内部分的对应。没有导入或执行所附科研模块，没有运行测试、模型、数据构建、标签解析、指标计算或bootstrap，没有联网检索、连接项目Linux、访问包外科研私有路径或修改项目源码。报告文件与核验JSON的生成仅为本次审查交付。
+
+CPU的“实际运行”是指包内保存的Linux原回执所记载的运行，本审没有重新运行或现场认证。旧原生GPU、既有VJP/四层梯度资格和旧运行结果在未变范围按已有闭合记录承接；本包未提供的旧原件不冒称本次重新核验。
+
+### 2.3 引用索引
+
+下文行号均指本包当前文件；R01等为本轮新发现编号，不覆盖原方案EV-R01/EV-R02。
+
+P：reports/documentation/20261107/evolution_pilot/proposal.zh.md
+I：reports/documentation/20261107/evolution_pilot/implementation.zh.md
+REQ：reports/documentation/20261107/evolution_pilot/implementation/review/request.zh.md
+PREV：reports/documentation/20261107/evolution_pilot/review/external_review.zh.txt
+DISP：reports/documentation/20261107/evolution_pilot/review/primary_disposition.zh.md
+DATA：scripts/step30_evolution_data.py
+RUN：scripts/step30_evolution_run.py
+POL：scripts/step30_evolution_policy.py
+EVAL：scripts/step30_evolution_evaluate.py
+IO：scripts/step30_evolution_io.py
+CTRL：scripts/step30_evolution_control.py
+VD：scripts/step29_vendorlink_data.py
+VM：scripts/step29_vendorlink_methods.py
+VR：scripts/step29_vendorlink_run.py
+TEST：tests/step30_evolution_cpu.py
+AUD：reports/documentation/20261107/evolution_qualification/audit.py
+FUP：reports/documentation/20261107/evolution_qualification/followup.py
+QR/QJ/QS：同一evolution_qualification目录的report.zh.md、followup_cross_account.json、status.json。
+CPU01/02/03：implementation/cpu01/receipt.json、cpu02/receipt.json、cpu03/receipt.json。
+LIFE01/02/03：implementation/cpu01_lifecycle.json、cpu02_lifecycle.json、cpu03_lifecycle.json。
+DIFF：implementation/review/cpu01_to_final.diff。
+BUDGET/RECEIVE：implementation/budget.json、implementation/receive_manifest.json。
+
+## 三、必须修复的实现缺陷
+
+### EV-IMP-R01：目录统计与合法原子保存竞态
+
+类别：REPRODUCIBILITY_DEFECT。
+处置时点：正式campaign派发前；该函数也用于其他资源检查，应一次修复共享实现。
+确定性：代码及正常并发交错可确证；不是已观察到的正式故障。
+
+位置：
+- IO::directory_bytes，第106、107行。
+- CTRL::Runner.run，第109、116、126、127、132行。
+- IO::write，第26、28行。
+- RUN::atomic_tensor，第91、93行。
+
+directory_bytes的实现先用p.is_file()判断，再用p.stat().st_size取大小。父控制器在worker活动时每0.5秒调用它，而worker正常写JSON使用.tmp原子replace，阶段模型使用.partial原子replace。
+
+可复核的静态时序：
+1. 父进程枚举到workload.json.tmp或stage1.partial。
+2. p.is_file()返回真。
+3. worker将该临时文件原子改名为正式文件。
+4. 父进程对原临时路径执行p.stat()，抛FileNotFoundError。
+5. 异常进入Runner.run的失败分支，self.failed置真，finally终止/排空原本正常的worker，后续队列停止。
+
+这不需要恶意输入、外部删除或恢复操作。每epoch小型workload更新也触发这类原子改名，风险不只来自三个模型端点。worker扫描时与父账本原子写交错，同样可能遇到消失路径。
+
+最小修法：改为逐路径取得一次stat并据其判断/累加；仅局部容忍扫描过程中路径消失的FileNotFoundError。其他I/O错误和真实超帽仍拒绝，保留全实验目录范围、现有大保存预留和父监测。不要跳过全部临时文件、吞掉所有OSError或放开磁盘帽。
+
+最小定向补证：受控地让枚举后的临时路径在stat前消失，确认不被判运行失败；同一小夹具保留真实超帽拒绝。无需GPU、完整模型或正常训练重跑。
+
+### EV-IMP-R02：未继承原资格CSV字段长度设置
+
+类别：REPRODUCIBILITY_DEFECT。
+处置时点：首次真实四表构建前。
+确定性：读取入口设置不等价已确证；官方包是否实际触发未知。
+
+位置：
+- AUD::main，第315行；FUP::main，第249行：原两个实际入口均先调用csv.field_size_limit(16 * 1024**2)。
+- AUD::read_table，第258、260行：真正的TSV解析器。
+- DATA::qualification_modules，第45、50、53行；DATA::clean_archive，第84、89、102、108行。
+- CTRL::build，第308行。
+
+新入口有意只导入两个模块并直接复用read_table/scan，不会运行它们的main。因此原main中的字段长度设置也被一并绕过；新构建链中没有等价设置。这个问题与是否保留20条旧门无关。
+
+静态反例：在沿用CPython 3.10默认131072字段长度限制的解释器中，一个合法TSV字段含131073个字符，仍低于原设置16×1024²的上限。旧入口允许解析，新入口会在清洗/容量复核之前因字段过长退出。这里没有在本审执行该例。
+
+不能据此写“真实官方包必失败”：QR只提供正文中位数和95分位，本包没有能证明最大字段超过该默认限制的原始字段或统计。应修的是明确遗漏的读取设置，而非据猜测重跑资格。
+
+最小修法：新clean_archive或唯一构建入口在读取任何四表前设置与原资格相同的字段长度上限。只补一条通过实际read_table的手写长字段例即可；不需要打开官方包来查最长字段。CPU01的test_data没有调用clean_archive，所以其PASS子项不能覆盖此遗漏。
+
+### EV-IMP-R03：核验的资格脚本与实际导入脚本没有强制对应
+
+类别：REPRODUCIBILITY_DEFECT。
+处置时点：首次真实四表构建前。
+确定性：入口接受错误来源组合的路径已确证；没有证据表明已现场错接。
+
+位置：
+- CTRL::build，第305、306、307、308行。
+- DATA::qualification_modules，第49、50、53行。
+- IO::SOURCES，第19、20行；IO::permit，第82、83、84、89行。
+
+build会verify qualification_sources中的每一条，但实际动态导入目录来自另一个qualification_directory。程序没有要求该列表覆盖真正要导入的audit.py和followup.py。permit的必需来源集合是九个step29/30模块，也没有补上这两个动态依赖。
+
+普通旧路径误接反例：qualification_sources指向目录A中的已冻结脚本，两个哈希均通过；qualification_directory却仍指向目录B。随后实际运行B中的audit.py/followup.py。空qualification_sources列表也不会在这一步被拒绝。不同版本完全可能具有相同聚合计数，因此末端计数复核不能替代源码身份对应。
+
+本项不把“将来的许可可能填错任何值”泛化成防攻击需求；它只针对本次真实动态导入的两个已知直接依赖，补齐实现已经声称的来源保证。
+
+最小修法：打开官方四表前，计算实际将导入的两个resolved路径，要求在已批准来源绑定中找到对应record，并对这些实际路径核大小/SHA。缺项、空列表或只核另一目录应拒绝。可保留其他已批准来源，无需全仓库白名单平台。
+
+最小定向补证：两个小目录或手写元数据构造“校验A、将导入B”，确认在官方数据访问之前拒绝；同时保留正确绑定路径。无需原始语料。
+
+### EV-IMP-R04：语言样本可以被误绑定为另一冻结数据已通过
+
+类别：REPRODUCIBILITY_DEFECT。
+处置时点：应随导出格式一起在首次构建前修复，至少不得在修复前完成正式语言门/训练准入。
+确定性：错误来源组合可被当前代码接受已确证；没有声称实际样本已经用错。
+
+位置：
+- DATA::partition，第270、271行：产生固定fit语言样本。
+- DATA::export_dataset，第292、293、295行：写样本，但manifest没有其文件身份。
+- CTRL::main的language分支，第337、338、339行。
+- DATA::language_result，第299、304、305、307、308行。
+- IO::dataset，第100、101、102行。
+
+语言判断本身的29/32规则正确。然而，language入口仅验证许可中samples和decisions各自的文件哈希及相互ID一致，然后将allowed.dataset_manifest直接抄进回执。后续dataset只检查该抄入字段与当前manifest绑定相等。
+
+静态反例：目标是新数据清单M2，许可误用了旧目录S1样本和J1判断。S1/J1三个域均有32个匹配ID，每域至少29个english。language_result返回true，回执被写成passed=true、manifest=M2，随后dataset接受。无需修改任何脚本或伪造任何文件，仅一处普通旧路径残留就能造成门的错误归属。
+
+因此，“回执上写着M2”不足以证明检查的就是M2的固定fit样本。它与现有29/32边界测试是两件不同的事。
+
+最小修法：
+1. export_dataset将实际language_samples.json的文件record纳入冻结manifest。
+2. language动作先核manifest，要求将读取的样本record与该manifest所指定record完全一致。
+3. 回执保留实际样本record和manifest关联；dataset据此校验。
+
+不必重新从全部fit生成样本，不必打开test文本，也不必建立一般性数据血缘系统。
+
+最小定向补证：新manifest加旧samples/decisions应在错误数据门开放前拒绝；既有29/32通过、28/32拒绝继续复用。
+
+### EV-IMP-R05：构建后半段资源回调缺失
+
+类别：REPRODUCIBILITY_DEFECT；局部运行边界问题。
+处置时点：首次真实数据构建前。
+确定性：回调空档已确证；没有证明真实960账号构建会超预算或磁盘。
+
+位置：
+- CTRL::build，第301、308、309、310、312行。
+- DATA::match_accounts，第177行；DATA::partition，第220行。
+- DATA::export_dataset，第275、279、283、287、291、292、295行。
+- IO::Budget.check，第115、117、119、121、124、125行。
+
+Budget.check只传给clean_archive。随后partition、匹配、排序、全部JSON导出和最终manifest生成均没有回调；build之后直接ok=True。该动作由main直接调用，不经过Runner的父监测。
+
+普通静态触发：清洗的最后一次检查通过后，匹配/导出因共享CPU或磁盘变慢而越过剩余截止；或者其他正常作业保存端点，使共享空闲跌破64GiB预留。后半段没有检查，仍可继续写完数据并先标成功。目录超帽/共享空闲不足也没有完成前终检。
+
+必须准确区分费用：finally中的Ledger.charge会累计实际构建耗时，超辅助桶会保存费用后抛TimeoutError。因此本项不是“超时永不拒绝”或“构建费丢失”；问题是后半程只能在时间上事后发现，磁盘/RSS等没有对应结束检查，并可能先记录success=True再因总费用报错。
+
+最小修法：将现有check贯穿匹配槽循环、适当分区循环和文件导出边界，在完成manifest提交/ok=True前执行覆盖磁盘状态的终检。已有磁盘检查有2秒节流，终检应确保不被节流跳过；保留失败费用和已有日志，不另建守护/恢复平台。
+
+最小定向补证：手写导出夹具在进入导出后让现有回调报告超时或磁盘不足，确认及时中止、不发布成功完成状态且费用不退回。可与R01的资源小夹具合并，不能据此扩成全面资源压测。
+
+## 四、对用户五项重点的实际核查
+
+### 4.1 数据：主要科学构建接通，正式可构建性仍待真实门
+
+DATA::clean_archive实际调用原AUD.scan，并逐段复用FUP的正文规范化、账号内/跨账号精确正文排除、20个含字母词/90% ASCII/三功能词筛查、5词shingle与8个MinHash候选、命中后Jaccard≥.8。各层容量及近重复比较/排除数与保存qualification_summary进行核对；不采用已勘误的PGP可解码零值。〔DATA第108、112、127、134、152、154、160行；AUD::scan；FUP::run、cross_account_exclusions〕
+
+同快照恢复不是仅比较casefold：
+- remember_snapshot与原scan同用(日期,int(scrape_id),raw_hash)严格小于规则；
+- 同键不覆盖，保留首先出现的同一解析源记录；
+- 新代码保存scrape、source_row和解码行摘要；
+- 输出前再次核日期/scrape/raw键及大小写文本casefold一致。
+CPU01例中后期小写记录先出现，仍选回早期Apple/The AND with Case，保存源记录序号为2。〔DATA第59、70、71、79、169、170行；AUD第204、205行；TEST第73、76、77、78、80行〕
+
+“source_row”应准确解释为TSV解析记录序号，不一定等于物理文本行号；带引号字段可含换行。source_sha256是解码行字典规范JSON的摘要，不是原文件该行字节摘要。固定归档身份、解析记录序号、字段键及摘要结合仍能定位同一源记录；这是一项解释精确化，不是否定当前同快照逻辑。
+
+4条门由partition中的len(rs)>=4实际决定，新构建不调用旧eligible_ads/build_views，旧20条门没有残留到本轮路径。固定哈希槽/边顺序、逐槽visited和迭代DFS增广实现了已选匹配规则；配额不足直接停止。全局selected_vids/lids/body_keys阻断重复导出，每账号4条固定拆成两份，每群8账号/16视图/32记录。〔DATA第177、179、180、184、195、199、200、205、228、244、247、249行〕
+
+qrels在evaluation_order之后生成，再blind。VD的视图ID基于群ID和各自不相交记录集合，不含身份前缀；评估自然视图与标签顺序一致。〔DATA第259、261、262行；VD第60、68、69、71、73行〕
+
+语言抽样和29/32阈值本身进入真实入口，灰区不计英语；问题是R04的来源关联，而不是阈值没有实现。manifest中的language_audit_passed=False可以保持冻结，由独立回执控制准入；不能仅凭该旧字段false认定门未接线。
+
+QJ保存的最终24411记录/3468账号、4条档三域最大等额互斥quota342，仍是划分前容量证据。每域取320的正式匹配、全部清洗计数重放、实际960账号/3840条导出及人工语言结果尚未执行；CPU01的9个手写分区群/288条记录不能代替这些真实数据门。
+
+### 4.2 V_ER：真实联合头、历史encoder梯度和一次更新
+
+真实调用链为CTRL.worker(train)→RUN.execute→RUN.update_vendor→RUN.vendor_backward→VM.Model.encode/classifier。
+
+每阶段只调用当前load_fit，历史类别只取存活VendorMemory.classes；排序后的当前∪历史类别用于一个联合头，最多160+48=208类。每阶段重置V分类头和AdamW；没有回读旧完整fit或预读未来fit。〔RUN第120、125、133、136、137行；CTRL第273、275、276行；VM第170、173、175、242、247行〕
+
+实际目标为mean CE_current + 0.1 mean CE_history。当前和历史各调用同一classifier/classes，分别forward/backward；随后只有一次clip和optimizer.step。不是64条无权均值，不是两个分离softmax头。〔RUN第59、61、65、68、72、76、80、81、83行〕
+
+CPU01独立一图参考的最大梯度误差为0；去掉历史项后encoder梯度最大差0.001957843080163002。这是在零dropout微型模型上的真实更新子项，证明历史CE参与encoder梯度；没有把它扩大成真实语料效果或全BERT性能证据。〔TEST第163、179、180、189、193、194、195、196行；CPU01.checks.updates〕
+
+V_ER的Algorithm R选择复用相同局部随机流，但不生成H教师；完整序列化状态包含类别映射，仍受6群/1MiB约束。H/V回放同阶段同更新索引draw一致；H当前整群shuffle和V当前广告shuffle各自保持配对，不要求两种训练目标共享完全相同分类头。CPU01保存三种回放draw一致、H三臂当前流一致、V两臂当前流一致；20群/域的小型reservoir例有9次新教师、0次刷新，V_ER教师为0。〔RUN第32、40、49、52、55、141、153、156行；VM::Memory；TEST第155、156、157、207、211、214、217行〕
+
+### 4.3 H核心与共同cased工厂可按未变范围复用
+
+新RUN仅复用旧方法对象、Memory、update_h及VR.set_rates，不调用旧run.execute/save_state/main。
+
+H保留双通道记录向量[normalize(title);normalize(body)]/sqrt(2)、0.5mean+0.5LogMeanExp、自然/重组监督均值、原rank/hard、0.1历史监督和独立0.5出生评分MSE；跨阶段H优化器持续。D_birth的0.5没有再乘0.1。旧VJP将记录表梯度回传encoder/head的路径仍在实际调用中。〔VM第108、137、145、151、155、196、203、216、219、253、258、260行；RUN第138、139、159行〕
+
+RUN.make_model固定do_lower_case=False，正式默认hidden768；训练、端点恢复与评分共用factory，教师使用同一Model/tokenizer。旧VR.main的True不进入此链。CPU01实际微型工厂已证明Apple/apple token ID不同，起点恢复评分逐值相等。H0仍应解释为Evolution共同新输入协议下的旧表示/优化配方，不能声称旧实验逐字节重放。〔RUN第20、24、26、27、201、206、211行；CTRL第265、272行；TEST第111、112、119、132、133行〕
+
+非零出生保持损失只能说明路径触发，不能单独替代既有VJP/四层梯度资格。旧原生证据可按相同最大形状和未变计算作参考，不需要因此新增GPU资格，也不能据旧峰值保证新数据全程不会OOM。
+
+### 4.4 单域、紧凑端点、九格与标签一次开放已经真实接线
+
+RUN.execute显式支持stages=1或3。A正常执行单域、保存0/1并输出完成状态；不是中断旧三域任务。起点initial.pt只存实际head和任务/预训练绑定；V的Identity head为空，不存重复骨干，也不为无头起点读取fit。阶段端点只保存encoder/head和必要身份、配置、更新计数。〔RUN第99、112、114、117、182、186、191、193行〕
+
+每epoch仅写小型workload；没有latest.pt，也不周期保存optimizer/RNG/Memory。CPU01的五个系统各为1个起点小文件+3个阶段文件；单域为起点+1阶段。恢复只服务固定推理，不能把它叫作获准训练恢复。〔RUN第172、182、201、208、211行；TEST第129、130、151、153、158、161、162行〕
+
+九格为(0,D1)、(1,D1/D2)、(2,D1/D2/D3)、(3,D1/D2/D3)。score_batch先核全部规定任务训练完成，再恢复0/1/2/3，对每群生成120个有限无序pair分数；analyze_batch先校全部格、群、视图顺序、配额和盲源，再用排他创建保存一次qrels访问尝试。缺分数不读标签，第二次开放在读取前被拒。〔POL第12、75、78行；EVAL第17、38、45、65、67、75、76、88、149、154、157行；IO第59、63行〕
+
+CPU03是2条手写微型轨迹、每域1群、共18格实际score_batch/analyze_batch测试；它确证真实评价接口，而不是已经跑完正式18/15条确认批次。生产CLI没有fixture_specs/fixture_groups/expected_hidden/expected_groups覆盖选项，真实worker采用固定spec和默认正式规模。〔TEST第237、242、246、259、264、266行；CTRL::main、worker〕
+
+单正例query_metrics输出十指标，MAP=MRR，Recall@1=NDCG@1；UTF-8盲ID破同分，不制造重复独立证据。〔EVAL第118、129、133、136、137、139行〕
+
+### 4.5 A选择、B/C/D停止和净学习修法正确对应当前方案
+
+A按完整16任务及精确spec验证，先用能力门过滤，再以未舍入均值和0.005近优集合按固定顺序选择。适配收益另按对H0至少0.01、两seed均正判断。若H0获选，C/D各去重3条，并标same_configuration_reused；缺seed/缺格拒绝，没有删失后继续。〔POL第81、83、87、99、103、108、113、118、121、63、242行〕
+
+B确实要求H_SEQ和V_SEQ都满足能力、平均G≥0.03和既定明显遗忘门。C按四个对照逐一检验F/O幅度、3/3方向、质量与净学习；C任何共同条件未过，不派D。D重新检验B及C，并加入各方向条件区间。科学false正常结束，与运行异常分开。〔POL::scenario、mechanism、decision；CTRL第148、153、159、164、166、169行〕
+
+同域同一对照的新域规则准确实现为：
+learning_ok(d,b) = (mean G_full - mean G_b >= -0.02)
+                   OR (mean P_full > mean P_b AND mean A_full >= mean A_b)。
+
+Full每域平均G≥0.01、每seed G≥0放在OR外；Full绝对能力及相对初学/末态、F/O幅度与方向也仍是共同AND。代码先构成三个固定seed×三个域矩阵，再逐参考循环，未发现混域或混对照拼条件。输出保留original/high_start/own_learning以及Full/ref逐seed P/A/G。〔POL第141、142、143、144、145、147、168、170、171、174、178、179、182、186、188行〕
+
+因此可明确接受本轮已选净学习修法：较高起点且学后不低的正学习可以过受限路径；负学习、零平均学习或某seed负G仍拒绝。通过高起点路径不能改写为“相对净增量更大”。
+
+D的bootstrap固定PCG64、seed2026110702、5000次，各域抽12群，方法/阶段/三个固定seed共享同域索引，再等权三seed；linear分位2.5%/97.5%。内部两个对照四方向与两个外部对照分别给支持，passed要求全部支持。内部过而V_ER跨0时，总体false，CPU03纸面指标例也明确覆盖。〔POL第192、201、205、208、210、213、215、222、224、247、248、250、251、252行；TEST第339、345、350、351、352行〕
+
+这些是边际95%条件区间，不是联合95%同时覆盖，不涵盖训练seed总体或潜在控制者/残余模板依赖。用户已确定的更强门不在本审重开。
+
+## 五、CPU原证据、失败及版本桥
+
+### 5.1 三轮不能混成一次全PASS
+
+| 轮次 | 原状态/退出码 | 已完成范围 | 外层生命周期秒 | 权威收费秒 | receipt内部收费秒 |
+|---|---|---|---:|---:|---:|
+| CPU01 | FAIL / 1 | data、updates；随后决策夹具失败 | 7.837049745023251 | 8 | 5 |
+| CPU02 | PASS / 0 | decisions、boundaries | 5.079015010036528 | 6 | 3 |
+| CPU03 | PASS / 0 | evaluation、decisions、boundaries | 7.838232571957633 | 8 | 6 |
+
+权威CPU收费8+6+8=22秒；622秒辅助账=22秒CPU+明确标注的600秒保守准备费用。600秒不是实测运算时间。receipt内部累计5/11/20不是外层累计8/14/22，原字段应保留，不应为表面一致而追改。〔LIFE01/02/03；BUDGET；CPU01/02/03〕
+
+CPU01失败来自test_decisions中for p,a,...把此前A结果列表a覆盖成浮点数，pipeline随后select_a遍历float触发TypeError。DIFF显示局部变量改为pre/after；并未通过修改科学选择器去迎合夹具。data/updates在异常前已保存通过子项，因此不需要因整轮FAIL否认这些证据，但也不能改称CPU01整轮PASS。
+
+### 5.2 本审独立核验的来源桥
+
+三份cpuXX_sources.json与各自receipt.sources完整一致。
+
+当前12份必要来源与CPU03来源全部大小/SHA一致。
+CPU01有7份与当前字节相同：DATA、RUN、三个旧step29模块、AUD、FUP；其余5份为POL、IO、EVAL、CTRL、TEST。
+本审只用包内DIFF反向作文本还原，并对还原的5份及未变7份核大小/SHA，12份全部匹配CPU01_sources.json。没有访问包外Git，也没有执行恢复出的代码。
+CPU02有8份与当前相同，IO/EVAL/CTRL/TEST存在后续修改。其回执与自己的源清单一致；CPU02中间版TEST没有声称从包外Git恢复或被本审独立运行。最终相关路径由CPU03再次覆盖。
+
+因此：DATA/RUN/旧核心的CPU01已完成子项可定向复用；最终评价和控制分支的覆盖应看CPU03及静态差异，不能只以旧CPU02 PASS为当前全部模块背书。
+
+RECEIVE列18份回传对象，包中包含其中15份；15份实际大小/SHA全部匹配，三个progress.json未打包。它们不在package_manifest的38载荷承诺内，所以不是包缺项。本审不将RECEIVE中“18份双端已核”的执行者记录写成本审独立查看了远端18份；三轮最终receipt与console/lifecycle足以支持本次所列状态，无需为三个中间progress索取额外材料。
+
+### 5.3 必要解释修正EV-IMP-C01
+
+I第26行“总目录资源限制…补核”需要收窄：
+CPU03实际运行了最终正常准入路径和真实闭门子进程失败/停止；TEST第358行的边界例没有构造64GiB超帽、共享空闲不足或RSS超限事件，也没有覆盖R01原子改名竞态。
+
+可以写“最终源码以experiment_root计总量，实际失败派发路径已核”；不能写“所有资源阈值越界和正常保存竞态均已原生通过”。这项解释修正不要求新增GPU或全量压测；R01/R05的小型定向例足够针对具体剩余风险。
+
+## 六、费用、资源、保存量与许可
+
+### 6.1 训练/评分/分析的生命周期收费成立
+
+Runner在Popen之前开始计时，在退出/释放之后收费；子进程模块导入、permit/来源核验、模型SHA、载模、计算、保存和失败退出均在生命周期内。父监测只计活跃段，sleep不作为父活跃重复收费。单worker串行派发，异常之后不再派下一任务；资源不足立即停止，没有等待器或重试。〔CTRL第86、95、105、109、119、121、127、132、137、142、143行〕
+
+48h为独立三桶：训练144000秒、GPU评价14400秒、辅助14400秒；1200秒CPU是辅助子集。预算未引用旧ABC/中文余额。单域任务900秒、完整轨迹3600秒，保留退出reserve及失败费用。〔POL第16、17、20行；CTRL第201、208、212行；IO::Ledger〕
+
+### 6.2 必要解释修正EV-IMP-C02：直接保管动作不等于Runner全生命周期
+
+build的begin在CTRL第297行；main第324行permit、build前置导入和建账发生更早。language也主要只对Ledger.active内处理计时。不能将二者的内部时钟宣传成同Runner一样覆盖整个命令启动至退出。
+
+同时也不能说“整个构建未计费”：archive核验、资格汇总与资格来源核验均在begin之后；finally累计实际耗时，失败费用不退款。现有30秒保守tail明确用于最终保存/清理，不能倒称为启动前验源的实测时间。
+
+后续执行前，应将这些小型前置/收尾活动纳入明确、可核对的准备收费，或沿用完整外层生命周期回执；允许明确保守收费，不要求为了这一小段建立另一套计费平台。应继承当前622秒及之后新增的真实/明确保守费用，不得在build、language、campaign之间重新套用旧余额。当前尚无正式gate，不能据此声称预算已经被重置。
+
+### 6.3 保存量与资源门
+
+无去重最大52任务=16单域+36完整轨迹，124阶段模型+52起点小head/引用，合计176个评价状态；不是176份完整BERT，也不是52条完整三阶段。H0获选后C/D各少3条，变46任务、106阶段模型。代码保存路径与这些数量对应。
+
+对照方案按435755784字节骨干估算124份约50.3GiB，是逻辑张量写入量级，不是物理磁盘写入测量；目录帽64GiB、启动128GiB空闲和运行共享保留64GiB已进入相应配置与主入口。新入口确实排除旧每epoch latest及完整optimizer保存。〔P§4、§6；RUN::execute；POL::LIMITS；CTRL第184行；IO第124、125行〕
+
+修复R01/R05后，仍只能将17GiB显存准入、40GiB可用RAM、32GiB worker RSS及8GiB构建预算称为运行边界与规划，不能说真实Evolution全程峰值已实测。现场还须核其他活动合同未体现的显存承诺；旧PID、历史空闲量或旧短测不会自动满足本次现场条件。
+
+## 七、最小回收方案：哪些复用，哪些补证
+
+建议一次有限修复回收，保持科学实现和选择不变：
+
+| 对象 | 可复用部分 | 仅需追加的最小证据 |
+|---|---|---|
+| R01目录竞态 | 单worker、原子保存、失败停止、真实闭门子进程 | 枚举后路径消失不误判；真实超帽仍拒绝 |
+| R02字段设置 | 原清洗定义、CPU01分区/快照/语言阈值 | 一条手写长TSV字段通过实际读取器 |
+| R03资格来源 | 已冻结AUD/FUP及其SHA、清洗逻辑 | 核验A而导入B/缺实际依赖时在数据前拒绝 |
+| R04语言关联 | 固定抽样算法、29/32和28/32 | 新manifest加旧样本判断拒绝；正确关联接受 |
+| R05构建末段 | 原Budget/Ledger、清洗回调、失败收费 | 导出途中资源回调失败即中止，不发布成功状态 |
+| V_ER/H/端点 | CPU01已通过更新子项、未变来源及旧资格 | 不要求重跑无变化模型/梯度/九格 |
+| 门及评价 | CPU03实际18格接口、完整任务表纸面判据 | 科学门无修改时无需再次5000次重采样 |
+
+这些是给主执行者的最小验证建议，不表示本审已经运行或授予新增执行许可。合并手写夹具即可，不要求每一行检查都新增独立测试文件，也不需要重新全跑CPU01。
+
+## 八、后续执行前提与范围排除
+
+以下属于后续许可/真实数据门，不是“尚未完成所以本轮实现失败”：
+
+1. 用户另行批准的真实四表构建及实际来源/原基数/清洗计数核回。
+2. 每域320、160/64/96、四条/账号、完整隔离与固定960账号导出真正成功。
+3. 获准保管端查看固定fit语言样本，按29/32判定；不能由CPU手写文本代替。
+4. 实现修复与主执行者独立处置闭合之后，才可形成明确approved动作门。
+5. 模型/数据/来源、最新累计费用和现场资源的准确绑定；无自动等待/恢复。
+6. 后续真实效果按A/B/C/D规定正常推进或停止，负结果完整保留。
+
+SCIENTIFIC_BLOCKER：本轮未发现。此结论限已接受的观察账号视图检索代理，不恢复真实跨账号同控、严格在线或种子总体可重复等未获证主张。
+
+必要解释修正：C01资源CPU覆盖范围；C02保管动作计时边界；source_row/摘要的准确含义；CPU01整轮FAIL、回传清单15/18的证据分层。
+
+可选后续：本轮若获得有效结果后，其他时期、更大候选池或额外任务泛化可另立研究；不作为本轮通过条件。
+
+OUT_OF_SCOPE_OVERDESIGN：新增骨干/大小写对照、更多季度/顺序/seed、8/20条档、历史系数HPO、L2R/GCR/FOREVER新增臂、额外GPU资格、全语料去重平台、通用防攻击/恢复/等待系统、无变化旧审查重开、为了显著性扩跑。本审均不要求。
+
+旧VendorLink有效负结果、旧ABC因dev门未过且候选训练为0、中文活动合同及其预算不改。本包不支持对Evolution性能作正负结果判断。
+
+## 九、给主执行者的最终处置意见
+
+建议回收R01—R05五个局部实现问题及C01/C02解释修正。修复不改变既定科学问题，现有证据不作废；按真实变化补最小CPU证据并核来源后，可关闭这轮实现审查，再由用户决定下一步具体数据/执行范围。
+
+当前裁决是“存在必须先修的局部实现缺陷，主要科学与训练/评价路径可保留”，不是“全部通过可启动”，也不是“方案或H已经无效”。
+
+## 十、逐文件阅读与核验范围
+
+以下逐项清单由本包实际38载荷及清单生成，记录完整读取方式、行数、字节数与SHA；未沿文档链接递归读取包外历史。JSON全字段读取不意味着重新生成其统计，也不意味着重新认证当时运行现场。
+
+
+01. reports/documentation/20261107/evolution_pilot/proposal.zh.md
+    读取：全文静态读取；235行，41237字节。
+    SHA256：51e953e7893d961298ab71741d73afc2729b918438fc376f2f3492b1d47b1b24
+
+02. reports/documentation/20261107/evolution_pilot/implementation.zh.md
+    读取：全文静态读取；42行，7773字节。
+    SHA256：14f8096856188d353725a668a20db46adaf29052a6254a86377ff8dbf32ce330
+
+03. reports/documentation/20261107/evolution_pilot/review/external_review.zh.txt
+    读取：全文静态读取；354行，30939字节。
+    SHA256：1e4d92475e9f94701337e0880c4a4750c686ca25f440897f5d8e115e68fd0970
+
+04. reports/documentation/20261107/evolution_pilot/review/primary_disposition.zh.md
+    读取：全文静态读取；62行，11697字节。
+    SHA256：4a9f86a6ada7975f0ecf0fe711ec1aac40cc73fc2d3d88227c5c170680bf104a
+
+05. reports/documentation/20261107/evolution_qualification/report.zh.md
+    读取：全文静态读取；141行，15982字节。
+    SHA256：1fde8b5d8c43c9dc5a4945a0f577ce0340df5bd307969206f99b5faef8cade51
+
+06. reports/documentation/20261107/evolution_qualification/status.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；46行，2329字节。
+    SHA256：f4ae747b465fbb087aef72329721c0b2c8cf95fd8b72eff705dc767cb082e05f
+
+07. reports/documentation/20261107/evolution_qualification/followup_cross_account.json
+    读取：全部键和值读取（包括前后容量直方图/Hall约束/构成/限制/元数据）；未重算原始数据；2360行，57223字节。
+    SHA256：216ca99b48e93b6ac7afdeac01bd365ba21edbafa57d07975f13e5fc6d4e6af4
+
+08. reports/documentation/20261107/evolution_qualification/audit.py
+    读取：全文静态读取；398行，19972字节。
+    SHA256：e9b396601ad72e46365c856804b6fe6bf0f233190ff3d2661475173d6bdf369c
+
+09. reports/documentation/20261107/evolution_qualification/followup.py
+    读取：全文静态读取；269行，13749字节。
+    SHA256：20c33f435e279bf4618ec4d05184181f4880812b78fcdf7cc83dfbf2040485bb
+
+10. scripts/step30_evolution_policy.py
+    读取：全文静态读取；253行，13539字节。
+    SHA256：b4b7d826ae6ac84733f6eb2d79029da1363e72b47e2590c51ec2d8ff3abef98b
+
+11. scripts/step30_evolution_data.py
+    读取：全文静态读取；309行，15204字节。
+    SHA256：2608ebbe50380cb298c7ca5ef25368f2a4c3d5f7ace6dd3ae19b240f0bd947ad
+
+12. scripts/step30_evolution_run.py
+    读取：全文静态读取；213行，11656字节。
+    SHA256：bd4c7aa1b05ff3e35df255a2dd4e1bad6f0dabca72644b65cb66764bdbc3f7fb
+
+13. scripts/step30_evolution_io.py
+    读取：全文静态读取；164行，7013字节。
+    SHA256：55bbf646b2271562da2f3eb22b3079ab30c30ed7409866d7aa92bd02db79b73e
+
+14. scripts/step30_evolution_evaluate.py
+    读取：全文静态读取；178行，9725字节。
+    SHA256：ebb00983ece19d32504609e0a3f88f918131f9440137b88d903e8fce1f639f2f
+
+15. scripts/step30_evolution_control.py
+    读取：全文静态读取；347行，17989字节。
+    SHA256：11898d1e2423f76d6706b3be7ff311c0ccfe08d6e13d3c4a61922ade56268f1c
+
+16. scripts/step29_vendorlink_data.py
+    读取：全文静态读取；226行，11636字节。
+    SHA256：e0d2a10b9d6731967411f701e58ac2cc610d0ed7c9798640f485823954f16668
+
+17. scripts/step29_vendorlink_methods.py
+    读取：全文静态读取；325行，15846字节。
+    SHA256：85a61ea71aa815cfd2e27cb5fe674b2db83e1a09ce0f62be032f90076941d359
+
+18. scripts/step29_vendorlink_run.py
+    读取：全文静态读取；316行，16484字节。
+    SHA256：4509895e6c24f429ceb9d10d82ef03ddf5b21fe24f259e558067476439eebf5b
+
+19. tests/step30_evolution_cpu.py
+    读取：全文静态读取；446行，25488字节。
+    SHA256：d942ec3d922a2110ac8af14e00df6af715f8f8360d59ce84e0a5e35d5c80235c
+
+20. reports/documentation/20261107/evolution_pilot/implementation/budget.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；46行，1245字节。
+    SHA256：9d7c963a198a8d606104b5f1e1e7824c291223416e7e3949f9cbca936a98e414
+
+21. reports/documentation/20261107/evolution_pilot/implementation/receive_manifest.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；97行，3049字节。
+    SHA256：9437f6cae8f87b8e84ad6960983d21db9ac81c34456644c823256da997a0dc36
+
+22. reports/documentation/20261107/evolution_pilot/implementation/review/request.zh.md
+    读取：全文静态读取；25行，5043字节。
+    SHA256：db888533e114ac556fa54ad29cfc8dbeb558a3a856b67556ccbdb62d11af070b
+
+23. reports/documentation/20261107/evolution_pilot/implementation/review/cpu01_to_final.diff
+    读取：全文静态读取；335行，21155字节。
+    SHA256：de25fb39bc9edb95828b5d13e9f98ec0fb9258bcf6227f5e7d1ced7d4c34f298
+
+24. reports/documentation/20261107/evolution_pilot/implementation/cpu01_sources.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；62行，3161字节。
+    SHA256：4b7d204d8ac8d1e42c6440c16b6d3f8d5f2d5b5489962ebcad8a1b21b282c0b6
+
+25. reports/documentation/20261107/evolution_pilot/implementation/cpu01_admission.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；11行，198字节。
+    SHA256：fc385a00631cbdd27b1ef55ae0d51b1db18f5600ebfa00aae955ee83f2f9c10d
+
+26. reports/documentation/20261107/evolution_pilot/implementation/cpu01_lifecycle.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；23行，847字节。
+    SHA256：90c6a0b20b7087cb05d37649e5976a1fc6dc6369ba3ff42b8379b45299ad08a3
+
+27. reports/documentation/20261107/evolution_pilot/implementation/cpu01_console.txt
+    读取：全文静态读取；17行，1470字节。
+    SHA256：0c32b982832ea0ccc0604c8e8be116594ca419092d08a1812fc4ae29e63ca5a2
+
+28. reports/documentation/20261107/evolution_pilot/implementation/cpu01/receipt.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；162行，7230字节。
+    SHA256：d5d2b676a39ce052d56b0ab5cf0aab491f2aa71046663dd8aab3b691819f14d6
+
+29. reports/documentation/20261107/evolution_pilot/implementation/cpu02_sources.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；62行，3161字节。
+    SHA256：7e745b365b6fbe42bc362aaee582e57992e0f4c799d245ad6d7a6803d8a575eb
+
+30. reports/documentation/20261107/evolution_pilot/implementation/cpu02_admission.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；11行，198字节。
+    SHA256：fe1c037d17bb9eb146c1d5b99ab434b79d02d0b707a83a85678c75917e403bc3
+
+31. reports/documentation/20261107/evolution_pilot/implementation/cpu02_lifecycle.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；27行，911字节。
+    SHA256：e73eb85ac59a4566048bfbcf336526cab80ed366ec07a44012189d042c3962f5
+
+32. reports/documentation/20261107/evolution_pilot/implementation/cpu02_console.txt
+    读取：全文静态读取；3行，102字节。
+    SHA256：225dc9299dd5df99d137266cd570a64ddb599d98402f044c9c056709cf2cae6e
+
+33. reports/documentation/20261107/evolution_pilot/implementation/cpu02/receipt.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；92行，3959字节。
+    SHA256：134025607ee619f331af5e5cff8534ca42b0882e250ef3bbc17bf30197e7a539
+
+34. reports/documentation/20261107/evolution_pilot/implementation/cpu03_sources.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；62行，3161字节。
+    SHA256：d7fe7cea5c4d8da31ea6765d1b739099cc9399130d0f130248572f58cda8005a
+
+35. reports/documentation/20261107/evolution_pilot/implementation/cpu03_admission.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；11行，198字节。
+    SHA256：5c875d8afbe01bd067fe950351bbb95ac00da13f2d8593a0bf0206eb735c6853
+
+36. reports/documentation/20261107/evolution_pilot/implementation/cpu03_lifecycle.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；27行，908字节。
+    SHA256：991cf69d832128f63a2549fb4338ff143500ee3a5bb28285326a55d59b9d70de
+
+37. reports/documentation/20261107/evolution_pilot/implementation/cpu03_console.txt
+    读取：全文静态读取；4行，118字节。
+    SHA256：38c257af8a4f28ec28b4488dec56841f1d3496bd3a3914337f06828e6ba18f47
+
+38. reports/documentation/20261107/evolution_pilot/implementation/cpu03/receipt.json
+    读取：全部字段和值读取；来源/回执按完整对象核对；100行，4192字节。
+    SHA256：1664af5c059fa04957a94409962a1dd241db3338d8d1b3cab1deb8efd8c517b9
+
+39. package_manifest.json
+    读取：全文读取并以实际附件逐载荷核对；210行，8361字节。
+    SHA256：237826b27a6472d023bcc32207695ab24c64c3d0f53d0fcaf63bb9fb553208fb
+
+附注：本ZIP内仅为审查产物，不包含重新打包的输入源码、正式数据、模型或Memory。报告中静态反例未由本审运行；必要补证须由主执行者在其实际获准范围内处置。

@@ -8,6 +8,7 @@ import math
 import os
 from pathlib import Path
 import shutil
+import stat
 import sys
 import time
 
@@ -56,6 +57,19 @@ def pinned(row: dict):
     return read(verify(row))
 
 
+def qualification_directory(allowed: dict) -> Path:
+    directory = Path(allowed['qualification_directory']).resolve()
+    bindings = {Path(row['path']).resolve(): row for row in allowed['qualification_sources']}
+    required = {directory/(name+'.py') for name in ('audit', 'followup')}
+    if len(allowed['qualification_sources']) != 2 or set(bindings) != required:
+        raise ValueError('Bind the exact audit/followup files that will be imported')
+    if not directory.is_relative_to(Path(allowed['workspace']).resolve()):
+        raise ValueError('Qualification imports must use the isolated workspace')
+    for row in bindings.values():
+        verify(row)
+    return directory
+
+
 def access(root: Path, role: str, sources: list[dict]) -> None:
     path = root/'access'/f'{role}.json'
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -98,13 +112,25 @@ def dataset(allowed: dict) -> dict:
             or manifest['domains'] != ['2014-Q3', '2014-Q4', '2015-Q1']):
         raise ValueError('Dataset protocol or quotas differ')
     language = pinned(allowed['language_receipt'])
-    if not language['passed'] or language['manifest'] != allowed['dataset_manifest']:
+    if (not language['passed'] or language['manifest'] != allowed['dataset_manifest']
+            or not manifest.get('language_samples')
+            or language.get('language_samples') != manifest['language_samples']):
         raise ValueError('Same frozen dataset must pass the predetermined manual language gate')
     return manifest
 
 
 def directory_bytes(root: Path) -> int:
-    return sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+    total = 0
+    for path in root.rglob('*'):
+        try:
+            item = path.stat()
+        except FileNotFoundError:
+            # Atomic writers may rename an enumerated .tmp before this stat.
+            # Other I/O failures remain failures; the save reserve is unchanged.
+            continue
+        if stat.S_ISREG(item.st_mode):
+            total += item.st_size
+    return total
 
 
 class Budget:
@@ -112,13 +138,13 @@ class Budget:
         self.root, self.deadline, self.rss = root, deadline, rss
         self.last = 0.
 
-    def check(self):
+    def check(self, force: bool = False):
         now = time.monotonic()
         if now >= self.deadline-10:
             raise TimeoutError('Worker deadline/shutdown reserve')
         if psutil.Process().memory_info().rss > self.rss:
             raise RuntimeError('Worker RSS limit')
-        if now-self.last >= 2:
+        if force or now-self.last >= 2:
             self.last = now
             # Reserve one compact model and metadata BEFORE an atomic save.
             if (directory_bytes(self.root)+2**30 > LIMITS['disk_bytes']

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+import csv
 from dataclasses import asdict, dataclass
 from datetime import date
 import hashlib
@@ -82,6 +83,9 @@ def remember_snapshot(earliest: dict, row: dict, ordinal: int, dates: dict, base
 
 
 def clean_archive(archive: Path, qualification: Path, expected: dict, check) -> tuple[list[Record], dict]:
+    # The frozen audit.main sets this before opening the same four TSV tables.
+    # This entry reuses read_table directly, so it must preserve that setting.
+    csv.field_size_limit(16 * 1024**2)
     base, follow = qualification_modules(qualification, check)
     texts, earliest = {}, {}
     with zipfile.ZipFile(archive) as z:
@@ -174,17 +178,26 @@ def clean_archive(archive: Path, qualification: Path, expected: dict, check) -> 
     return output, dict(cleaning=counts, table_receipts=receipts)
 
 
-def match_accounts(eligible: dict[str, set[str]], quota: int = 320) -> dict[str, list[str]]:
+def match_accounts(eligible: dict[str, set[str]], quota: int = 320, check=None) -> dict[str, list[str]]:
+    check = check or (lambda: None)  # Optional only for the handwritten fixture.
     slots = [(d, str(i)) for d in DOMAINS for i in range(quota)]
     slots.sort(key=lambda x: (digest('slot', *x), tuple(k.encode() for k in x)))
-    edges = {slot: ordered(eligible[slot[0]], 'edge', *slot) for slot in slots}
+    edges = {}
+    for slot in slots:
+        check()
+        edges[slot] = ordered(eligible[slot[0]], 'edge', *slot)
     held = {}
     # Iterative DFS is equivalent to the specified recursive augment, without
     # depending on Python's recursion limit for 960 slots.
     for start in slots:
+        check()
         visited, stack = set(), [(start, iter(edges[start]), None)]
+        steps = 0
         found = False
         while stack:
+            steps += 1
+            if steps % 1024 == 0:
+                check()
             slot, it, via = stack[-1]
             v = next(it, None)
             if v is None:
@@ -217,16 +230,19 @@ def validate_group(group: Group, training: bool) -> None:
         raise ValueError('Only blinded evaluation input permitted')
 
 
-def partition(records: list[Record], split_counts: dict | None = None) -> tuple[dict, dict]:
+def partition(records: list[Record], split_counts: dict | None = None, check=None) -> tuple[dict, dict]:
+    check = check or (lambda: None)
     counts = SPLITS if split_counts is None else split_counts  # Small handwritten CPU fixture only.
     if set(counts) != set(SPLITS) or any(n < 8 or n % 8 for n in counts.values()):
         raise ValueError('Exact whole eight-account groups required')
     by_account = defaultdict(list)
-    for r in records:
+    for ordinal, r in enumerate(records):
+        if ordinal % 1000 == 0:
+            check()
         if r.domain in DOMAINS:
             by_account[r.domain, r.vid].append(r)
     eligible = {d: {v for (domain, v), rs in by_account.items() if domain == d and len(rs) >= 4} for d in DOMAINS}
-    assigned = match_accounts(eligible, sum(counts.values()))
+    assigned = match_accounts(eligible, sum(counts.values()), check)
     exports, custody = {}, dict(mapping=[], qrels={}, language_samples={})
     selected_vids, selected_lids, selected_keys = set(), set(), set()
     for d in DOMAINS:
@@ -238,6 +254,7 @@ def partition(records: list[Record], split_counts: dict | None = None) -> tuple[
             selected = ordered(selected, 'group', d, split)
             groups, qrels, fit_records = [], {}, []
             for index in range(0, len(selected), 8):
+                check()
                 uid = digest('group', d, split, *selected[index:index+8])
                 views = []
                 for v in selected[index:index+8]:
@@ -272,27 +289,35 @@ def partition(records: list[Record], split_counts: dict | None = None) -> tuple[
     return exports, custody
 
 
-def export_dataset(root: Path, records: list[Record], cleaning: dict, write, record) -> dict:
+def export_dataset(root: Path, records: list[Record], cleaning: dict, write, record, check=None) -> dict:
+    check = check or (lambda: None)
+    check()
     if root.exists():
         raise ValueError('Fresh custodian directory required; no re-split or overwrite')
     root.mkdir(parents=True)
-    exports, custody = partition(records)
+    exports, custody = partition(records, check=check)
     private = root/'private_custody'
     private.mkdir(mode=0o700)
     files = {}
     for (domain, split), groups in exports.items():
+        check()
         path = root/f'{domain}_{split}.json'
         write(path, [asdict(g) for g in groups])
         files[domain+':'+split] = record(path)
     for (domain, split), labels in custody['qrels'].items():
+        check()
         path = private/f'{domain}_{split}_qrels.json'
         write(path, labels)
         files[domain+':'+split+':qrels'] = record(path)
     write(private/'source_mapping.json', custody['mapping'])
+    check()
     write(private/'language_samples.json', custody['language_samples'])
     manifest = dict(protocol='evolution-pilot-v1', files=files, counts=SPLITS, domains=list(DOMAINS),
-                    language_audit_passed=False, cleaning=cleaning)
+                    language_audit_passed=False, cleaning=cleaning,
+                    language_samples=record(private/'language_samples.json'))
+    check()
     write(root/'manifest.json', manifest)
+    check()
     return manifest
 
 

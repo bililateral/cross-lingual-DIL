@@ -14,7 +14,7 @@ import time
 import psutil
 
 from step30_evolution_io import (Budget, Ledger, PYTHON, access, dataset, directory_bytes,
-                                  permit, pinned, read, record, sha, verify, write)
+                                  permit, pinned, qualification_directory, read, record, sha, verify, write)
 from step30_evolution_policy import CAPS, DOMAINS, LIMITS, decision, select_a, tasks
 
 
@@ -300,16 +300,34 @@ def build(allowed: dict):
         raise ValueError('New build output must be inside the experiment disk cap')
     budget = Budget(experiment, begin+CAPS['auxiliary']-ledger.used['auxiliary'], 8*2**30)
     try:
+        qualification = qualification_directory(allowed)
+        budget.check()
         access(accounting, 'official_four_table_build', [allowed['archive']])
         archive = verify(allowed['archive'])
         expected = pinned(allowed['qualification_summary'])['analysis']
-        for row in allowed['qualification_sources']:
-            verify(row)
-        data, cleaning = clean_archive(archive, Path(allowed['qualification_directory']), expected, budget.check)
-        export_dataset(target, data, cleaning, write, record)
+        data, cleaning = clean_archive(archive, qualification, expected, budget.check)
+        export_dataset(target, data, cleaning, write, record, budget.check)
+        budget.check(force=True)
         ok = True
     finally:
         ledger.charge('auxiliary', 'official_build', time.monotonic()-begin, ok)
+
+
+def adjudicate_language(allowed: dict):
+    from step30_evolution_data import language_result
+    target = Path(allowed['language_output'])
+    if target.exists():
+        raise ValueError('Language adjudication already attempted; no selective re-audit')
+    target.mkdir(parents=True)
+    ledger = Ledger(target, allowed['prior_seconds'], allowed['cpu_test_seconds'])
+    with ledger.active('fixed_manual_language_count'):
+        manifest = pinned(allowed['dataset_manifest'])
+        if manifest.get('language_samples') != allowed['language_samples']:
+            raise ValueError('Language sample must be bound by this exact dataset manifest')
+        access(target, 'manual_fit_language_judgments', [allowed['language_samples'], allowed['language_decisions']])
+        result = language_result(pinned(allowed['language_samples']), pinned(allowed['language_decisions']))
+        write(target/'language_receipt.json', dict(**result, manifest=allowed['dataset_manifest'],
+                                                  language_samples=allowed['language_samples']))
 
 
 def main():
@@ -327,16 +345,7 @@ def main():
     elif args.action == 'build':
         build(allowed)
     elif args.action == 'language':
-        from step30_evolution_data import language_result
-        target = Path(allowed['language_output'])
-        if target.exists():
-            raise ValueError('Language adjudication already attempted; no selective re-audit')
-        target.mkdir(parents=True)
-        ledger = Ledger(target, allowed['prior_seconds'], allowed['cpu_test_seconds'])
-        with ledger.active('fixed_manual_language_count'):
-            access(target, 'manual_fit_language_judgments', [allowed['language_samples'], allowed['language_decisions']])
-            result = language_result(pinned(allowed['language_samples']), pinned(allowed['language_decisions']))
-            write(target/'language_receipt.json', dict(**result, manifest=allowed['dataset_manifest']))
+        adjudicate_language(allowed)
     else:
         if args.target is None or args.batch is None or args.deadline is None:
             raise ValueError('Worker requires controller-provided target, batch and deadline')

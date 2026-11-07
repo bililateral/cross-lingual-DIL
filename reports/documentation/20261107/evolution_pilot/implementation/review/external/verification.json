@@ -1,0 +1,68 @@
+{
+  "input": {
+    "file": "evolution_implementation_review.zip",
+    "bytes": 153495,
+    "sha256": "affb8eadab7f853694bfc2c3ea1ed2956bdabd927848b867bfff0ec5992c789d",
+    "zip_members": 39,
+    "payloads": 38,
+    "payload_bytes": 405787,
+    "declared_and_actual_payload_sets_equal": true,
+    "all_payload_sizes_and_sha256_match": true,
+    "duplicate_member_names": [],
+    "unsafe_paths": []
+  },
+  "source_bridge": {
+    "all_three_receipts_sources_equal_their_source_manifest": true,
+    "cpu03_all_12_sources_match_current_bytes": true,
+    "cpu01_unchanged_sources_count": 7,
+    "cpu01_changed_sources_reconstructed_from_supplied_unified_diff": 5,
+    "cpu01_all_12_original_source_sizes_and_sha256_matched": true,
+    "cpu02_matches_current_sources_count": 8,
+    "cpu02_intermediate_test_source_independently_recovered": false,
+    "external_git_accessed": false,
+    "changed_cpu01_paths": [
+      "scripts/step30_evolution_control.py",
+      "scripts/step30_evolution_evaluate.py",
+      "scripts/step30_evolution_io.py",
+      "scripts/step30_evolution_policy.py",
+      "tests/step30_evolution_cpu.py"
+    ]
+  },
+  "cpu_lifecycle_summary": [
+    {
+      "id": "cpu01",
+      "exit_code": 1,
+      "lifecycle_seconds": 7.837049745023251,
+      "charged_seconds": 8,
+      "cumulative_cpu_seconds": 8
+    },
+    {
+      "id": "cpu02",
+      "exit_code": 0,
+      "lifecycle_seconds": 5.079015010036528,
+      "charged_seconds": 6,
+      "cumulative_cpu_seconds": 14
+    },
+    {
+      "id": "cpu03",
+      "exit_code": 0,
+      "lifecycle_seconds": 7.838232571957633,
+      "charged_seconds": 8,
+      "cumulative_cpu_seconds": 22
+    }
+  ],
+  "cpu_charged_seconds": 22,
+  "auxiliary_charged_seconds": 622,
+  "conservative_preparation_seconds": 600,
+  "receive_manifest": {
+    "listed": 18,
+    "present_and_independently_verified": 15,
+    "not_in_package": [
+      "cpu01/progress.json",
+      "cpu02/progress.json",
+      "cpu03/progress.json"
+    ],
+    "top_level_package_manifest_missing_payloads": []
+  },
+  "verification_method": "Attachment-only hashing, JSON comparisons and reverse unified-diff text reconstruction. No scientific source imports, tests, model calls, data builds, metric computations or resampling were run."
+}
