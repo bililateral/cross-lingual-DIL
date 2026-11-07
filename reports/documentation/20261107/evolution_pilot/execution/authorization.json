@@ -1,0 +1,22 @@
+{
+  "operation": "Evolution_two_worker_execution_supplement",
+  "user_training_instruction": "服务器上的H消融实验都暂停了，你可以正式运行vendor-link实验了，改成2-worker。",
+  "user_gpu_limit": "每个worker分配14G显存上限就行",
+  "scope_confirmation": "确认上述调度行为，继续实施",
+  "latest_failure_correction": "不是，还是保持原本的控制器逻辑，失败的停止新派发，健康任务继续执行",
+  "scope": "scope.zh.md",
+  "workers": 2,
+  "allocator_bytes": 13958643712,
+  "process_gpu_bytes": 15032385536,
+  "worker_failure_policy": "retire_failed_slot_continue_healthy",
+  "resource_policy": "start_one_when_ready_then_fill_second_with_unreflected_commitments",
+  "automatic_wait": true,
+  "automatic_retry": false,
+  "additional_gpu_qualification": false,
+  "cpu_test_cap_seconds": 1200,
+  "prior_cpu_test_seconds": 29,
+  "prior_seconds": {"training": 0, "gpu": 130, "auxiliary": 956},
+  "budget_seconds": {"training": 144000, "gpu": 14400, "auxiliary": 14400},
+  "external_upload": "requires permission for the concrete newly prepared package",
+  "push": false
+}

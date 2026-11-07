@@ -18,7 +18,8 @@ from step30_evolution_policy import CAPS, LIMITS
 
 PYTHON = '/home/yongpeng/miniconda3/envs/py310/bin/python'
 SOURCES = tuple('step30_evolution_'+x+'.py' for x in ('policy', 'data', 'run', 'evaluate', 'io', 'control')) + (
-    'step29_vendorlink_data.py', 'step29_vendorlink_methods.py', 'step29_vendorlink_run.py')
+    'step29_vendorlink_data.py', 'step29_vendorlink_methods.py', 'step29_vendorlink_run.py',
+    'step28_formal_queue.py')
 
 
 def write(path: Path, value) -> None:
@@ -84,10 +85,13 @@ def permit(path: Path, action: str) -> dict:
             or value.get('experiment') != 'Evolution_pilot_v1' or value.get('approved') is not True
             or value.get('review_closed') is not True or action not in value.get('actions', [])
             or value.get('limits') != LIMITS or value.get('budget_seconds') != CAPS
-            or value.get('automatic_retry') is not False or value.get('automatic_wait') is not False):
+            or value.get('automatic_retry') is not False or value.get('automatic_wait') is not True
+            or value.get('worker_failure_policy') != 'retire_failed_slot_continue_healthy'):
         raise ValueError('Explicit source-bound reviewed Evolution operation permit required')
     verify(value['authorization'])
     verify(value['proposal'])
+    verify(value['execution_scope'])
+    verify(value['review_disposition'])
     workspace = Path(value['workspace']).resolve()
     experiment = Path(value['experiment_root']).resolve()
     if not workspace.is_relative_to(experiment) or not Path(value['campaign']).resolve().is_relative_to(experiment):

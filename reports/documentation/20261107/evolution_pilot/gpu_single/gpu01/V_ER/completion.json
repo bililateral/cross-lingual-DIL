@@ -1,0 +1,102 @@
+{
+  "status": "TRAINING_COMPLETE_EVALUATION_CLOSED",
+  "identity": {
+    "purpose": "handwritten_gpu_qualification_not_effect_evidence",
+    "permit": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/gpu_single/gpu_ready.json",
+      "bytes": 6275,
+      "sha256": "b3ff8fc062cfffb5f9e8b39db02084f81f6f292607c8ef791b2e38fa3c92a606"
+    },
+    "task": {
+      "id": "gpu_fixture_V_ER",
+      "phase": "GPU_FIXTURE",
+      "system": "V_ER",
+      "recipe": "V0",
+      "seed": 107,
+      "stages": 3,
+      "epochs": 1,
+      "settings": {
+        "method": "VendorLink_SEQ",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 1e-05,
+        "head_lr": 0.001,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "cls",
+        "head_schedule": "constant",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5
+      }
+    },
+    "actual_data_access": false
+  },
+  "task": {
+    "id": "gpu_fixture_V_ER",
+    "phase": "GPU_FIXTURE",
+    "system": "V_ER",
+    "recipe": "V0",
+    "seed": 107,
+    "stages": 3,
+    "epochs": 1,
+    "settings": {
+      "method": "VendorLink_SEQ",
+      "lambda_rank": 1.3051794547562026,
+      "lr_multiplier": 1.0,
+      "encoder_lr": 1e-05,
+      "head_lr": 0.001,
+      "vendor_lr": 4e-05,
+      "weight_decay": 0.01,
+      "vendor_weight_decay": 0.0,
+      "microbatch": 8,
+      "vendor_batch": 32,
+      "channel_tokens": 256,
+      "vendor_tokens": 512,
+      "memory_groups": 6,
+      "memory_bytes": 1048576,
+      "pooling": "cls",
+      "head_schedule": "constant",
+      "bce_weight": 1.0,
+      "hard_weight": 0.5
+    }
+  },
+  "endpoints": {
+    "0": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/gpu_single/gpu01/V_ER/initial.pt",
+      "bytes": 3245,
+      "sha256": "22d1bcfa2dd818b120266d06a7dfc4e3b1ac6133bda151c581c4e47de7701be2"
+    },
+    "1": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/gpu_single/gpu01/V_ER/stage1.pt",
+      "bytes": 433316004,
+      "sha256": "55fe63d68b63cb04668411fd254bed67d12329a02041ecfa6c5bd7a3bcf5f160"
+    },
+    "2": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/gpu_single/gpu01/V_ER/stage2.pt",
+      "bytes": 433316004,
+      "sha256": "0db1107a13f5170bdb807197ca7594d4d23847796d129bfadff8468164e8863e"
+    },
+    "3": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/gpu_single/gpu01/V_ER/stage3.pt",
+      "bytes": 433316004,
+      "sha256": "f6736d8fd482d431093f73d662872e098b0f1eff3ecfec207796eb9289f8de58"
+    }
+  },
+  "workload": {
+    "current_updates": 60,
+    "current_records": 1920,
+    "history_groups": 40,
+    "history_records": 1280,
+    "teacher_groups": 0,
+    "teacher_records": 0,
+    "stage_model_saves": 3
+  },
+  "updates": 60
+}

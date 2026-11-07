@@ -14,8 +14,9 @@ METRICS = ('map', 'mrr', 'recall@1', 'recall@3', 'recall@5', 'recall@10',
            'ndcg@1', 'ndcg@3', 'ndcg@5', 'ndcg@10')
 SEEDS = {'A': (11, 12), 'B': (13, 14, 15), 'C': (13, 14, 15), 'D': (21, 22, 23)}
 CAPS = {'training': 144000, 'gpu': 14400, 'auxiliary': 14400}
-LIMITS = {'workers': 1, 'epochs': 40, 'rss_bytes': 32*2**30,
-          'free_ram_bytes': 40*2**30, 'free_gpu_bytes': 17*2**30,
+LIMITS = {'workers': 2, 'epochs': 40, 'rss_bytes': 32*2**30,
+          'free_ram_bytes': 40*2**30, 'free_gpu_bytes': 14*2**30,
+          'process_gpu_bytes': 14*2**30, 'allocator_bytes': 13*2**30,
           'disk_bytes': 64*2**30, 'free_disk_start': 128*2**30,
           'free_disk_reserve': 64*2**30, 'cpu_test_seconds': 1200}
 SYSTEMS = ('H0_SEQ', 'H_SEQ', 'H_ER', 'H_full', 'V_SEQ', 'V_ER')

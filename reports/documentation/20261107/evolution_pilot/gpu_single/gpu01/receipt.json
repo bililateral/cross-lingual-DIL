@@ -1,0 +1,166 @@
+{
+  "status": "PASS",
+  "permit": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/gpu_single/gpu_ready.json",
+    "bytes": 6275,
+    "sha256": "b3ff8fc062cfffb5f9e8b39db02084f81f6f292607c8ef791b2e38fa3c92a606"
+  },
+  "measured_body_seconds": 127.33816934097558,
+  "metrics": {
+    "cuda_peak_allocated_bytes": 12277048832,
+    "cuda_peak_reserved_bytes": 12404654080,
+    "sampled_rss_bytes": 2595004416,
+    "encode_calls": 1120,
+    "token_lengths": {
+      "H_full:256:8:True": 976,
+      "V_ER:512:8:True": 44,
+      "V_ER:512:32:False": 100
+    },
+    "runs": [
+      {
+        "system": "H_full",
+        "recipe": "H3",
+        "updates": 60,
+        "encoder_max_abs_change": 0.0005921488627791405,
+        "workload": {
+          "current_updates": 60,
+          "current_records": 1920,
+          "history_groups": 40,
+          "history_records": 1280,
+          "teacher_groups": 11,
+          "teacher_records": 352,
+          "stage_model_saves": 3
+        },
+        "restored_cells": [
+          {
+            "stage": 0,
+            "domain": 1,
+            "pairs": 120
+          },
+          {
+            "stage": 1,
+            "domain": 1,
+            "pairs": 120
+          },
+          {
+            "stage": 1,
+            "domain": 2,
+            "pairs": 120
+          },
+          {
+            "stage": 2,
+            "domain": 1,
+            "pairs": 120
+          },
+          {
+            "stage": 2,
+            "domain": 2,
+            "pairs": 120
+          },
+          {
+            "stage": 2,
+            "domain": 3,
+            "pairs": 120
+          },
+          {
+            "stage": 3,
+            "domain": 1,
+            "pairs": 120
+          },
+          {
+            "stage": 3,
+            "domain": 2,
+            "pairs": 120
+          },
+          {
+            "stage": 3,
+            "domain": 3,
+            "pairs": 120
+          }
+        ],
+        "initial_scores_exact": true,
+        "final_scores_exact": true,
+        "saved_models": [
+          "initial.pt",
+          "stage1.pt",
+          "stage2.pt",
+          "stage3.pt"
+        ]
+      },
+      {
+        "system": "V_ER",
+        "recipe": "V0",
+        "updates": 60,
+        "encoder_max_abs_change": 0.0008395705372095108,
+        "workload": {
+          "current_updates": 60,
+          "current_records": 1920,
+          "history_groups": 40,
+          "history_records": 1280,
+          "teacher_groups": 0,
+          "teacher_records": 0,
+          "stage_model_saves": 3
+        },
+        "restored_cells": [
+          {
+            "stage": 0,
+            "domain": 1,
+            "pairs": 120
+          },
+          {
+            "stage": 1,
+            "domain": 1,
+            "pairs": 120
+          },
+          {
+            "stage": 1,
+            "domain": 2,
+            "pairs": 120
+          },
+          {
+            "stage": 2,
+            "domain": 1,
+            "pairs": 120
+          },
+          {
+            "stage": 2,
+            "domain": 2,
+            "pairs": 120
+          },
+          {
+            "stage": 2,
+            "domain": 3,
+            "pairs": 120
+          },
+          {
+            "stage": 3,
+            "domain": 1,
+            "pairs": 120
+          },
+          {
+            "stage": 3,
+            "domain": 2,
+            "pairs": 120
+          },
+          {
+            "stage": 3,
+            "domain": 3,
+            "pairs": 120
+          }
+        ],
+        "initial_scores_exact": true,
+        "final_scores_exact": true,
+        "saved_models": [
+          "initial.pt",
+          "stage1.pt",
+          "stage2.pt",
+          "stage3.pt"
+        ]
+      }
+    ]
+  },
+  "handwritten": true,
+  "real_data_read": false,
+  "effect_claim": false,
+  "accounting": "Use the separate complete outer-process lifecycle receipt, including failure/import/save/exit."
+}

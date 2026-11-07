@@ -1,0 +1,65 @@
+{
+  "used_seconds": {
+    "training": 0,
+    "gpu": 130,
+    "auxiliary": 956
+  },
+  "caps": {
+    "training": 144000,
+    "gpu": 14400,
+    "auxiliary": 14400
+  },
+  "cpu_test_seconds": 29,
+  "preparation_conservative_seconds": 60,
+  "events": [
+    {
+      "operation": "single_gpu_scope_preparation",
+      "bucket": "auxiliary",
+      "charged_seconds": 60,
+      "conservative": true
+    },
+    {
+      "operation": "cpu_fixture01",
+      "bucket": "auxiliary",
+      "charged_seconds": 1,
+      "success": true,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/gpu_single/cpu01_lifecycle.json",
+        "bytes": 979,
+        "sha256": "3dd90415b7a0b0eca2d39252f231e4472abc71b13c72ff067395fec1b1c48718"
+      }
+    },
+    {
+      "operation": "monitor_import_failure01",
+      "success": false,
+      "auxiliary_seconds": 2,
+      "conservative": true,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/gpu_single/preflight_failure01.json",
+        "bytes": 737,
+        "sha256": "42c8d07e88db5abf1faabf29bfc48d187d4a85ebf97a749a2f10db01e80c8533"
+      }
+    },
+    {
+      "operation": "repaired_monitor_import_and_existing_reader",
+      "success": true,
+      "auxiliary_seconds": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/gpu_single/monitor_cpu.json",
+        "bytes": 825,
+        "sha256": "360dc6564e8d5482627676c3d9ad005583d182ba148378a2a02982be0526062a"
+      }
+    },
+    {
+      "operation": "single_gpu01",
+      "success": true,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/gpu_single/gpu_lifecycle.json",
+        "bytes": 575,
+        "sha256": "f6d7e020353458cf214fe339e0f0280f82edb4af7bcd0fc7d10ce8b111413fde"
+      },
+      "gpu_seconds": 130,
+      "auxiliary_seconds": 2
+    }
+  ]
+}

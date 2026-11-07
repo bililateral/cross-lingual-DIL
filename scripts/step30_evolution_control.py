@@ -1,4 +1,4 @@
-"""One finite Evolution worker, A -> B -> C -> D, no listener or retry."""
+"""Finite Evolution queue: up to two slots, failed slots retire, no retry."""
 from __future__ import annotations
 
 import argparse
@@ -18,36 +18,50 @@ from step30_evolution_io import (Budget, Ledger, PYTHON, access, dataset, direct
 from step30_evolution_policy import CAPS, DOMAINS, LIMITS, decision, select_a, tasks
 
 
-def resource_observation(allowed: dict, root: Path, gpu: bool) -> dict:
+def resource_observation(allowed: dict, root: Path, gpu: bool, owned=(), nv=None) -> dict:
     import shutil
     root = Path(allowed['experiment_root'])
-    observation = dict(ram_available=psutil.virtual_memory().available,
-                       disk_free=shutil.disk_usage(root).free, experiment_bytes=directory_bytes(root))
-    observation['ready'] = (observation['ram_available'] >= LIMITS['free_ram_bytes'] and
-                            observation['disk_free'] >= LIMITS['free_disk_reserve']+2**30 and
-                            observation['experiment_bytes']+2**30 <= LIMITS['disk_bytes'])
-    if gpu:
-        import pynvml as nv
-        nv.nvmlInit()
+    ram_pending = 0
+    for row in owned:
         try:
-            device = nv.nvmlDeviceGetHandleByIndex(0)
-            memory = nv.nvmlDeviceGetMemoryInfo(device)
-            used = {p.pid: p.usedGpuMemory for p in nv.nvmlDeviceGetComputeRunningProcesses(device)}
+            ram_pending += max(0, LIMITS['free_ram_bytes']-psutil.Process(row['pid']).memory_info().rss)
+        except psutil.NoSuchProcess:
+            pass
+    save_reserve = (len(owned)+1)*2**30
+    observation = dict(ram_available=psutil.virtual_memory().available,
+                       ram_pending=ram_pending, disk_free=shutil.disk_usage(root).free,
+                       experiment_bytes=directory_bytes(root), save_reserve=save_reserve)
+    observation['ready'] = (observation['ram_available']-ram_pending >= LIMITS['free_ram_bytes'] and
+                            observation['disk_free'] >= LIMITS['free_disk_reserve']+save_reserve and
+                            observation['experiment_bytes']+save_reserve <= LIMITS['disk_bytes'])
+    if gpu:
+        from step28_formal_queue import GpuMemory
+        temporary_reader = nv is None
+        if temporary_reader:
+            nv = GpuMemory()
+        try:
+            memory = nv.snapshot()
+            used = memory['processes']
             unreflected, commitments = 0, []
-            for row in allowed['other_gpu_commitments']:
+            for row in [*allowed['other_gpu_commitments'], *owned]:
                 try:
                     process = psutil.Process(row['pid'])
                     if process.create_time() != row['created'] or process.username() != row['owner']:
                         raise ValueError('Declared active commitment process identity changed')
+                    if row not in owned and (process.cwd() != row['cwd'] or process.cmdline() != row['command']):
+                        raise ValueError('Declared active commitment command/cwd changed')
                     remaining = max(0, row['reserved_bytes']-used.get(row['pid'], 0))
                     unreflected += remaining
                     commitments.append(dict(**row, unreflected_bytes=remaining))
                 except psutil.NoSuchProcess:
                     commitments.append(dict(**row, exited=True))
-            observation.update(gpu_free=memory.free, unreflected_commitments=unreflected, commitments=commitments)
-            observation['ready'] &= memory.free-unreflected >= LIMITS['free_gpu_bytes']
+            if set(used)-{r['pid'] for r in commitments if not r.get('exited')}:
+                raise ValueError('Unrecognized GPU job; its commitment must be checked before admission')
+            observation.update(gpu_free=memory['free'], unreflected_commitments=unreflected, commitments=commitments)
+            observation['ready'] &= memory['free']-unreflected >= LIMITS['free_gpu_bytes']
         finally:
-            nv.nvmlShutdown()
+            if temporary_reader:
+                nv.close()
     return observation
 
 
@@ -80,69 +94,181 @@ class Runner:
         self.allowed, self.gate_path, self.root, self.ledger = allowed, gate_path, root, ledger
         self.failed = False
 
-    def run(self, action: str, target: Path, bucket: str, seconds: int, extra: list[str]):
-        if self.failed:
-            raise RuntimeError('Failed single worker cannot dispatch another operation')
-        with self.ledger.active('admission_'+target.name):
-            self.ledger.reserve(bucket, seconds)
-            observation = resource_observation(self.allowed, self.root, bucket in ('training', 'gpu'))
-            write(target/'admission.json', observation)
-            if not observation['ready']:
-                raise RuntimeError('Resource gate closed; no automatic waiting/listener')
-            cores = psutil.Process().cpu_affinity()
-            if len(cores) < 2:
-                raise RuntimeError('Two allowed CPU cores required')
-        start, process, ok, parent_active = time.monotonic(), None, False, 0.
-        deadline = start+seconds
-        argv = ['taskset', '-c', ','.join(map(str, cores[-2:])), PYTHON, '-B', '-u', str(Path(__file__).resolve()),
-                '--gate', str(self.gate_path), '--action', action, '--target', str(target), '--deadline', str(deadline), *extra]
-        environment = dict(os.environ, OMP_NUM_THREADS='2', MKL_NUM_THREADS='2', OPENBLAS_NUM_THREADS='2',
-                           TOKENIZERS_PARALLELISM='false', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1',
-                           CUBLAS_WORKSPACE_CONFIG=':4096:8', CUDA_VISIBLE_DEVICES='0' if bucket in ('training', 'gpu') else '')
-        error = None
-        try:
-            with (target/'console.txt').open('x') as output:
-                process = subprocess.Popen(argv, env=environment, cwd=self.allowed['workspace'],
-                                           stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
-                p = psutil.Process(process.pid)
-                write(target/'process.json', dict(pid=p.pid, owner=p.username(), created=p.create_time(), command=argv, cwd=p.cwd()))
-                while process.poll() is None:
-                    active_start = time.monotonic()
-                    try:
-                        if time.monotonic() >= deadline-5:
-                            raise TimeoutError('Full worker lifecycle deadline')
-                        if p.memory_info().rss > LIMITS['rss_bytes']:
-                            raise RuntimeError('Worker RAM limit')
-                        if directory_bytes(Path(self.allowed['experiment_root'])) > LIMITS['disk_bytes']:
-                            raise RuntimeError('Experiment disk limit')
-                    finally:
-                        # Parent monitoring is auxiliary active work; pure sleep
-                        # is excluded and worker lifecycle is charged separately.
-                        parent_active += time.monotonic()-active_start
-                    time.sleep(.5)
-                if process.returncode:
-                    raise RuntimeError(f'Worker exit {process.returncode}')
-                ok = True
-        except BaseException as exc:
-            error, self.failed = repr(exc), True
-            raise
-        finally:
+    def retire_waiter(self, active):
+        binding = self.allowed.get('waiter')
+        if not binding or (self.root/'waiter_deleted.json').exists():
+            return
+        for item in active.values():
+            path = item['job']['target']/'run/updates.jsonl'
+            if item['job']['action'] != 'train' or not path.exists():
+                continue
+            import json
+            with path.open() as source:
+                first = source.readline()
             try:
-                if process is not None:
-                    release(process)
+                update = json.loads(first)
+            except json.JSONDecodeError:
+                continue  # The writer may still be completing its first line.
+            if update.get('optimizer_updates') == 1 and update.get('total_updates', 0) >= 1:
+                script = verify(binding)
+                if script != Path(self.allowed['workspace'])/'scripts/once_wait.py':
+                    raise ValueError('Only this campaign one-shot wrapper may delete itself')
+                script.unlink()
+                write(self.root/'waiter_deleted.json', dict(source=binding, first_update=str(path),
+                      total_updates=update['total_updates'], deleted=True, queue_continues=True))
+                return
+
+    def command(self, job: dict, slot: int, deadline: float):
+        cores = psutil.Process().cpu_affinity()
+        if len(cores) < 2*LIMITS['workers']:
+            raise RuntimeError('Four allowed CPU cores required for two slots')
+        chosen = cores[-4:][slot*2:slot*2+2]
+        return ['taskset', '-c', ','.join(map(str, chosen)), PYTHON, '-B', '-u', str(Path(__file__).resolve()),
+                '--gate', str(self.gate_path), '--action', job['action'], '--target', str(job['target']),
+                '--deadline', str(deadline), *job['extra']]
+
+    def run_many(self, jobs: list[dict], slots: int, completed):
+        """One parent owns dispatch and accounting; healthy slots keep taking work."""
+        import shutil
+        from step28_formal_queue import GpuMemory
+        if self.failed:
+            raise RuntimeError('Incomplete phase cannot start downstream work')
+        if not 1 <= slots <= LIMITS['workers']:
+            raise ValueError('Unapproved slot count')
+        active, retired, failures = {}, set(), []
+        next_job, parent_active, budget_stop = 0, 0., None
+        gpu = any(j['bucket'] in ('training', 'gpu') for j in jobs)
+        nv = GpuMemory() if gpu else None
+        def finish(slot, error=None):
+            item = active.pop(slot)
+            p, job = item['process'], item['job']
+            try:
+                release(p)
             except BaseException as exc:
-                error, ok, self.failed = repr(exc), False, True
-                raise
+                error = error or repr(exc)
+            elapsed = time.monotonic()-item['started']
+            if p.returncode or elapsed > job['seconds']:
+                error = error or f'Worker exit {p.returncode} or lifecycle cap exceeded'
+            if error is None:
+                try:
+                    completed(job)
+                except BaseException as exc:
+                    error = repr(exc)
+            receipt = dict(success=error is None, error=error, seconds=elapsed, slot=slot,
+                           released=p.poll() is not None, peak_gpu_bytes=item['peak_gpu'], peak_rss_bytes=item['peak_rss'])
+            write(job['target']/'dispatch_receipt.json', receipt)
+            self.ledger.charge(job['bucket'], job['target'].name, elapsed, error is None)
+            if error is not None:
+                retired.add(slot)
+                failures.append(dict(task=job['target'].name, slot=slot, error=error))
+        try:
+            while active or (next_job < len(jobs) and len(retired) < slots and budget_stop is None):
+                tick = time.monotonic()
+                try:
+                    snapshot = nv.snapshot() if nv else None
+                    self.retire_waiter(active)
+                    for slot, item in list(active.items()):
+                        p, job = item['process'], item['job']
+                        error = None
+                        if p.poll() is None:
+                            try:
+                                rss = psutil.Process(p.pid).memory_info().rss
+                                occupied = snapshot['processes'].get(p.pid, 0) if snapshot else 0
+                                item['peak_rss'] = max(item['peak_rss'], rss)
+                                item['peak_gpu'] = max(item['peak_gpu'], occupied)
+                                if time.monotonic() >= item['deadline']-15:
+                                    error = 'Full worker lifecycle deadline'
+                                elif rss > LIMITS['rss_bytes'] or occupied > LIMITS['process_gpu_bytes']:
+                                    error = 'Worker RAM/GPU limit'
+                                elif (directory_bytes(Path(self.allowed['experiment_root'])) > LIMITS['disk_bytes']
+                                      or shutil.disk_usage(self.root).free < LIMITS['free_disk_reserve']):
+                                    error = 'Shared disk limit'
+                            except psutil.NoSuchProcess:
+                                pass
+                        if p.poll() is not None or error:
+                            finish(slot, error)
+                    for slot in range(slots):
+                        if slot in active or slot in retired or next_job == len(jobs) or budget_stop:
+                            continue
+                        job = jobs[next_job]
+                        outstanding = sum(x['job']['seconds'] for x in active.values() if x['job']['bucket'] == job['bucket'])
+                        try:
+                            self.ledger.reserve(job['bucket'], outstanding+job['seconds'])
+                            auxiliary_reserved = sum(x['job']['seconds'] for x in active.values() if x['job']['bucket'] == 'auxiliary')
+                            self.ledger.reserve('auxiliary', auxiliary_reserved+math.ceil(parent_active)+60+
+                                                (job['seconds'] if job['bucket'] == 'auxiliary' else 0))
+                        except TimeoutError as exc:
+                            if not active:
+                                budget_stop = str(exc)
+                                break
+                            continue  # In-flight reservations can be released after completion.
+                        owned = [x['identity'] for x in active.values()]
+                        observation = resource_observation(self.allowed, self.root, gpu, owned, nv)
+                        write(job['target']/'admission.json', observation)
+                        if not observation['ready']:
+                            continue
+                        next_job += 1  # A launched/failed launch is consumed, never retried.
+                        started = time.monotonic()
+                        deadline = started+job['seconds']
+                        process = None
+                        try:
+                            argv = self.command(job, slot, deadline)
+                            environment = dict(os.environ, OMP_NUM_THREADS='2', MKL_NUM_THREADS='2', OPENBLAS_NUM_THREADS='2',
+                                TOKENIZERS_PARALLELISM='false', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1',
+                                CUBLAS_WORKSPACE_CONFIG=':4096:8', CUDA_VISIBLE_DEVICES='0' if gpu else '')
+                            with (job['target']/'console.txt').open('x') as output:
+                                process = subprocess.Popen(argv, env=environment, cwd=self.allowed['workspace'],
+                                    stdout=output, stderr=subprocess.STDOUT, start_new_session=True, umask=0o077)
+                            p = psutil.Process(process.pid)
+                            identity = dict(pid=p.pid, owner=p.username(), created=p.create_time(), command=argv,
+                                            cwd=p.cwd(), reserved_bytes=LIMITS['free_gpu_bytes'])
+                            # taskset execs in place, so the command after exec omits its own wrapper.
+                            identity['command'] = argv[3:]
+                            active[slot] = dict(process=process, job=job, identity=identity, started=started,
+                                                deadline=deadline, peak_gpu=0, peak_rss=0)
+                            write(job['target']/'process.json', dict(**identity, launch_command=argv, slot=slot))
+                        except BaseException as exc:
+                            if slot in active:
+                                finish(slot, repr(exc))
+                            else:
+                                if process is not None:
+                                    release(process)
+                                elapsed = time.monotonic()-started
+                                write(job['target']/'dispatch_receipt.json', dict(success=False, error=repr(exc),
+                                      seconds=elapsed, slot=slot, released=True))
+                                self.ledger.charge(job['bucket'], job['target'].name, elapsed, False)
+                                retired.add(slot)
+                                failures.append(dict(task=job['target'].name, slot=slot, error=repr(exc)))
+                    write(self.root/'dispatch.json', dict(active={s: x['identity'] for s, x in active.items()},
+                          retired=sorted(retired), failures=failures, pending=[j['target'].name for j in jobs[next_job:]],
+                          budget_stop=budget_stop, status='RUNNING' if active else 'WAITING_RESOURCES'))
+                finally:
+                    parent_active += time.monotonic()-tick
+                if self.ledger.used['auxiliary']+math.ceil(parent_active)+60 >= CAPS['auxiliary']:
+                    budget_stop = 'Auxiliary monitoring budget exhausted'
+                if active or (next_job < len(jobs) and len(retired) < slots and budget_stop is None):
+                    time.sleep(.2 if active else 30)
+        finally:
+            cleanup = time.monotonic()
+            try:
+                for slot in list(active):
+                    try:
+                        finish(slot, 'Controller interrupted; no automatic retry')
+                    finally:
+                        self.failed = True
+                if nv:
+                    nv.close()
             finally:
-                elapsed = time.monotonic()-start
-                if elapsed > seconds:
-                    ok, self.failed = False, True
-                    error = error or 'Worker lifecycle overrun'
-                write(target/'dispatch_receipt.json', dict(success=ok, error=error, seconds=elapsed, released=True))
-                self.ledger.charge(bucket, target.name, elapsed, ok)
-                self.ledger.charge('auxiliary', 'monitor_'+target.name, parent_active, ok)
-        if not ok:
-            raise RuntimeError(error or 'Worker failed; no retry')
+                parent_active += time.monotonic()-cleanup
+                self.ledger.charge('auxiliary', 'dispatch_monitor', parent_active, not failures and not budget_stop)
+        self.failed |= bool(failures or budget_stop or next_job != len(jobs))
+        write(self.root/'dispatch.json', dict(status='INCOMPLETE' if self.failed else 'COMPLETE', active={},
+              retired=sorted(retired), failures=failures, pending=[j['target'].name for j in jobs[next_job:]], budget_stop=budget_stop))
+        if self.failed:
+            raise RuntimeError('Incomplete phase; healthy slots drained, downstream closed')
+
+    def run(self, action: str, target: Path, bucket: str, seconds: int, extra: list[str]):
+        self.run_many([dict(action=action, target=target, bucket=bucket, seconds=seconds, extra=extra)], 1, lambda job: None)
 
 
 def pipeline(run_phase, save, choose=select_a, judge=decision):
@@ -181,6 +307,8 @@ def campaign(allowed: dict, gate_path: Path):
     runner = Runner(allowed, gate_path, root, ledger)
     try:
         with ledger.active('prepare'):
+            if allowed.get('waiter'):
+                verify(allowed['waiter'])
             if shutil.disk_usage(root).free < LIMITS['free_disk_start']:
                 raise RuntimeError('At least 128 GiB free at campaign start')
             manifest = dataset(allowed)
@@ -192,18 +320,24 @@ def campaign(allowed: dict, gate_path: Path):
                 target.mkdir()
                 batch = dict(phase=phase, selected=selected, specs=specs, gate=gate_binding, completed=[])
                 write(target/'batch.json', batch)
+            jobs = []
             for task in specs:
                 with ledger.active('prepare_'+task['id']):
                     job = target/task['id']
                     job.mkdir()
                     identity = dict(gate=gate_binding, spec=task, dataset=allowed['dataset_manifest'])
                     write(job/'spec.json', dict(task=task, identity=identity))
-                runner.run('train', job, 'training', 900 if task['stages'] == 1 else 3600, ['--batch', str(target/'batch.json')])
+                jobs.append(dict(action='train', target=job, bucket='training',
+                                 seconds=900 if task['stages'] == 1 else 3600, extra=['--batch', str(target/'batch.json')]))
+            def completed(job):
+                task = next(t for t in specs if t['id'] == job['target'].name)
+                identity = read(job['target']/'spec.json')['identity']
                 with ledger.active('validate_'+task['id']):
-                    completion = job/'run/completion.json'
+                    completion = job['target']/'run/completion.json'
                     training_complete(task, read(completion), identity)
                     batch['completed'].append(dict(task_id=task['id'], identity=identity, completion=record(completion)))
                     write(target/'batch.json', batch)
+            runner.run_many(jobs, LIMITS['workers'], completed)
             # Only a fully complete prescribed phase may start any blind scoring.
             runner.run('score', target, 'gpu', CAPS['gpu']-ledger.used['gpu'], ['--batch', str(target/'batch.json')])
             analysis = target/'analysis'
@@ -233,6 +367,8 @@ def configure_gpu():
     torch.use_deterministic_algorithms(True)
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
+    total = torch.cuda.get_device_properties(0).total_memory
+    torch.cuda.set_per_process_memory_fraction(LIMITS['allocator_bytes']/total, 0)
 
 
 def worker(allowed: dict, gate_path: Path, action: str, target: Path, batch_path: Path, deadline: float):
