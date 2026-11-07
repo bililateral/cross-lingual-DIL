@@ -140,7 +140,8 @@ def slot_admission(allowed, snapshot, capacity, occupied):
         ready=observation["ready"] and capacity-reserved >= slot_bytes)
 
 
-def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, poll_seconds=2, observe=None):
+def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, poll_seconds=2, observe=None,
+             admit=slot_admission):
     """Failed slots retire; healthy slots continue to claim pending trajectories."""
     active, pending, retired, receipts = {}, list(enumerate(rows)), set(), []
     capacity = None
@@ -211,7 +212,7 @@ def dispatch(root, rows, command, validate, allowed, ledger, *, monitor=None, po
                     if not active:
                         capacity = current["free"]
                     occupied = sum(item["row"].get("gpu", True) for item in active.values())
-                    observation = slot_admission(allowed, current, capacity, occupied)
+                    observation = admit(allowed, current, capacity, occupied)
                     data.write_json(root/"admission.json", dict(id=row["id"], **observation))
                     if not observation["ready"]:
                         break

@@ -1,0 +1,24 @@
+test_actual_confirmation_restore_score_then_single_label_opening (__main__.AblationTests) ... ERROR
+test_actual_updates_optimizer_restore_and_own_memory (__main__.AblationTests) ... ok
+test_closed_gate_ram_credit_wait_and_failed_slot (__main__.AblationTests) ... ok
+test_objective_gradients_deleted_branches_and_mother (__main__.AblationTests) ... /home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/tests/test_step28_h_ablation.py:123: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  self.assertGreater(float(difference), 1e-4)
+ok
+
+======================================================================
+ERROR: test_actual_confirmation_restore_score_then_single_label_opening (__main__.AblationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/tests/test_step28_h_ablation.py", line 292, in test_actual_confirmation_restore_score_then_single_label_opening
+    evaluate.confirmation(campaign, job, records, budget, dict(sources=[], limits=run.LIMITS))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/scripts/step28_h_ablation_evaluate.py", line 129, in confirmation
+    m.parent.configure_numerics()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/scripts/step28_bge_continual.py", line 35, in configure_numerics
+    raise RuntimeError("Start Python with CUBLAS_WORKSPACE_CONFIG=:4096:8")
+RuntimeError: Start Python with CUBLAS_WORKSPACE_CONFIG=:4096:8
+
+----------------------------------------------------------------------
+Ran 4 tests in 12.266s
+
+FAILED (errors=1)

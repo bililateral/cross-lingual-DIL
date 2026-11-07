@@ -266,7 +266,7 @@ def execute(job: Path, spec: m.Spec, deadline: float, gate_path: Path, *,
                                               valid, c, stage, first_map, budget)
         manifest["points"][str(stage)] = point
         manifest["updates"] += 288
-        manifest["gradient_group_presentations"] += 288*(1+(stage > 1 and spec.name != "SEQ_ref"))
+        manifest["gradient_group_presentations"] += 288*(1+(stage > 1 and getattr(spec, "uses_history", spec.name != "SEQ_ref")))
         data.write_json(root/"progress.json", manifest)
         del current, calibration
     manifest.update(status=COMPLETE, resources=budget.snapshot())
