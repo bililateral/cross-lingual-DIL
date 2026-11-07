@@ -152,6 +152,85 @@ if (p/'spec.json').exists():
         runner.run_many(jobs, 2, lambda job: None)
         assert read(reserve_root/'two/started.json')['start'] >= read(reserve_root/'one/finished.json')['end']
         checks.append(dict(name='inflight_full_caps_reserved_and_released_before_second_start', passed=True))
+
+        hold_root = args.output/'external_hold'
+        hold_root.mkdir()
+        class ExternalHold(Snapshot):
+            holds = 0
+            def snapshot(self):
+                value = super().snapshot()
+                if (hold_root/'one/process.json').exists() and not (hold_root/'one/finished.json').exists():
+                    value['processes'][99999999] = 2**30
+                    ExternalHold.holds += 1
+                return value
+        queue.GpuMemory = ExternalHold
+        runner = control.Runner(scope, gate, hold_root, Ledger(hold_root,
+            dict(training=0, gpu=0, auxiliary=0), 0))
+        jobs = []
+        for name in ('one', 'two'):
+            target = hold_root/name
+            target.mkdir()
+            jobs.append(dict(action='train', target=target, bucket='training', seconds=60, extra=[]))
+        runner.run_many(jobs, 2, lambda job: None)
+        assert ExternalHold.holds > 0 and read(hold_root/'dispatch.json')['status'] == 'COMPLETE'
+        assert read(hold_root/'two/started.json')['start'] >= read(hold_root/'one/finished.json')['end']
+        changed = dict(identity, created=identity['created']+1)
+        held = control.resource_observation(dict(scope, other_gpu_commitments=[changed]), args.output, True, [], Snapshot())
+        assert not held['ready'] and 'identity changed' in held['hold']
+        checks.append(dict(name='unknown_or_changed_external_commitment_holds_admission_not_healthy_worker', passed=True))
+
+        original_observation, original_sleep = control.resource_observation, control.time.sleep
+        analysis_root = args.output/'analysis_wait'
+        analysis_root.mkdir()
+        attempts = []
+        def first_closed(*args, **kwargs):
+            observation = original_observation(*args, **kwargs)
+            attempts.append(observation)
+            if len(attempts) == 1:
+                observation['ready'] = False
+            return observation
+        control.resource_observation = first_closed
+        control.time.sleep = lambda seconds: original_sleep(.01 if seconds >= 30 else seconds)
+        try:
+            ledger = Ledger(analysis_root, dict(training=0, gpu=0, auxiliary=0), 0)
+            runner = control.Runner(scope, gate, analysis_root, ledger)
+            target = analysis_root/'analyze'
+            target.mkdir()
+            runner.run('analyze', target, 'auxiliary', CAPS['auxiliary']-ledger.used['auxiliary']-60, [])
+            assert len(attempts) >= 2 and read(target/'dispatch_receipt.json')['success']
+            checks.append(dict(name='analysis_budget_recomputed_after_resource_wait', passed=True))
+        finally:
+            control.resource_observation, control.time.sleep = original_observation, original_sleep
+
+        error_root = args.output/'unexpected_error'
+        error_root.mkdir()
+        def fail_during_refill(*args, **kwargs):
+            owned = args[3] if len(args) > 3 else kwargs.get('owned', ())
+            if owned:
+                raise OSError('handwritten admission infrastructure error')
+            return original_observation(*args, **kwargs)
+        control.resource_observation = fail_during_refill
+        try:
+            runner = control.Runner(scope, gate, error_root, Ledger(error_root,
+                dict(training=0, gpu=0, auxiliary=0), 0))
+            jobs = []
+            for name in ('one', 'two'):
+                target = error_root/name
+                target.mkdir()
+                jobs.append(dict(action='train', target=target, bucket='training', seconds=60, extra=[]))
+            try:
+                runner.run_many(jobs, 2, lambda job: None)
+                raise AssertionError('Injected controller error swallowed')
+            except OSError as exc:
+                assert 'handwritten admission' in str(exc)
+            final = read(error_root/'dispatch.json')
+            assert final['status'] == 'INCOMPLETE' and not final['active'] and final['controller_error']
+            child_pid = read(error_root/'one/process.json')['pid']
+            assert not control.psutil.pid_exists(child_pid)
+            assert read(error_root/'one/dispatch_receipt.json')['released']
+            checks.append(dict(name='exception_cleanup_writes_final_state_and_preserves_original_error', passed=True))
+        finally:
+            control.resource_observation = original_observation
         success = True
     finally:
         queue.GpuMemory, control.Runner.command = real_reader, original_command

@@ -47,16 +47,17 @@ def resource_observation(allowed: dict, root: Path, gpu: bool, owned=(), nv=None
                 try:
                     process = psutil.Process(row['pid'])
                     if process.create_time() != row['created'] or process.username() != row['owner']:
-                        raise ValueError('Declared active commitment process identity changed')
+                        return dict(observation, ready=False, hold='Declared GPU commitment identity changed')
                     if row not in owned and (process.cwd() != row['cwd'] or process.cmdline() != row['command']):
-                        raise ValueError('Declared active commitment command/cwd changed')
+                        return dict(observation, ready=False, hold='Declared GPU commitment command/cwd changed')
                     remaining = max(0, row['reserved_bytes']-used.get(row['pid'], 0))
                     unreflected += remaining
                     commitments.append(dict(**row, unreflected_bytes=remaining))
                 except psutil.NoSuchProcess:
                     commitments.append(dict(**row, exited=True))
             if set(used)-{r['pid'] for r in commitments if not r.get('exited')}:
-                raise ValueError('Unrecognized GPU job; its commitment must be checked before admission')
+                return dict(observation, ready=False, hold='Unrecognized GPU commitment',
+                            unknown_pids=sorted(set(used)-{r['pid'] for r in commitments if not r.get('exited')}))
             observation.update(gpu_free=memory['free'], unreflected_commitments=unreflected, commitments=commitments)
             observation['ready'] &= memory['free']-unreflected >= LIMITS['free_gpu_bytes']
         finally:
@@ -137,6 +138,7 @@ class Runner:
             raise ValueError('Unapproved slot count')
         active, retired, failures = {}, set(), []
         next_job, parent_active, budget_stop = 0, 0., None
+        controller_error = None
         gpu = any(j['bucket'] in ('training', 'gpu') for j in jobs)
         nv = GpuMemory() if gpu else None
         def finish(slot, error=None):
@@ -190,9 +192,16 @@ class Runner:
                     for slot in range(slots):
                         if slot in active or slot in retired or next_job == len(jobs) or budget_stop:
                             continue
-                        job = jobs[next_job]
+                        job = dict(jobs[next_job])
                         outstanding = sum(x['job']['seconds'] for x in active.values() if x['job']['bucket'] == job['bucket'])
                         try:
+                            if job['action'] == 'analyze':
+                                # This operation is allotted the remaining auxiliary
+                                # bucket, measured at actual launch after any wait.
+                                job['seconds'] = min(job['seconds'], CAPS['auxiliary']-self.ledger.used['auxiliary']-
+                                                     outstanding-math.ceil(parent_active)-60)
+                                if job['seconds'] <= 15:
+                                    raise TimeoutError('Insufficient remaining analysis lifecycle budget')
                             self.ledger.reserve(job['bucket'], outstanding+job['seconds'])
                             auxiliary_reserved = sum(x['job']['seconds'] for x in active.values() if x['job']['bucket'] == 'auxiliary')
                             self.ledger.reserve('auxiliary', auxiliary_reserved+math.ceil(parent_active)+60+
@@ -248,22 +257,40 @@ class Runner:
                     budget_stop = 'Auxiliary monitoring budget exhausted'
                 if active or (next_job < len(jobs) and len(retired) < slots and budget_stop is None):
                     time.sleep(.2 if active else 30)
+        except BaseException as exc:
+            controller_error = repr(exc)
+            self.failed = True
+            raise
         finally:
             cleanup = time.monotonic()
+            cleanup_errors = []
             try:
                 for slot in list(active):
                     try:
                         finish(slot, 'Controller interrupted; no automatic retry')
+                    except BaseException as exc:
+                        cleanup_errors.append(repr(exc))
                     finally:
                         self.failed = True
                 if nv:
-                    nv.close()
+                    try:
+                        nv.close()
+                    except BaseException as exc:
+                        cleanup_errors.append(repr(exc))
             finally:
                 parent_active += time.monotonic()-cleanup
-                self.ledger.charge('auxiliary', 'dispatch_monitor', parent_active, not failures and not budget_stop)
-        self.failed |= bool(failures or budget_stop or next_job != len(jobs))
-        write(self.root/'dispatch.json', dict(status='INCOMPLETE' if self.failed else 'COMPLETE', active={},
-              retired=sorted(retired), failures=failures, pending=[j['target'].name for j in jobs[next_job:]], budget_stop=budget_stop))
+                try:
+                    self.ledger.charge('auxiliary', 'dispatch_monitor', parent_active,
+                                       not failures and not budget_stop and not controller_error and not cleanup_errors)
+                except BaseException as exc:
+                    cleanup_errors.append(repr(exc))
+                self.failed |= bool(failures or budget_stop or controller_error or cleanup_errors or next_job != len(jobs))
+                write(self.root/'dispatch.json', dict(status='INCOMPLETE' if self.failed else 'COMPLETE',
+                      active={s: x['identity'] for s, x in active.items()}, retired=sorted(retired), failures=failures,
+                      pending=[j['target'].name for j in jobs[next_job:]], budget_stop=budget_stop,
+                      controller_error=controller_error, cleanup_errors=cleanup_errors))
+                if cleanup_errors and controller_error is None:
+                    raise RuntimeError('Controller cleanup/accounting failure: '+repr(cleanup_errors))
         if self.failed:
             raise RuntimeError('Incomplete phase; healthy slots drained, downstream closed')
 
@@ -332,11 +359,11 @@ def campaign(allowed: dict, gate_path: Path):
             def completed(job):
                 task = next(t for t in specs if t['id'] == job['target'].name)
                 identity = read(job['target']/'spec.json')['identity']
-                with ledger.active('validate_'+task['id']):
-                    completion = job['target']/'run/completion.json'
-                    training_complete(task, read(completion), identity)
-                    batch['completed'].append(dict(task_id=task['id'], identity=identity, completion=record(completion)))
-                    write(target/'batch.json', batch)
+                # run_many already charges this callback as parent active work.
+                completion = job['target']/'run/completion.json'
+                training_complete(task, read(completion), identity)
+                batch['completed'].append(dict(task_id=task['id'], identity=identity, completion=record(completion)))
+                write(target/'batch.json', batch)
             runner.run_many(jobs, LIMITS['workers'], completed)
             # Only a fully complete prescribed phase may start any blind scoring.
             runner.run('score', target, 'gpu', CAPS['gpu']-ledger.used['gpu'], ['--batch', str(target/'batch.json')])
