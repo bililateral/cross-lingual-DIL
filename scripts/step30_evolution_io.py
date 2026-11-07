@@ -75,6 +75,9 @@ def permit(path: Path, action: str) -> dict:
     verify(value['authorization'])
     verify(value['proposal'])
     workspace = Path(value['workspace']).resolve()
+    experiment = Path(value['experiment_root']).resolve()
+    if not workspace.is_relative_to(experiment) or not Path(value['campaign']).resolve().is_relative_to(experiment):
+        raise ValueError('All new source/data/output belong to the bound experiment directory')
     actual = Path(__file__).resolve().parent
     bindings = {Path(r['path']).resolve(): r for r in value['sources']}
     required = {actual/name for name in SOURCES}
@@ -88,6 +91,8 @@ def permit(path: Path, action: str) -> dict:
 
 
 def dataset(allowed: dict) -> dict:
+    if not Path(allowed['dataset_manifest']['path']).resolve().is_relative_to(Path(allowed['experiment_root']).resolve()):
+        raise ValueError('New dataset must count against the same experiment disk cap')
     manifest = pinned(allowed['dataset_manifest'])
     if (manifest['protocol'] != 'evolution-pilot-v1' or manifest['counts'] != {'fit': 160, 'dev': 64, 'test': 96}
             or manifest['domains'] != ['2014-Q3', '2014-Q4', '2015-Q1']):

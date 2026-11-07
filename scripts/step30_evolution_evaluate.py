@@ -14,16 +14,16 @@ from step30_evolution_policy import DOMAINS, METRICS, SPLITS, cells, tasks
 from step30_evolution_run import restore
 
 
-def training_complete(task: dict, completion: dict, expected_identity: dict) -> None:
+def training_complete(task: dict, completion: dict, expected_identity: dict, *, fit_groups: int = 20) -> None:
     stages, epochs = task['stages'], task['epochs']
-    expected_updates = 20*epochs*stages
+    expected_updates = fit_groups*epochs*stages
     work = completion['workload']
     replay = task['system'] in ('H_ER', 'H_full', 'V_ER')
     if (completion['status'] != 'TRAINING_COMPLETE_EVALUATION_CLOSED' or completion['task'] != task
             or completion['identity'] != expected_identity or completion['updates'] != expected_updates
             or set(completion['endpoints']) != {str(i) for i in range(stages+1)}
             or work['current_updates'] != expected_updates or work['current_records'] != 32*expected_updates
-            or work['stage_model_saves'] != stages or work['history_groups'] != (1600 if replay else 0)
+            or work['stage_model_saves'] != stages or work['history_groups'] != ((stages-1)*epochs*fit_groups if replay else 0)
             or work['history_records'] != 32*work['history_groups']):
         raise ValueError('Incomplete or mismatched trajectory; downstream remains closed')
     if (work['teacher_groups'] > (12 if task['system'] in ('H_ER', 'H_full') else 0)
@@ -31,16 +31,18 @@ def training_complete(task: dict, completion: dict, expected_identity: dict) -> 
         raise ValueError('Teacher workload differs from contract')
 
 
-def score_batch(root: Path, batch: dict, manifest: dict, factory, model_binding: dict, check) -> dict:
+def score_batch(root: Path, batch: dict, manifest: dict, factory, model_binding: dict, check,
+                *, fixture_specs=None, fixture_groups=None) -> dict:
     phase, specs = batch['phase'], batch['specs']
-    if specs != tasks(phase, batch.get('selected')) or len(batch['completed']) != len(specs):
+    expected_specs = tasks(phase, batch.get('selected')) if fixture_specs is None else fixture_specs
+    if specs != expected_specs or len(batch['completed']) != len(specs):
         raise ValueError('Complete fixed training batch required before blind scoring')
     completed = {r['task_id']: r for r in batch['completed']}
     if set(completed) != {s['id'] for s in specs}:
         raise ValueError('Missing/duplicate batch identities')
     for task in specs:
         row = completed[task['id']]
-        training_complete(task, pinned(row['completion']), row['identity'])
+        training_complete(task, pinned(row['completion']), row['identity'], fit_groups=20 if fixture_groups is None else fixture_groups)
     split = 'test' if phase == 'D' else 'dev'
     domains = DOMAINS[:1] if phase == 'A' else DOMAINS
     sources = [manifest['files'][d+':'+split] for d in domains]
@@ -48,7 +50,7 @@ def score_batch(root: Path, batch: dict, manifest: dict, factory, model_binding:
     public, inventory = {}, {}
     for d, source in zip(domains, sources):
         groups = [Group.from_dict(x) for x in pinned(source)]
-        if (len(groups) != SPLITS[split]//8 or len({g.uid for g in groups}) != len(groups)
+        if (len(groups) != (SPLITS[split]//8 if fixture_groups is None else fixture_groups) or len({g.uid for g in groups}) != len(groups)
                 or any(g.domain != d or g.split != split for g in groups)):
             raise ValueError('Blind quota/domain/partition differs')
         for g in groups:
@@ -138,17 +140,18 @@ def query_metrics(scores, labels, ids: list[str]) -> dict:
     return result
 
 
-def analyze_batch(root: Path, batch: dict, manifest: dict) -> list[dict]:
+def analyze_batch(root: Path, batch: dict, manifest: dict, *, fixture_specs=None, fixture_groups=None) -> list[dict]:
     phase, specs = batch['phase'], batch['specs']
     blind = read(root/'blind_complete.json')
-    if specs != tasks(phase, batch.get('selected')) or blind['phase'] != phase:
+    expected_specs = tasks(phase, batch.get('selected')) if fixture_specs is None else fixture_specs
+    if specs != expected_specs or blind['phase'] != phase:
         raise ValueError('Label release phase/configuration differs')
     validate_blind(blind, specs)  # ALL scores checked before ANY qrels access.
     split = 'test' if phase == 'D' else 'dev'
     domains = DOMAINS[:1] if phase == 'A' else DOMAINS
     if (set(blind['inventory']) != set(domains) or
             blind['blind_sources'] != [manifest['files'][d+':'+split] for d in domains] or
-            any(len(blind['inventory'][d]) != SPLITS[split]//8 for d in domains)):
+            any(len(blind['inventory'][d]) != (SPLITS[split]//8 if fixture_groups is None else fixture_groups) for d in domains)):
         raise ValueError('Blind dataset sources/domains/quotas differ before qrels opening')
     sources = [manifest['files'][d+':'+split+':qrels'] for d in domains]
     access(root.parent, phase+'_qrels', sources)

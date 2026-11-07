@@ -87,9 +87,9 @@ def test_data(temp, qualification):
                 same_snapshot_source_row=selected[2], language_boundary=[29, 28])
 
 
-def test_updates(temp):
+def tiny_factory(temp):
     model_dir = temp/'tiny_model'
-    model_dir.mkdir()
+    model_dir.mkdir(parents=True)
     vocab = ['[PAD]', '[UNK]', '[CLS]', '[SEP]', '[MASK]', 'Apple', 'apple', 'the', 'and', 'with', 'offer']+[str(i) for i in range(8)]
     (model_dir/'vocab.txt').write_text('\n'.join(vocab)+'\n')
     tokenizer = BertTokenizer(vocab_file=str(model_dir/'vocab.txt'), do_lower_case=False)
@@ -102,6 +102,11 @@ def test_updates(temp):
     binding = dict(directory=str(model_dir), files=[io.record(p) for p in sorted(model_dir.iterdir())])
     def factory(task):
         return run.make_model(model_dir, task, 'cpu', expected_hidden=8)
+    return factory, binding
+
+
+def test_updates(temp):
+    factory, binding = tiny_factory(temp/'updates_fixture')
     task = policy.spec('B', 'H_SEQ', 'H3', 13)
     m = factory(task)
     assert m.tokenizer(['Apple', 'apple'])['input_ids'][0] != m.tokenizer(['Apple', 'apple'])['input_ids'][1]
@@ -217,6 +222,52 @@ def test_updates(temp):
                 paired_history_draws=True, teacher_calls=len(teacher.calls), teacher_refreshes=0)
 
 
+def test_evaluation(temp):
+    factory, binding = tiny_factory(temp/'evaluation_fixture')
+    root = temp/'evaluation'
+    root.mkdir()
+    manifest = dict(files={})
+    for d in policy.DOMAINS:
+        g = group(d, split='test').evaluation_order()
+        path, truth = root/(d+'_blind.json'), root/(d+'_qrels.json')
+        io.write(path, [asdict(g.blind())])
+        io.write(truth, {g.uid: dict(view_ids=[v.uid for v in g.views], labels=g.labels())})
+        manifest['files'][d+':test'] = io.record(path)
+        manifest['files'][d+':test:qrels'] = io.record(truth)
+    specs = [dict(policy.spec('D', m, 'H3' if m == 'H_full' else 'V0', 21), epochs=2) for m in ('H_full', 'V_ER')]
+    batch = dict(phase='D', specs=specs, selected=dict(H='H3', V='V0'), completed=[])
+    for task in specs:
+        identity = dict(fixture=True, system=task['system'])
+        job = root/task['id']
+        result = run.execute(factory(task), lambda d: [group(d)], job, task, identity,
+                             binding, io.write, io.record, expected_groups=1)
+        evaluate.training_complete(task, result, identity, fit_groups=1)
+        batch['completed'].append(dict(task_id=task['id'], identity=identity, completion=io.record(job/'completion.json')))
+    blind = evaluate.score_batch(root, batch, manifest, factory, binding, lambda: None,
+                                 fixture_specs=specs, fixture_groups=1)
+    assert blind['forwards'] == 18
+    label_access = root.parent/'access/D_qrels.json'
+    assert not label_access.exists()
+    first = blind['runs'][0]['cells']['0_1']
+    path = Path(first['path'])
+    good = io.read(path)
+    bad = copy.deepcopy(good)
+    next(iter(bad.values()))['scores'].pop()
+    io.write(path, bad)
+    blind['runs'][0]['cells']['0_1'] = io.record(path)
+    io.write(root/'blind_complete.json', blind)
+    must_fail(lambda: evaluate.analyze_batch(root, batch, manifest, fixture_specs=specs, fixture_groups=1), 'no label open after incomplete blind output')
+    assert not label_access.exists()
+    io.write(path, good)
+    blind['runs'][0]['cells']['0_1'] = io.record(path)
+    io.write(root/'blind_complete.json', blind)
+    metrics = evaluate.analyze_batch(root, batch, manifest, fixture_specs=specs, fixture_groups=1)
+    assert len(metrics) == 2 and all(len(r['cells']) == 9 for r in metrics) and label_access.exists()
+    must_fail(lambda: evaluate.analyze_batch(root, batch, manifest, fixture_specs=specs, fixture_groups=1), 'no second D label open')
+    return dict(actual_trajectories=2, blind_cells=18, label_open_after_all_scores=True,
+                missing_score_blocks_open=True, second_open_rejected=True, metrics_per_cell=10)
+
+
 def fake_row(task, P=(.3, .3, .3), A=(.7, .7, .7), final=(.6, .6, .7), groups=12):
     # Paper metrics for decision tests only: never claimed to be model output.
     entries = {}
@@ -291,6 +342,14 @@ def test_decisions(temp):
     for m in policy.REFERENCES:
         for endpoint in ('F', 'O'):
             assert abs(d['intervals'][m][endpoint][0]-d['intervals'][m][endpoint][1]) < 1e-12
+    noisy = copy.deepcopy(drows)
+    for row in noisy:
+        if row['spec']['system'] == 'V_ER':
+            for key in ('3_1', '3_2'):
+                for i, g in enumerate(row['cells'][key]['groups']):
+                    g['queries']['map'] = [.45 if i < 6 else .85]*16
+    uncertain = policy.decision(noisy, selected, 'D')
+    assert uncertain['internal_support'] and not uncertain['support']['V_ER'] and not uncertain['passed']
     must_fail(lambda: policy.decision(drows[:-1], selected, 'D'), 'missing confirm seed')
     return dict(paper_cases=len(cases)+2, stop_dispatch=['A_only_capability', 'B_joint', 'C_full'],
                 no_d_after_c_failure=True, paired_bootstrap_replicates=5000, all_internal_external_support_checked=True)
@@ -315,7 +374,7 @@ def test_boundaries(temp):
     failed_job = runner_root/'failed_worker'
     failed_job.mkdir()
     runner_ledger = io.Ledger(runner_root, dict(training=0, gpu=0, auxiliary=0), 0)
-    runner = control.Runner(dict(workspace=str(temp)), gate, runner_root, runner_ledger)
+    runner = control.Runner(dict(workspace=str(temp), experiment_root=str(temp)), gate, runner_root, runner_ledger)
     must_fail(lambda: runner.run('analyze', failed_job, 'auxiliary', 20, []), 'actual worker failure')
     assert runner.failed and not io.read(failed_job/'dispatch_receipt.json')['success']
     used = runner_ledger.used.copy()
@@ -342,7 +401,7 @@ def main():
     parser.add_argument('--sources', type=Path, required=True)
     parser.add_argument('--qualification', type=Path, required=True)
     parser.add_argument('--prior-seconds', type=int, default=0)
-    parser.add_argument('--only', choices=('all', 'remaining', 'data', 'updates', 'decisions', 'boundaries'), default='all')
+    parser.add_argument('--only', choices=('all', 'remaining', 'final', 'data', 'updates', 'evaluation', 'decisions', 'boundaries'), default='all')
     args = parser.parse_args()
     if sys.platform != 'linux' or Path(sys.executable).resolve() != Path(io.PYTHON).resolve() or os.environ.get('CUDA_VISIBLE_DEVICES') != '':
         raise RuntimeError('Linux py310 with CUDA hidden required')
@@ -363,9 +422,11 @@ def main():
         with tempfile.TemporaryDirectory(dir=args.output) as directory:
             temp = Path(directory)
             for name, fn in (('data', lambda: test_data(temp, args.qualification)),
-                             ('updates', lambda: test_updates(temp)), ('decisions', lambda: test_decisions(temp)),
+                             ('updates', lambda: test_updates(temp)), ('evaluation', lambda: test_evaluation(temp)),
+                             ('decisions', lambda: test_decisions(temp)),
                              ('boundaries', lambda: test_boundaries(temp))):
-                if args.only in ('all', name) or (args.only == 'remaining' and name in ('decisions', 'boundaries')):
+                if (args.only in ('all', name) or (args.only == 'remaining' and name in ('decisions', 'boundaries'))
+                        or (args.only == 'final' and name in ('evaluation', 'decisions', 'boundaries'))):
                     result['checks'][name] = fn()
                     io.write(args.output/'progress.json', result)
                     print('PASS', name, flush=True)

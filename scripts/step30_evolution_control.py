@@ -20,6 +20,7 @@ from step30_evolution_policy import CAPS, DOMAINS, LIMITS, decision, select_a, t
 
 def resource_observation(allowed: dict, root: Path, gpu: bool) -> dict:
     import shutil
+    root = Path(allowed['experiment_root'])
     observation = dict(ram_available=psutil.virtual_memory().available,
                        disk_free=shutil.disk_usage(root).free, experiment_bytes=directory_bytes(root))
     observation['ready'] = (observation['ram_available'] >= LIMITS['free_ram_bytes'] and
@@ -112,7 +113,7 @@ class Runner:
                             raise TimeoutError('Full worker lifecycle deadline')
                         if p.memory_info().rss > LIMITS['rss_bytes']:
                             raise RuntimeError('Worker RAM limit')
-                        if directory_bytes(self.root) > LIMITS['disk_bytes']:
+                        if directory_bytes(Path(self.allowed['experiment_root'])) > LIMITS['disk_bytes']:
                             raise RuntimeError('Experiment disk limit')
                     finally:
                         # Parent monitoring is auxiliary active work; pure sleep
@@ -215,7 +216,7 @@ def campaign(allowed: dict, gate_path: Path):
                 return select_a(rows)
         def judge(rows, selected, phase):
             with ledger.active(phase+'_decision'):
-                budget = Budget(root, time.monotonic()+CAPS['auxiliary']-ledger.used['auxiliary'])
+                budget = Budget(Path(allowed['experiment_root']), time.monotonic()+CAPS['auxiliary']-ledger.used['auxiliary'])
                 return decision(rows, selected, phase, budget.check)
         result = pipeline(run_phase, lambda phase, result: write(root/phase/'decision.json', result), choose, judge)
         with ledger.active('complete'):
@@ -245,11 +246,19 @@ def worker(allowed: dict, gate_path: Path, action: str, target: Path, batch_path
     batch = read(batch_path)
     if batch['gate'] != record(gate_path) or batch['specs'] != tasks(batch['phase'], batch.get('selected')):
         raise ValueError('Batch gate/tasks differ')
-    budget = Budget(root, deadline)
+    budget = Budget(Path(allowed['experiment_root']), deadline)
     budget.check()
     manifest = dataset(allowed)
     binding = allowed['model_binding']
     if action in ('train', 'score'):
+        directory = Path(binding['directory']).resolve()
+        if directory != Path('/home/yongpeng/cross-lingual/models/step29/bert_base_cased').resolve():
+            raise ValueError('Use the already approved local English backbone')
+        model_sources = {Path(r['path']).resolve() for r in binding['files']}
+        actual = {p.resolve() for p in directory.iterdir() if p.is_file() and p.suffix in ('.json', '.txt', '.bin', '.safetensors')}
+        if (model_sources != actual or not {'config.json', 'vocab.txt'} <= {p.name for p in actual}
+                or not {'pytorch_model.bin', 'model.safetensors'} & {p.name for p in actual}):
+            raise ValueError('Complete actual model/tokenizer file identities required')
         for source in binding['files']:
             verify(source)
         configure_gpu()
@@ -286,7 +295,10 @@ def build(allowed: dict):
     accounting.mkdir(parents=True)
     ledger = Ledger(accounting, allowed['prior_seconds'], allowed['cpu_test_seconds'])
     begin, ok = time.monotonic(), False
-    budget = Budget(accounting, begin+CAPS['auxiliary']-ledger.used['auxiliary'], 8*2**30)
+    experiment = Path(allowed['experiment_root']).resolve()
+    if not target.resolve().is_relative_to(experiment):
+        raise ValueError('New build output must be inside the experiment disk cap')
+    budget = Budget(experiment, begin+CAPS['auxiliary']-ledger.used['auxiliary'], 8*2**30)
     try:
         access(accounting, 'official_four_table_build', [allowed['archive']])
         archive = verify(allowed['archive'])
