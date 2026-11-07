@@ -113,6 +113,7 @@ if (p/'spec.json').exists():
         assert ledger['used_seconds']['training'] == sum(__import__('math').ceil(r['seconds']) for r in rows)
         checks.append(dict(name='actual_campaign_overlap_failure_retirement_healthy_refill_and_label_barrier',
                            slots=[r['slot'] for r in rows], passed=True, first_update_deletes_waiter=True))
+        scope.pop('waiter')  # Subsequent independent fixture roots have no first-start wrapper.
 
         self_process = control.psutil.Process()
         identity = dict(pid=self_process.pid, owner=self_process.username(), created=self_process.create_time(),
