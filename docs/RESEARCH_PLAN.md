@@ -6,7 +6,7 @@
 
 已形成[具体英文适配与遗忘预实验提案](../reports/documentation/20261107/evolution_pilot/proposal.zh.md)。下一步先解释并确认其中的新科学选择：固定2014-Q3→Q4→2015-Q1、4条/账号、每域160/64/96及15候选；原已审英文H母体/既有BERT；H/V对等有限适配；先检查双顺序基线的5个百分点遗忘与初学/新域能力，再比较同配置回放及旧评分、外部回放，最后一次封存账号确认。16单域+最多36完整轨迹、1worker/48累计小时为待确认提议，不是已批准预算或训练合同。
 
-方案的成功/停止、三种访问权限、9格学习前后评价、固定种子、成本代理及边界见同一提案；不另复制进度。先核对[具体待发审查材料](../reports/documentation/20261107/evolution_pilot/review/request.zh.md)的外发许可，再用本地Playwright MCP网页GPT 6 Pro必要方案外审及独立处置。当前没有发送；旧Evolution包未发送且已删除，不能恢复当新包上传。审查通过不授予实现、正式划分、数据/标签读取、训练或监听；后续实施需要明确范围，并只补新数据构建、V_ER及新完整入口/评价/停止门的必要证据，复用未变旧证据，不重复GPU资格。
+方案的成功/停止、三种访问权限、9格学习前后评价、固定种子、成本代理及边界见同一提案；不另复制进度。用户已批准[具体新包](../reports/documentation/20261107/evolution_pilot/review/authorization.json)按草案送审，下一步回收本地Playwright网页GPT 6 Pro完整结果并独立处置；实际状态只见交接和[提交原件](../reports/documentation/20261107/evolution_pilot/review/submission.json)。旧Evolution包未发送且已删除，不能恢复当新包上传。审查通过不授予实现、正式划分、数据/标签读取、训练或监听；后续实施需要明确范围，并只补新数据构建、V_ER及新完整入口/评价/停止门的必要证据，复用未变旧证据，不重复GPU资格。
 
 [最终资格报告](../reports/documentation/20261107/evolution_qualification/report.zh.md)及原始汇总支持有限预实验，不能证明遗忘、适配收益或H优势。342/144/20是每域划分前容量；PGP格式漏识别的零值不采用。原VendorLink有效负结果、ABC因dev前置未过且新候选训练为0的正常停止保持；不换门、重启旧监听或挪用55h余额。
 
