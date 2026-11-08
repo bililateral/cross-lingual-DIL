@@ -10,7 +10,9 @@
 
 用户追问排除旧账号的必要性：“为什么要剔除这些？不能用吗？”执行者纠正：旧fit/dev可以用于开发，只排除其作为未见账号确认；旧test若未训练/开发、未开放效果，可由明确用途转换许可用作新确认候选，不能把旧权限限制说成科学上永远不可使用。用户随后明确：“允许旧test作为新确认候选”。该补充替代本次资格中“全部排除旧test”的初提议：同一次扫描分别计旧fit/dev/test/未使用来源，旧test＋未使用账号可作确认候选，旧fit/dev仍只可作开发；保留同一1800秒帽，其余禁令不变。实际选择与训练仍待新合同。
 
-范围与来源记录见[初始许可](../reports/documentation/20261108/evolution_registered/qualification/authorization.json)、[旧test补充](../reports/documentation/20261108/evolution_registered/qualification/supplement.json)。原公开停止记录和实际评价入口支持旧流程只开放A/B的dev，旧C/D未执行；未读取旧评价标签或预测。新方案/后续正式实现的必要外审仍待具体材料与外发许可，旧候选127的免审/免核验不扩大到本任务。本轮按已有要求维护唯一交接、计划和设计入口，本地提交，不推送。
+范围与来源记录见[初始许可](../reports/documentation/20261108/evolution_registered/qualification/authorization.json)、[旧test补充](../reports/documentation/20261108/evolution_registered/qualification/supplement.json)。原公开停止记录和实际评价入口支持旧流程只开放A/B的dev，旧C/D未执行；未读取旧评价标签或预测。旧候选127的免审/免核验不扩大到本任务。本轮按已有要求维护唯一交接、计划和设计入口，本地提交，不推送。
+
+资格与具体方案完成后，执行者给出新的112735字节、28载荷、SHA256为3ab066d14cd61cdde05171d77b68e8c714741600778843ae7a41f607f9d6d224的定向包；用户明确：“允许发送本包审查，训练关闭”。该许可只覆盖本地Playwright网页GPT 6 Pro的方案/资格审查、回收与独立处置，不授权正式分区、语言开封、模型、训练或监听，24小时仍为建议。具体[授权](../reports/documentation/20261108/evolution_registered/review/authorization.json)及[唯一提交](../reports/documentation/20261108/evolution_registered/review/submission.json)保留，旧包许可不挪用。
 
 ## 2026-11-08：明确删除本次Evolution权重与本轮新增文件
 
