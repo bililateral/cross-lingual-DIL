@@ -4,6 +4,8 @@
 
 ## Evolution后续接手任务
 
+**当前优先转回原VendorLink。** 用户11月8日确认的[固定全市场开发诊断](../reports/documentation/20261108/vendorlink_fullpool/scope.zh.md)及[完整结果](../reports/documentation/20261108/vendorlink_fullpool/report.zh.md)提供后续依据。下一步优先考虑复用原ABC H_full／H_ER已有端点，以同一固定开发池补齐Full−SEQ／Full−ER及对VendorLink的比较，区分保持收益和绝对能力差距；不是先追加训练，也不要求VendorLink必须遗忘。若补齐后学习不足仍是瓶颈，再单独论证当前训练账号重分群这一负账号覆盖假设。新增端点评价／数据消费与训练均须明确下一范围，本轮不自动执行；不改旧ABC停止门、恢复搜索或把开发诊断当独立确认。本次必要核验与免外审许可限已确认范围。实际状态见交接唯一VendorLink项，原Evolution下述已结束范围及费用不变。
+
 用户已接受方向咨询建议，明确“继续推进，采用双路同时运行”，并批准开发数据构建与固定96条fit语言判断。从[当前六轨迹执行范围](../reports/documentation/20261108/evolution_registered/execution/scope.zh.md)、[许可](../reports/documentation/20261108/evolution_registered/execution/authorization.json)及[实现证据](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)接手；实际进度只维护在交接唯一Evolution项。原[30轨迹草案](../reports/documentation/20261108/evolution_registered/proposal.zh.md)只作来源，后续24条及24小时预算未获准。
 
 已获准的一次Linux CPU资格及“允许旧test作为新确认候选”补充已执行，随后已按许可导出288开发账号并保留288确认身份，确认正文未导出或开封。旧fit/dev可用于开发；旧test与未使用账号可作为新确认候选，后者必须未参与旧训练/开发或效果选择。新任务同账号身份跨fit/gallery/query，文本与角色日期严格隔离；开发与确认账号仍互斥。旧test不是科学上永久不可用，使用前须保留已明确的用途转换和旧访问历史，不能以新合同重置已见结果。

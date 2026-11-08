@@ -18,22 +18,23 @@ from step30_evolution_io import (Budget, Ledger, PYTHON, access, dataset, direct
 from step30_evolution_policy import CAPS, DOMAINS, LIMITS, decision, select_a, tasks
 
 
-def resource_observation(allowed: dict, root: Path, gpu: bool, owned=(), nv=None) -> dict:
+def resource_observation(allowed: dict, root: Path, gpu: bool, owned=(), nv=None, *, limits=None) -> dict:
     import shutil
+    limits = LIMITS if limits is None else limits
     root = Path(allowed['experiment_root'])
     ram_pending = 0
     for row in owned:
         try:
-            ram_pending += max(0, LIMITS['free_ram_bytes']-psutil.Process(row['pid']).memory_info().rss)
+            ram_pending += max(0, limits['free_ram_bytes']-psutil.Process(row['pid']).memory_info().rss)
         except psutil.NoSuchProcess:
             pass
-    save_reserve = (len(owned)+1)*2**30
+    save_reserve = (len(owned)+1)*limits.get('save_reserve_bytes', 2**30)
     observation = dict(ram_available=psutil.virtual_memory().available,
                        ram_pending=ram_pending, disk_free=shutil.disk_usage(root).free,
                        experiment_bytes=directory_bytes(root), save_reserve=save_reserve)
-    observation['ready'] = (observation['ram_available']-ram_pending >= LIMITS['free_ram_bytes'] and
-                            observation['disk_free'] >= LIMITS['free_disk_reserve']+save_reserve and
-                            observation['experiment_bytes']+save_reserve <= LIMITS['disk_bytes'])
+    observation['ready'] = (observation['ram_available']-ram_pending >= limits['free_ram_bytes'] and
+                            observation['disk_free'] >= limits['free_disk_reserve']+save_reserve and
+                            observation['experiment_bytes']+save_reserve <= limits['disk_bytes'])
     if gpu:
         from step28_formal_queue import GpuMemory
         temporary_reader = nv is None
@@ -59,7 +60,7 @@ def resource_observation(allowed: dict, root: Path, gpu: bool, owned=(), nv=None
                 return dict(observation, ready=False, hold='Unrecognized GPU commitment',
                             unknown_pids=sorted(set(used)-{r['pid'] for r in commitments if not r.get('exited')}))
             observation.update(gpu_free=memory['free'], unreflected_commitments=unreflected, commitments=commitments)
-            observation['ready'] &= memory['free']-unreflected >= LIMITS['free_gpu_bytes']
+            observation['ready'] &= memory['free']-unreflected >= limits['free_gpu_bytes']
         finally:
             if temporary_reader:
                 nv.close()
@@ -92,10 +93,13 @@ def release(process):
 
 class Runner:
     def __init__(self, allowed: dict, gate_path: Path, root: Path, ledger: Ledger, *,
-                 worker_entry: Path | None = None, caps: dict = CAPS):
+                 worker_entry: Path | None = None, caps: dict = CAPS, limits=None,
+                 wait_for_resources: bool = True):
         self.allowed, self.gate_path, self.root, self.ledger = allowed, gate_path, root, ledger
         self.worker_entry = Path(__file__).resolve() if worker_entry is None else Path(worker_entry).resolve()
         self.caps = dict(caps)
+        self.limits = dict(LIMITS if limits is None else limits)
+        self.wait_for_resources = wait_for_resources
         if self.caps != ledger.caps:
             raise ValueError('Controller and ledger must use identical cumulative budgets')
         self.failed = False
@@ -126,7 +130,7 @@ class Runner:
 
     def command(self, job: dict, slot: int, deadline: float):
         cores = psutil.Process().cpu_affinity()
-        if len(cores) < 2*LIMITS['workers']:
+        if len(cores) < 2*self.limits['workers']:
             raise RuntimeError('Four allowed CPU cores required for two slots')
         chosen = cores[-4:][slot*2:slot*2+2]
         return ['taskset', '-c', ','.join(map(str, chosen)), PYTHON, '-B', '-u', str(self.worker_entry),
@@ -139,7 +143,7 @@ class Runner:
         from step28_formal_queue import GpuMemory
         if self.failed:
             raise RuntimeError('Incomplete phase cannot start downstream work')
-        if not 1 <= slots <= LIMITS['workers']:
+        if not 1 <= slots <= self.limits['workers']:
             raise ValueError('Unapproved slot count')
         active, retired, failures = {}, set(), []
         unreleased = {}
@@ -193,10 +197,10 @@ class Runner:
                                 item['peak_gpu'] = max(item['peak_gpu'], occupied)
                                 if time.monotonic() >= item['deadline']-15:
                                     error = 'Full worker lifecycle deadline'
-                                elif rss > LIMITS['rss_bytes'] or occupied > LIMITS['process_gpu_bytes']:
+                                elif rss > self.limits['rss_bytes'] or occupied > self.limits['process_gpu_bytes']:
                                     error = 'Worker RAM/GPU limit'
-                                elif (directory_bytes(Path(self.allowed['experiment_root'])) > LIMITS['disk_bytes']
-                                      or shutil.disk_usage(self.root).free < LIMITS['free_disk_reserve']):
+                                elif (directory_bytes(Path(self.allowed['experiment_root'])) > self.limits['disk_bytes']
+                                      or shutil.disk_usage(self.root).free < self.limits['free_disk_reserve']):
                                     error = 'Shared disk limit'
                             except psutil.NoSuchProcess:
                                 pass
@@ -225,9 +229,11 @@ class Runner:
                                 break
                             continue  # In-flight reservations can be released after completion.
                         owned = [x['identity'] for x in active.values()]
-                        observation = resource_observation(self.allowed, self.root, gpu, owned, nv)
+                        observation = resource_observation(self.allowed, self.root, gpu, owned, nv, limits=self.limits)
                         write(job['target']/'admission.json', observation)
                         if not observation['ready']:
+                            if not active and not self.wait_for_resources:
+                                raise RuntimeError('Resources unavailable; no automatic waiting authorized')
                             continue
                         next_job += 1  # A launched/failed launch is consumed, never retried.
                         started = time.monotonic()
@@ -243,7 +249,7 @@ class Runner:
                                     stdout=output, stderr=subprocess.STDOUT, start_new_session=True, umask=0o077)
                             p = psutil.Process(process.pid)
                             identity = dict(pid=p.pid, owner=p.username(), created=p.create_time(), command=argv,
-                                            cwd=p.cwd(), reserved_bytes=LIMITS['free_gpu_bytes'])
+                                            cwd=p.cwd(), reserved_bytes=self.limits['free_gpu_bytes'])
                             # taskset execs in place, so the command after exec omits its own wrapper.
                             identity['command'] = argv[3:]
                             active[slot] = dict(process=process, job=job, identity=identity, started=started,
