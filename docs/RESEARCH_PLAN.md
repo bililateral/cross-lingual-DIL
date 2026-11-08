@@ -6,9 +6,9 @@
 
 用户已接受方向咨询建议，明确“继续推进，采用双路同时运行”，并批准开发数据构建与固定96条fit语言判断。从[当前六轨迹执行范围](../reports/documentation/20261108/evolution_registered/execution/scope.zh.md)、[许可](../reports/documentation/20261108/evolution_registered/execution/authorization.json)及[实现证据](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)接手；实际进度只维护在交接唯一Evolution项。原[30轨迹草案](../reports/documentation/20261108/evolution_registered/proposal.zh.md)只作来源，后续24条及24小时预算未获准。
 
-已获准的一次Linux CPU资格及“允许旧test作为新确认候选”补充已执行，未正式划分。旧fit/dev可用于开发；旧test与未使用账号可作为新确认候选，后者必须未参与旧训练/开发或效果选择。新任务同账号身份跨fit/gallery/query，文本与角色日期严格隔离；开发与确认账号仍互斥。旧test不是科学上永久不可用，使用前须保留已明确的用途转换和旧访问历史，不能以新合同重置已见结果。
+已获准的一次Linux CPU资格及“允许旧test作为新确认候选”补充已执行，随后已按许可导出288开发账号并保留288确认身份，确认正文未导出或开封。旧fit/dev可用于开发；旧test与未使用账号可作为新确认候选，后者必须未参与旧训练/开发或效果选择。新任务同账号身份跨fit/gallery/query，文本与角色日期严格隔离；开发与确认账号仍互斥。旧test不是科学上永久不可用，使用前须保留已明确的用途转换和旧访问历史，不能以新合同重置已见结果。
 
-本次定向实现外审及R01/R02主审闭合、一次开发导出和固定语言门已完成；实际执行从[正式门](../reports/documentation/20261108/evolution_registered/execution/formal_gate.json)进入。沿既有六条/双路队列运行并在完整后评分，按实际终态汇报原P与冻结对照，不重建队列、不重问开训。未来H_ER/Full、V_ER和独立确认均需另行决定；此次实际控制器没有M/C路径。只有原P前提成立才讨论机制价值，若无共同明显遗忘按已接受建议结束当前Evolution上的协议扩展，不改门或换seed继续寻找现象。
+本次定向实现外审及R01/R02主审闭合、开发导出、语言门、正式六条与完整评分分析均已完成，来源从[正式门](../reports/documentation/20261108/evolution_registered/execution/formal_gate.json)进入。[本轮结果](../reports/documentation/20261108/evolution_registered/result/report.zh.md)为有效的STOP_LEARNING：两SEQ的新学习增量通过，但绝对能力保护与共同明显遗忘均失败；冻结对照显示更新收益，不能笼统写为无学习或任何地方都不遗忘。用户明确本次结果不提交外审，已完成保存字段主审核对。按既定停止条款结束本有限链及当前Evolution资料上寻找明显遗忘的协议扩展，不启动H_ER/Full、V_ER或独立确认，不改门、换seed或追加HPO翻转结果。控制器没有M/C路径；未来若另立研究目标或数据，保留本轮已见开发结果与停止事实。
 
 当前只导出96×3开发，确认身份保留、不导出正文；严格4/2/2、固定H1/V1、原P技术投入门、均值与逐格报告保持。冻结评分列各批刚学后和最终差值，不新增自动价值门、不以最终冻结更好否定曾获得后丢失的能力。Full主要效果/代价口径须在未来M结果前固定。确认候选余量极小，后续若不足不得自动借旧dev填确认。
 
