@@ -1,5 +1,25 @@
 # 科研文件存储与恢复
 
+## 2026-11-08 Evolution权重及本轮新增文件定向删除
+
+用户在具体清单与不可恢复后果已呈现后，明确选择“按上述范围全部删除”，原话与保留边界见[讨论记录](RESEARCH_DISCUSSION.zh.md)。本次仅处理当前Evolution A/B和本轮三个提交新增材料，未改写Git历史；删除不改变原有效负结果、判据、访问事实或已发生费用。实验累计仍按原账training12926/gpu367/auxiliary1882秒（4h12m55，CPU59秒为子账）保留，本次为文件管理，无科研计算、载模或训练。
+
+| 端与精确对象 | 实际删除文件数 | 逻辑字节 | 结果与恢复边界 |
+|---|---:|---:|---|
+| Linux：/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/execution/campaign 下A/B完成记录绑定的initial.pt与stage*.pt | 56（22起点、34阶段模型） | 14776938922 | 11:03:15删除完成，全部目标不存在；未入Git，无可由本次Git历史恢复的权重副本 |
+| Linux：/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/candidate127/ 整个目录 | 88 | 13188966 | 11:03:15目录及文件已删除，包含54份原始评分文件及未入Git的逐query指标；原始结果不能由汇总还原 |
+| Linux：/home/yongpeng/cross-lingual/reports/documentation/20261107/evolution_pilot/execution/stop_observation.json | 1 | 34128 | 11:03:15已删除，字节相同的已提交Windows副本可从下述Git入口恢复 |
+| Windows：本轮三提交新增文件，基于c1b07a6f至6a9d9a36的新增清单 | 39 | 325159 | 客户端11:04:11删除完成；32份candidate127材料、6份execution新副本及scripts/step30_evolution_candidate127.py均不存在，已提交原字节可恢复 |
+| 两端合计 | 184 | 14790487175 | Linux145文件14790162016字节；此为逻辑字节，不冒称文件系统实测净增 |
+
+Linux权重的精确原路径/大小/SHA仍保存在原`execution/campaign/A/batch.json`、`B/batch.json`绑定的22份`run/completion.json`中，原件未改。对象范围为A的H0—H3、V0—V3各seed11/12，每任务initial.pt和stage1.pt；B的H1/V1各seed13—15，每任务initial.pt及stage1—3.pt。删除前56份逐项大小/SHA已经匹配原绑定，最终执行再次核对绑定原件SHA、目标最终路径、属主、普通文件/无符号链接、单硬链接及字节总量。候选目录88文件和单独停止观测也核对实际归属、边界和数量后逐文件删除，只移除该目录内的空目录，没有递归删除整个evolution_pilot。
+
+原A/B的327个非权重文件在Linux保留，删除前后路径与文件元数据完全一致；27份关键原件（A/B batch、22份completion、整批completion/dispatch/budget）的SHA逐份不变。正式门、数据manifest、共享bert-base-cased五文件和H消融dispatch共8项元数据保持；Evolution官方数据、固定数据正文/隔离标签、原代码/审查、旧VendorLink/ABC及H消融资产均不在删除对象内。11:03:15无Evolution活动进程；H原监管1412412仍存在，属主yongpeng，创建时刻1794051702.82、命令和cwd核对，原dispatch仍PAUSED_IDLE、7完成/0活动/56待派。未修改H的暂停状态、来源、模型或预算。
+
+Windows精确删除集合可由`git diff --name-only --diff-filter=A c1b07a6f..6a9d9a364f4dda78f61a0922176feeca08aa82b9`恢复；这三个提交为eda3b629、e33a313e、6a9d9a36。39份现存字节在删除前已实际读取Git blob并逐份匹配大小/SHA，执行时再次确认HEAD与工作区未变、39文件325159字节、最终绝对路径位于工作区且路径链无reparse point，再用PowerShell LiteralPath逐文件删除。恢复原件使用`6a9d9a364f4dda78f61a0922176feeca08aa82b9:<仓库相对路径>`；不依赖当前同名文件或仅有哈希。Windows execution六项是stop_observation.json，以及campaign/completion.json、dispatch.json、budget.json、A/decision.json、B/decision.json；其Linux原A/B来源保留。candidate127的源码、报告、汇总、回执和未上传审查包都在该Git历史内，54份原始评分和原始逐query指标没有入Git；不得宣称已完整保管或可从Git重放。
+
+原冻结运行回执不追改成“未使用”，已删路径通过本记录解释。现有交接、计划、设计入口与用户决定原位修正，不另造清理包、备份或平行进度系统。根docs仅在Windows维护，本次正常本地提交，不推送。恢复历史源码不授权重新读取数据、载模、评分或训练。此为用户指定局部清理，最近大清理2026-11-06及下次到期2026-11-21保持。
+
 ## 2026-11-07 Evolution双路正式启动与核验收尾
 
 本次增量外审及独立主审已关闭三项必修，正式来源022e405a与11份部署脚本绑定在`execution/formal_gate.json`；Linux `execution/campaign`已实际运行。七份启动原件通过SFTP回传，大小/SHA与[启动清单](../reports/documentation/20261107/evolution_pilot/execution/start_evidence_manifest.json)全部一致；正文、标签、预测、Memory和正式权重仍只留Linux。动态运行状态只见交接唯一Evolution项，不以此处作为新的进度入口。
