@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-08 VendorLink固定全市场诊断收尾
+
+两SEQ及用户追加Full／ER的同池评价均完整完成，实际入口和两版部署分别留在Linux `/home/yongpeng/cross-lingual/reports/documentation/20261108/vendorlink_fullpool/workspace/`、其`history/workspace/`。原ABC四方法共36旧阶段权重全部保留；96分数矩阵、逐query向量、原开发文本/标签和账号身份只在Linux，不回Windows。Windows只收聚合、来源和运行小证据：父目录[59份161614字节](../reports/documentation/20261108/vendorlink_fullpool/receive.json)、补充[57份458834字节](../reports/documentation/20261108/vendorlink_fullpool/history/receive.json)均逐份大小/SHA匹配。根docs仅Windows更新；21:30:23[最终SFTP](../reports/documentation/20261108/vendorlink_fullpool/final_sync.json)同步具名8份报告、核对和恢复说明共31988字节，全部匹配，没有覆盖冻结运行原件。
+
+一次性测试两实际版本和运输助手先提交Git `a370acb4216dc63c69eff2ab7500f92c84b1cd78`，逐份读取Git原字节并核对执行回执/本地大小与SHA后退役。Windows实际删除4文件41265字节：`tests/step32_fullpool_increment.py`，以及本任务父目录下`cpu01/test_source.py`、`transport.py`、`transfer.py`。Linux21:30:23实际删除本任务父目录`workspace/tests/step32_fullpool_increment.py`及`cpu01/test_source.py`，共2文件17357字节；两端合计58622逻辑字节。精确路径、各文件大小/SHA及`commit:path`恢复入口见[Windows回执](../reports/documentation/20261108/vendorlink_fullpool/cleanup_windows.json)、[Linux回执](../reports/documentation/20261108/vendorlink_fullpool/cleanup_linux.json)和[Git原字节核对](../reports/documentation/20261108/vendorlink_fullpool/cleanup_request.json)。原始CPU01失败及CPU02局部修复日志、11秒子账均保留，两端生产源码和所有结果未删除；补充未创建新CPU/GPU核验脚本。
+
+清理前确认两批控制器/worker均已退出，两套生产来源分别与正式门一致，删除项不在两套生产绑定中。中文暂停监管及其模型、来源与活动状态未改。本次只做局部常规收尾，不重置11月6日大清理完成日与11月21日下次到期；恢复源码不自动授权重跑。两批合并823/7200秒费用及原负结果不清零。本地提交，不推送。
+
 ## 2026-11-08 Registered六轨迹训练权重定向删除
 
 用户要求删除“最近这次实验的模型训练权重文件”，在H消融与今日Evolution六轨迹两个对象及删除影响已说明后，明确选中“今天最新完成的Evolution实验”。本次许可仅覆盖Registered的H1/V1各seed31/32/33六条正式训练权重；原停止结论、数据访问与费用不变，不授权补训或恢复中文H。
