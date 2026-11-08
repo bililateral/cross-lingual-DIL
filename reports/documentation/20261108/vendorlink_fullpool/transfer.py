@@ -33,8 +33,23 @@ for task in TASKS:
                 'progress.json', 'failure.json', 'console.txt')]
 
 parser = argparse.ArgumentParser()
-parser.add_argument('action', choices=('prepare', 'test', 'test_repair', 'start', 'status', 'observe_final', 'collect', 'deliver'))
+parser.add_argument('action', choices=('prepare', 'test', 'test_repair', 'start', 'status', 'observe_final', 'collect', 'deliver',
+                                     'history_prepare', 'history_start', 'history_status', 'history_observe_final', 'history_collect', 'history_finish'))
 args = parser.parse_args()
+finish = args.action == 'history_finish'
+history = args.action.startswith('history_')
+if history:
+    args.action = args.action.removeprefix('history_')
+    if finish:
+        args.action = 'observe_final'
+    REL = REL/'history'
+    REMOTE += '/history'
+    PUBLIC = [p for p in PUBLIC if not p.startswith('campaign/scoring/')]
+    TASKS = [f'ABC_s{s}_{m}' for s in (4, 5, 6) for m in ('H_full', 'H_ER')]
+    for task in TASKS:
+        PUBLIC += [f'campaign/scoring/{task}/{name}' for name in
+                   ('blind_complete.json','dispatch_receipt.json','process.json','admission.json','progress.json','failure.json','console.txt')]
+    PUBLIC += ['inputs.json','campaign/analysis/comparison.json','campaign/analysis/comparison.zh.md','entry_check.json']
 client = paramiko.SSHClient()
 client.load_system_host_keys()
 client.connect('10.201.109.111', username='yongpeng', password=getpass.getpass('SSH password: '),
@@ -55,21 +70,38 @@ def fixed_remote(code, timeout=60):
 
 prefix = "from pathlib import Path\nimport json,sys,time,os,math,subprocess\nroot=Path("+repr(REMOTE)+")\n"
 prefix += "sys.path.insert(0,str(root/'workspace/scripts'))\n"
+prefix += 'history='+repr(history)+'\n'
 try:
     if args.action == 'prepare':
         fixed_remote(prefix+"(root/'workspace/scripts').mkdir(parents=True,exist_ok=True)\n(root/'workspace/tests').mkdir(exist_ok=True)\n")
         files = [(LOCAL/'scripts'/name, 'workspace/scripts/'+name) for name in SOURCES]
-        files += [(LOCAL/'tests/step32_fullpool_increment.py', 'workspace/tests/step32_fullpool_increment.py')]
-        files += [(LOCAL/REL/name, name) for name in ('inputs.json', 'scope.zh.md', 'authorization.json')]
+        if not history:
+            files += [(LOCAL/'tests/step32_fullpool_increment.py', 'workspace/tests/step32_fullpool_increment.py')]
+        files += [(LOCAL/REL/name, name) for name in (('scope.zh.md', 'authorization.json') if history else ('inputs.json', 'scope.zh.md', 'authorization.json'))]
         with client.open_sftp() as sftp:
             for local, relative in files:
                 sftp.put(str(local), REMOTE+'/'+relative)
         text = fixed_remote(prefix+r'''
 import datetime, shutil, psutil
-from step30_evolution_io import record,write
+from step30_evolution_io import record,write,read,verify
 start=time.monotonic()
 assert not (root/'campaign').exists(), 'Never overwrite a launched campaign'
 assert not (root/'preparation_budget.json').exists(), 'Preparation is single-use'
+if history:
+    parent=root.parent
+    prior=read(parent/'campaign/budget.json')
+    assert read(parent/'campaign/completion.json')['status']=='DESCRIPTIVE_DEV_DIAGNOSTIC_COMPLETE'
+    inputs=read(parent/'inputs.json'); inputs['old_runs']=[]
+    old=Path('/home/yongpeng/cross-lingual/reports/documentation/20261101/formal_chain/vendorlink/training')
+    for seed in (4,5,6):
+        for method in ('H_full','H_ER'):
+            task=dict(id=f'ABC_s{seed}_{method}',seed=seed,method=method,order='ABC')
+            path=old/task['id']/'run/completion.json'; value=read(path)
+            assert value['identity']['spec']==task
+            inputs['old_runs'].append(dict(id=task['id'],spec=task,completion=record(path),sources=value['identity']['sources']))
+    inputs['reference_result']=record(parent/'campaign/analysis/result.json')
+    inputs['reference_scores']=record(parent/'campaign/scoring_complete.json')
+    write(root/'inputs.json',inputs)
 sources=[record(p) for p in sorted((root/'workspace/scripts').glob('*.py'))]
 write(root/'source_manifest.json',sources)
 pause=Path('/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/dispatch.json')
@@ -86,9 +118,15 @@ observation=dict(observed=datetime.datetime.now(datetime.timezone(datetime.timed
     ram_available=psutil.virtual_memory().available,disk_free=shutil.disk_usage(root).free)
 write(root/'observation.json',observation)
 elapsed=time.monotonic()-start
-write(root/'preparation_budget.json',dict(used_seconds=dict(gpu=0,auxiliary=300+math.ceil(elapsed)),cpu_test_seconds=0,
-    events=[dict(operation='conservative_local_transport_observation_and_closeout',charged_seconds=300),
-            dict(operation='remote_preparation',actual_seconds=elapsed,charged_seconds=math.ceil(elapsed))]))
+if history:
+    write(root/'preparation_budget.json',dict(used_seconds=dict(gpu=prior['used_seconds']['gpu'],auxiliary=prior['used_seconds']['auxiliary']+120+math.ceil(elapsed)),
+        cpu_test_seconds=prior['cpu_test_seconds'],inherited_budget=record(parent/'campaign/budget.json'),
+        events=[dict(operation='supplement_transport_and_closeout',charged_seconds=120),
+                dict(operation='remote_preparation',actual_seconds=elapsed,charged_seconds=math.ceil(elapsed))]))
+else:
+    write(root/'preparation_budget.json',dict(used_seconds=dict(gpu=0,auxiliary=300+math.ceil(elapsed)),cpu_test_seconds=0,
+        events=[dict(operation='conservative_local_transport_observation_and_closeout',charged_seconds=300),
+                dict(operation='remote_preparation',actual_seconds=elapsed,charged_seconds=math.ceil(elapsed))]))
 print(json.dumps(dict(sources=len(sources),observation=observation)))
 ''')
         print(text)
@@ -122,28 +160,54 @@ write(target/'receipt.json',receipt)
 print((target/'console.txt').read_text()); print(json.dumps(dict(passed=receipt['passed'],seconds=elapsed,used=prior)))
 ''',timeout=210))
     elif args.action == 'start':
+        if history:
+            manifest = json.loads(fixed_remote(prefix+"print((root/'source_manifest.json').read_text())\n"))
+            for source in manifest:
+                name = Path(source['path']).name
+                local = LOCAL/'scripts'/name
+                if (name not in SOURCES or local.stat().st_size != source['bytes']
+                        or hashlib.sha256(local.read_bytes()).hexdigest() != source['sha256']):
+                    raise ValueError('New deployed source differs from Windows implementation')
+            (LOCAL/REL/'deployment_check.json').write_text(json.dumps(dict(
+                all_matched=True,sources=manifest,new_tests=0),indent=2)+'\n',encoding='utf-8')
         print(fixed_remote(prefix+r'''
 import psutil
 from step30_evolution_io import read,write,record,verify
 import step32_vendorlink_fullpool as f
 assert not (root/'campaign').exists() and not (root/'launch.json').exists(), 'Single launch only'
-first=read(root/'cpu01/receipt.json')
-receipt=read(root/'cpu02/receipt.json') if (root/'cpu02/receipt.json').exists() else first
+evidence=root.parent if history else root
+first=read(evidence/'cpu01/receipt.json')
+receipt=read(evidence/'cpu02/receipt.json') if (evidence/'cpu02/receipt.json').exists() else first
 assert receipt['passed']
 if not first['passed']:
     assert receipt['sources']==first['sources'], 'Production source changed; old evidence cannot be reused automatically'
     assert receipt['selection']==['Increment.test_self_ties_and_wrong_labels']
-    assert record(root/'cpu01/test_source.py')['sha256']==first['test_source']['sha256']
-    original=(root/'cpu01/console.txt').read_text()
+    assert record(evidence/'cpu01/test_source.py')['sha256']==first['test_source']['sha256']
+    original=(evidence/'cpu01/console.txt').read_text()
     assert 'test_actual_six_scores_and_joint_analysis (__main__.Increment) ... ok' in original
     assert 'test_real_two_slot_failure_and_limits (__main__.Increment) ... ok' in original
 for source in receipt['sources']: verify(source)
+if history:
+    sources=read(root/'source_manifest.json')
+    old_hashes={Path(x['path']).name:x['sha256'] for x in receipt['sources']}
+    assert len(sources)==13
+    for source in sources:
+        verify(source)
+        name=Path(source['path']).name
+        if name!='step32_vendorlink_fullpool.py': assert source['sha256']==old_hashes[name]
+else: sources=receipt['sources']
 gate=dict(protocol=f.PROTOCOL,approved=True,review_exempt_by_user=True,caps=f.CAPS,limits=f.LIMITS,
     automatic_retry=False,automatic_next_phase=False,automatic_wait=False,other_gpu_commitments=[],
-    experiment_root=str(root),workspace=str(root/'workspace'),sources=receipt['sources'],
+    experiment_root=str(root),workspace=str(root/'workspace'),sources=sources,
     authorization=record(root/'authorization.json'),scope=record(root/'scope.zh.md'),inputs=record(root/'inputs.json'),
     preparation_budget=record(root/'preparation_budget.json'))
+if history:gate['methods']=['H_full','H_ER']
 write(root/'gate.json',gate)
+if history:
+    checked,inputs=f.permit(root/'gate.json')
+    assert f.tasks(checked['methods'])==[r['spec'] for r in inputs['old_runs']]
+    write(root/'entry_check.json',dict(methods=checked['methods'],tasks=len(inputs['old_runs']),sources=len(sources),
+        unchanged_dependencies=12,production_gate_passed=True,new_cpu_tests=0,reference_result=inputs['reference_result']))
 command=[sys.executable,'-B','-u',str(root/'workspace/scripts/step32_vendorlink_fullpool.py'),'--gate',str(root/'gate.json'),'--action','campaign']
 env=dict(os.environ,OMP_NUM_THREADS='2',MKL_NUM_THREADS='2',OPENBLAS_NUM_THREADS='2',TOKENIZERS_PARALLELISM='false',HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',CUBLAS_WORKSPACE_CONFIG=':4096:8')
 with (root/'controller_console.txt').open('x') as log:
@@ -202,7 +266,8 @@ write(root/'final_observation.json',out);print(json.dumps(out,ensure_ascii=False
 '''))
     elif args.action == 'deliver':
         names = ['report.zh.md', 'implementation.zh.md', 'saved_check.json',
-                 'deployment_check.json', 'cleanup_request.json']
+                 'deployment_check.json', 'cleanup_request.json',
+                 'history/report.zh.md', 'history/saved_check.json', 'history/deployment_check.json']
         delivered = []
         with client.open_sftp() as sftp:
             for name in names:
@@ -216,13 +281,17 @@ from step30_evolution_io import read,write,record,verify
 assert read(root/'campaign/completion.json')['status']=='DESCRIPTIVE_DEV_DIAGNOSTIC_COMPLETE'
 assert not (root/'cleanup_linux.json').exists(), 'Cleanup is single-use'
 launch=read(root/'launch.json')
-for r in [launch]+[read(p) for p in (root/'campaign').glob('**/process.json')]:
+assert read(root/'history/campaign/completion.json')['status']=='DESCRIPTIVE_DEV_DIAGNOSTIC_COMPLETE'
+owned=[launch,read(root/'history/launch.json')]
+owned += [read(p) for folder in (root/'campaign',root/'history/campaign') for p in folder.glob('**/process.json')]
+for r in owned:
     try:
         p=psutil.Process(r['pid'])
         assert p.create_time()!=r['created'] or p.status()==psutil.STATUS_ZOMBIE,'Own process still active'
     except (psutil.NoSuchProcess,psutil.ZombieProcess):pass
 gate=read(root/'gate.json')
-for r in gate['sources']:verify(r)
+history_gate=read(root/'history/gate.json')
+for r in gate['sources']+history_gate['sources']:verify(r)
 for r in delivered:verify(dict(path=str(root/r['relative']),bytes=r['bytes'],sha256=r['sha256']))
 request=read(root/'cleanup_request.json')
 targets={'workspace/tests/step32_fullpool_increment.py','cpu01/test_source.py'}
@@ -238,7 +307,7 @@ for r in request['linux']:
     assert actual['bytes']==r['bytes'] and actual['sha256']==r['sha256']
     deleted.append(dict(**actual,restore=r['restore']))
 for r in deleted:Path(r['path']).unlink()
-for r in gate['sources']:verify(r)
+for r in gate['sources']+history_gate['sources']:verify(r)
 out=dict(at=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat(),
     deleted=deleted,count=len(deleted),bytes=sum(x['bytes'] for x in deleted),
     production_sources_unchanged=True,weights_untouched=True,restore_commit=request['commit'])
@@ -246,7 +315,7 @@ write(root/'cleanup_linux.json',out)
 write(root/'final_sync.json',dict(at=out['at'],files=delivered,all_matched=True,root_docs_synced=False))
 print(json.dumps(out))
 '''))
-    if args.action in ('collect', 'deliver'):
+    if args.action in ('collect', 'deliver') or finish:
         paths = PUBLIC+['controller_console.txt']
         output = fixed_remote(prefix+'names='+repr(paths)+'\n'+r'''
 from step30_evolution_io import record

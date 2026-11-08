@@ -41,9 +41,9 @@ SOURCES = ('step32_vendorlink_fullpool.py', 'step31_evolution_registered_evaluat
            'step29_vendorlink_run.py', 'step28_formal_queue.py')
 
 
-def tasks():
+def tasks(methods=METHODS):
     return [dict(id=f'ABC_s{s}_{m}', seed=s, method=m, order='ABC')
-            for s in (4, 5, 6) for m in METHODS]
+            for s in (4, 5, 6) for m in methods]
 
 
 class Check:
@@ -78,7 +78,10 @@ def permit(path):
     for row in [*gate['sources'], gate['authorization'], gate['scope'], gate['inputs']]:
         verify(row)
     inputs = pinned(gate['inputs'])
-    if ({r['id'] for r in inputs['old_runs']} != {t['id'] for t in tasks()}
+    methods = tuple(gate.get('methods', METHODS))
+    if methods not in (METHODS, ('H_full', 'H_ER')):
+        raise ValueError('Only the original pair or explicitly approved history pair')
+    if ({r['id'] for r in inputs['old_runs']} != {t['id'] for t in tasks(methods)}
             or len(inputs['old_runs']) != 6 or inputs['dev_queries'] != COUNTS):
         raise ValueError('Exactly the six old ABC trajectories and three dev pools required')
     exported = {r['path']: r for r in pinned(inputs['export_manifest'])['files']}
@@ -91,10 +94,11 @@ def permit(path):
     return gate, inputs
 
 
-def old_completion(binding, check=lambda: None):
+def old_completion(binding, check=lambda: None, allowed_tasks=None):
     value = pinned(binding['completion'])
     if (value['identity']['spec'] != binding['spec'] or binding['spec']['id'] != binding['id']
-            or binding['spec'] not in tasks() or value['identity']['epochs'] != 40
+            or binding['spec'] not in (tasks() if allowed_tasks is None else allowed_tasks)
+            or value['identity']['epochs'] != 40
             or value['identity']['sources'] != binding['sources'] or value['updates'] != 10280
             or value['inference_endpoints'] is not True
             or value['stage_endpoints'] != ['stage1.pt', 'stage2.pt', 'stage3.pt']
@@ -136,7 +140,7 @@ def make_model(inputs, settings):
 
 def score_one(target, task, inputs, check, factory=make_model):
     binding = next(r for r in inputs['old_runs'] if r['id'] == task['id'])
-    completion = old_completion(binding, check)
+    completion = old_completion(binding, check, (task,))
     pools, groups = load_public(inputs, target)
     settings = Settings(method=task['method'])
     model = factory(inputs, settings)
@@ -245,12 +249,13 @@ def query_metrics(scores, ids, positive):
                             *[np.where(ranks <= k, 1/np.log2(ranks+1), 0.) for k in (1, 3, 5, 10)]])
 
 
-def analyze(target, inputs, receipts, check=lambda: None):
-    if len(receipts) != 6 or {r['task_id'] for r in receipts} != {t['id'] for t in tasks()}:
+def analyze(target, inputs, receipts, check=lambda: None, methods=METHODS):
+    planned = tasks(methods)
+    if len(receipts) != 6 or {r['task_id'] for r in receipts} != {t['id'] for t in planned}:
         raise ValueError('All six trajectories required before any dev qrels read')
     by_id = {r['task_id']: pinned(r['completion']) for r in receipts}
     reference_ids = None
-    for task in tasks():
+    for task in planned:
         check()
         result = by_id[task['id']]
         if result['dev_sources'] != inputs['dev_sources']:
@@ -262,14 +267,23 @@ def analyze(target, inputs, receipts, check=lambda: None):
     pools, groups = load_public(inputs, target)
     if {d: [v.uid for v in pools[d]] for d in DOMAINS} != reference_ids:
         raise ValueError('Input views differ from complete blind scores')
+    if 'reference_scores' in inputs:
+        old = pinned(pinned(inputs['reference_scores'])[0]['completion'])
+        if old['dev_sources'] != inputs['dev_sources']:
+            raise ValueError('Original pair used different dev inputs')
+        for key in ('1_1', '2_2', '3_3'):
+            cell = old['cells'][key]
+            with np.load(verify(cell['matrix']), allow_pickle=False) as data:
+                if data['ids'].tolist() != reference_ids[cell['domain']]:
+                    raise ValueError('History pair differs from original pair candidate identities')
     access(target, 'dev_qrels_joint_opening', [inputs['dev_qrels'][d] for d in DOMAINS])
     positives = {d: positive_map(groups[d], pinned(inputs['dev_qrels'][d])) for d in DOMAINS}
     summary = dict(status='DESCRIPTIVE_DEV_DIAGNOSTIC_COMPLETE', protocol=PROTOCOL,
                    metrics=METRICS, training_updates=0, scored_trajectories=6, checkpoints=18, cells=48,
                    counts=COUNTS, runs=[], methods={}, automatic_next_phase=False,
-                   inference='reused_original_CLS_H_and_original_VendorLink',
+                   inference='reused_original_method_settings_and_checkpoints',
                    scope='fixed_seen_development_data_observed_account_proxy_no_confirmatory_claim')
-    for task in tasks():
+    for task in planned:
         cells = {}
         for key, cell in by_id[task['id']]['cells'].items():
             check()
@@ -286,7 +300,7 @@ def analyze(target, inputs, receipts, check=lambda: None):
                      F_A=r['1_1']-r['3_1'], F_B=r['2_2']-r['3_2'],
                      G_B=r['2_2']-r['1_2'], G_C=r['3_3']-r['2_3'])
         summary['runs'].append(dict(task=task, cells=cells, roles={k: v.tolist() for k, v in roles.items()}))
-    for method in METHODS:
+    for method in methods:
         rows = [x for x in summary['runs'] if x['task']['method'] == method]
         summary['methods'][method] = dict(
             cells={k: np.mean([x['cells'][k]['mean'] for x in rows], axis=0).tolist() for k in rows[0]['cells']},
@@ -303,7 +317,45 @@ def analyze(target, inputs, receipts, check=lambda: None):
             lines.append('|'+key+'|'+'|'.join(f'{x:.9f}' for x in values)+'|')
         lines.append('')
     (target/'tables.zh.md').write_text('\n'.join(lines)+'\n', encoding='utf-8')
+    if 'reference_result' in inputs:
+        comparison(target, inputs, summary)
     return summary
+
+
+def comparison(target, inputs, current):
+    """Pair the two completed evaluations without recomputing the original metrics."""
+    previous = pinned(inputs['reference_result'])
+    if (previous['status'] != current['status'] or previous['metrics'] != list(METRICS)
+            or previous['counts'] != COUNTS or set(previous['methods']) != set(METHODS)
+            or set(current['methods']) != {'H_full', 'H_ER'}):
+        raise ValueError('Only the exact completed two-pair comparison is permitted')
+    combined = dict(methods={**previous['methods'], **current['methods']},
+                    runs=previous['runs']+current['runs'], metrics=METRICS,
+                    reference=inputs['reference_result'], history=record(target/'result.json'),
+                    same_candidate_identities_verified=True, training_updates=0, paired_differences={})
+    for left, right in (('H_full', 'H_SEQ'), ('H_ER', 'H_SEQ'),
+                        ('H_full', 'H_ER'), ('H_full', 'VendorLink_SEQ')):
+        pairs = []
+        for seed in (4, 5, 6):
+            a, b = [next(r for r in combined['runs'] if r['task']['seed']==seed
+                         and r['task']['method']==method) for method in (left, right)]
+            pairs.append(dict(seed=seed, roles={k:(np.array(a['roles'][k])-b['roles'][k]).tolist()
+                                               for k in a['roles']}))
+        combined['paired_differences'][left+'-'+right] = dict(seeds=pairs,
+            mean={k:np.mean([p['roles'][k] for p in pairs],axis=0).tolist() for k in pairs[0]['roles']})
+    write(target/'comparison.json', combined)
+    lines = ['# 固定全市场开发诊断：四方法比较', '',
+             'Q/O/N/final为MAP百分数；F/增量/方法差为百分点。开发描述比较，无显著性验收。', '',
+             '|方法|Q|O|F|N|final|G_B|G_C|', '|---|'+'---:|'*7]
+    for method in ('H_SEQ', 'H_ER', 'H_full', 'VendorLink_SEQ'):
+        r=combined['methods'][method]['roles']
+        lines.append('|'+method+'|'+'|'.join(f'{100*r[k][0]:.6f}' for k in ('Q','O','F','N','final','G_B','G_C'))+'|')
+    for label, value in combined['paired_differences'].items():
+        lines += ['', '## '+label, '', '|seed|ΔQ|ΔO|ΔF|ΔN|Δfinal|', '|---|'+'---:|'*5]
+        for row in [*value['seeds'],dict(seed='均值',roles=value['mean'])]:
+            lines.append('|'+str(row['seed'])+'|'+'|'.join(f'{100*row["roles"][k][0]:.6f}'
+                         for k in ('Q','O','F','N','final'))+'|')
+    (target/'comparison.zh.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
 
 
 def campaign(gate, inputs, gate_path):
@@ -314,22 +366,23 @@ def campaign(gate, inputs, gate_path):
     runner = Runner(gate, gate_path, root, ledger, worker_entry=Path(__file__), caps=CAPS,
                     limits=LIMITS, wait_for_resources=False)
     receipts = []
+    planned = tasks(gate.get('methods', METHODS))
     try:
         with ledger.active('metadata_and_fixed_batch'):
             for binding in inputs['old_runs']:
-                old_completion(binding)
+                old_completion(binding, allowed_tasks=planned)
             for row in inputs['model_files']:
                 verify(row)
-            write(root/'batch.json', dict(protocol=PROTOCOL, tasks=tasks(), cells=CELLS,
+            write(root/'batch.json', dict(protocol=PROTOCOL, tasks=planned, cells=CELLS,
                                          gate=record(gate_path), inputs=gate['inputs']))
             jobs = []
-            for task in tasks():
+            for task in planned:
                 target = root/'scoring'/task['id']; target.mkdir(parents=True)
                 jobs.append(dict(action='score', target=target, bucket='gpu', seconds=900,
                                  extra=['--task', task['id']]))
         def complete(job):
             binding = record(job['target']/'blind_complete.json')
-            task = next(t for t in tasks() if t['id'] == job['target'].name)
+            task = next(t for t in planned if t['id'] == job['target'].name)
             validate_scores(pinned(binding), task)
             receipts.append(dict(task_id=task['id'], completion=binding))
             write(root/'scoring_complete.json', receipts)
@@ -362,11 +415,11 @@ def main():
     root = Path(gate['experiment_root'])
     if args.target is None or args.deadline is None:
         raise ValueError('Controller-bound worker required')
-    check = Check(root, args.deadline)
+    check = Check(root.parent if gate.get('methods') == ['H_full', 'H_ER'] else root, args.deadline)
     check()
     try:
         if args.action == 'score':
-            task = next(t for t in tasks() if t['id'] == args.task)
+            task = next(t for t in tasks(gate.get('methods', METHODS)) if t['id'] == args.task)
             if args.target.resolve() != root/'campaign/scoring'/task['id']:
                 raise ValueError('Exact scoring destination required')
             configure_gpu()  # Existing deterministic FP32 and 13GiB allocator configuration.
@@ -374,7 +427,8 @@ def main():
         else:
             if args.target.resolve() != root/'campaign/analysis':
                 raise ValueError('Exact analysis destination required')
-            analyze(args.target, inputs, read(root/'campaign/scoring_complete.json'), check)
+            analyze(args.target, inputs, read(root/'campaign/scoring_complete.json'), check,
+                    gate.get('methods', METHODS))
         check()
     except BaseException as exc:
         write(args.target/'failure.json', dict(error=repr(exc), automatic_retry=False))

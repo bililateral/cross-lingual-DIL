@@ -4,7 +4,7 @@
 
 ## Evolution后续接手任务
 
-**当前优先转回原VendorLink。** 用户11月8日确认的[固定全市场开发诊断](../reports/documentation/20261108/vendorlink_fullpool/scope.zh.md)及[完整结果](../reports/documentation/20261108/vendorlink_fullpool/report.zh.md)提供后续依据。下一步优先考虑复用原ABC H_full／H_ER已有端点，以同一固定开发池补齐Full−SEQ／Full−ER及对VendorLink的比较，区分保持收益和绝对能力差距；不是先追加训练，也不要求VendorLink必须遗忘。若补齐后学习不足仍是瓶颈，再单独论证当前训练账号重分群这一负账号覆盖假设。新增端点评价／数据消费与训练均须明确下一范围，本轮不自动执行；不改旧ABC停止门、恢复搜索或把开发诊断当独立确认。本次必要核验与免外审许可限已确认范围。实际状态见交接唯一VendorLink项，原Evolution下述已结束范围及费用不变。
+**当前优先转回原VendorLink。** 用户11月8日确认[固定全市场开发诊断](../reports/documentation/20261108/vendorlink_fullpool/scope.zh.md)，随后“现在就做”批准[Full／ER同池补充](../reports/documentation/20261108/vendorlink_fullpool/history/scope.zh.md)。[四方法结果](../reports/documentation/20261108/vendorlink_fullpool/history/report.zh.md)现提供后续依据：Full对SEQ有平均保持和旧域/新域最终收益，但额外旧评分保持对ER未体现平均最终MAP增益，且整体仍低于VendorLink。下一轮分别论证旧评分约束与英文学习能力两个问题，先选单一假设和保护条件，不以制造大遗忘或同时多因素调参推进；原固定负账号覆盖不足仅是待检验解释。当前无新增训练或独立确认授权，不要求VendorLink必须遗忘，不改旧ABC停止门、恢复搜索或把开发诊断当独立确认。实际状态见交接唯一VendorLink项，原Evolution已结束范围及费用不变。
 
 用户已接受方向咨询建议，明确“继续推进，采用双路同时运行”，并批准开发数据构建与固定96条fit语言判断。从[当前六轨迹执行范围](../reports/documentation/20261108/evolution_registered/execution/scope.zh.md)、[许可](../reports/documentation/20261108/evolution_registered/execution/authorization.json)及[实现证据](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)接手；实际进度只维护在交接唯一Evolution项。原[30轨迹草案](../reports/documentation/20261108/evolution_registered/proposal.zh.md)只作来源，后续24条及24小时预算未获准。
 
