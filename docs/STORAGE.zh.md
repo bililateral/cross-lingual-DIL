@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-08 原三市场跨账号关系核查收尾
+
+用户已确认原三市场商品包/规范缓存核查、纳入既有身份SQL/HTML，并进一步要求“完成后…脚本和中间文件都删掉”，最后明确“本轮免外审，完成主审和清理”。[本轮报告](../reports/documentation/20261108/vendorlink_alias_evidence/report.zh.md)按证据不足分支交付：保留真实不同账号的弱关联候选及缺口，没有正式训练集、划分或训练。原始身份、链接、指纹、声明正文仅留Linux `reports/documentation/20261108/vendorlink_alias_evidence/final_evidence/`；六个必要最终文件5513443字节，身份见[清单](../reports/documentation/20261108/vendorlink_alias_evidence/final_evidence_manifest.json)，用途见[读取说明](../reports/documentation/20261108/vendorlink_alias_evidence/data_readme.zh.md)。它们不是已验证正负标签，后续不得自动作为训练入口。
+
+五个最小实际源码版本先保存本地Git `7eef50b3f0ba0ccb1de7790155c5aecf6ae059d7`，逐份读回确认大小/SHA及完整字节与执行版本一致；恢复入口见[source_recovery.json](../reports/documentation/20261108/vendorlink_alias_evidence/source_recovery.json)。Windows23:32:40删除36文件245145字节；Linux23:32:52删除34文件17537123字节，合计70文件17782268逻辑字节（约16.96MiB）。包括三份step33脚本、header_evidence、audit03旧版本及各Linux执行副本/缓存、重复提取证据、临时GPG目录、未上传外审包和解包副本；精确路径、SHA、数量见[Windows回执](../reports/documentation/20261108/vendorlink_alias_evidence/cleanup_windows.json)和[Linux回执](../reports/documentation/20261108/vendorlink_alias_evidence/cleanup_linux.json)。源码仍可由Git恢复不等于保留可自动执行工作副本，也不授权重跑。
+
+Windows/Linux分别核对33/35个保留证据文件SHA未变；Linux五份原始包/规范缓存/SQL删除前后SHA一致，原HTML位于删除范围之外。原日志、实际修复前后汇总、来源、费用、主审和最终候选保留，其他实验、旧模型和中文暂停作业未动。未发送任何外审材料。七项计时172.10秒，保守收费200/3600秒，无模型/GPU/训练；费用及结果不足事实不清零。[最终SFTP](../reports/documentation/20261108/vendorlink_alias_evidence/final_sync.json)9份/55466字节双向读回一致，回执自身亦同步；原始候选未回Windows，根docs仅Windows维护。退出SSH前再核对Linux六份最终证据SHA匹配，本任务目录不剩.py/.pyc/.zip。本次为局部收尾，不重置11月6日大清理完成日和11月21日下次到期；本地提交，不推送。
+
 ## 2026-11-08 VendorLink固定全市场诊断收尾
 
 两SEQ及用户追加Full／ER的同池评价均完整完成，实际入口和两版部署分别留在Linux `/home/yongpeng/cross-lingual/reports/documentation/20261108/vendorlink_fullpool/workspace/`、其`history/workspace/`。原ABC四方法共36旧阶段权重全部保留；96分数矩阵、逐query向量、原开发文本/标签和账号身份只在Linux，不回Windows。Windows只收聚合、来源和运行小证据：父目录[59份161614字节](../reports/documentation/20261108/vendorlink_fullpool/receive.json)、补充[57份458834字节](../reports/documentation/20261108/vendorlink_fullpool/history/receive.json)均逐份大小/SHA匹配。根docs仅Windows更新；21:30:23[最终SFTP](../reports/documentation/20261108/vendorlink_fullpool/final_sync.json)同步具名8份报告、核对和恢复说明共31988字节，全部匹配，没有覆盖冻结运行原件。
