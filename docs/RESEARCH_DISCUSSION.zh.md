@@ -1,5 +1,13 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-08：方向咨询完整回收，解释瓶颈与建议
+
+用户要求：“GPT 6 Pro的回复已经出来，把它对当前科研瓶颈和下一步怎么推进的建议讲清楚。”沿原会话和具体包许可回收[完整报告](../reports/documentation/20261108/evolution_registered/direction_review/external/report.zh.md)及[决策表](../reports/documentation/20261108/evolution_registered/direction_review/external/decision_table.md)，返回8成员、33571字节；页面ZIP身份、7载荷清单及15输入身份均核对一致，见[回收](../reports/documentation/20261108/evolution_registered/direction_review/recovery.json)与[独立处置](../reports/documentation/20261108/evolution_registered/direction_review/primary_disposition.zh.md)。
+
+外审建议收缩当前英文抗遗忘承诺：先回答持续更新是否获得值得保留的新能力，以及两SEQ是否共同明显遗忘；首选仅原P的6条加复用第一阶段模型的冻结扩库评分。后续先H_ER/Full各3条，内部有价值再考虑V_ER与独立确认；最多5累计任务小时为新建议，不是授权或实测保证。原草案本来有条件停止，不能误说成无条件跑30条。外审未发现推翻资格/旧结果的确定数据或算式错误，未证明出生保持是负收益的原因。执行者核对直接源码和旧聚合支持这些解释，并指出新增冻结收益的精确取舍仍须前瞻定义。
+
+本轮仅回收、独立解释及维护既有记录，不等于用户已同意6条/新评分/5小时或一次结束承诺。用户此前已选Registered方向，完整H、双SEQ共同遗忘、均值门与完整逐格代价保持；训练继续关闭。未改科学草案或运行代码，未连接Linux、读私有正文/标签、载模、计算或恢复中文H消融。后续实质选择由用户在理解建议后决定，本轮本地提交、不推送。
+
 ## 2026-11-08：用户要求重新咨询科研方向，上传成功后结束等待
 
 用户质疑现推进是否具备充分科研依据，明确要求“把我们目前的问题发给GPT 6 Pro，交代清楚问题背景和瓶颈所在，让它告诉我们如何继续推进”。本次目标是独立判断应用问题、负结果含义、完整H与任务适配、数值门依据及最小下一步，允许删减或停止，不要求为原草案背书。完整[问题说明](../reports/documentation/20261108/evolution_registered/direction_review/request.zh.md)配已开放原报告/聚合、当前草案、前轮审查及两份必要源码形成96504字节/15载荷包，不含真实正文/账号/标签、逐query预测、模型、Memory或凭据；历史127报告仅从Git读入包，未恢复被删目录或唯一原始结果。

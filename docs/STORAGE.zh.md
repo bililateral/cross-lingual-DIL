@@ -6,6 +6,8 @@
 
 Windows只收到15份聚合/身份载荷与一份清单，大小/SHA一致，实际用途和费用见[资格报告](../reports/documentation/20261108/evolution_registered/qualification/report.zh.md)、[回传核对](../reports/documentation/20261108/evolution_registered/qualification/receive.json)。回传完成后已删除本次两端qualification_upload.zip/qualification_evidence.zip临时传输副本，共4文件86874字节：Linux位于evolution_registered根，Windows位于该任务qualification目录；载荷与清单保留，私有缓存未动。新的evolution_registered_review.zip及完整返回包/载荷已回收核验，仍用于后续合同与实际实现对照，保留；另已核对同SHA并删除.playwright-mcp/evolution-registered-review-return.zip这份30394字节的浏览器重复下载，正式返回原件保留。实际资格入口、五份原数据依赖及源身份仍有本轮主审/必要外审用途，暂保留；本轮不删除旧数据、原A/B非权重结果、共享模型或中文H资产。既有权重及127原始结果删除事实保持，下面记录不改。本次新缓存保管不重置项目大清理日期。
 
+本次科研方向咨询另回收33571字节返回ZIP及8成员，保存于`reports/documentation/20261108/evolution_registered/direction_review/external/`；原文、输入包与返回载荷仍用于当前方向取舍和后续方案对照，保留。核对页面SHA、7载荷清单及15输入来源后，仅删除Windows `.playwright-mcp/evolution-direction-independent-review.zip`这一同SHA浏览器重复副本，1文件33571字节；正式返回包保留可恢复原字节，详见[回收与清理记录](../reports/documentation/20261108/evolution_registered/direction_review/recovery.json)。未连接Linux或改其资产，不重置大清理周期。
+
 ## 2026-11-08 Evolution权重及本轮新增文件定向删除
 
 用户在具体清单与不可恢复后果已呈现后，明确选择“按上述范围全部删除”，原话与保留边界见[讨论记录](RESEARCH_DISCUSSION.zh.md)。本次仅处理当前Evolution A/B和本轮三个提交新增材料，未改写Git历史；删除不改变原有效负结果、判据、访问事实或已发生费用。实验累计仍按原账training12926/gpu367/auxiliary1882秒（4h12m55，CPU59秒为子账）保留，本次为文件管理，无科研计算、载模或训练。

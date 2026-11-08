@@ -1,0 +1,131 @@
+{
+  "model_self_description": "GPT-6 Astra Pro; UI/backend independently unverifiable",
+  "direction_verdict": "HOLD_FULL_CHAIN_RECOMMEND_ONE_BOUNDED_PREMISE_EXPERIMENT",
+  "confirmed_package_or_result_arithmetic_errors_found": false,
+  "findings": [
+    {
+      "id": "EV-DIR-D01",
+      "classification": "研究决策建议",
+      "finding": "不推荐当前承诺30轨迹自动链；只保留一次可结束的前提实验",
+      "evidence": [
+        "E01",
+        "E02",
+        "E09",
+        "E10",
+        "E15"
+      ],
+      "minimum_action": "一页应用与停止承诺；未来若获准仅6条双SEQ三批及冻结θ1评分",
+      "needs_user_decision": true
+    },
+    {
+      "id": "EV-DIR-E01",
+      "classification": "确定的任务边界",
+      "finding": "已登记同账号新文本检索不同于旧未见账号任务；成功不能改写旧结果或证明真实跨账号同控",
+      "evidence": [
+        "E02 §1/§3",
+        "E13 Model/score"
+      ],
+      "minimum_action": "独立命名并限制结论",
+      "needs_user_decision": false
+    },
+    {
+      "id": "EV-DIR-U01",
+      "classification": "未验证假设",
+      "finding": "继续更新模型是否比冻结第一批模型后扩库更有价值，尚未检验",
+      "evidence": [
+        "E02 §3.2/§5.1"
+      ],
+      "minimum_action": "复用θ1，比较各批刚学后及最终增长库；新增评分而无新增训练",
+      "needs_user_decision": true
+    },
+    {
+      "id": "EV-DIR-E02",
+      "classification": "确定负证据，原因未识别",
+      "finding": "旧Full平均不如同Memory的H_ER；出生保持负收益不是所有蒸馏无效的证明",
+      "evidence": [
+        "E09 §4",
+        "E10 comparisons.H_full-H_ER",
+        "E13 h_objective/Memory.retain"
+      ],
+      "minimum_action": "若前提成立，Full–ER优先；不以Full–SEQ替代机制证据",
+      "needs_user_decision": true
+    },
+    {
+      "id": "EV-DIR-U02",
+      "classification": "方法匹配假设",
+      "finding": "H通用成对函数与V分类训练后检索均静态可用，但不保证新任务学习充分或共同遗忘",
+      "evidence": [
+        "E13",
+        "E14",
+        "L1",
+        "L2",
+        "L3"
+      ],
+      "minimum_action": "固定H1/V1有限检验；失败不自动搜索",
+      "needs_user_decision": true
+    },
+    {
+      "id": "EV-DIR-E03",
+      "classification": "确定解释边界",
+      "finding": "六群为首批50%/两旧批25%；全量gallery另计；账号内日期不保证全局在线流",
+      "evidence": [
+        "E02 §2.2/§3/§4.1",
+        "E04"
+      ],
+      "minimum_action": "如实称离线登记顺序模拟与训练Memory约束，不增加清洗或资格",
+      "needs_user_decision": false
+    },
+    {
+      "id": "EV-DIR-E04",
+      "classification": "数值依据不足",
+      "finding": "5/3/2pp与.60/.55没有公认标准或本案功效支持",
+      "evidence": [
+        "E01 §3",
+        "E02 §5",
+        "L1-L5"
+      ],
+      "minimum_action": "前者仅作用户接受的探索投入规则；撤回后者业务SLA解释；M效果/代价门必须在M结果前确定，C复用",
+      "needs_user_decision": true
+    },
+    {
+      "id": "EV-DIR-E05",
+      "classification": "统计解释边界",
+      "finding": "F改善=O改善−Q差；三seed及固定gallery查询bootstrap不提供市场总体或完整重训推断",
+      "evidence": [
+        "E02 §5.3",
+        "E07 §7.7",
+        "E08"
+      ],
+      "minimum_action": "条件报告，不重采样；不加逐格最终非劣门",
+      "needs_user_decision": false
+    },
+    {
+      "id": "EV-DIR-S01",
+      "classification": "停止建议",
+      "finding": "再无共同明显遗忘、Full无ER增量或一次独立确认不成立，则结束对应主张",
+      "evidence": [
+        "E01",
+        "E02",
+        "E09",
+        "E15"
+      ],
+      "minimum_action": "完整保留负结果，不换协议/seed/阈值追求阳性；机制修改需另定版本",
+      "needs_user_decision": true
+    }
+  ],
+  "preserved_user_choices": [
+    "完整H",
+    "双SEQ共同明显遗忘",
+    "均值门并完整报告逐格代价",
+    "训练关闭"
+  ],
+  "not_automatic": [
+    "正式划分",
+    "语言开封",
+    "新评分",
+    "模型加载",
+    "训练",
+    "监听",
+    "中文H消融恢复"
+  ]
+}
