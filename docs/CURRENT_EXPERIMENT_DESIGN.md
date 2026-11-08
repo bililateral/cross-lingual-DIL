@@ -4,6 +4,8 @@ H/S评价补充（2026-11-02）：用户选择[方案A](../reports/seller_alias_
 
 ## 当前合同入口
 
+VendorLink真实跨账号关系资格（2026-11-08）：用户已确认[原包/规范缓存核查及条件性数据准备](../reports/documentation/20261108/vendorlink_alias_evidence/scope.zh.md)，并明确纳入既有身份SQL/HTML。当前判断及证据从[核查报告](../reports/documentation/20261108/vendorlink_alias_evidence/report.zh.md)进入；训练关闭，不把同账号拆分替代用户要求的马甲关联。用户明确本轮免外审、完成主审及清理，见[主审](../reports/documentation/20261108/vendorlink_alias_evidence/review/primary_disposition.zh.md)；实际状态只维护交接唯一VendorLink项。下面全市场诊断及更早合同是已发生的代理实验依据，不恢复为当前跨账号运行许可。
+
 VendorLink固定全市场开发诊断（2026-11-08）：[用户确认范围](../reports/documentation/20261108/vendorlink_fullpool/scope.zh.md)、[许可](../reports/documentation/20261108/vendorlink_fullpool/authorization.json)、实际入口`scripts/step32_vendorlink_fullpool.py`、[结果及边界](../reports/documentation/20261108/vendorlink_fullpool/report.zh.md)。原ABC两SEQ各三seed、18旧端点、48格开发评分；双worker、2累计小时、零新训练、无自动后续。本次用户明确免外审，只做必要Linux增量核验；旧四臂负结果及ABC前置门停止事实保持。运行状态仅在当前交接对应项维护。
 
 同轮用户“现在就做”追加[Full／ER同池评价](../reports/documentation/20261108/vendorlink_fullpool/history/scope.zh.md)及[许可](../reports/documentation/20261108/vendorlink_fullpool/history/authorization.json)：新增18旧端点48格，原两SEQ结果直接复用；累计总帽7200秒及双worker不变。原生产来源不覆盖，补充workspace绑定本次明确方法列表；评分数学及十指标不改，逐种子比较四方法，不启动训练。[完整四方法报告](../reports/documentation/20261108/vendorlink_fullpool/history/report.zh.md)及[逐seed差值](../reports/documentation/20261108/vendorlink_fullpool/history/campaign/analysis/comparison.zh.md)保留完整H对SEQ的正向证据、Full对ER及VendorLink的差距与质量边界。
