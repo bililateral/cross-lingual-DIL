@@ -4,15 +4,15 @@
 
 ## Evolution后续接手任务
 
-用户已选择“Evolution已登记账号的增量文本检索”，要求保留完整H，先准备数据资格和有限预实验，训练保持关闭。从[本轮具体方案](../reports/documentation/20261108/evolution_registered/proposal.zh.md)和[一次资格结果](../reports/documentation/20261108/evolution_registered/qualification/report.zh.md)接手；实际进度只维护在交接唯一Evolution项。
+用户已接受方向咨询建议，明确“继续推进，采用双路同时运行”，并批准开发数据构建与固定96条fit语言判断。从[当前六轨迹执行范围](../reports/documentation/20261108/evolution_registered/execution/scope.zh.md)、[许可](../reports/documentation/20261108/evolution_registered/execution/authorization.json)及[实现证据](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)接手；实际进度只维护在交接唯一Evolution项。原[30轨迹草案](../reports/documentation/20261108/evolution_registered/proposal.zh.md)只作来源，后续24条及24小时预算未获准。
 
 已获准的一次Linux CPU资格及“允许旧test作为新确认候选”补充已执行，未正式划分。旧fit/dev可用于开发；旧test与未使用账号可作为新确认候选，后者必须未参与旧训练/开发或效果选择。新任务同账号身份跨fit/gallery/query，文本与角色日期严格隔离；开发与确认账号仍互斥。旧test不是科学上永久不可用，使用前须保留已明确的用途转换和旧访问历史，不能以新合同重置已见结果。
 
-用户要求的科研方向咨询已完整回收，下一步先依据[完整意见](../reports/documentation/20261108/evolution_registered/direction_review/external/report.zh.md)与[独立处置](../reports/documentation/20261108/evolution_registered/direction_review/primary_disposition.zh.md)决定投入范围，不将前轮规格审查当作路线必然合理。首选建议是只承诺原P六条（H_SEQ/V_SEQ×31/32/33×三批）并新增复用θ1的冻结扩库评分，先验证持续更新的价值及共同明显遗忘；新增评分、5累计任务小时及“再无前提即结束当前Evolution扩展”均尚待用户选择。若前提成立，再决定H_ER/Full六条内部比较、V_ER三条和独立确认，不自动衔接原后续24条。已选Registered方向无需重复确认；原草案本来有条件停止，不能误说成无条件30条。
+当前先闭合本次数据/矩形评分/入口的定向实现审查，再沿已授权范围完成一次开发导出及语言门，核对实际来源、资源、骨干与费用后直接双路执行六条及冻结评分，不再重复问是否开训。未来H_ER/Full、V_ER和独立确认均需另行决定；此次实际控制器没有M/C路径。只有原P前提成立才讨论机制价值，若无共同明显遗忘按已接受建议结束当前Evolution上的协议扩展，不改门或换seed继续寻找现象。
 
-现有96账号×3批×2 cohort、4/2/2、H1/V1固定迁移和原判据仍是未冻结草案，未被本次审查自动改写。完整H、双SEQ共同明显遗忘、均值门及逐格代价保持。未来若采用冻结对照，须在结果前明确新增收益/新旧取舍，不能以最终冻结更好单独否定曾获得后丢失的能力；Full主要效果/代价口径须在M结果前固定。确认候选余量极小，正式构建若有必要排除不得自动借旧dev填确认。
+当前只导出96×3开发，确认身份保留、不导出正文；严格4/2/2、固定H1/V1、原P技术投入门、均值与逐格报告保持。冻结评分列各批刚学后和最终差值，不新增自动价值门、不以最终冻结更好否定曾获得后丢失的能力。Full主要效果/代价口径须在未来M结果前固定。确认候选余量极小，后续若不足不得自动借旧dev填确认。
 
-本轮不自动实施正式分区、语言样本阅读、训练评价实现或计算；30轨迹、具体数值门、最多双worker/14GiB、24累计任务小时均是待实质确认的建议。已发生资格辅助352秒须承接，不能重新清零。从已回收[本次外审及独立处置](../reports/documentation/20261108/evolution_registered/review/primary_disposition.zh.md)承接：两统计规格已在草案补清，用户选择保留现有均值门并完整报告逐格代价，不加逐格非劣门；不重开本轮已充分的方案审查，后续实现只按实际差异作必要定向审查。后续实现只补角色/矩形评分/固定池判据的实际接线，复用未变H核心与已审紧凑保存，不扩成新通用框架或重复GPU资格。
+费用按新5小时桶承接既有资格352秒及本轮全部失败/核验/准备，不借旧实验额度。必要手写CPU子帽180秒在辅助1小时内；不追加GPU资格。已闭合方向、数学与并发证据按适用范围复用，只审本轮实际接线变化；新具体审查包需外发许可，外审及主审不自动扩大新数据或后续轨迹权限。
 
 原季度路线仍结束，不续原C/D、不重训已删权重、不改门搜索顺序/种子/池规模。原[科学方案](../reports/documentation/20261107/evolution_pilot/proposal.zh.md)、[固定数据](../reports/documentation/20261107/evolution_pilot/data_preparation/report.zh.md)、[双路补充](../reports/documentation/20261107/evolution_pilot/execution/scope.zh.md)、[原实现主审](../reports/documentation/20261107/evolution_pilot/implementation/review/primary_disposition.zh.md)与[GPU证据](../reports/documentation/20261107/evolution_pilot/gpu_single/report.zh.md)是已发生事实的来源。A/B未揭示共同明显遗忘，127开发诊断同样没有；原VendorLink有效负结果、ABC前置门停止且无新候选训练权重、全部费用保持。已完成删除的对象和Git恢复界限见[存储记录](STORAGE.zh.md)，不可恢复的模型及127原始分数不冒称仍可复用。
 

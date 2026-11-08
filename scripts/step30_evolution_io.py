@@ -157,8 +157,9 @@ class Budget:
 
 
 class Ledger:
-    def __init__(self, root: Path, prior: dict, cpu_tests: int):
-        if set(prior) != set(CAPS) or any(not math.isfinite(v) or v < 0 or v >= CAPS[k] for k, v in prior.items()):
+    def __init__(self, root: Path, prior: dict, cpu_tests: int, *, caps: dict = CAPS):
+        self.caps = dict(caps)
+        if set(prior) != set(self.caps) or any(not math.isfinite(v) or v < 0 or v >= self.caps[k] for k, v in prior.items()):
             raise ValueError('Complete nonnegative prior costs required')
         if not 0 <= cpu_tests <= 1200 or prior['auxiliary'] < cpu_tests:
             raise ValueError('CPU tests are a subset of the auxiliary cumulative budget')
@@ -168,11 +169,11 @@ class Ledger:
         self.save()
 
     def save(self):
-        write(self.root/'budget.json', dict(used_seconds=self.used, caps=CAPS, cpu_test_seconds=self.cpu_tests,
+        write(self.root/'budget.json', dict(used_seconds=self.used, caps=self.caps, cpu_test_seconds=self.cpu_tests,
                                             conservative_tail_seconds=30, events=self.events))
 
     def reserve(self, bucket, seconds):
-        if seconds <= 0 or self.used[bucket]+seconds > CAPS[bucket]:
+        if seconds <= 0 or self.used[bucket]+seconds > self.caps[bucket]:
             raise TimeoutError('Cannot reserve full next operation within cumulative bucket')
 
     def charge(self, bucket, name, seconds, success):
@@ -181,7 +182,7 @@ class Ledger:
         self.events.append(dict(operation=name, bucket=bucket, actual_seconds=seconds,
                                 charged_seconds=charged, success=success))
         self.save()
-        if self.used[bucket] > CAPS[bucket]:
+        if self.used[bucket] > self.caps[bucket]:
             raise TimeoutError('Cumulative budget exceeded; no further dispatch')
 
     @contextmanager

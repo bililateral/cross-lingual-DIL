@@ -1,0 +1,161 @@
+diff --git a/scripts/step30_evolution_control.py b/scripts/step30_evolution_control.py
+index 8a5eac97..36ec3711 100644
+--- a/scripts/step30_evolution_control.py
++++ b/scripts/step30_evolution_control.py
+@@ -91,8 +91,13 @@ def release(process):
+ 
+ 
+ class Runner:
+-    def __init__(self, allowed: dict, gate_path: Path, root: Path, ledger: Ledger):
++    def __init__(self, allowed: dict, gate_path: Path, root: Path, ledger: Ledger, *,
++                 worker_entry: Path | None = None, caps: dict = CAPS):
+         self.allowed, self.gate_path, self.root, self.ledger = allowed, gate_path, root, ledger
++        self.worker_entry = Path(__file__).resolve() if worker_entry is None else Path(worker_entry).resolve()
++        self.caps = dict(caps)
++        if self.caps != ledger.caps:
++            raise ValueError('Controller and ledger must use identical cumulative budgets')
+         self.failed = False
+ 
+     def retire_waiter(self, active):
+@@ -124,7 +129,7 @@ class Runner:
+         if len(cores) < 2*LIMITS['workers']:
+             raise RuntimeError('Four allowed CPU cores required for two slots')
+         chosen = cores[-4:][slot*2:slot*2+2]
+-        return ['taskset', '-c', ','.join(map(str, chosen)), PYTHON, '-B', '-u', str(Path(__file__).resolve()),
++        return ['taskset', '-c', ','.join(map(str, chosen)), PYTHON, '-B', '-u', str(self.worker_entry),
+                 '--gate', str(self.gate_path), '--action', job['action'], '--target', str(job['target']),
+                 '--deadline', str(deadline), *job['extra']]
+ 
+@@ -206,7 +211,7 @@ class Runner:
+                             if job['action'] == 'analyze':
+                                 # This operation is allotted the remaining auxiliary
+                                 # bucket, measured at actual launch after any wait.
+-                                job['seconds'] = min(job['seconds'], CAPS['auxiliary']-self.ledger.used['auxiliary']-
++                                job['seconds'] = min(job['seconds'], self.caps['auxiliary']-self.ledger.used['auxiliary']-
+                                                      outstanding-math.ceil(parent_active)-60)
+                                 if job['seconds'] <= 15:
+                                     raise TimeoutError('Insufficient remaining analysis lifecycle budget')
+@@ -261,7 +266,7 @@ class Runner:
+                           budget_stop=budget_stop, status='RUNNING' if active else 'WAITING_RESOURCES'))
+                 finally:
+                     parent_active += time.monotonic()-tick
+-                if self.ledger.used['auxiliary']+math.ceil(parent_active)+60 >= CAPS['auxiliary']:
++                if self.ledger.used['auxiliary']+math.ceil(parent_active)+60 >= self.caps['auxiliary']:
+                     budget_stop = 'Auxiliary monitoring budget exhausted'
+                 if active or (next_job < len(jobs) and len(retired) < slots and budget_stop is None):
+                     time.sleep(.2 if active else 30)
+diff --git a/scripts/step30_evolution_io.py b/scripts/step30_evolution_io.py
+index a8c27d6a..e6f6c975 100644
+--- a/scripts/step30_evolution_io.py
++++ b/scripts/step30_evolution_io.py
+@@ -157,8 +157,9 @@ class Budget:
+ 
+ 
+ class Ledger:
+-    def __init__(self, root: Path, prior: dict, cpu_tests: int):
+-        if set(prior) != set(CAPS) or any(not math.isfinite(v) or v < 0 or v >= CAPS[k] for k, v in prior.items()):
++    def __init__(self, root: Path, prior: dict, cpu_tests: int, *, caps: dict = CAPS):
++        self.caps = dict(caps)
++        if set(prior) != set(self.caps) or any(not math.isfinite(v) or v < 0 or v >= self.caps[k] for k, v in prior.items()):
+             raise ValueError('Complete nonnegative prior costs required')
+         if not 0 <= cpu_tests <= 1200 or prior['auxiliary'] < cpu_tests:
+             raise ValueError('CPU tests are a subset of the auxiliary cumulative budget')
+@@ -168,11 +169,11 @@ class Ledger:
+         self.save()
+ 
+     def save(self):
+-        write(self.root/'budget.json', dict(used_seconds=self.used, caps=CAPS, cpu_test_seconds=self.cpu_tests,
++        write(self.root/'budget.json', dict(used_seconds=self.used, caps=self.caps, cpu_test_seconds=self.cpu_tests,
+                                             conservative_tail_seconds=30, events=self.events))
+ 
+     def reserve(self, bucket, seconds):
+-        if seconds <= 0 or self.used[bucket]+seconds > CAPS[bucket]:
++        if seconds <= 0 or self.used[bucket]+seconds > self.caps[bucket]:
+             raise TimeoutError('Cannot reserve full next operation within cumulative bucket')
+ 
+     def charge(self, bucket, name, seconds, success):
+@@ -181,7 +182,7 @@ class Ledger:
+         self.events.append(dict(operation=name, bucket=bucket, actual_seconds=seconds,
+                                 charged_seconds=charged, success=success))
+         self.save()
+-        if self.used[bucket] > CAPS[bucket]:
++        if self.used[bucket] > self.caps[bucket]:
+             raise TimeoutError('Cumulative budget exceeded; no further dispatch')
+ 
+     @contextmanager
+diff --git a/scripts/step30_evolution_run.py b/scripts/step30_evolution_run.py
+index e979eab6..ff3cba3b 100644
+--- a/scripts/step30_evolution_run.py
++++ b/scripts/step30_evolution_run.py
+@@ -17,9 +17,10 @@ from step30_evolution_data import validate_group
+ from step30_evolution_policy import DOMAINS, SPLITS
+ 
+ 
+-def make_model(model_path: Path, task: dict, device: str = 'cuda:0', *, expected_hidden: int = 768) -> Model:
++def make_model(model_path: Path, task: dict, device: str = 'cuda:0', *, expected_hidden: int = 768,
++               domains: tuple = DOMAINS) -> Model:
+     from transformers import BertModel, BertTokenizer
+-    torch.manual_seed(seed_for(task['seed'], DOMAINS, 'initial'))
++    torch.manual_seed(seed_for(task['seed'], domains, 'initial'))
+     encoder = BertModel.from_pretrained(model_path, local_files_only=True)
+     if encoder.config.hidden_size != expected_hidden:
+         raise ValueError('The approved pretrained backbone is BERT base with hidden size 768')
+@@ -95,7 +96,7 @@ def atomic_tensor(path: Path, state, check):
+ 
+ 
+ def execute(model: Model, load_fit, job: Path, task: dict, identity: dict, model_binding: dict,
+-            write, record, check=lambda: None, *, expected_groups: int = 20) -> dict:
++            write, record, check=lambda: None, *, expected_groups: int = 20, domains: tuple = DOMAINS) -> dict:
+     if job.exists() or task['stages'] not in (1, 3) or task['epochs'] < 1:
+         raise ValueError('Fresh single/full trajectory required')
+     if asdict(model.settings) != task['settings']:
+@@ -105,7 +106,9 @@ def execute(model: Model, load_fit, job: Path, task: dict, identity: dict, model
+     vendor, replay = system.startswith('V_'), system in ('H_ER', 'H_full', 'V_ER')
+     if vendor != (s.method == 'VendorLink_SEQ'):
+         raise ValueError('Wrong actual model family')
+-    memory = (VendorMemory if vendor else Memory)(seed_for(seed, DOMAINS, 'reservoir'), s)
++    if len(domains) != 3 or len(set(domains)) != 3:
++        raise ValueError('Three distinct explicitly bound domains required')
++    memory = (VendorMemory if vendor else Memory)(seed_for(seed, domains, 'reservoir'), s)
+     optimizer, endpoints, updates = None, {}, 0
+     workload = dict(current_updates=0, current_records=0, history_groups=0, history_records=0,
+                     teacher_groups=0, teacher_records=0, stage_model_saves=0)
+@@ -117,8 +120,8 @@ def execute(model: Model, load_fit, job: Path, task: dict, identity: dict, model
+         for stage in range(task['stages']):
+             check()
+             # The loader is called once here for this CURRENT domain only.
+-            groups = load_fit(DOMAINS[stage])
+-            if len(groups) != expected_groups or any(g.domain != DOMAINS[stage] or g.split != 'fit' for g in groups):
++            groups = load_fit(domains[stage])
++            if len(groups) != expected_groups or any(g.domain != domains[stage] or g.split != 'fit' for g in groups):
+                 raise ValueError('Current fit quota/domain mismatch')
+             for group in groups:
+                 validate_group(group, True)
+@@ -133,12 +136,12 @@ def execute(model: Model, load_fit, job: Path, task: dict, identity: dict, model
+                 old_classes = memory.classes() if replay else []
+                 if set(classes) & set(old_classes):
+                     raise ValueError('Current fit and retained history identities overlap')
+-                model.start_vendor_stage(sorted(set(classes) | set(old_classes)), seed_for(seed, DOMAINS, stage, 'head'))
++                model.start_vendor_stage(sorted(set(classes) | set(old_classes)), seed_for(seed, domains, stage, 'head'))
+                 optimizer = make_optimizer(model)
+             elif optimizer is None:
+                 optimizer = make_optimizer(model)
+             for epoch in range(task['epochs']):
+-                stream = random.Random(seed_for(seed, DOMAINS, stage, epoch, 'current'))
++                stream = random.Random(seed_for(seed, domains, stage, epoch, 'current'))
+                 if vendor:
+                     examples = [(r, v.identity) for g in groups for v in g.views for r in v.records]
+                     stream.shuffle(examples)
+@@ -150,10 +153,10 @@ def execute(model: Model, load_fit, job: Path, task: dict, identity: dict, model
+                 for batch_index, batch in enumerate(batches):
+                     check()
+                     update = epoch*expected_groups+batch_index+1
+-                    step_seed = seed_for(seed, DOMAINS, stage, update, 'update')
++                    step_seed = seed_for(seed, domains, stage, update, 'update')
+                     history, teacher = (None, None)
+                     if stage and replay:
+-                        history, teacher = memory.draw(seed_for(seed, DOMAINS, stage, update, 'history'))
++                        history, teacher = memory.draw(seed_for(seed, domains, stage, update, 'history'))
+                     set_rates(optimizer, s, update, task['epochs']*expected_groups)
+                     logs = (update_vendor(model, optimizer, batch, history, step_seed, check) if vendor else
+                             update_h(model, optimizer, batch, history, teacher, step_seed, check))

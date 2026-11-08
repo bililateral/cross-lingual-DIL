@@ -1,0 +1,65 @@
+{
+  "status": "TRAINING_COMPLETE_EVALUATION_CLOSED",
+  "identity": {
+    "fixture": true
+  },
+  "task": {
+    "id": "handwritten_H_SEQ",
+    "stages": 3,
+    "epochs": 1,
+    "seed": 31,
+    "system": "H_SEQ",
+    "settings": {
+      "method": "H_SEQ",
+      "lambda_rank": 1.3051794547562026,
+      "lr_multiplier": 1.2832655111666686,
+      "encoder_lr": 1e-05,
+      "head_lr": 0.001,
+      "vendor_lr": 4e-05,
+      "weight_decay": 0.01,
+      "vendor_weight_decay": 0.0,
+      "microbatch": 8,
+      "vendor_batch": 32,
+      "channel_tokens": 256,
+      "vendor_tokens": 512,
+      "memory_groups": 6,
+      "memory_bytes": 1048576,
+      "pooling": "mean_last4_sum",
+      "head_schedule": "constant",
+      "bce_weight": 1.0,
+      "hard_weight": 0.5
+    }
+  },
+  "endpoints": {
+    "0": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/cpu02/H_SEQ/initial.pt",
+      "bytes": 12061,
+      "sha256": "5f061f8374b8b3e261ff14b0a070a7682a41fd79b82443bf0d6b6e8420ad9c2f"
+    },
+    "1": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/cpu02/H_SEQ/stage1.pt",
+      "bytes": 14478,
+      "sha256": "2724447d52915bba3231552ba0540b46f9114effd07fc0af61bf641f0f6d8071"
+    },
+    "2": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/cpu02/H_SEQ/stage2.pt",
+      "bytes": 14478,
+      "sha256": "5f38cb3bd1b8d41cac0d7ab60e2f709fd52edd782ca83bfa708ed1c07a02d400"
+    },
+    "3": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/cpu02/H_SEQ/stage3.pt",
+      "bytes": 14478,
+      "sha256": "8892a1a667323c36b956939d4cc26be10f754c9cd0fcbcc26a3bee5c01a2fa3a"
+    }
+  },
+  "workload": {
+    "current_updates": 3,
+    "current_records": 96,
+    "history_groups": 0,
+    "history_records": 0,
+    "teacher_groups": 0,
+    "teacher_records": 0,
+    "stage_model_saves": 3
+  },
+  "updates": 3
+}

@@ -91,8 +91,13 @@ def release(process):
 
 
 class Runner:
-    def __init__(self, allowed: dict, gate_path: Path, root: Path, ledger: Ledger):
+    def __init__(self, allowed: dict, gate_path: Path, root: Path, ledger: Ledger, *,
+                 worker_entry: Path | None = None, caps: dict = CAPS):
         self.allowed, self.gate_path, self.root, self.ledger = allowed, gate_path, root, ledger
+        self.worker_entry = Path(__file__).resolve() if worker_entry is None else Path(worker_entry).resolve()
+        self.caps = dict(caps)
+        if self.caps != ledger.caps:
+            raise ValueError('Controller and ledger must use identical cumulative budgets')
         self.failed = False
 
     def retire_waiter(self, active):
@@ -124,7 +129,7 @@ class Runner:
         if len(cores) < 2*LIMITS['workers']:
             raise RuntimeError('Four allowed CPU cores required for two slots')
         chosen = cores[-4:][slot*2:slot*2+2]
-        return ['taskset', '-c', ','.join(map(str, chosen)), PYTHON, '-B', '-u', str(Path(__file__).resolve()),
+        return ['taskset', '-c', ','.join(map(str, chosen)), PYTHON, '-B', '-u', str(self.worker_entry),
                 '--gate', str(self.gate_path), '--action', job['action'], '--target', str(job['target']),
                 '--deadline', str(deadline), *job['extra']]
 
@@ -206,7 +211,7 @@ class Runner:
                             if job['action'] == 'analyze':
                                 # This operation is allotted the remaining auxiliary
                                 # bucket, measured at actual launch after any wait.
-                                job['seconds'] = min(job['seconds'], CAPS['auxiliary']-self.ledger.used['auxiliary']-
+                                job['seconds'] = min(job['seconds'], self.caps['auxiliary']-self.ledger.used['auxiliary']-
                                                      outstanding-math.ceil(parent_active)-60)
                                 if job['seconds'] <= 15:
                                     raise TimeoutError('Insufficient remaining analysis lifecycle budget')
@@ -261,7 +266,7 @@ class Runner:
                           budget_stop=budget_stop, status='RUNNING' if active else 'WAITING_RESOURCES'))
                 finally:
                     parent_active += time.monotonic()-tick
-                if self.ledger.used['auxiliary']+math.ceil(parent_active)+60 >= CAPS['auxiliary']:
+                if self.ledger.used['auxiliary']+math.ceil(parent_active)+60 >= self.caps['auxiliary']:
                     budget_stop = 'Auxiliary monitoring budget exhausted'
                 if active or (next_job < len(jobs) and len(retired) < slots and budget_stop is None):
                     time.sleep(.2 if active else 30)

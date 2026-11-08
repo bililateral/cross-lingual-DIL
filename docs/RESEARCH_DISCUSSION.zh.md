@@ -1,5 +1,16 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-08：接受有限前提实验，双路执行及开发语言访问
+
+用户在193091字节、74载荷、SHA256为97a3027f31321871dc1fb75c9ad01c89bf6d8452b843a7a57499aac2755eba41的具体实现包及排除范围呈现后答复：“允许发送该具体实现包”。许可只覆盖本次Playwright至chatgpt.com审查；已有六条/双路/数据授权不重复申请。[外发许可与实际提交](../reports/documentation/20261108/evolution_registered/execution/review/submission.json)已记录，未据上传本身跳过主审或数据语言条件。
+
+
+用户在完整方向意见和独立解释后明确：“那就按它的建议继续推进，采用双路同时运行。”该决定接受只做H_SEQ/V_SEQ×31/32/33×三批的六条及θ1冻结扩库评分、5累计任务小时、每worker整PID14GiB、失败槽退出而健康槽继续；本轮没有后续M/C自动接续。原30轨迹/24小时待批建议不生效，原“暂不训练”已被这次有限执行指令替代，仍须满足具体实现审查、数据语言与来源/资源前提，不再重复申请同范围开训。
+
+执行者明确提出新96条语言样本的读取边界后，用户确认：“允许上述数据构建与96条语言判断”。允许Linux机器复用资格缓存、固定保留确认候选身份、只导出288开发账号4/2/2；本会话只阅读每批固定32条开发fit正文，至少29/32明确英文，否则停止不换样本。正文不进Git或外审，确认正文与旧qrels/预测不开。
+
+[执行范围](../reports/documentation/20261108/evolution_registered/execution/scope.zh.md)及[授权记录](../reports/documentation/20261108/evolution_registered/execution/authorization.json)是实际入口依据。冻结对照完整报告刚学后和最终差异，不新增含糊“有价值”自动PASS；原P能力/学习/双SEQ遗忘门保持，全部结果后只等用户决定是否值得另批机制阶段。新代码和限定Linux手写CPU证据已形成，详见[实现报告](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)；具体新实现包外发尚需绑定许可。未正式构建/开语言样本、载模或训练，中文H暂停不变，本轮本地提交不推送。
+
 ## 2026-11-08：方向咨询完整回收，解释瓶颈与建议
 
 用户要求：“GPT 6 Pro的回复已经出来，把它对当前科研瓶颈和下一步怎么推进的建议讲清楚。”沿原会话和具体包许可回收[完整报告](../reports/documentation/20261108/evolution_registered/direction_review/external/report.zh.md)及[决策表](../reports/documentation/20261108/evolution_registered/direction_review/external/decision_table.md)，返回8成员、33571字节；页面ZIP身份、7载荷清单及15输入身份均核对一致，见[回收](../reports/documentation/20261108/evolution_registered/direction_review/recovery.json)与[独立处置](../reports/documentation/20261108/evolution_registered/direction_review/primary_disposition.zh.md)。

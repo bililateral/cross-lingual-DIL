@@ -17,9 +17,10 @@ from step30_evolution_data import validate_group
 from step30_evolution_policy import DOMAINS, SPLITS
 
 
-def make_model(model_path: Path, task: dict, device: str = 'cuda:0', *, expected_hidden: int = 768) -> Model:
+def make_model(model_path: Path, task: dict, device: str = 'cuda:0', *, expected_hidden: int = 768,
+               domains: tuple = DOMAINS) -> Model:
     from transformers import BertModel, BertTokenizer
-    torch.manual_seed(seed_for(task['seed'], DOMAINS, 'initial'))
+    torch.manual_seed(seed_for(task['seed'], domains, 'initial'))
     encoder = BertModel.from_pretrained(model_path, local_files_only=True)
     if encoder.config.hidden_size != expected_hidden:
         raise ValueError('The approved pretrained backbone is BERT base with hidden size 768')
@@ -95,7 +96,7 @@ def atomic_tensor(path: Path, state, check):
 
 
 def execute(model: Model, load_fit, job: Path, task: dict, identity: dict, model_binding: dict,
-            write, record, check=lambda: None, *, expected_groups: int = 20) -> dict:
+            write, record, check=lambda: None, *, expected_groups: int = 20, domains: tuple = DOMAINS) -> dict:
     if job.exists() or task['stages'] not in (1, 3) or task['epochs'] < 1:
         raise ValueError('Fresh single/full trajectory required')
     if asdict(model.settings) != task['settings']:
@@ -105,7 +106,9 @@ def execute(model: Model, load_fit, job: Path, task: dict, identity: dict, model
     vendor, replay = system.startswith('V_'), system in ('H_ER', 'H_full', 'V_ER')
     if vendor != (s.method == 'VendorLink_SEQ'):
         raise ValueError('Wrong actual model family')
-    memory = (VendorMemory if vendor else Memory)(seed_for(seed, DOMAINS, 'reservoir'), s)
+    if len(domains) != 3 or len(set(domains)) != 3:
+        raise ValueError('Three distinct explicitly bound domains required')
+    memory = (VendorMemory if vendor else Memory)(seed_for(seed, domains, 'reservoir'), s)
     optimizer, endpoints, updates = None, {}, 0
     workload = dict(current_updates=0, current_records=0, history_groups=0, history_records=0,
                     teacher_groups=0, teacher_records=0, stage_model_saves=0)
@@ -117,8 +120,8 @@ def execute(model: Model, load_fit, job: Path, task: dict, identity: dict, model
         for stage in range(task['stages']):
             check()
             # The loader is called once here for this CURRENT domain only.
-            groups = load_fit(DOMAINS[stage])
-            if len(groups) != expected_groups or any(g.domain != DOMAINS[stage] or g.split != 'fit' for g in groups):
+            groups = load_fit(domains[stage])
+            if len(groups) != expected_groups or any(g.domain != domains[stage] or g.split != 'fit' for g in groups):
                 raise ValueError('Current fit quota/domain mismatch')
             for group in groups:
                 validate_group(group, True)
@@ -133,12 +136,12 @@ def execute(model: Model, load_fit, job: Path, task: dict, identity: dict, model
                 old_classes = memory.classes() if replay else []
                 if set(classes) & set(old_classes):
                     raise ValueError('Current fit and retained history identities overlap')
-                model.start_vendor_stage(sorted(set(classes) | set(old_classes)), seed_for(seed, DOMAINS, stage, 'head'))
+                model.start_vendor_stage(sorted(set(classes) | set(old_classes)), seed_for(seed, domains, stage, 'head'))
                 optimizer = make_optimizer(model)
             elif optimizer is None:
                 optimizer = make_optimizer(model)
             for epoch in range(task['epochs']):
-                stream = random.Random(seed_for(seed, DOMAINS, stage, epoch, 'current'))
+                stream = random.Random(seed_for(seed, domains, stage, epoch, 'current'))
                 if vendor:
                     examples = [(r, v.identity) for g in groups for v in g.views for r in v.records]
                     stream.shuffle(examples)
@@ -150,10 +153,10 @@ def execute(model: Model, load_fit, job: Path, task: dict, identity: dict, model
                 for batch_index, batch in enumerate(batches):
                     check()
                     update = epoch*expected_groups+batch_index+1
-                    step_seed = seed_for(seed, DOMAINS, stage, update, 'update')
+                    step_seed = seed_for(seed, domains, stage, update, 'update')
                     history, teacher = (None, None)
                     if stage and replay:
-                        history, teacher = memory.draw(seed_for(seed, DOMAINS, stage, update, 'history'))
+                        history, teacher = memory.draw(seed_for(seed, domains, stage, update, 'history'))
                     set_rates(optimizer, s, update, task['epochs']*expected_groups)
                     logs = (update_vendor(model, optimizer, batch, history, step_seed, check) if vendor else
                             update_h(model, optimizer, batch, history, teacher, step_seed, check))

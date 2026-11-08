@@ -1,5 +1,10 @@
 # 科研文件存储与恢复
 
+## 2026-11-08 Registered有限前提实现来源与核验
+
+新实现隔离部署于Linux `reports/documentation/20261108/evolution_registered/execution/workspace/`，未覆盖旧活动workspace。Windows仅保存源码、手写CPU日志/回执和来源清单；当前没有正式开发数据或新训练模型。真实资格缓存仍按下节保管，用户已批准的后续288开发账号和96条语言文本也只留Linux，不入Git或外审包。
+
+CPU01失败、修复后CPU02及实际评分入口CPU03的来源、费用和证据见[实现记录](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)。初稿的精确来源由execution/deployment.zip及清单保留；CPU02/03来源清单和最终entry_sources各自保留，不能用新版本冒接旧执行。38份小证据及4份入口证据已按传输ZIP和逐文件大小/SHA核对；对应ZIP、一次性核验源码及Linux Tiny载荷目前仍有本轮实现审查用途，暂保留，审查闭合后按实际用途收尾。未删除本轮证据、旧数据、共享模型或中文H资产；不重置大清理周期。
 ## 2026-11-08 已登记账号资格缓存
 
 用户批准一次限定CPU资格，并补充允许旧test作为新确认候选。新私有缓存仅在Linux：`/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/qualification/private_custody/eligible.jsonl`，656账号/5248条角色候选记录，6250335字节，SHA256 `253f171e4ff387bc970a7793e7a2c4a0d14515580c89f028c276e891e755817c`，目录0700。它含真实身份与清洗文本，供未来获准构建复用，不是正式训练数据；不得进入Git、Windows或外审包。新开发/确认尚未实际分配，旧test没有训练或评价开封。

@@ -1,0 +1,65 @@
+{
+  "status": "TRAINING_COMPLETE_EVALUATION_CLOSED",
+  "identity": {
+    "fixture": true
+  },
+  "task": {
+    "id": "handwritten_VendorLink_SEQ",
+    "stages": 3,
+    "epochs": 1,
+    "seed": 31,
+    "system": "V_SEQ",
+    "settings": {
+      "method": "VendorLink_SEQ",
+      "lambda_rank": 1.3051794547562026,
+      "lr_multiplier": 1.2832655111666686,
+      "encoder_lr": 1e-05,
+      "head_lr": 0.001,
+      "vendor_lr": 4e-05,
+      "weight_decay": 0.01,
+      "vendor_weight_decay": 0.0,
+      "microbatch": 8,
+      "vendor_batch": 32,
+      "channel_tokens": 256,
+      "vendor_tokens": 512,
+      "memory_groups": 6,
+      "memory_bytes": 1048576,
+      "pooling": "mean_last4_sum",
+      "head_schedule": "constant",
+      "bce_weight": 1.0,
+      "hard_weight": 0.5
+    }
+  },
+  "endpoints": {
+    "0": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/cpu02/VendorLink_SEQ/initial.pt",
+      "bytes": 1965,
+      "sha256": "b2e9bd671f6d0c8cdb42cb0267a7e07d3e1782a7cef44778534c504c07c4d888"
+    },
+    "1": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/cpu02/VendorLink_SEQ/stage1.pt",
+      "bytes": 4450,
+      "sha256": "74332102564efb9357d9d8b32b920b9683f51cc7fffac873f0dc1d693b4014bd"
+    },
+    "2": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/cpu02/VendorLink_SEQ/stage2.pt",
+      "bytes": 4450,
+      "sha256": "597e9217619f167bea4f2c659a555b5a34b9d446fa4f57e8cb63cb2937e3de37"
+    },
+    "3": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/cpu02/VendorLink_SEQ/stage3.pt",
+      "bytes": 4450,
+      "sha256": "55ceaf78742aa716f11e9b06f73c9e2d8e433ed9d8baa7484fecebe28a898c5b"
+    }
+  },
+  "workload": {
+    "current_updates": 3,
+    "current_records": 96,
+    "history_groups": 0,
+    "history_records": 0,
+    "teacher_groups": 0,
+    "teacher_records": 0,
+    "stage_model_saves": 3
+  },
+  "updates": 3
+}
