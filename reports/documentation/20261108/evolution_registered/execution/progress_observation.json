@@ -1,0 +1,111 @@
+{
+  "at": "2026-11-08T16:24:25+0800",
+  "status": "RUNNING",
+  "active": [
+    {
+      "slot": "0",
+      "pid": 1656491,
+      "owner": "yongpeng",
+      "created": 1794125581.47,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "-u",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace/scripts/step31_evolution_registered_control.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/formal_gate.json",
+        "--action",
+        "train",
+        "--target",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/campaign/training/P_H_SEQ_H1_s31",
+        "--deadline",
+        "1559396.477302824",
+        "--task",
+        "P_H_SEQ_H1_s31"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace",
+      "reserved_bytes": 15032385536,
+      "rss": 2112077824
+    },
+    {
+      "slot": "1",
+      "pid": 1660397,
+      "owner": "yongpeng",
+      "created": 1794126152.06,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "-u",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace/scripts/step31_evolution_registered_control.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/formal_gate.json",
+        "--action",
+        "train",
+        "--target",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/campaign/training/P_H_SEQ_H1_s32",
+        "--deadline",
+        "1559967.063289864",
+        "--task",
+        "P_H_SEQ_H1_s32"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace",
+      "reserved_bytes": 15032385536,
+      "rss": 2107932672
+    }
+  ],
+  "pending": 3,
+  "failures": [],
+  "completed": 1,
+  "updates": [
+    {
+      "task": "P_H_SEQ_H1_s31",
+      "updates": 972,
+      "stage": 3,
+      "epoch": 1
+    },
+    {
+      "task": "P_H_SEQ_H1_s32",
+      "updates": 214,
+      "stage": 1,
+      "epoch": 18
+    },
+    {
+      "task": "P_V_SEQ_V1_s31",
+      "updates": 1440,
+      "stage": 3,
+      "epoch": 40
+    }
+  ],
+  "budget": {
+    "used_seconds": {
+      "training": 571,
+      "gpu": 0,
+      "auxiliary": 627
+    },
+    "caps": {
+      "training": 10800,
+      "gpu": 3600,
+      "auxiliary": 3600
+    },
+    "cpu_test_seconds": 20,
+    "conservative_tail_seconds": 30,
+    "events": [
+      {
+        "operation": "prepare_registered_campaign",
+        "bucket": "auxiliary",
+        "actual_seconds": 0.0009527869988232851,
+        "charged_seconds": 1,
+        "success": true
+      },
+      {
+        "operation": "P_V_SEQ_V1_s31",
+        "bucket": "training",
+        "actual_seconds": 570.5711602361407,
+        "charged_seconds": 571,
+        "success": true
+      }
+    ]
+  },
+  "gpu_processes": "1656491, 8076 MiB\n1660397, 8248 MiB\n",
+  "evaluation_label_attempt": false
+}

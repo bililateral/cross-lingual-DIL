@@ -4,7 +4,9 @@
 
 新实现隔离部署于Linux `reports/documentation/20261108/evolution_registered/execution/workspace/`，未覆盖旧活动workspace。Windows仅保存源码、手写CPU日志/回执和来源清单；正式开发数据及新训练权重只留Linux。真实资格缓存仍按下节保管，用户已批准的后续288开发账号和96条语言文本也只留Linux，不入Git或外审包。
 
-CPU01失败、修复后CPU02及实际评分入口CPU03的来源、费用和证据见[实现记录](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)。初稿的精确来源由execution/deployment.zip及清单保留；CPU02/03来源清单和最终entry_sources各自保留，不能用新版本冒接旧执行。38份小证据及4份入口证据已按传输ZIP和逐文件大小/SHA核对；对应ZIP、一次性核验源码及Linux Tiny载荷目前仍有本轮实现审查用途，暂保留，审查闭合后按实际用途收尾。未删除本轮证据、旧数据、共享模型或中文H资产；不重置大清理周期。
+CPU01失败、修复后CPU02及实际评分入口CPU03的来源、费用和证据见[实现记录](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)。初稿的精确来源可从Git `713d9929:reports/documentation/20261108/evolution_registered/execution/deployment.zip`恢复，deployment_manifest及CPU02/03来源清单、entry_sources、repair_sources保留，不能用新版本冒接旧执行。38份小证据、4份入口证据和审后CPU04原始通过/失败回执继续保留；审查闭合后已退役一次性核验脚本与传输副本，精确范围见下段。未删除正式数据、共享模型或中文H资产；不重置大清理周期。
+
+本次收尾在逐份读回Git原字节并核对大小/SHA后，Windows删除10文件147977字节：`tests/step31_registered_increment.py`、`tests/step31_registered_scoring_entry.py`、`tests/step31_registered_entry_fixes.py`，以及本任务execution下的`cpu01_source.py`、`deployment.zip`、`evidence.zip`、`entry_evidence.zip`、`repair_deployment.zip`、`repair_evidence.zip`、`start_evidence.zip`。每份均可从 `713d9929:<仓库相对路径>`精确恢复，包括初次失败夹具；恢复不授予重跑权限。Linux 16:27:21删除workspace/tests同名三脚本及上述五个evidence/repair/start传输ZIP，共8文件66222字节，见[实际清理原件](../reports/documentation/20261108/evolution_registered/execution/cleanup.json)；Linux deployment.zip在首次核查时已不存在，不计为本次删除，该次核查失败未执行删除。两端合计18文件214199逻辑字节；Linux删除前后实际14生产源、正式门及主审处置SHA保持，删除对象不在活动命令或正式源绑定内。Linux手写Tiny载荷、完整审查输入/返回、原始失败/费用证据及实际训练资产保留。本次局部清理不重置大清理周期。
 本次审后已建Linux execution/dataset：288开发账号/2304记录、288确认身份预留、固定96条语言判定及私有qrels；正文/身份/逐条判定不回传。Windows仅保留同字节data_manifest.json、language_receipt.json和启动/源/资源元数据；12载荷按start_manifest逐项核对。实际campaign权重/训练访问及后续盲分数依赖仅在Linux，当前活动，禁止清理。
 
 实现外审返回7成员/36947字节已核对，原文、结构化发现和来源对应保留execution/review/external；仅删除同SHA的.playwright-mcp/evolution-registered-implementation-independent-review-20261108.zip浏览器重复件（1文件36947字节），正式返回仍保留用于本轮结果主审。审后CPU04与全部来源和费用原件保留；没有删除活动资产或改变大清理周期。
