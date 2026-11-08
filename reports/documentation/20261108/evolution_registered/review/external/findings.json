@@ -1,0 +1,352 @@
+{
+  "schema_version": "1.0",
+  "review_date": "2026-11-08",
+  "timezone": "UTC+08:00",
+  "reviewer_self_description": {
+    "configured_identity": "GPT-6 Astra Pro",
+    "backend_route_independently_verified": false
+  },
+  "input": {
+    "filename": "evolution_registered_review.zip",
+    "bytes": 112735,
+    "sha256": "3ab066d14cd61cdde05171d77b68e8c714741600778843ae7a41f607f9d6d224",
+    "zip_members": 29,
+    "payloads": 28,
+    "payload_bytes": 268067,
+    "all_payloads_verified": true
+  },
+  "authorization": {
+    "specific_original_package_review_authorized": true,
+    "manifest_upload_false_is_historical": true,
+    "formal_partition": false,
+    "language_opening": false,
+    "model_loading": false,
+    "training": false,
+    "formal_scoring": false,
+    "listener": false
+  },
+  "verdict": {
+    "cpu_qualification": "ACCEPT_CAPACITY_PASS_NOT_DATA_READY",
+    "proposal": "RECOMMEND_CONTINUING_TO_CONTRACT_SELECTION_WITH_TWO_LOCAL_SPECIFICATIONS_TO_FREEZE",
+    "confirmed_cpu_qualification_defects": 0,
+    "confirmed_mathematical_scientific_errors": 0,
+    "required_before_formal_contract_freeze": 2,
+    "scientific_choice_findings": 1,
+    "optional_clarifications": 2,
+    "new_real_data_scan_required": false,
+    "new_training_or_resampling_required_by_this_review": false,
+    "automatic_execution_permission_granted": false,
+    "summary_zh": "接受已完成CPU容量资格；方案有明确应用意义且完整H/五系统可保留。R01/R02为正式合同冻结前须补齐的判据规格，不影响资格结果。C01须由用户选择容忍范围；不擅增门、种子、搜索或预算。"
+  },
+  "findings": [
+    {
+      "id": "EV-REG-R01",
+      "title_zh": "bootstrap区间构造法尚未唯一指定",
+      "classification": "REQUIRED_SPECIFICATION_CLARIFICATION",
+      "classification_zh": "确定的规格欠定；非已发生科研结果错误",
+      "severity": "moderate",
+      "certainty": "confirmed_from_text",
+      "required_by": "formal_statistical_contract_freeze",
+      "invalidates_completed_cpu_qualification": false,
+      "evidence": [
+        {
+          "path": "reports/documentation/20261108/evolution_registered/proposal.zh.md",
+          "lines": [
+            168,
+            168
+          ]
+        },
+        {
+          "path": "scripts/step30_evolution_policy.py",
+          "lines": [
+            193,
+            226
+          ]
+        }
+      ],
+      "observation_zh": "新稿已固定2000次、旧批分层、query单元、配对、97.5%双侧和条件范围，未明确percentile/basic等构造法、分位数约定及统计随机种子。旧实现的具体选择未在新规格中明确承接。",
+      "impact_zh": "同一保存统计及同一重采样分布可能产生相反方向准入结论，未来正式判据尚不唯一可执行。",
+      "paper_counterexample": {
+        "executed": false,
+        "observed_improvement": 0.02,
+        "bootstrap_quantiles": [
+          0.005,
+          0.05
+        ],
+        "percentile_interval": [
+          0.005,
+          0.05
+        ],
+        "basic_interval": [
+          -0.01,
+          0.035
+        ]
+      },
+      "minimum_fix_zh": "在冻结合同时明确一种区间构造法（可承接percentile）、分位数规则、统计随机种子及差值方向；每旧批抽96账号query，方法/三个固定seed/相关初学与最终端点共享索引，固定gallery，按既定权重合成，四改善方向下界>0。",
+      "not_required": [
+        "运行bootstrap",
+        "新增训练seed",
+        "追加真实数据",
+        "修改97.5%为99%",
+        "通用统计框架"
+      ]
+    },
+    {
+      "id": "EV-REG-R02",
+      "title_zh": "新学习增量第一路径的seed聚合轴未明确",
+      "classification": "REQUIRED_SPECIFICATION_CLARIFICATION",
+      "classification_zh": "确定的规格欠定；非已发生科研结果错误",
+      "severity": "moderate",
+      "certainty": "confirmed_from_text",
+      "required_by": "formal_decision_contract_freeze",
+      "invalidates_completed_cpu_qualification": false,
+      "evidence": [
+        {
+          "path": "reports/documentation/20261108/evolution_registered/proposal.zh.md",
+          "lines": [
+            146,
+            146
+          ]
+        },
+        {
+          "path": "reports/documentation/20261108/evolution_registered/proposal.zh.md",
+          "lines": [
+            164,
+            164
+          ]
+        }
+      ],
+      "observation_zh": "前文先定义逐seed量，第一分支Full G >= reference G-.01未说明按均值还是逐seed；第二分支明确写平均。",
+      "impact_zh": "同一组合法正学习和学后性能值会随聚合解释改变第一分支结果。",
+      "paper_counterexample": {
+        "executed": false,
+        "reference_g": [
+          0.03,
+          0.03,
+          0.03
+        ],
+        "full_g": [
+          0.01,
+          0.05,
+          0.03
+        ],
+        "reference_after": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "full_after": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "both_mean_g": 0.03,
+        "mean_branch_passes": true,
+        "all_seed_branch_passes": false,
+        "high_start_branch_passes": false
+      },
+      "minimum_fix_zh": "建议顺着现稿结构明确比较逐批三seed平均G，保留已写明的逐seed非负及学后MAP保护；如用户要逐seed增量保护，须明确写成全seed条件，冻结后不得依结果切换。",
+      "not_required": [
+        "运行模型",
+        "新增seed",
+        "更改现有数值阈值",
+        "重新资格"
+      ]
+    },
+    {
+      "id": "EV-REG-C01",
+      "title_zh": "每seed每旧批的最终相对代价可被平均补偿",
+      "classification": "SCIENTIFIC_CHOICE",
+      "classification_zh": "待用户科学选择",
+      "severity": "moderate_scientific_tradeoff",
+      "certainty": "paper_counterexample_of_nonimplication",
+      "required_by": "user_choice_before_contract_freeze",
+      "invalidates_completed_cpu_qualification": false,
+      "evidence": [
+        {
+          "path": "reports/documentation/20261108/evolution_registered/proposal.zh.md",
+          "lines": [
+            162,
+            166
+          ]
+        }
+      ],
+      "observation_zh": "现门保护初学、新学习、各旧批均值、各seed两旧批均值及最终绝对底线，没有每(seed,旧批)相对对手的最终非劣要求。初学及学后-.02本身也是容忍。",
+      "impact_zh": "可以声称逐批平均和逐seed平均改善，不能声称每seed每旧批最终都无相对损失。",
+      "paper_counterexample": {
+        "executed": false,
+        "scope": "Only illustrates mean and absolute-floor gates; not a full empirical run or interval pass",
+        "reference_final": [
+          [
+            0.7,
+            0.7
+          ],
+          [
+            0.7,
+            0.7
+          ],
+          [
+            0.7,
+            0.7
+          ]
+        ],
+        "full_final": [
+          [
+            0.55,
+            0.92
+          ],
+          [
+            0.85,
+            0.75
+          ],
+          [
+            0.85,
+            0.75
+          ]
+        ],
+        "both_initial_q": 0.95,
+        "per_seed_mean_o_gains": [
+          0.035,
+          0.1,
+          0.1
+        ],
+        "one_cell_relative_loss": 0.15
+      },
+      "minimum_fix_zh": "用户明确是否接受该平均补偿与.02有界代价；接受则保持现门并逐格报告。仅在用户要求每格相对保护时另行选择容忍界限，审查者不自动加门。",
+      "not_required": [
+        "自动添加逐格非劣门",
+        "新增seed",
+        "扩跑",
+        "降低既定目标"
+      ]
+    },
+    {
+      "id": "EV-REG-O01",
+      "title_zh": "把矩形H/V原评分及唯一正例语义写成明确式",
+      "classification": "OPTIONAL_CLARIFICATION",
+      "classification_zh": "可选表述明确化；未来受影响实现仍需既定验收",
+      "severity": "low",
+      "certainty": "existing_formula_verified_new_interface_unimplemented",
+      "required_by": null,
+      "invalidates_completed_cpu_qualification": false,
+      "evidence": [
+        {
+          "path": "reports/documentation/20261108/evolution_registered/proposal.zh.md",
+          "lines": [
+            78,
+            84
+          ]
+        },
+        {
+          "path": "reports/documentation/20261108/evolution_registered/proposal.zh.md",
+          "lines": [
+            118,
+            125
+          ]
+        },
+        {
+          "path": "scripts/step29_vendorlink_methods.py",
+          "lines": [
+            79,
+            109
+          ]
+        },
+        {
+          "path": "scripts/step30_evolution_evaluate.py",
+          "lines": [
+            118,
+            139
+          ]
+        }
+      ],
+      "observation_zh": "方案已要求矩形评分等价原H/V。原V为2u·v/(||u||²+||v||²)，非均值再单位化余弦；相同vid的不同query/gallery视图必须保留为正例。",
+      "impact_zh": "未来误用普通余弦会改变排序；误按vid删自身会删除唯一正例。当前尚未发生该实现错误。",
+      "minimum_fix_zh": "明写H的2×2块聚合、V精确归一化及不同视图的正例定义；在未来已计划的手写对齐中覆盖，不需要现在重复GPU资格。",
+      "not_required": [
+        "新增GPU资格",
+        "新评分算法",
+        "现在载模"
+      ]
+    },
+    {
+      "id": "EV-REG-O02",
+      "title_zh": "显式列出三个增长附加格和评分清单规模",
+      "classification": "OPTIONAL_CLARIFICATION",
+      "classification_zh": "可选合同明确化",
+      "severity": "low",
+      "certainty": "derived_from_fixed_design",
+      "required_by": null,
+      "invalidates_completed_cpu_qualification": false,
+      "evidence": [
+        {
+          "path": "reports/documentation/20261108/evolution_registered/proposal.zh.md",
+          "lines": [
+            78,
+            84
+          ]
+        },
+        {
+          "path": "reports/documentation/20261108/evolution_registered/proposal.zh.md",
+          "lines": [
+            140,
+            142
+          ]
+        },
+        {
+          "path": "reports/documentation/20261108/evolution_registered/proposal.zh.md",
+          "lines": [
+            184,
+            197
+          ]
+        }
+      ],
+      "observation_zh": "主30轨迹/90阶段/43200当前/17280历史算式正确；增长附加格未逐项展开。",
+      "impact_zh": "枚举有助于未来整批完整性和实际评分成本核对，不改变科学任务数。",
+      "paper_arithmetic": {
+        "fixed_matrices": 270,
+        "fixed_view_pair_scores": 4423680,
+        "growth_extra_matrices_if_separate": 90,
+        "growth_extra_scores_if_separate": 2211840,
+        "total_scores_if_both_fully_saved": 6635520
+      },
+      "minimum_fix_zh": "在未来新协议清单列t2/E1/G2、t3/E1/G3、t3/E2/G3及cohort/端点/池/顺序来源绑定；允许同端点重合矩形切片复用。",
+      "not_required": [
+        "增加训练轨迹",
+        "额外结果选择机会",
+        "增加GPU预算"
+      ]
+    }
+  ],
+  "evidence_boundaries": [
+    "全部28载荷及包清单全文读取；原项目源码未导入或执行。",
+    "资格运行只据随包保存记录静态对应，不是本审现场复现。",
+    "未访问真实archive/source_mapping/eligible缓存/文本/账号/标签/预测/Memory/模型。",
+    "本包没有access.json、started.json、stdout/stderr、旧stop_observation原件、旧选择结果及旧正式训练全账。",
+    "原receive.json的16成员回传包没有在本审独立完整复验。",
+    "旧闭合审查按未变范围复用；当前新矩形评分、控制入口尚未实现。",
+    "旧GPU单路0.1秒采样峰值不保证新任务全程或双槽。",
+    "条件query bootstrap不代表完整重训/训练seed总体/市场总体。",
+    "两个RSS采集量不逐字节相等；报告保留原数并解释，均低于8GiB。"
+  ],
+  "audit_actions": {
+    "zip_and_payload_hashing": true,
+    "safe_extraction": true,
+    "static_text_reading": true,
+    "saved_aggregate_arithmetic": true,
+    "paper_examples": true,
+    "project_imports": false,
+    "project_tests": false,
+    "training": false,
+    "inference": false,
+    "resampling": false,
+    "private_data_access": false,
+    "asset_web_search": false,
+    "formal_cohort_selection": false
+  },
+  "outputs": {
+    "report": "report.zh.md",
+    "reading_scope": "reading_scope.tsv",
+    "input_verification": "input_verification.json",
+    "evidence_checks": "evidence_checks.json"
+  }
+}

@@ -14,6 +14,8 @@
 
 资格与具体方案完成后，执行者给出新的112735字节、28载荷、SHA256为3ab066d14cd61cdde05171d77b68e8c714741600778843ae7a41f607f9d6d224的定向包；用户明确：“允许发送本包审查，训练关闭”。该许可只覆盖本地Playwright网页GPT 6 Pro的方案/资格审查、回收与独立处置，不授权正式分区、语言开封、模型、训练或监听，24小时仍为建议。具体[授权](../reports/documentation/20261108/evolution_registered/review/authorization.json)及[唯一提交](../reports/documentation/20261108/evolution_registered/review/submission.json)保留，旧包许可不挪用。
 
+完整[外审](../reports/documentation/20261108/evolution_registered/review/external/report.zh.md)接受CPU容量有限结论，指出bootstrap区间构造及新学习比较seed聚合两处规格欠定，并说明均值门不能保证每个seed×旧批最终相对非劣。执行者独立核实后，将“对四个既定对照，每seed×旧批最终MAP不得低超过.02”的可选增强具体呈现给用户；用户明确选择：“保持现有均值门，完整报告逐格代价”。据此不加逐格非劣门，保持原均值/跨seed整体条件与初学、新学习、最终绝对底线，完整报告每格差值和最差代价，不声称每格都更好。两处规格在草案明确为固定percentile/统计随机性及逐批三seed均值比较，未运行统计；评分公式和三增长格仅展开既有要求。详见[独立处置](../reports/documentation/20261108/evolution_registered/review/primary_disposition.zh.md)。用户对该科学选择的确认不是正式分区、训练或24小时执行许可；修订草案没有再次外发，不冒称第二轮网页通过。
+
 ## 2026-11-08：明确删除本次Evolution权重与本轮新增文件
 
 用户要求：“那就把这次vnedor-link训练的模型权重文件都删掉以及你这轮对话刚生成的文件都删掉”。执行者将“这次”具体限定为当前Evolution A/B，列出Linux的56个权重/起点文件14776938922字节、整个candidate127目录88文件及stop_observation.json，以及Windows本轮三个提交新增的39文件325159字节；说明其中127原始分数/逐query指标是未入Git的唯一原件，删除后不能从已提交汇总恢复。原A/B在Linux的非权重结果、Evolution数据、共享预训练、旧VendorLink/ABC与H消融资产保留；原有交接/计划等文档只修正引用和删除记录，Git历史不改写。

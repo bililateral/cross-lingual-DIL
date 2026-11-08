@@ -10,7 +10,7 @@
 
 下一步先审阅具体方案：推荐96账号×3批×2 cohort、4/2/2角色、H1/V1固定迁移而不新增调参、五系统，先6条SEQ共同能力/遗忘门检，条件性9条机制开发及15条独立确认。成功同时要求旧初学、明显遗忘、Full最终旧能力/保持、新批正学习与稳定性；只高最终平均MAP或只H遗忘均不足。确认候选余量极小，正式构建若有必要排除不得自动借旧dev填确认。
 
-本轮不自动实施正式分区、语言样本阅读、训练评价实现或计算；30轨迹、具体数值门、最多双worker/14GiB、24累计任务小时均是待实质确认的建议。已发生资格辅助352秒须承接，不能重新清零。沿本次[具体包许可](../reports/documentation/20261108/evolution_registered/review/authorization.json)与唯一提交完成定向审查和独立处置；旧外审包或127诊断免审不覆盖新任务。后续实现只补角色/矩形评分/固定池判据的实际接线，复用未变H核心与已审紧凑保存，不扩成新通用框架或重复GPU资格。
+本轮不自动实施正式分区、语言样本阅读、训练评价实现或计算；30轨迹、具体数值门、最多双worker/14GiB、24累计任务小时均是待实质确认的建议。已发生资格辅助352秒须承接，不能重新清零。从已回收[本次外审及独立处置](../reports/documentation/20261108/evolution_registered/review/primary_disposition.zh.md)承接：两统计规格已在草案补清，用户选择保留现有均值门并完整报告逐格代价，不加逐格非劣门；不重开本轮已充分的方案审查，后续实现只按实际差异作必要定向审查。后续实现只补角色/矩形评分/固定池判据的实际接线，复用未变H核心与已审紧凑保存，不扩成新通用框架或重复GPU资格。
 
 原季度路线仍结束，不续原C/D、不重训已删权重、不改门搜索顺序/种子/池规模。原[科学方案](../reports/documentation/20261107/evolution_pilot/proposal.zh.md)、[固定数据](../reports/documentation/20261107/evolution_pilot/data_preparation/report.zh.md)、[双路补充](../reports/documentation/20261107/evolution_pilot/execution/scope.zh.md)、[原实现主审](../reports/documentation/20261107/evolution_pilot/implementation/review/primary_disposition.zh.md)与[GPU证据](../reports/documentation/20261107/evolution_pilot/gpu_single/report.zh.md)是已发生事实的来源。A/B未揭示共同明显遗忘，127开发诊断同样没有；原VendorLink有效负结果、ABC前置门停止且无新候选训练权重、全部费用保持。已完成删除的对象和Git恢复界限见[存储记录](STORAGE.zh.md)，不可恢复的模型及127原始分数不冒称仍可复用。
 

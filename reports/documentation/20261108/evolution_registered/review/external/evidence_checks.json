@@ -1,0 +1,173 @@
+{
+  "scope": "Only attachment hashes, parsed saved aggregate JSON, text and simple arithmetic. No project imports, research implementation, real data, inference, training or resampling executed.",
+  "qualification_sources": [
+    {
+      "source": "step30_evolution_data.py",
+      "path": "scripts/step30_evolution_data.py",
+      "matches_manifest_and_result": true,
+      "bytes": 16029,
+      "sha256": "7c01fb4c9f3e959e3f7fa63b197f76919b00cc87c9af1c00f9bbf9009d0e2850"
+    },
+    {
+      "source": "step30_evolution_policy.py",
+      "path": "scripts/step30_evolution_policy.py",
+      "matches_manifest_and_result": true,
+      "bytes": 13609,
+      "sha256": "a6245ce9b7e349b99bc0278d43d80abe325151fb8478cf0eee38200dca3dd971"
+    },
+    {
+      "source": "step29_vendorlink_data.py",
+      "path": "scripts/step29_vendorlink_data.py",
+      "matches_manifest_and_result": true,
+      "bytes": 11636,
+      "sha256": "e0d2a10b9d6731967411f701e58ac2cc610d0ed7c9798640f485823954f16668"
+    },
+    {
+      "source": "audit.py",
+      "path": "reports/documentation/20261107/evolution_qualification/audit.py",
+      "matches_manifest_and_result": true,
+      "bytes": 19972,
+      "sha256": "e9b396601ad72e46365c856804b6fe6bf0f233190ff3d2661475173d6bdf369c"
+    },
+    {
+      "source": "followup.py",
+      "path": "reports/documentation/20261107/evolution_qualification/followup.py",
+      "matches_manifest_and_result": true,
+      "bytes": 13749,
+      "sha256": "20c33f435e279bf4618ec4d05184181f4880812b78fcdf7cc83dfbf2040485bb"
+    }
+  ],
+  "entry_and_supplement_hash_match": true,
+  "old_manifest_hash_match": true,
+  "cleaning_object_identical_to_prior_manifest": true,
+  "cleaning_histogram_checks": [
+    {
+      "layer": "base_capacity",
+      "accounts": 3898,
+      "records": 62447,
+      "at_least": {
+        "4": 2597,
+        "8": 1819,
+        "20": 846
+      },
+      "histogram_reconciled": true
+    },
+    {
+      "layer": "body_unique_and_not_shared_capacity",
+      "accounts": 3890,
+      "records": 43009,
+      "at_least": {
+        "4": 2297,
+        "8": 1453,
+        "20": 539
+      },
+      "histogram_reconciled": true
+    },
+    {
+      "layer": "body_quality_screen_capacity",
+      "accounts": 3488,
+      "records": 30922,
+      "at_least": {
+        "4": 1853,
+        "8": 1049,
+        "20": 348
+      },
+      "histogram_reconciled": true
+    },
+    {
+      "layer": "near_copy_screen_capacity",
+      "accounts": 3488,
+      "records": 25100,
+      "at_least": {
+        "4": 1644,
+        "8": 865,
+        "20": 244
+      },
+      "histogram_reconciled": true
+    },
+    {
+      "layer": "cross_account_screen_capacity",
+      "accounts": 3468,
+      "records": 24411,
+      "at_least": {
+        "4": 1629,
+        "8": 849,
+        "20": 233
+      },
+      "histogram_reconciled": true
+    }
+  ],
+  "qualification_counter_sums": {
+    "strict_pool_accounts": 3468,
+    "strict_pool_records": 24411,
+    "at_least_eight": 849,
+    "fewer_than_eight": 2619,
+    "no_two_later_gallery": 56,
+    "no_two_later_query": 137,
+    "strict_date_roles": 656,
+    "eligible": 656,
+    "role_record_or_body_overlap": 0,
+    "role_near_copy_rejected": 0
+  },
+  "role_pair_check": {
+    "accounts": 656,
+    "pairs_each": 28,
+    "pairs_total": 18368
+  },
+  "capacity": {
+    "confirmation_candidates": 290,
+    "pre_reservation_development_candidates": 496,
+    "suggested_confirmation_old_test": 160,
+    "suggested_confirmation_unused": 128,
+    "remaining_development_candidates": 368,
+    "confirmation_margin": 2,
+    "total_margin": 80,
+    "formal_selection_performed_by_this_review": false
+  },
+  "budget": {
+    "body_seconds": 170.88554596714675,
+    "outer_seconds": 171.59,
+    "preparation_reserve": 180,
+    "charged_seconds": 352,
+    "budget_peak_rss_bytes": 2016219136,
+    "budget_peak_rss_gib": 1.8777503967285156,
+    "outer_max_rss_bytes": 2014957568,
+    "outer_max_rss_gib": 1.8765754699707031,
+    "rss_difference_bytes": 1261568,
+    "rss_measurements_byte_identical": false,
+    "rss_note": "Different collectors: qualifier records max(psutil RSS, ru_maxrss); outer lifecycle records max_rss_kib. Values are not byte-identical, both below cap. No claim of exact agreement.",
+    "outer_ceiling_charge_matches": true
+  },
+  "proposed_workload": {
+    "trajectories": 30,
+    "stages": 90,
+    "current_updates_per_stage": 480,
+    "current_updates": 43200,
+    "current_record_presentations": 1382400,
+    "replay_trajectories": 18,
+    "history_group_uses": 17280,
+    "history_record_presentations": 552960,
+    "p_current_updates": 8640,
+    "maximum_teacher_groups": 144,
+    "stage_models": 90,
+    "small_initial_references": 30,
+    "fixed_cells": 270,
+    "fixed_view_pair_score_values": 4423680,
+    "growth_extra_cells_if_separately_saved": 90,
+    "growth_extra_full_score_values_if_separately_saved": 2211840,
+    "total_score_values_if_full_fixed_and_growth_saved": 6635520,
+    "budget_seconds": 86400,
+    "budget_split_seconds": {
+      "training": 64800,
+      "gpu": 10800,
+      "auxiliary": 10800
+    },
+    "qualification_auxiliary_to_carry_forward": 352
+  },
+  "evidence_limits": [
+    "No source data/archive, account mapping, candidate cache, qrels, predictions, model or Memory inspected.",
+    "No access.json, started.json, stdout/stderr, original old stop_observation, old result selection or old formal training ledger included in this input.",
+    "receive.json describes a distinct prior transfer and is not independently verified as a complete original archive by this review."
+  ],
+  "reviewer_mechanical_check_note": "An initial equality assertion between the two RSS collectors was rejected by the saved values; the review corrected that unwarranted equality assumption and retains both readings. No research operation was performed."
+}
