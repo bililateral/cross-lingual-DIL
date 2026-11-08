@@ -4,13 +4,17 @@
 
 ## Evolution后续接手任务
 
-本次季度路线已经结束，不再沿原队列继续C/D、重训或搜索其他候选池/时期/种子。原[科学方案](../reports/documentation/20261107/evolution_pilot/proposal.zh.md)、[双worker执行补充](../reports/documentation/20261107/evolution_pilot/execution/scope.zh.md)及[实际正式门](../reports/documentation/20261107/evolution_pilot/execution/formal_gate.json)作为已发生运行的合同保留：最多两路、每槽整PID14GiB/allocator13GiB、失败槽退出而健康槽继续领取、原48h累计分桶和双SEQ明显遗忘门均未事后改写。原A/B在科学前置门未通过时正常停止。
+用户已选择“Evolution已登记账号的增量文本检索”，要求保留完整H，先准备数据资格和有限预实验，训练保持关闭。从[本轮具体方案](../reports/documentation/20261108/evolution_registered/proposal.zh.md)和[一次资格结果](../reports/documentation/20261108/evolution_registered/qualification/report.zh.md)接手；实际进度只维护在交接唯一Evolution项。
 
-用户另批准的固定127候选开发诊断已执行并解释，仍未揭示共同明显遗忘；额外CPU/GPU核验及本次网页外审按用户明确决定免去。该诊断只复用原B六轨迹/54格和原dev、训练0/test关闭，未追加C/D。用户随后明确确认删除本次56个权重/起点、两端本轮新增文件以及唯一127原始分数/逐query指标；删除已经完成，范围和精确Git恢复入口见[存储记录](STORAGE.zh.md)，用户原话见[讨论记录](RESEARCH_DISCUSSION.zh.md)。原A/B非权重原件继续留Linux，诊断已提交源码/汇总/报告留Git历史；不能将已删权重或未入Git原始结果写成仍可复用。
+已获准的一次Linux CPU资格及“允许旧test作为新确认候选”补充已执行，未正式划分。旧fit/dev可用于开发；旧test与未使用账号可作为新确认候选，后者必须未参与旧训练/开发或效果选择。新任务同账号身份跨fit/gallery/query，文本与角色日期严格隔离；开发与确认账号仍互斥。旧test不是科学上永久不可用，使用前须保留已明确的用途转换和旧访问历史，不能以新合同重置已见结果。
 
-[固定数据](../reports/documentation/20261107/evolution_pilot/data_preparation/report.zh.md)、[原实现主审](../reports/documentation/20261107/evolution_pilot/implementation/review/primary_disposition.zh.md)、[单路GPU证据](../reports/documentation/20261107/evolution_pilot/gpu_single/report.zh.md)及[双路增量主审](../reports/documentation/20261107/evolution_pilot/execution/review/primary_disposition.zh.md)保留。后续若研究新的分域或历史账号库上的新文本检索，须先明确任务、账号/文本隔离、数据权限和新范围；旧开始许可、剩余预算或恢复源码均不自动授权计算。H消融继续等待明确恢复，动态状态只见交接唯一对应项。
+下一步先审阅具体方案：推荐96账号×3批×2 cohort、4/2/2角色、H1/V1固定迁移而不新增调参、五系统，先6条SEQ共同能力/遗忘门检，条件性9条机制开发及15条独立确认。成功同时要求旧初学、明显遗忘、Full最终旧能力/保持、新批正学习与稳定性；只高最终平均MAP或只H遗忘均不足。确认候选余量极小，正式构建若有必要排除不得自动借旧dev填确认。
 
-主张仍限同观察账号两份互斥文本的代理检索，不声称已验证真实跨账号同控。原VendorLink有效负结果、ABC前置门正常停止且无新候选训练权重、Evolution双SEQ未出现明显遗忘及全部既有费用保持；这不是完整H抗遗忘优势或英文能力上限的检验结论。首次完整文本观察日期、未来信息参与离线清洗、语言启发式、近重复近似、固定候选及统计功效边界继续保留，改写H数值行不得作为效果或选参依据。本次清理与文档维护仅本地提交，既有11月7日远端交付事实保持，不扩为新一轮推送许可。
+本轮不自动实施正式分区、语言样本阅读、训练评价实现或计算；30轨迹、具体数值门、最多双worker/14GiB、24累计任务小时均是待实质确认的建议。已发生资格辅助352秒须承接，不能重新清零。方案和实际资格材料完备后准备一个具体新包，核对外发许可并做必要定向审查；旧外审包或127诊断免审不覆盖新任务。后续实现只补角色/矩形评分/固定池判据的实际接线，复用未变H核心与已审紧凑保存，不扩成新通用框架或重复GPU资格。
+
+原季度路线仍结束，不续原C/D、不重训已删权重、不改门搜索顺序/种子/池规模。原[科学方案](../reports/documentation/20261107/evolution_pilot/proposal.zh.md)、[固定数据](../reports/documentation/20261107/evolution_pilot/data_preparation/report.zh.md)、[双路补充](../reports/documentation/20261107/evolution_pilot/execution/scope.zh.md)、[原实现主审](../reports/documentation/20261107/evolution_pilot/implementation/review/primary_disposition.zh.md)与[GPU证据](../reports/documentation/20261107/evolution_pilot/gpu_single/report.zh.md)是已发生事实的来源。A/B未揭示共同明显遗忘，127开发诊断同样没有；原VendorLink有效负结果、ABC前置门停止且无新候选训练权重、全部费用保持。已完成删除的对象和Git恢复界限见[存储记录](STORAGE.zh.md)，不可恢复的模型及127原始分数不冒称仍可复用。
+
+主张仍为同观察账号文本检索，不扩为真实跨账号同控。全局未来文本参与离线清洗、观察日非创建日、启发式语言和近重复近似边界保持，H演示改写行不得作效果/选参依据。中文H消融等候用户明确恢复，本轮不干预。按已有要求维护唯一交接、计划与决定记录，本地提交，不将旧批推送许可扩至新材料。
 
 ## 其他研究线的既有后续安排
 

@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-08 已登记账号资格缓存
+
+用户批准一次限定CPU资格，并补充允许旧test作为新确认候选。新私有缓存仅在Linux：`/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/qualification/private_custody/eligible.jsonl`，656账号/5248条角色候选记录，6250335字节，SHA256 `253f171e4ff387bc970a7793e7a2c4a0d14515580c89f028c276e891e755817c`，目录0700。它含真实身份与清洗文本，供未来获准构建复用，不是正式训练数据；不得进入Git、Windows或外审包。新开发/确认尚未实际分配，旧test没有训练或评价开封。
+
+Windows只收到15份聚合/身份载荷与一份清单，大小/SHA一致，实际用途和费用见[资格报告](../reports/documentation/20261108/evolution_registered/qualification/report.zh.md)、[回传核对](../reports/documentation/20261108/evolution_registered/qualification/receive.json)。回传完成后已删除本次两端qualification_upload.zip/qualification_evidence.zip临时传输副本，共4文件86874字节：Linux位于evolution_registered根，Windows位于该任务qualification目录；载荷与清单保留，私有缓存未动。新的evolution_registered_review.zip有待送审用途，未删。实际资格入口、五份原数据依赖及源身份仍有本轮主审/必要外审用途，暂保留；本轮不删除旧数据、原A/B非权重结果、共享模型或中文H资产。既有权重及127原始结果删除事实保持，下面记录不改。本次新缓存保管不重置项目大清理日期。
+
 ## 2026-11-08 Evolution权重及本轮新增文件定向删除
 
 用户在具体清单与不可恢复后果已呈现后，明确选择“按上述范围全部删除”，原话与保留边界见[讨论记录](RESEARCH_DISCUSSION.zh.md)。本次仅处理当前Evolution A/B和本轮三个提交新增材料，未改写Git历史；删除不改变原有效负结果、判据、访问事实或已发生费用。实验累计仍按原账training12926/gpu367/auxiliary1882秒（4h12m55，CPU59秒为子账）保留，本次为文件管理，无科研计算、载模或训练。
