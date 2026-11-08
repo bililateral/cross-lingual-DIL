@@ -1,0 +1,126 @@
+{
+  "at": "2026-11-08T16:15:47+0800",
+  "controller": {
+    "at": "2026-11-08T16:13:00+0800",
+    "pid": 1656486,
+    "owner": "yongpeng",
+    "created": 1794125580.3,
+    "command": [
+      "/home/yongpeng/miniconda3/envs/py310/bin/python",
+      "-B",
+      "-u",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace/scripts/step31_evolution_registered_control.py",
+      "--gate",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/formal_gate.json",
+      "--action",
+      "campaign"
+    ],
+    "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace",
+    "gate": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/formal_gate.json",
+      "bytes": 7389,
+      "sha256": "fdabcbc23d44666bbf67b18d7ea73fab4d4befb0d587cc58129f444e92e624a8"
+    },
+    "workers": 2,
+    "training_trajectories": 6,
+    "automatic_next_phase": false,
+    "budget_before_campaign": {
+      "training": 0,
+      "gpu": 0,
+      "auxiliary": 596
+    }
+  },
+  "status": "RUNNING",
+  "active": [
+    {
+      "slot": "0",
+      "task": "P_H_SEQ_H1_s31",
+      "pid": 1656491,
+      "owner": "yongpeng",
+      "created": 1794125581.47,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "-u",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace/scripts/step31_evolution_registered_control.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/formal_gate.json",
+        "--action",
+        "train",
+        "--target",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/campaign/training/P_H_SEQ_H1_s31",
+        "--deadline",
+        "1559396.477302824",
+        "--task",
+        "P_H_SEQ_H1_s31"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace",
+      "rss": 2102521856,
+      "elapsed_seconds": 165.8308560848236,
+      "updates": 212,
+      "stage": 1,
+      "epoch": 18,
+      "last_optimizer_updates": 1,
+      "gradient_norm": 2.1206881999969482
+    },
+    {
+      "slot": "1",
+      "task": "P_V_SEQ_V1_s31",
+      "pid": 1656492,
+      "owner": "yongpeng",
+      "created": 1794125581.48,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "-u",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace/scripts/step31_evolution_registered_control.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/formal_gate.json",
+        "--action",
+        "train",
+        "--target",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/campaign/training/P_V_SEQ_V1_s31",
+        "--deadline",
+        "1559396.482579443",
+        "--task",
+        "P_V_SEQ_V1_s31"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace",
+      "rss": 1749147648,
+      "elapsed_seconds": 165.82444739341736,
+      "updates": 424,
+      "stage": 1,
+      "epoch": 36,
+      "last_optimizer_updates": 1,
+      "gradient_norm": 6.049062252044678
+    }
+  ],
+  "pending": 4,
+  "failures": [],
+  "completed": 0,
+  "settled_budget": {
+    "used_seconds": {
+      "training": 0,
+      "gpu": 0,
+      "auxiliary": 627
+    },
+    "caps": {
+      "training": 10800,
+      "gpu": 3600,
+      "auxiliary": 3600
+    },
+    "cpu_test_seconds": 20,
+    "conservative_tail_seconds": 30,
+    "events": [
+      {
+        "operation": "prepare_registered_campaign",
+        "bucket": "auxiliary",
+        "actual_seconds": 0.0009527869988232851,
+        "charged_seconds": 1,
+        "success": true
+      }
+    ]
+  },
+  "gpu_processes": "1656492, 12552 MiB\n1656491, 8022 MiB\n",
+  "evaluation_label_attempt": false
+}

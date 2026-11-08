@@ -1,6 +1,6 @@
 # Registered六轨迹实现与必要增量证据
 
-2026-11-08。承接[用户许可](authorization.json)和[具体执行范围](scope.zh.md)。本轮已实现双路P六条、冻结扩库评分与一次全批开标；正式数据构建、载模训练、评分尚未执行，等待这次具体实现增量的外审及主审闭合。无需再次申请六条/双路/14GiB的普通执行许可；新包外发仍按具体包许可。
+2026-11-08。承接[用户许可](authorization.json)和[具体执行范围](scope.zh.md)。本轮已实现双路P六条、冻结扩库评分与一次全批开标；原外审R01/R02两项已按用户指令修复并[主审闭合](review/primary_disposition.zh.md)。[开发数据及固定语言门](data_report.zh.md)已通过，16:13正式启动双路，实际来源见formal_gate.json、启动见launch.json。下列CPU01—03及549/17等为审前原始时点，不冒称当前费用；修后CPU04及新增费用见下节。
 
 ## 实际接线
 
@@ -30,3 +30,9 @@
 15:29:41只读现场见observation.json：中文H仍PAUSED_IDLE，7完成、0活动、56待派；监管1412412的属主/创建时刻/命令/cwd匹配原身份。GPU无计算进程，来源资格缓存已核对大小/SHA。此为时点观察，正式启动前须复查，不动中文暂停状态或未开放效果。
 
 Linux独立目录为`/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/`，workspace/scripts保留实际来源。38份必要小证据及清单已经SCP回传并逐项核对，CPU02/03的16份当时源码与Windows匹配；最终入口来源另见entry_sources。真实资格缓存仍只在Linux；本轮没有打开96条正式语言正文、确认文本或旧qrels。手写CPU权重/评分不进入审查包；必要原始证据和精确失败来源保留，临时载荷在审查与诊断完成后按既有纪律收尾。
+
+## 审后两处修复与正式入口
+
+用户指令修复后，gpu_admission直接调用原configure_gpu，恢复确定性、TF32关闭和两线程设置；campaign失败回执不再固定声明effects_open=false，访问尝试原件保留。Linux CPU04定向核验2.1762秒、计3秒，配置实际变化和手写qrels读取前/后失败均PASS，CUDA未初始化；不重跑CPU02/03或追加GPU探针。累计CPU20/180秒，修复后辅助582秒；数据/语言/来源与准入后正式启动前辅助596秒，运行账继续累计且活动任务未结算费用不能当0。
+
+修后14份生产源实际身份见repair_sources.json，正式门已绑定新control及主审处置；旧entry_sources和原审查包保持原字节。真实数据288开发账号/2304记录，语言32/32、32/32、31/32达门；96条正文与逐条判定仅Linux。16:15:47 start_observation显示两个实际PID身份匹配、H212/V424次更新、0失败/4待派、评价标签访问尚未发生。这是启动观测，不是效果结论或当前实时状态，后续以实际campaign为准。

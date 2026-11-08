@@ -1,0 +1,159 @@
+{
+  "cpu02_sources.json": {
+    "count": 15,
+    "matched": [
+      "scripts/step30_evolution_policy.py",
+      "scripts/step31_evolution_registered_evaluate.py",
+      "scripts/step28_formal_queue.py",
+      "scripts/step29_vendorlink_methods.py",
+      "scripts/step29_vendorlink_run.py",
+      "scripts/step31_evolution_registered_policy.py",
+      "scripts/step30_evolution_control.py",
+      "scripts/step31_evolution_registered_data.py",
+      "scripts/step30_evolution_io.py",
+      "scripts/step30_evolution_evaluate.py",
+      "scripts/step29_vendorlink_data.py",
+      "scripts/step30_evolution_run.py",
+      "scripts/step30_evolution_data.py",
+      "tests/step31_registered_increment.py"
+    ],
+    "historical_different": [
+      {
+        "path": "scripts/step31_evolution_registered_control.py",
+        "recorded_sha256": "5c1d28741e87b3f13e2efffec692278dd34161fa05a468525529321a91744adf",
+        "current_sha256": "b2ce445a68fa15ee63cd6eb6e8ea877a7214505ae6011ee506aa3c8316021613"
+      }
+    ],
+    "missing": []
+  },
+  "cpu03_sources.json": {
+    "count": 16,
+    "matched": [
+      "scripts/step30_evolution_policy.py",
+      "scripts/step31_evolution_registered_evaluate.py",
+      "scripts/step28_formal_queue.py",
+      "scripts/step29_vendorlink_methods.py",
+      "scripts/step29_vendorlink_run.py",
+      "scripts/step31_evolution_registered_policy.py",
+      "scripts/step30_evolution_control.py",
+      "scripts/step31_evolution_registered_data.py",
+      "scripts/step30_evolution_io.py",
+      "scripts/step30_evolution_evaluate.py",
+      "scripts/step29_vendorlink_data.py",
+      "scripts/step30_evolution_run.py",
+      "scripts/step30_evolution_data.py",
+      "tests/step31_registered_increment.py",
+      "tests/step31_registered_scoring_entry.py"
+    ],
+    "historical_different": [
+      {
+        "path": "scripts/step31_evolution_registered_control.py",
+        "recorded_sha256": "5c1d28741e87b3f13e2efffec692278dd34161fa05a468525529321a91744adf",
+        "current_sha256": "b2ce445a68fa15ee63cd6eb6e8ea877a7214505ae6011ee506aa3c8316021613"
+      }
+    ],
+    "missing": []
+  },
+  "entry_sources.json": {
+    "count": 14,
+    "match_count": 14,
+    "differences": []
+  },
+  "final_sources.json": {
+    "count": 16,
+    "match_count": 15,
+    "differences": [
+      {
+        "path": "scripts/step31_evolution_registered_control.py",
+        "available": true,
+        "match": false
+      }
+    ]
+  },
+  "deployment_manifest.json": {
+    "count": 17,
+    "match_count": 14,
+    "differences": [
+      {
+        "path": "scripts/step31_evolution_registered_evaluate.py",
+        "available": true,
+        "match": false
+      },
+      {
+        "path": "scripts/step31_evolution_registered_control.py",
+        "available": true,
+        "match": false
+      },
+      {
+        "path": "tests/step31_registered_increment.py",
+        "available": true,
+        "match": false
+      }
+    ]
+  },
+  "late_control_delta": {
+    "reconstructed_bytes": 11911,
+    "reconstructed_sha256": "5c1d28741e87b3f13e2efffec692278dd34161fa05a468525529321a91744adf",
+    "matches_cpu02_cpu03_recorded_source": true,
+    "removed_text": [
+      "    if preparation['cpu_test_seconds'] > LIMITS['cpu_test_seconds']:\n        raise ValueError('The new CPU increment budget is exhausted')\n",
+      "        process = psutil.Process()\n        process.cpu_affinity(process.cpu_affinity()[:2])\n"
+    ]
+  },
+  "initial_V_delta": {
+    "reconstructed_bytes": 10218,
+    "reconstructed_sha256": "887ec499d8f364946bb52c29c45becee6d4303669800cd371743a26243b662ee",
+    "matches_initial_deployment": true
+  },
+  "cpu01_fixture_delta": {
+    "reconstructed_bytes": 9364,
+    "reconstructed_sha256": "51c78df7494258929c880f417f88d4b95080a114b88f732c0027ab8139c2cc39",
+    "matches_preserved_cpu01": true
+  },
+  "evidence_manifest": {
+    "count": 38,
+    "all_match": true
+  },
+  "shared_diff_verification": [
+    {
+      "path": "scripts/step30_evolution_control.py",
+      "hunks": 4,
+      "all_context_matches_current": true,
+      "current_git_blob": "36ec371171bd224d3ee461f92ee39074f649c78e",
+      "current_diff_index": "36ec3711",
+      "current_index_matches": true,
+      "reconstructed_old_git_blob": "8a5eac97d3a6ab1ab89914b5c5cab70ceff77ec0",
+      "old_diff_index": "8a5eac97",
+      "old_index_matches": true,
+      "current_sha256": "c4974a3f3659d4bb0854710d30ff66cef299ef2f556f7dcab21efdc04384d4d7",
+      "reconstructed_old_sha256": "343221fed524d5a15a2a4d51678107fbfdd14bfae464c8d5f2cb6a59f8fe7c40"
+    },
+    {
+      "path": "scripts/step30_evolution_io.py",
+      "hunks": 3,
+      "all_context_matches_current": true,
+      "current_git_blob": "e6f6c97566df91de6afa70608d87641de63c2606",
+      "current_diff_index": "e6f6c975",
+      "current_index_matches": true,
+      "reconstructed_old_git_blob": "a8c27d6a357d25eca59e193dfab9709effe3ec99",
+      "old_diff_index": "a8c27d6a",
+      "old_index_matches": true,
+      "current_sha256": "a0f08e5e5e8f4152fc291e39e9f68d0b693820d7ff0aa9ae81a66758410b4918",
+      "reconstructed_old_sha256": "c4c9571622b8051417f1e36f4012f07e95cf61076891165cff50dfb2047210e0"
+    },
+    {
+      "path": "scripts/step30_evolution_run.py",
+      "hunks": 6,
+      "all_context_matches_current": true,
+      "current_git_blob": "ff3cba3be2e0bd7fd42ab6a66608f208a358ee81",
+      "current_diff_index": "ff3cba3b",
+      "current_index_matches": true,
+      "reconstructed_old_git_blob": "e979eab66d41bcb4a2b0f8e0df4560076dc82e96",
+      "old_diff_index": "e979eab6",
+      "old_index_matches": true,
+      "current_sha256": "384c7c2641a523ea660ab6ccf884d1bbf216d9561a1268ff575ef7b2e8c987dc",
+      "reconstructed_old_sha256": "bd4c7aa1b05ff3e35df255a2dd4e1bad6f0dabca72644b65cb66764bdbc3f7fb"
+    }
+  ],
+  "boundary": "Text/hash correspondence only; reconstructed historical text was not executed and remote history/assets were not independently accessed."
+}

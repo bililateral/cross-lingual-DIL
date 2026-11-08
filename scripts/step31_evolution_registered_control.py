@@ -13,7 +13,7 @@ import time
 import psutil
 
 from step30_evolution_io import (PYTHON, Budget, Ledger, access, pinned, read, record, verify, write)
-from step30_evolution_control import Runner
+from step30_evolution_control import Runner, configure_gpu
 from step31_evolution_registered_policy import PROTOCOL, DOMAINS, CAPS, LIMITS, tasks, identity
 
 SOURCES = ('step31_evolution_registered_policy.py', 'step31_evolution_registered_data.py',
@@ -66,8 +66,7 @@ def gpu_admission():
     import torch
     if not torch.cuda.is_available():
         raise ValueError('CUDA is required for formal training/scoring')
-    total = torch.cuda.get_device_properties(0).total_memory
-    torch.cuda.set_per_process_memory_fraction(LIMITS['allocator_bytes']/total, 0)
+    configure_gpu()
 
 
 def worker(gate, args):
@@ -180,7 +179,7 @@ def campaign(gate, gate_path):
               automatic_next_phase=False, training_trajectories=6, scoring_trajectories=6))
     except BaseException as exc:
         write(root/'failure.json', dict(error=repr(exc), automatic_retry=False,
-                                       effects_open=False, automatic_next_phase=False))
+                                       automatic_next_phase=False))
         raise
     finally:
         ledger.save()

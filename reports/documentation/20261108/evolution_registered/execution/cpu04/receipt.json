@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "gpu_flags": {
+    "deterministic": true,
+    "matmul_tf32": false,
+    "cudnn_tf32": false,
+    "threads": 2,
+    "interop_threads": 2
+  },
+  "allocator_fraction": 0.40625,
+  "cuda_initialized": false,
+  "failure_cases": [
+    {
+      "case": "before_labels",
+      "failure": {
+        "error": "RuntimeError('injected before labels')",
+        "automatic_retry": false,
+        "automatic_next_phase": false
+      },
+      "handwritten_label_access_recorded": false
+    },
+    {
+      "case": "after_labels",
+      "failure": {
+        "error": "TimeoutError('injected after handwritten qrels read')",
+        "automatic_retry": false,
+        "automatic_next_phase": false
+      },
+      "handwritten_label_access_recorded": true
+    }
+  ],
+  "sources": [
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace/scripts/step31_evolution_registered_control.py",
+      "bytes": 12013,
+      "sha256": "75456cde5e71cc27272a5c914296d17f4b8a30bda004c638513880e2089f53bc"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace/tests/step31_registered_entry_fixes.py",
+      "bytes": 4737,
+      "sha256": "d95e92fd28c32023830f15d0dc55dbc6591d9ee6ff0696f0fd5089650bcea7be"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/execution/workspace/scripts/step30_evolution_control.py",
+      "bytes": 29554,
+      "sha256": "c4974a3f3659d4bb0854710d30ff66cef299ef2f556f7dcab21efdc04384d4d7"
+    }
+  ],
+  "scope": "Real configuration and campaign exception path; CUDA calls and child jobs stubbed; no GPU, real labels or training"
+}

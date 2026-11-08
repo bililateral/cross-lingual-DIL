@@ -1,5 +1,8 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-08：修复已审入口遗漏后直接开训
+
+用户引用网页外审确认的新GPU入口漏接确定性/TF32设置、campaign失败误写effects_open=false两项，明确要求“修改”；随后明确：“通过了就直接开始训练吧，外审没发现别的问题。”修复限于调用原GPU配置及删除不实失败断言，不新增科学选择、核验范围或预算。实际Linux CPU04定向核验通过，3秒计入原180秒子帽；外审完整回收、[主审闭合](../reports/documentation/20261108/evolution_registered/execution/review/primary_disposition.zh.md)后，依原许可完成一次数据构建和96条语言判断，于16:13启动既定双路六条。未重问开训，未新增Full/ER、HPO、确认或后续自动阶段，中文消融暂停保持。
 ## 2026-11-08：接受有限前提实验，双路执行及开发语言访问
 
 用户在193091字节、74载荷、SHA256为97a3027f31321871dc1fb75c9ad01c89bf6d8452b843a7a57499aac2755eba41的具体实现包及排除范围呈现后答复：“允许发送该具体实现包”。许可只覆盖本次Playwright至chatgpt.com审查；已有六条/双路/数据授权不重复申请。[外发许可与实际提交](../reports/documentation/20261108/evolution_registered/execution/review/submission.json)已记录，未据上传本身跳过主审或数据语言条件。

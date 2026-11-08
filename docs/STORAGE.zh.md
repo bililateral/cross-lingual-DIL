@@ -2,12 +2,15 @@
 
 ## 2026-11-08 Registered有限前提实现来源与核验
 
-新实现隔离部署于Linux `reports/documentation/20261108/evolution_registered/execution/workspace/`，未覆盖旧活动workspace。Windows仅保存源码、手写CPU日志/回执和来源清单；当前没有正式开发数据或新训练模型。真实资格缓存仍按下节保管，用户已批准的后续288开发账号和96条语言文本也只留Linux，不入Git或外审包。
+新实现隔离部署于Linux `reports/documentation/20261108/evolution_registered/execution/workspace/`，未覆盖旧活动workspace。Windows仅保存源码、手写CPU日志/回执和来源清单；正式开发数据及新训练权重只留Linux。真实资格缓存仍按下节保管，用户已批准的后续288开发账号和96条语言文本也只留Linux，不入Git或外审包。
 
 CPU01失败、修复后CPU02及实际评分入口CPU03的来源、费用和证据见[实现记录](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)。初稿的精确来源由execution/deployment.zip及清单保留；CPU02/03来源清单和最终entry_sources各自保留，不能用新版本冒接旧执行。38份小证据及4份入口证据已按传输ZIP和逐文件大小/SHA核对；对应ZIP、一次性核验源码及Linux Tiny载荷目前仍有本轮实现审查用途，暂保留，审查闭合后按实际用途收尾。未删除本轮证据、旧数据、共享模型或中文H资产；不重置大清理周期。
+本次审后已建Linux execution/dataset：288开发账号/2304记录、288确认身份预留、固定96条语言判定及私有qrels；正文/身份/逐条判定不回传。Windows仅保留同字节data_manifest.json、language_receipt.json和启动/源/资源元数据；12载荷按start_manifest逐项核对。实际campaign权重/训练访问及后续盲分数依赖仅在Linux，当前活动，禁止清理。
+
+实现外审返回7成员/36947字节已核对，原文、结构化发现和来源对应保留execution/review/external；仅删除同SHA的.playwright-mcp/evolution-registered-implementation-independent-review-20261108.zip浏览器重复件（1文件36947字节），正式返回仍保留用于本轮结果主审。审后CPU04与全部来源和费用原件保留；没有删除活动资产或改变大清理周期。
 ## 2026-11-08 已登记账号资格缓存
 
-用户批准一次限定CPU资格，并补充允许旧test作为新确认候选。新私有缓存仅在Linux：`/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/qualification/private_custody/eligible.jsonl`，656账号/5248条角色候选记录，6250335字节，SHA256 `253f171e4ff387bc970a7793e7a2c4a0d14515580c89f028c276e891e755817c`，目录0700。它含真实身份与清洗文本，供未来获准构建复用，不是正式训练数据；不得进入Git、Windows或外审包。新开发/确认尚未实际分配，旧test没有训练或评价开封。
+用户批准一次限定CPU资格，并补充允许旧test作为新确认候选。新私有缓存仅在Linux：`/home/yongpeng/cross-lingual/reports/documentation/20261108/evolution_registered/qualification/private_custody/eligible.jsonl`，656账号/5248条角色候选记录，6250335字节，SHA256 `253f171e4ff387bc970a7793e7a2c4a0d14515580c89f028c276e891e755817c`，目录0700。它含真实身份与清洗文本，供未来获准构建复用，不是正式训练数据；不得进入Git、Windows或外审包。资格时尚未分配；随后已按批准范围固定保留确认身份并导出开发，见[实际数据交付](../reports/documentation/20261108/evolution_registered/execution/data_report.zh.md)。旧test没有训练或评价开封。
 
 Windows只收到15份聚合/身份载荷与一份清单，大小/SHA一致，实际用途和费用见[资格报告](../reports/documentation/20261108/evolution_registered/qualification/report.zh.md)、[回传核对](../reports/documentation/20261108/evolution_registered/qualification/receive.json)。回传完成后已删除本次两端qualification_upload.zip/qualification_evidence.zip临时传输副本，共4文件86874字节：Linux位于evolution_registered根，Windows位于该任务qualification目录；载荷与清单保留，私有缓存未动。新的evolution_registered_review.zip及完整返回包/载荷已回收核验，仍用于后续合同与实际实现对照，保留；另已核对同SHA并删除.playwright-mcp/evolution-registered-review-return.zip这份30394字节的浏览器重复下载，正式返回原件保留。实际资格入口、五份原数据依赖及源身份仍有本轮主审/必要外审用途，暂保留；本轮不删除旧数据、原A/B非权重结果、共享模型或中文H资产。既有权重及127原始结果删除事实保持，下面记录不改。本次新缓存保管不重置项目大清理日期。
 

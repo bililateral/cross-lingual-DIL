@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-08",
+  "reviewer_self_identification": "GPT-6 Astra Pro; UI selector/backend model not independently verified",
+  "input": {
+    "filename": "evolution_registered_implementation_review.zip",
+    "bytes": 193091,
+    "sha256": "97a3027f31321871dc1fb75c9ad01c89bf6d8452b843a7a57499aac2755eba41",
+    "members": 75,
+    "payloads": 74,
+    "integrity": "PASS_ALL_PAYLOAD_SIZES_AND_SHA256"
+  },
+  "verdict": "CHANGES_REQUIRED_REPRODUCIBILITY_ONLY",
+  "counts": {
+    "SCIENTIFIC_BLOCKER": 0,
+    "REPRODUCIBILITY_DEFECT": 2,
+    "NONBLOCKING": 3,
+    "OUT_OF_SCOPE_OVERDESIGN": 1
+  },
+  "scientific_conclusion": "未确认新增科研阻断；没有正式数据或效果证据，不评价H抗遗忘效果。",
+  "authorization": "本审不授予或执行正式运行；修复与主审关闭后仍须满足既有现场条件。",
+  "actions_performed": [
+    "附件解包",
+    "ZIP及载荷大小/SHA256/CRC与成员检查",
+    "JSON/源码文本静态阅读",
+    "源码文本逆向重建及哈希对应",
+    "已保存计数的简单算术"
+  ],
+  "actions_not_performed": [
+    "执行或导入项目模块/测试",
+    "真实数据构建或语言正文判断",
+    "载模/GPU/训练/评分",
+    "指标重算或统计重采样",
+    "读取包外私有数据或连接项目Linux",
+    "修改输入源码或gate"
+  ],
+  "findings": [
+    {
+      "id": "EVREG-I-R01",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "required_before_formal_entry": true,
+      "status": "CONFIRMED_STATIC",
+      "title": "新GPU入口遗漏原确定性与TF32关闭配置",
+      "locations": [
+        {
+          "path": "scripts/step31_evolution_registered_control.py",
+          "lines": [
+            65,
+            70
+          ],
+          "symbol": "gpu_admission"
+        },
+        {
+          "path": "scripts/step31_evolution_registered_control.py",
+          "lines": [
+            86,
+            91
+          ],
+          "symbol": "worker"
+        },
+        {
+          "path": "scripts/step30_evolution_control.py",
+          "lines": [
+            403,
+            411
+          ],
+          "symbol": "configure_gpu"
+        },
+        {
+          "path": "scripts/step30_evolution_control.py",
+          "lines": [
+            429,
+            440
+          ],
+          "symbol": "old worker"
+        },
+        {
+          "path": "scripts/step30_evolution_control.py",
+          "lines": [
+            238,
+            240
+          ],
+          "symbol": "Runner environment"
+        },
+        {
+          "path": "reports/documentation/20261108/evolution_registered/execution/scope.zh.md",
+          "lines": [
+            19,
+            19
+          ]
+        },
+        {
+          "path": "reports/documentation/20261108/evolution_registered/proposal.zh.md",
+          "lines": [
+            94,
+            94
+          ]
+        }
+      ],
+      "observation": "原train/score实际调用configure_gpu，设置Torch线程、interop、确定性算法及两TF32=False。新train/score只调用包含CUDA检查和allocator的gpu_admission，未调用其余设置。",
+      "counterexample": "进入配置时若确定性未启用或TF32允许，新入口保持该状态，旧入口明确修正；不需任何模型输出即可由setter调用缺失证明两个入口约束不同。",
+      "impact": "当前源码不能保证沿用已审数值执行条件；不意味着已发生非确定输出、TF32计算或指标失真。",
+      "minimal_fix": "保留CUDA可用性检查，载模前直接调用已存在的step30_evolution_control.configure_gpu；训练与评分复用同一路径。更新最终来源绑定。",
+      "minimal_closure_evidence": "定向源码/调用链和来源核对；若主审需运行证据，仅现有CPU预算内极小替身核查调用顺序，不需GPU、BERT或全量CPU02/03。",
+      "not_required": [
+        "更改H/V公式",
+        "新确定性框架",
+        "重跑旧GPU资格",
+        "新训练",
+        "改变科学门"
+      ]
+    },
+    {
+      "id": "EVREG-I-R02",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "required_before_formal_entry": true,
+      "status": "CONFIRMED_STATIC",
+      "title": "开标后的失败仍被错误声明为effects_open=False",
+      "locations": [
+        {
+          "path": "scripts/step31_evolution_registered_control.py",
+          "lines": [
+            117,
+            124
+          ],
+          "symbol": "worker analyze and final check"
+        },
+        {
+          "path": "scripts/step31_evolution_registered_control.py",
+          "lines": [
+            175,
+            183
+          ],
+          "symbol": "campaign exception"
+        },
+        {
+          "path": "scripts/step31_evolution_registered_evaluate.py",
+          "lines": [
+            182,
+            195
+          ],
+          "symbol": "analyze"
+        },
+        {
+          "path": "scripts/step30_evolution_io.py",
+          "lines": [
+            74,
+            79
+          ],
+          "symbol": "access"
+        },
+        {
+          "path": "scripts/step30_evolution_control.py",
+          "lines": [
+            398,
+            400
+          ],
+          "symbol": "old failure receipt"
+        }
+      ],
+      "observation": "analyze先留开标尝试、读qrels、保存逐任务指标并check；campaign捕获任何异常均固定effects_open=False。",
+      "counterexample": "六训练90格齐全后，analyze读完qrels并保存首份metrics，随后check超时；父campaign失败文件仍写未开放。完整result保存后worker最后check失败也可触发。",
+      "impact": "失败留证混淆下游关闭与尚未开标/产出指标。并非训练或评分缺项时提前开标；现有一次性access门仍有效。",
+      "minimal_fix": "删除固定effects_open=False，改为downstream_closed=True并保留禁止重试/后续字段；可按access回执存在记录label_access_attempted。若不能判断真实effects_open，用unknown/null。",
+      "state_semantics": "access在首次打开qrels前留ATTEMPT，因此回执存在不证明全部qrels已读或人已见效果，不应直接换成effects_open=True。",
+      "minimal_closure_evidence": "字段删除/替换的静态差异；如新增状态逻辑，用一次手写失败分支例即可，无需重建90矩阵、真实标签或GPU。",
+      "not_required": [
+        "事务发布平台",
+        "通用状态机",
+        "删除已读回执或部分指标",
+        "自动重试"
+      ]
+    },
+    {
+      "id": "EVREG-I-N01",
+      "classification": "NONBLOCKING",
+      "required_before_formal_entry": false,
+      "status": "OPTIONAL_REPORTING_IMPROVEMENT",
+      "title": "冻结差值摘要可显式扩展到全部十指标",
+      "locations": [
+        {
+          "path": "scripts/step31_evolution_registered_policy.py",
+          "lines": [
+            57,
+            65
+          ]
+        },
+        {
+          "path": "scripts/step31_evolution_registered_evaluate.py",
+          "lines": [
+            188,
+            191
+          ]
+        }
+      ],
+      "observation": "冻结差和三seed均值摘要仅MAP；全部90格十指标及逐query值已经保存，没有指标载荷缺失。",
+      "minimal_fix": "可对METRICS循环输出同样固定的成对差和均值，并标明(t,d,p)。",
+      "boundary": "报告便利性，不改P门、不增加评分/标签访问/统计重采样，不以此阻断开训。"
+    },
+    {
+      "id": "EVREG-I-N02",
+      "classification": "NONBLOCKING",
+      "required_before_formal_entry": false,
+      "status": "OPTIONAL_CONSUMER_BINDING_CHECK",
+      "title": "分析端可复核已保存endpoint_identity",
+      "locations": [
+        {
+          "path": "scripts/step31_evolution_registered_evaluate.py",
+          "lines": [
+            105,
+            107
+          ]
+        },
+        {
+          "path": "scripts/step31_evolution_registered_evaluate.py",
+          "lines": [
+            162,
+            175
+          ]
+        }
+      ],
+      "observation": "评分记录endpoint_identity，分析显式比task/manifest，未再次比较该字段。",
+      "counterexample": "需外部重接/改写receipt后，来自同task同manifest但不同训练身份的评分可过这一处核验；正常campaign的精确目标、restore身份检查和SHA链没有证明存在该错误。",
+      "minimal_fix": "可与validate_training(batch)对应完成身份增加一次相等检查。",
+      "boundary": "不是已证实正常管线错端点；不要求重新评分或一般签名框架。"
+    },
+    {
+      "id": "EVREG-I-N03",
+      "classification": "NONBLOCKING",
+      "required_before_formal_entry": false,
+      "status": "OPTIONAL_LANGUAGE_PROVENANCE",
+      "title": "语言判定原件可增加来源绑定",
+      "locations": [
+        {
+          "path": "scripts/step31_evolution_registered_data.py",
+          "lines": [
+            115,
+            133
+          ]
+        },
+        {
+          "path": "scripts/step31_evolution_registered_control.py",
+          "lines": [
+            230,
+            231
+          ]
+        }
+      ],
+      "observation": "receipt保存聚合计数与样本/manifest绑定，未记录传入decision文件大小/SHA；scope本已要求原判定留Linux，尚未执行，不能推定原件丢失。",
+      "minimal_fix": "保留原decision文件并可将其绑定写入receipt。",
+      "boundary": "不重新抽样或重判，不扩大正文返回范围，不升级为当前阻断。"
+    },
+    {
+      "id": "EVREG-I-O01",
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "required_before_formal_entry": false,
+      "status": "EXCLUDED",
+      "title": "不把本轮小修扩大为新科学或通用资格工程",
+      "excluded_actions": [
+        "重做清洗/容量资格",
+        "索取确认正文、旧qrels、模型或Memory",
+        "新增方法/seed/HPO/预算/M/C",
+        "改遗忘门、epoch、学习率或候选池寻找有利结果",
+        "追加通用GPU或双路完整资格",
+        "建立通用恢复/锁/事务框架",
+        "因为CPU03合成元数据要求先正式训练再审",
+        "因为两处最终守卫要求CPU02/03全量回归"
+      ]
+    }
+  ],
+  "evidence_boundaries": [
+    "CPU01真实失败、更新0、计3秒；不是V已验证。",
+    "CPU02生产execute的Tiny每族3次更新和真实run_many CPU子进程；其局部V学习率4e-5，非完整正式V1复演。",
+    "CPU03真实score_one/analyze，训练完成元数据为合成；正式训练更新证明为0。",
+    "entry测试在permit拒绝，未触达最后CPU帽/亲和性或GPU配置成功路径。",
+    "旧GPU报告可复用有限工程证据，不证明本轮真实数据、双路全程或14GiB采样之外峰值。",
+    "新dev/确认私有载荷未提供，真实构建与语言门尚未执行。"
+  ],
+  "current_budget": {
+    "training_seconds": 0,
+    "gpu_seconds": 0,
+    "auxiliary_seconds": 549,
+    "cpu_test_subset_seconds": 17,
+    "cpu_test_cap_seconds": 180,
+    "auxiliary_cap_seconds": 3600,
+    "ledger_additional_tail_seconds": 30,
+    "historical_snapshot": {
+      "auxiliary_seconds": 548,
+      "cpu_test_subset_seconds": 16
+    }
+  },
+  "primary_closure": [
+    "修复R01并绑定实际来源",
+    "修复R02并保留访问/失败/费用证据",
+    "主执行者独立定向关闭；必要小CPU证据计入原子帽",
+    "实际用账承接549/17和后续费用；再满足既有数据/语言/来源/模型/资源/中文暂停条件"
+  ]
+}

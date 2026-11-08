@@ -1,0 +1,273 @@
+# Evolution Registered 六轨迹实际实现增量独立审查报告
+
+日期：2026-11-08（Asia/Shanghai）
+审查者自述：GPT-6 Astra Pro。无法独立核验用户界面选择器或后台路由型号，不作更强身份声明。
+输入：evolution_registered_implementation_review.zip
+审查方式：附件解包、逐成员大小/SHA256、JSON/文本及源码静态追踪、已保存计数的简单算术。没有导入或执行项目模块、测试、模型、训练、统计重算或重采样；没有连接项目Linux/GPU、读取包外私有路径或打开真实文本、标签、模型、Memory、缓存。
+本报告不修改输入包，不形成正式gate，不代用户或主执行者授权/启动执行。
+
+## 一、结论先行
+
+当前原字节不宜直接判为“实现增量全部闭合”。发现两项需要在正式训练/评分入口前关闭的 REPRODUCIBILITY_DEFECT：
+
+- EVREG-I-R01：新GPU入口漏接原来实际执行的确定性算法、TF32关闭等运行配置。最小修复是复用已经存在的 configure_gpu()。
+- EVREG-I-R02：campaign异常分支一律写 effects_open=False；分析已经开标并保存部分乃至全部指标后再失败，也会写成“未开放”。最小修复是改为准确的“下游关闭”，必要时单列开标尝试状态。
+
+没有确认 SCIENTIFIC_BLOCKER：未发现本轮实际数据划分、H/V矩形公式、冻结θ1双侧编码、P阈值、固定/增长候选池或标签前置完整门有改变研究问题的错误。两项必修属于明确的入口复现及失败留证缺陷，不支持“已经产生错误正式结果”或“真实标签已经违规开放”的断言。
+
+主体增量可以保留：六条H_SEQ/V_SEQ、E1/E2/E3、12群×40epoch×3阶段、8640计划当前更新、18个紧凑阶段模型、每轨迹15格/总90格、一次完整新dev开标、原P门、不自动进入M/C，以及3h训练/1h评分/1h辅助与双槽失败隔离，都有实际接线。当前仍未执行真实构建、96条语言判断或正式训练。
+
+两项修复均可由主执行者在现有范围内定向修正并独立关闭。无需重开研究方向、改变方法/种子/阈值、重跑旧资格、追加GPU探针，亦无需为最后两处无关守卫全量重跑CPU02/03。修复闭合后的现场数据、语言、来源、模型、预算与资源核对继续按原条件执行；本报告本身不完成这些现场步骤。
+
+## 二、输入身份及来源对应
+
+### 2.1 实际核包
+
+外层实际大小：193091字节。
+外层实际SHA256：97a3027f31321871dc1fb75c9ad01c89bf6d8452b843a7a57499aac2755eba41。
+ZIP成员数：75；package_manifest.json列74份载荷，清单自身另计。
+74份载荷的实际解压字节数与SHA256均逐项等于清单。缺失0、未列载荷0、重复成员名0、不安全路径0；ZIP CRC检查无错误。
+详见 input_verification.json 与 input_members.zh.txt。清单自身没有自校验条目，其实际大小/SHA单列，不能声称它被自身清单验证。
+
+### 2.2 CPU与最终源码没有被混接
+
+直接依据：execution/cpu02_sources.json、cpu03_sources.json、final_sources.json、entry_sources.json、deployment_manifest.json、evidence_manifest.json，以及包内实际源码。
+
+- entry_sources列14份生产文件，14/14大小和SHA与包内当前文件一致。
+- CPU02列15份来源，14份与当前一致；CPU03列16份，15份与当前一致。两者唯一差异都是step31 control。
+- 当前control为12142字节、SHA b2ce445a68fa15ee63cd6eb6e8ea877a7214505ae6011ee506aa3c8316021613。仅从文本移除CPU180秒子帽两行和build/language亲和性两行，得到11911字节、SHA 5c1d28741e87b3f13e2efffec692278dd34161fa05a468525529321a91744adf，精确匹配CPU02/03历史来源。这里只做文本/哈希重建，没有执行这个历史源码。
+- 当前evaluate移除逐记录零范数检查和normalize三行，精确恢复初稿10218字节、SHA 887ec499d8f364946bb52c29c45becee6d4303669800cd371743a26243b662ee。故作者所述V修复时间线能够由字节对应支持；当前已修V不能冒接为CPU01已通过。
+- 当前Tiny夹具去掉hidden_states表达式中的“(z,)+”，与保存的cpu01_source.py逐字节相同：9364字节、SHA 51c78df7494258929c880f417f88d4b95080a114b88f732c0027ab8139c2cc39。
+- evidence_manifest所列38份小证据全部匹配。
+- shared_changes.diff的三文件所有hunk都与当前文本吻合。文本逆向重建的旧/新Git blob分别匹配diff中8a5eac97/36ec3711、a8c27d6a/e6f6c975、e979eab6/ff3cba3b。支持该diff确为当前三份共享源码的完整指定增量；不等同于独立认证远端Git历史。
+- 这些核对证明“本包内容与保存来源记录对应”。本包不含远端权重、真实缓存、全部GPU日志；没有据此重新认证它们的现场真实性。
+
+## 三、两项开正式入口前必须关闭的复现缺陷
+
+### EVREG-I-R01：新GPU入口漏接原数值执行配置
+
+分类：REPRODUCIBILITY_DEFECT。
+优先级：正式训练/评分前必修，可直接主审闭合。
+定位：
+- scripts/step31_evolution_registered_control.py，第65–70、86–91行。
+- scripts/step30_evolution_control.py，第403–411、429–440行；Runner环境第238–240行。
+- execution/scope.zh.md，第19行；proposal.zh.md，第94行。
+
+旧worker对train/score实际调用configure_gpu()。该函数除13GiB allocator以外，还执行torch.set_num_threads(2)、torch.set_num_interop_threads(2)、torch.use_deterministic_algorithms(True)、torch.backends.cuda.matmul.allow_tf32=False和torch.backends.cudnn.allow_tf32=False。
+
+新worker却调用自己的gpu_admission()，其中只有CUDA可用检查和allocator设置。导入Runner所在模块不会自动执行configure_gpu；其余新调用路径也没有补上这些设置。Runner设置OMP/MKL/OpenBLAS线程环境和CUBLAS_WORKSPACE_CONFIG，不等同于执行上述PyTorch API；固定随机种子亦不是其替代。
+
+静态反例：
+假设进入GPU配置前，进程的确定性算法状态未启用，或某TF32开关允许使用。新gpu_admission仅改变allocator，原状态会保留；旧configure_gpu会明确恢复已审约束。故两个实际入口不能保证相同数值执行条件。此反例不依赖模型效果、真实数据或篡改回执。
+
+准确影响：
+已证实的是原显式配置在新入口中遗漏。不能声称实际Linux默认一定开启TF32、BERT一定已经走了有差异的算子，或正式结果已不确定/错误；当前没有正式运行。这也不是H/V数学公式错误。问题在于“沿用旧公式和GPU证据”不能覆盖一个未调用的数值配置函数。
+
+最小修复：
+保留新CUDA可用性检查，在载模前直接调用已有step30_evolution_control.configure_gpu()，替换重复的allocator两行，训练和评分两条路径都走同一配置。原函数使用的allocator字段仍为13GiB，与本轮一致；沿用的GPU资源限制不变，新CPU子帽仍为180秒。不需要另造配置框架。线程设置随原函数恢复，但本项主要依据是确定性/TF32配置遗漏，不能夸大为两核亲和性或14GiB帽已经失效。
+
+最小关闭证据：
+修复后的调用链、差异和最终来源绑定即可直接定向核查。如主审需实测接线，只用现有CPU子帽内的极小替身验证“训练/评分载模前调用原配置”；无需真实BERT、数据、GPU或整套CPU02/03重跑。本审没有执行该修复或测试。
+
+### EVREG-I-R02：开标后的失败也被写成effects_open=False
+
+分类：REPRODUCIBILITY_DEFECT。
+优先级：正式入口前必修，可直接主审闭合。
+定位：
+- scripts/step31_evolution_registered_control.py，第117–124、175–183行。
+- scripts/step31_evolution_registered_evaluate.py，第162–195行，特别是182–192行。
+- scripts/step30_evolution_io.py，第74–79行。
+- 对照旧step30_evolution_control.py，第398–400行。
+
+新campaign的这个异常处理分支对其捕获的异常一律写effects_open=False。然而analyze在全部六训练/90格核验之后，先写access/complete_P_labels.json，再实际读取三个新dev qrels，随后逐任务写*_metrics.json并调用check()。
+
+不需篡改任何文件的可达反例：
+1. 六训练和90格均完整，正常通过开标前检查。
+2. 第183行留下开标尝试回执，第184行读入qrels。
+3. 第190行保存第一条任务的逐格/逐query指标。
+4. 第192行check()因实际deadline、RSS或磁盘条件抛错。
+5. 分析子进程失败，Runner向campaign返回失败。
+6. campaign仍在第183行记录effects_open=False。
+
+还存在更直接路径：analyze已在第195行写完整result.json，worker最后的check(True)失败，或父进程保存总completion失败，也进入同一错误断言。此时不仅有开标尝试，还可能已经产生全部指标。
+
+准确影响：
+失败回执把“下游停止”错误地写成“未开标/未产生效果”。这是新失败留证缺陷，不是“缺训练或缺评分时提前开标”的科研阻断。全批完整门仍有效；open('x')的一次性回执仍阻止原路径再次开标。没有证据表明正式环境已发生此故障。
+
+最小修复：
+删除无法保证的effects_open=False，改用旧入口已经采用的downstream_closed=True，继续保留automatic_retry=False和automatic_next_phase=False。若需要方便主审判断，可额外记：
+
+    label_access_attempted = (root / 'analysis' / 'access' / 'complete_P_labels.json').exists()
+
+字段必须叫attempted。access是在首次打开qrels之前留存尝试，因此不能将回执存在等同于三个qrels已全部读完、指标全部算完或人已经看见结果；若仍保留effects_open而无法确定，使用明确unknown/null。保留访问回执、部分指标、费用和原异常，不清零、不删除。
+
+最小关闭证据：
+修复字段的静态差异可证明不再作错误断言；若采用新的状态字段，可用一个手写失败分支例验证开标尝试后失败仍留attempted和downstream_closed。无需重新训练、重新生成90矩阵、再次打开真实qrels或增加GPU。主审不需要建立事务发布框架或通用状态机。
+
+## 四、数据与当前训练接线核对
+
+### 4.1 确认预留、开发选择和4/2/2
+
+定位：step31_evolution_registered_data.py，第16–109行；step30_evolution_data.py，第222–230行。
+
+build固定缓存SHA/6250335字节并实际verify，核prior_usage精确计数262/104/160/130。partition先保留全部160旧test，再按seed41和confirmation purpose哈希固定取128未使用账号，确认保留288；剩262+104+2=368，再按development purpose固定取288。开发与确认没有重复占额，旧test不能落入开发。key使用规范JSON、UTF-8和SHA256，不依赖Python内置hash或原行序。
+
+开发按第4条fit观察日与registration哈希排序，连续分成96×3；整体少于三个不同登记观察日停止，不重抽。缓存角色按原资格已有的日期顺序产生，当前代码用fit[-1]。没有证据显示冻结缓存内部顺序错误，不能以任意坏缓存为由要求重开资格。
+
+每选中账号核fit4/gallery2/query2；max(fit date)<min(gallery date)，max(gallery date)<min(query date)。全开发全部角色共享记录ID/正文规范键集合，拒绝跨账号、跨批和跨角色精确重复。fit拆两个2记录视图，每8账号成16视图/32记录群并调用实际validate_group；每批12群。gallery/query无identity，独立view UID来自各自记录UID；qrels明确query→同账号的独立gallery。不存在按vid删掉唯一正例的接线。
+
+确认只在私有selection留身份，未导出其fit/gallery/query/qrels。构建程序为分配而机器解析含确认候选的完整缓存，是scope已明确的技术读取，不应说成“从未经过确认文本”；它不授权研究者浏览确认正文。
+
+数据边界仍限既有清洗：新增exact正文检查不证明跨账号语义近重复全部排除；全局清洗使用未来文本、观察日不是真实创建日、同vid互斥文本不是真实跨账号同控。这些不是本次代码漏洞。
+
+### 4.2 固定语言门
+
+定位：step31 data，第77–78、103–109、115–133行；step31 control，第53–62、220–232行。
+
+每批从384条开发fit按固定language哈希取32条，共96，只返回无语义ID与body。adjudicate要求三批齐全、每批恰为原32个样本ID，只接受english/other/unclear；每批至少29个english才通过，已有receipt则拒绝重判。dataset()在实际启动路径要求passed并绑定同一manifest和样本来源。
+
+尚未有真实96条语言判断，是现行现场前提；CPU手写英文不能替代。无需为本次静态审查索取这些正文。
+
+### 4.3 真正调用E1/E2/E3训练循环
+
+定位：step31 policy，第7–23行；step31 control，第90–112、148–164行；step30 run，第20–30、98–196行；step30 evaluate，第17–31行。
+
+六任务固定seed31/32/33，各H_SEQ/H1、V_SEQ/V1。loader只读manifest的当前fit，强制E1→E2→E3每域一次。实际execute收到expected_groups=12和domains=DOMAINS；域参数进入初始化、群domain核对和训练随机流，不是只在元数据改名称。旧默认季度参数保留，未全局覆写。
+
+H每epoch12群；V把96×4=384当前记录打散为32条一批，也是12更新。40epoch×12群=480/阶段，3阶段=1440/轨迹，6轨迹=8640计划当前更新；验收用fit_groups=12。H_SEQ/V_SEQ的replay为false，没有draw/retain/teacher，即使构造一个空Memory对象也不等于启用历史机制。
+
+H保留标题/正文两通道、末四层求和按mask平均、归一化记录表示、head、自然/重组监督及原聚合；V仍当前账号分类训练、原表征检索。V_SEQ的内部family名VendorLink_SEQ不表示读了VendorLink市场。H1/V1固定来源与学习率静态可追，不新增HPO。R01要求恢复原运行设置，不改变这些数学或配方。
+
+每阶段保存紧凑encoder/head，共18份；另六个小初始head和共同预训练绑定。没有逐epoch优化器/Memory完整状态，V分类head不用于检索。初始θ0是共同预训练encoder加实际新H head，不使用已删除旧实验权重。
+
+## 五、评分、一次开标与P门
+
+### 5.1 15格枚举与工作量
+
+定位：step31 policy，第13–17行；step31 evaluate，第90–127行。
+
+用(t,d,p)表示模型阶段、query批、前p批gallery：
+原九格：
+(0,1,1)、(1,1,1)、(1,2,2)、(2,1,1)、(2,2,2)、(2,3,3)、(3,1,1)、(3,2,2)、(3,3,3)。
+增长三格：
+(2,1,2)、(3,1,3)、(3,2,3)。
+冻结三格：
+(1,1,3)、(1,2,3)、(1,3,3)。
+
+每格96个query、96p个gallery。三类pool系数和16+8+9=33，因此每轨迹96×96×33=304128分数，6条合计90矩形/1824768逻辑分数。四端点分别承担1、5、4、5格。该数来自当前枚举的简单算术，不依赖CPU03硬填总量。
+
+### 5.2 θ1双侧编码及H/V原公式
+
+定位：step31 evaluate，第32–75、106–116行；step29_vendorlink_methods.py，第72–109、186–201、227–239行；step30 run，第204–215行。
+
+每个t恢复一个model，同一model同时编码qs和gs；t=1时新增E2/E3 query及三批gallery全部由θ1编码。没有冻结query混后期gallery。restore核identity/task/stage/model_binding，严格加载encoder/head。
+
+H两记录视图之间四个跨记录logit组成K：
+    H(q,g)=0.5 mean(K)+0.5(logsumexp(K)-log 4)
+新代码按[Nq,2,Ng,2]转为[Nq,Ng,4]，double聚合再转回原dtype，与旧h_pool一致，没有sigmoid/max替换。
+
+V先逐记录单位化，再取两条记录的均值u、v：
+    V(q,g)=2(u·v)/(||u||²+||v||²)
+零记录向量和非正分母拒绝，没有把视图均值再单位化，也没有加epsilon。CPU02前的遗漏已修；旧原函数比较和独立标量聚合能够捕获该类替换，不应把已修问题再列当前必修。
+
+### 5.3 完整前置门、正例与十指标
+
+定位：step31 evaluate，第78–87、130–195行；step31 control，第156–176行；step30 io，第74–79行。
+
+六条训练完整才进入六次串行评分；任一训练失败，Runner结束后抛错，不进入评分。analyze先要求六份评分，并对全部90格核文件大小/SHA、task、manifest、cell坐标、ID唯一/无交、数量、排序、矩阵尺寸、有限值与实际query/gallery输入ID对应，然后才调用一次access并读三个新dev qrels。
+
+access采用open('x')：成功或失败后的既有尝试都不会被覆盖，原路径第二次开标会在读qrels前拒绝。R02是异常回执状态不诚实，不是否认这一有效一次门。
+
+query_metrics要求query集合恰与qrels相同，每个query有一个存在于gallery的不同正例。gallery为ASCII hash顺序；stable argsort按该顺序打破分数并列。正例rank=r时，MAP=MRR=1/r，Recall@k为r≤k，NDCG@k在r≤k时为1/log2(r+1)，否则0。十指标、逐query值及全部格均保存，MAP/MRR不能视为两份独立证据。
+
+### 5.4 P门没有被改成冻结价值门
+
+定位：step31 policy，第30–72行；scope，第31–35行。
+
+两方法分别要求：每批三seed平均初学MAP≥.60、R@1≥.45，每seed每批MAP≥.55；每批平均G≥.01、每seed G≥0；两旧批平均F≥.05，每旧批平均≥.03，三个seed旧批平均F均>0，至少两个≥.04。每批初学Q、前置、最终O均取该批固定G_d，F=Q−O，不含候选增长竞争，也不改成峰值遗忘。
+
+只H遗忘不足以继续；能力/新学习失败返回STOP_LEARNING，其他共同遗忘条件失败返回STOP_NO_JOINT_FORGETTING，全过只到PREMISE_MET_AWAIT_USER_MECHANISM_DECISION，全部automatic_next_phase=False。门未达须具体说明是能力、学习或稳定性哪个条件，不应一律说“完全不遗忘”。
+
+冻结比较在相同query、相同候选池下列E2/E3刚学后相对θ1，以及最终G3全部批相对θ1。原P没有被新增“业务价值PASS”取代；最终冻结更好也不能单独否定曾获得再丢失的新能力。H_full/ER、M/C、独立确认或任何H抗遗忘结论均不属于本轮结果。
+
+## 六、Runner、资源和累计预算
+
+定位：step31 control，第127–186、189–232行；step30 control，第21–66、93–311行；step30 io，第140–195行；scope第37–49行。
+
+Runner获得新worker_entry=step31 control与新caps；command确实调用该入口。Ledger也收到同一caps，Runner构造时要求两者一致。共享源码只把入口/帽/domain参数显式化，旧默认保留。
+
+训练最多2槽；每槽2CPU核、整PID14GiB、allocator13GiB、RSS32GiB和40GiB RAM准入承诺；未知GPU进程关闭新准入，既有健康槽继续被监测。普通任务失败进入retired，不再领任务，健康槽继续本阶段有限队列。阶段排空若不完整则INCOMPLETE、禁止评分/开标/后续；评分本轮串行，不是另加双GPU评分额度。
+
+新caps为training10800、gpu3600、auxiliary3600，总18000秒。每训练任务1800、每评分任务600，分析最多300并按真正派发时剩余辅助额度缩短。预约同桶活动任务全帽和新任务全帽；退出/失败完整生命周期向上计费。父监测实际活动另记辅助，循环sleep在计时外；不把双路墙钟当累计任务时间。
+
+已存预算简单算术：
+CPU01计3，CPU02计5，CPU03计8，入口拒绝计1，合计17/180。
+最新辅助549=旧资格352+保守准备/传输/收尾180+本轮17；training=0、gpu=0。
+preparation_budget.json保留旧548/16，entry_budget.json为新549/17，不能据此指控篡改。CPU02内部模拟Ledger的387=352+30+4个子任务各1+监测1，是夹具账，不能再次叠加到实际准备账。
+
+现场正式入口读的是实验根可变preparation_budget.json。它必须承接最新549/17以及随后build/language、主审收尾等实际费用，不能拿包内旧快照当新起点。Ledger初始化再保守加30秒尾部，因此在尚无后续支出时辅助至少579；CPU17已在549内，不能再重复加。此为原定启动核对，不是已证实现场漏费；本审没有访问该实时文件。
+
+observation.json只记录2026-11-08 15:29:41的空GPU、中文H PAUSED_IDLE等现场时点。不能替代启动时复核，也不授权恢复中文H或看其效果。旧单路GPU峰值12.1875GiB来自保存报告，旧资格帽实际17/16GiB，不能追改成14/13GiB双路已实测；本轮不因此追加GPU资格。
+
+## 七、CPU证据的精确解释
+
+CPU01：
+外层2.8233006938826293秒、exit1、计3。旧末四Transformer层检查在H首更新前拒绝缺embedding层的Tiny夹具；failure updates0、stage saves0。保存失败源码/trace/费用合理。未到V，不能宣称初稿V通过；未为迁就夹具修改正式表示。
+
+CPU02：
+外层4.429736505029723秒、exit0、计5；receipt内部2.2534608950372785秒为另一计时边界。真实测试调用生产execute，H/V各3域、每域1群1epoch，合计各3次Tiny更新；断言当前fit顺序、参数变化、无history、三次紧凑保存，并实际restore后做评分等价比较。更新日志中的非零梯度、optimizer_updates及workload与该规模一致。
+
+CPU02并非完整正式H1/V1实测。局部Settings中V仍为4e-5，正式V1的2e-5由policy实际接线静态可核；它测试域/更新路径，不证明正式1440/8640次完成。双子进程测试确实用真实run_many，但覆盖command为sleep/exit，证明失败slot0退役、健康slot1接完1/2/3及阶段INCOMPLETE，不证明生产CLI、taskset或双GPU全程。夹具process.command的截短来自覆盖command不带taskset；完整launch_command保留，不能据此误判正式command切片错误。
+
+CPU03：
+外层7.736397149041295秒、exit0、计8；内部5.64653602684848秒。实际调用六次score_one，90格及完整analyze；冻结192候选矩形与288矩形对应列一致；少一份receipt先拒绝且无开标access，补齐后一次开标、不接M。
+但测试第51–69行人工写Tiny端点和1440更新/workload元数据，receipt明确synthetic_training_completion_metadata和real_training_updates_claimed=0。不能把它当8640正式更新、真实Evolution或GPU证据。
+
+入口拒绝：
+entry_check记录returncode1，在permit第36行以review_closed=false拒绝，未创建正式目录，14来源可解析，计1。它没有走到后来新增的CPU子帽或build/language亲和性分支，更没有触达本报告R01的GPU配置路径。最后两个守卫是可静态追踪的局部增量，CPU02/03未改函数的证据可复用，但不能写“最终正式全流程已实测”。
+
+本审对以上仅阅读现有源和回执，没有自行重复测试或复算指标。
+
+## 八、非阻断建议
+
+EVREG-I-N01，NONBLOCKING：冻结摘要可按全部METRICS直接展开。
+policy第57–65行显式生成的冻结差及三seed均值只有MAP；evaluate第188–191行已经保存全部90格十指标与逐query原件，不能称“其他指标丢失”。可把同一预定差值按METRICS循环输出，标清(t,d,p)，方便完整报告R@1/5等代价。仅确定性汇总，不改P门，不加评分、标签读取或统计重采样；无需把展示便利性当开训阻断。
+
+EVREG-I-N02，NONBLOCKING：分析端可复核已记录endpoint_identity。
+score_one第105行记录endpoint_identity，analyze第173行只显式比较task/manifest。可在开标前与validate_training(batch)返回的对应完成身份相等比较。当前正常campaign以全新目录、精确目标、restore身份核验及receipt SHA形成正确路径；要制造错身份通过该处的反例，需额外重接/改写外部回执，不能据此宣称正常管线已错端点评分。最小相等检查即可，无需重算得分或通用签名体系。
+
+EVREG-I-N03，NONBLOCKING：保留语言逐样本判定输入的绑定。
+language_adjudicate保存样本和manifest绑定及聚合计数，但未把CLI --decisions文件的大小/SHA写进receipt。scope已要求逐样本判定留Linux；只要执行者保留原件，不能断言它已经丢失。可顺手保存决策文件绑定或完整原判定JSON，不重新抽样、不重判96条，不扩大正文返回范围。
+
+## 九、应排除的越界过度设计
+
+OUT_OF_SCOPE_OVERDESIGN：
+不重审全部VendorLink/Evolution历史，不改已保留负结果；不重新清洗/容量盘点或索取确认正文、旧qrels、模型/Memory；不新增方法、seed、顺序、HPO、训练预算或Full/ER/M/C；不为造遗忘改变epoch、学习率、候选池或F定义；不追加一般GPU试跑、双路全程资格、系统级锁/通用恢复框架；不把CPU03合成训练元数据解释为欺骗，也不把它当正式训练证明；不因最后两处守卫未全重跑而要求全面回归；不把包内历史预算快照差异当篡改。
+
+本审要求的两项修复都是当前新入口的具体可达差异，不属于上述扩大范围。
+
+## 十、最小闭合清单与仍待现场满足的条件
+
+只需在正式入口前：
+1. 关闭R01，确保train/score载模前复用原configure_gpu，并更新实际源绑定。
+2. 关闭R02，失败只断言下游关闭，按attempt语义保留开标状态及已有证据。
+3. 主执行者对实际差异作独立处置；若留CPU证据，只做对应极小入口/失败分支例，并续记费用，不启动模型或GPU资格。
+
+随后按既有执行条件完成一次真实开发构建、固定96条语言门、精确来源与本地骨干、最新预算、实际双槽资源和中文暂停状态核对。它们未发生不等于代码缺陷，当前审查也不替代它们。新具体修复源须与实际使用来源一致，不能把原包的审查结论冒接到任意后续源码。
+
+本报告没有需要用户重新选择的科学参数，也不提出新的普通开训确认。是否由主执行者关闭两项、满足现场条件并沿既有授权推进，仍由原执行链处理；本审不启动或授权任何运行。
+
+## 十一、实际阅读范围与证据边界
+
+先完整读取execution/review/request.zh.md，再读现行scope、authorization、implementation和shared_changes.diff。
+
+完整读取/静态逐函数追踪：四个step31生产文件、两个当前CPU测试文件、step30 run、step29 methods；step30 io的全部文件以及所有新路径所调用函数。旧step30 control定向读资源/Runner、configure_gpu和旧worker对照、旧失败回执，不以此重审旧整套pipeline。旧step30 policy仅沿settings/LIMITS/METRICS等有效依赖复用，不采用其旧科学门。
+
+对其余依赖定向读取：step30 evaluate的training_complete/开标/指标、step30 data的validate_group及导入，step29 data的Ad/View/Group/assignment，step29 run的set_rates，step28 formal_queue的GpuMemory。proposal只定向核对本轮继续引用的数据角色、H1/V1、矩形公式和P条款；没有重开后续M/C统计与文献创新问题。
+
+完整核对执行authorization、各来源/部署/证据清单、gate_pending、预算和entry_check、observation、CPU01 trace/lifecycle/failure，CPU02/03 launch/lifecycle/receipt及CPU02 completion/workload/updates/dispatch。空console明确为空；模型/分数未附，未声称验证其文件字节。
+
+阅读资格report/result和两份相关primary_disposition。方向外审及旧双worker外审原文定向追读与本次范围、冻结对照、预算、旧问题关闭相关段；旧gpu_single报告全文读取，仅作已审证据的引用，不把缺少本包GPU原件补成自己实测。
+
+所有75成员均作完整性核对；“核对字节”与“阅读全文/定向语义阅读”在reading_scope.json中分开登记。包外链接、未提供私有载荷和实时Linux状态均未读取；没有联网搜索或补造事实。
+
