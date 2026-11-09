@@ -4,7 +4,9 @@
 
 ## Evolution后续接手任务
 
-**原三市场后续仅在明确新的证据或弱标签任务范围后推进，不启动训练。** 承接[固定主目标](RESEARCH_DISCUSSION.zh.md#2026-11-08固定vendorlink应用实验目的与跨上下文承接)、[不得用同账号拆分替代的纠正](RESEARCH_DISCUSSION.zh.md#2026-11-08纠正vendorlink任务边界先核查原论文的跨账号马甲发现)及[本轮两项确认与后续清理决定](RESEARCH_DISCUSSION.zh.md#2026-11-08批准原三市场跨账号关系核查及条件性数据准备)。按[获准范围](../reports/documentation/20261108/vendorlink_alias_evidence/scope.zh.md)已检查原商品包/规范缓存及SQL/身份HTML，[本轮报告](../reports/documentation/20261108/vendorlink_alias_evidence/report.zh.md)区分真实不同账号候选、来源弱关联和未建立的可验证同控/不同控标签。当前走证据不足分支：保留必要候选与缺口，不冻结正式划分、不把未知关系全当负例、不借同账号视图补正例。用户明确本轮免外审，已按主审完成局部清理；后续复用已保存证据和本地Git最小源码历史，不重建退役脚本或重复已充分完成的核查。若未来接受来源归组弱标签或引入新核实证据，须先明确主张、监督/评价、历史使用和阶段设计的实质差异，不由执行者自动替换。原[四方法全池诊断](../reports/documentation/20261108/vendorlink_fullpool/history/report.zh.md)仅属同账号代理；旧ABC/Evolution停止、负结果、费用和接触历史保持，不据其派生新调参，不要求VendorLink必须遗忘。唯一当前状态见交接；既有中文作业不动，本地提交、不推送。
+**原三市场按用户最新决定，回到论文账号监督的共同评价；先完成具体协议，不启动训练。** 依据[最新决定](RESEARCH_DISCUSSION.zh.md#2026-11-09删除关系候选转回论文账号监督的共同评价)和[草案](../reports/documentation/20261109/vendorlink_account_protocol/protocol.zh.md)，以已登记账号标签监督、独立商品文本评价，完整H保留多记录集合结构；保留VendorLink原分类器及作者集合相似度两种输出，不择弱者比较。跨账号候选发现单列为无真值的应用输出，不称已验证马甲准确率。先审定已知市场/旧fit账号、12/4/2/2、完整H英文母体、四个有限开发任务、三个配对seed、学习/遗忘及外部比较门，再决定数据资格、实现与分阶段执行；草案4单域＋12完整轨迹/最多2worker/新60h均不是已批准预算。新外审材料备齐后核对具体包许可，旧关系核查免审不扩用。
+
+六份已生成关系候选按用户确认已删除，保管见[存储记录](STORAGE.zh.md#2026-11-09-删除原三市场关系候选载荷)。不恢复候选、退役脚本或重跑关系核查。原[核查报告](../reports/documentation/20261108/vendorlink_alias_evidence/report.zh.md)仍支持“未建立可验证真实同控训练/评价集”，但这个更强任务的证据不足不再否决原论文层级的账号监督。原[全池诊断](../reports/documentation/20261108/vendorlink_fullpool/history/report.zh.md)仍为已见开发账号互斥检索，不能冒作新协议确认；旧ABC/Evolution停止、负结果、费用和接触史保持，不要求VendorLink必须遗忘。唯一当前状态见交接；中文暂停决定保持。本轮仅准备协议，本地提交、不推送。
 
 用户已接受方向咨询建议，明确“继续推进，采用双路同时运行”，并批准开发数据构建与固定96条fit语言判断。从[当前六轨迹执行范围](../reports/documentation/20261108/evolution_registered/execution/scope.zh.md)、[许可](../reports/documentation/20261108/evolution_registered/execution/authorization.json)及[实现证据](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)接手；实际进度只维护在交接唯一Evolution项。原[30轨迹草案](../reports/documentation/20261108/evolution_registered/proposal.zh.md)只作来源，后续24条及24小时预算未获准。
 

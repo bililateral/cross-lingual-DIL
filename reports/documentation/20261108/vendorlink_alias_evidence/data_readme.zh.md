@@ -1,5 +1,7 @@
 # 本轮最终候选证据读取说明
 
+> 2026-11-09保管更新：用户随后明确要求删除这些生成候选，并确认六文件/5513443字节、不另备份的范围。Linux已实际删除六份载荷及空final_evidence目录；Windows没有这些载荷。见[data_cleanup_20261109.json](data_cleanup_20261109.json)。下文是11月8日交付时的文件含义与保管历史，不表示文件仍存在，也不授予重新生成。原输入、报告、来源/费用、原清单和原完成回执保留。后续改按[账号监督共同协议草案](../../20261109/vendorlink_account_protocol/protocol.zh.md)准备，尚无新数据/训练授权。
+
 本轮没有生成可训练的真实马甲数据集。以下是用户已批准的“证据不足则保存候选与缺口”交付，不是正式标签、划分或评价候选池，不应被训练／评价入口自动载入。
 
 Linux目录：`/home/yongpeng/cross-lingual/reports/documentation/20261108/vendorlink_alias_evidence/final_evidence/`。原始账号、链接、指纹及声明语境仅留Linux；Windows只保存聚合、来源和说明。

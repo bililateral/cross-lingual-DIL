@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-09 删除原三市场关系候选载荷
+
+用户在具体六文件/5513443字节、不另备份及原始来源保留范围呈现后确认：“确认，按此删除并制定协议”。服务器09:37:57逐份复核普通文件、属主、精确目录、大小/SHA、无额外对象及无相关活动进程后，删除Linux `/home/yongpeng/cross-lingual/reports/documentation/20261108/vendorlink_alias_evidence/final_evidence/` 下 `accounts.jsonl`、`candidate_relations.jsonl`、`claim_candidates.jsonl`、`manual_relation_decisions.jsonl`、`header_candidates.jsonl`、`html_sources.jsonl`，并移除空目录；合计6文件5513443字节，未另备份。逐文件身份与32份其他核查文件SHA保留检查见[实际回执](../reports/documentation/20261108/vendorlink_alias_evidence/data_cleanup_20261109.json)。
+
+原始商品包、规范缓存、SQL/HTML、旧实验/模型和中文暂停资产不在删除范围；报告、聚合、来源哈希、费用及历史源码恢复入口保留。Windows再次核对本任务无六份候选载荷，删除0；此前未回传/入Git，现不能由Git或SHA恢复这些生成载荷。原始来源仍存在不等于获准重新生成。下节“六份候选保留”和旧manifest/completion均记录11月8日当时事实，已被本次用户决定与删除回执更新，不追改原件。
+
+本次2296字节回执经SFTP回传、落盘大小/SHA一致，SHA256 `ab5d1237d1b5c7f3943eaf39e6795d0f23a64e9d07f886cd96ac5d353f28a5c3`。新协议及候选读取说明已按[SFTP回执](../reports/documentation/20261109/vendorlink_account_protocol/sync.json)同步并逐份读回相同，根docs未同步。具体新审查包只在Windows准备，随后用户明确批准该包外发，已单次提交网页外审并保留精确输入身份；不是已删除旧核查包的恢复。本轮无新数据解析、科研计算、载模或训练；不重置原核查费用或11月6日大清理/11月21日下次到期。新[账号监督协议](../reports/documentation/20261109/vendorlink_account_protocol/protocol.zh.md)只是准备材料，不会恢复被删候选。本地提交、不推送，根docs只在Windows维护。
+
 ## 2026-11-08 原三市场跨账号关系核查收尾
 
 用户已确认原三市场商品包/规范缓存核查、纳入既有身份SQL/HTML，并进一步要求“完成后…脚本和中间文件都删掉”，最后明确“本轮免外审，完成主审和清理”。[本轮报告](../reports/documentation/20261108/vendorlink_alias_evidence/report.zh.md)按证据不足分支交付：保留真实不同账号的弱关联候选及缺口，没有正式训练集、划分或训练。原始身份、链接、指纹、声明正文仅留Linux `reports/documentation/20261108/vendorlink_alias_evidence/final_evidence/`；六个必要最终文件5513443字节，身份见[清单](../reports/documentation/20261108/vendorlink_alias_evidence/final_evidence_manifest.json)，用途见[读取说明](../reports/documentation/20261108/vendorlink_alias_evidence/data_readme.zh.md)。它们不是已验证正负标签，后续不得自动作为训练入口。
