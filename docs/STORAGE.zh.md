@@ -1,5 +1,15 @@
 # 科研文件存储与恢复
 
+## 2026-11-09 VendorLink seed44的15GiB资源修订与新重跑保管
+
+用户限定“提升到15G”，新Linux目录为`reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/`。原execution/campaign的OOM现场、成功轨迹和原retry_s44主动停止现场全部保留，不覆盖原件，不删除模型。只在新workspace的step34_vendorlink_account_policy.py改变allocator13→15GiB、整PID及准入14→16GiB三个常量；其余11份运行来源原字节复用，未改全局scripts或任何其他活动/冻结workspace。新policy5944字节SHA256 `40b2c56395d6482b52fda84be0a09fd8082570b78370a6841c3820783274d08a`，Windows具名副本供Git精确恢复；其他模块继续由原来源/Git恢复。新gate绑定修订说明、原科学审查、12份实际来源和本次小核验。整个原execution共同占用32GiB磁盘帽，不能把每次重跑各算32GiB。
+
+原retry_s44的最终累计账training41230/GPU87/auxiliary1605秒，含主动停止的539秒训练，已完整承接。新账在retry_s44_15g/campaign/budget.json：配置核验GPU1秒、准备辅助350秒已加入，观测时已结training41230/GPU88/auxiliary1955秒；CPU322秒为辅助子账，不能再相加。新训练/监管尚未结账；原60h分桶、4h生命周期、30秒尾部不重复计。原及前一retry的budget是累计历史快照，不能与新累计账相加。原retry_s44的13/14GiB及下节旧账入口仅代表当时事实。
+
+[资源核验回执](../reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/resource_check.json)保留精确手写源码及首次CPU夹具遗漏caps=CAPS的失败来源/错误与60秒保守CPU子账；实际封装原已显式传caps=ledger.caps，修正夹具后仅补本次证据，不改科研源码。核验执行实际入口的allocator设置语句并读回15GiB，不载模/训练、不申请大块显存；原生准入在15.5GiB阻塞、16GiB准入，Runner监控16GiB。PASS回执写入后的展示命令曾因外围未import json报错，随后重新读取同一已保存回执确认，不将展示错误冒作训练失败或追加GPU核验。
+
+Windows回传授权、修订说明/封装、gate/批次、核验、主动停止/启动、继承账、首步/进度和新policy共11份具名文件，按[同步清单](../reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/sync_manifest.json)全部大小/SHA一致；清单3490字节SHA256 `61d2952e39cf36e92d738b70d5416738eef7cb085a95ef92e622e91575375e44`。没有回传正文、账号身份、权重、分数或凭据；原H暂停和其他模型未动。核验源码已直接包含在回执，无额外临时核验脚本；新launch.py仍供实际监管，保留至无后续用途。根docs只在Windows，本地提交、不推送，不重置清理周期。实际进度见交接唯一当前项。
+
 ## 2026-11-09 VendorLink seed44单条重跑保管
 
 用户明确“直接把这条P_VendorLink_SEQ_s44实验重新启动”，限定一次原配置重跑。Linux新产物位于`reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44/campaign`；原`execution/campaign`的OOM现场、latest、阶段端点、日志、原失败费用及健康任务成功记录全部保留，不移动/覆盖原任务，也不恢复其余队列。12份既有已审运行源码原字节复制到retry_s44/workspace，仅调整新gate/batch的部署路径与授权绑定；数据、共享预训练及其原SHA直接复用，不复制模型或正文。原experiment_root继续覆盖新旧目录总磁盘32GiB帽，原13/14GiB显存和60h累计桶保持。
