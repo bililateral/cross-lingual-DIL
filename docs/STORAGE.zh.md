@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-09 接手只读诊断原件回收
+
+本轮仅只读核对Linux进程、运行元数据、冻结源码和现有费用，未修改Linux文件、活动源码/gate或进程，未载模、测试、训练或计算指标。13份原有小证据经SFTP保存于`execution/queue_resume/diagnosis_2036/`，共23200字节，逐份大小/SHA与Linux当时原件一致，见[接收清单](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/diagnosis_2036/receive.json)。内容仅primary终态/完成/失败/账、接续状态/承接依据/账及V45身份/资源准入、H45增量账；没有正文、账号、标签、分数、权重或凭据。Windows快照名说明用途，不覆盖此前final_observation或其他冻结回执；动态状态仍只在交接当前项维护。
+
+primary的训练端点、尚未退役的latest、包装失败和全部费用继续保护；H45/接续来源未改，原5份旧权重及核验脚本删除事实保持。本轮无资产删除、无新临时核验脚本，无需为只读诊断恢复或重跑旧CPU证据。根docs仅Windows维护，未向Linux补传本段或接收清单，本地提交、不推送，不重置项目大清理周期。
+
 ## 2026-11-09 整批自动接续部署与精确来源保管
 
 **本轮核验脚本收尾已完成**：Windows删除check_resume.py、cpu01/entry.py、cpu01/check.py共3份28204字节；Linux删除相同3份及无后续用途gate.base.json模板共4份35897字节。全部临时科学核验源码先逐字节与Git提交`1589ef658817e3e060e26cec29343c2c95492885`对应路径核对后删除，CPU01入口/检查及CPU02检查均可由该提交精确恢复，不重跑核验。18份运行源码/gate/CPU回执/免审/主审等保护对象身份未变，新控制器仍真实等待；最终运行入口及原12科学来源必须保留。首次Linux清理预核对因人工转录SHA不符而在删除前拒绝，随后直接使用已核实Git的Windows结构化回执复核完成，没有带错哈希删除。详见[双端清理回执](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/cleanup_receipt.json)及[Windows精确恢复表](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/cleanup_windows.json)。[6份收尾同步](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/final_sync_manifest.json)逐份大小/SHA一致，清单1976字节SHA256 `6c158a8a56eafa0c47f88a439df50be26b4769d6f0ce46807e00bc93748acb49f`；初次sync_manifest的3个已删路径按其当时事实保留，不追改原清单。
