@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-09 VendorLink seed44单条重跑保管
+
+用户明确“直接把这条P_VendorLink_SEQ_s44实验重新启动”，限定一次原配置重跑。Linux新产物位于`reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44/campaign`；原`execution/campaign`的OOM现场、latest、阶段端点、日志、原失败费用及健康任务成功记录全部保留，不移动/覆盖原任务，也不恢复其余队列。12份既有已审运行源码原字节复制到retry_s44/workspace，仅调整新gate/batch的部署路径与授权绑定；数据、共享预训练及其原SHA直接复用，不复制模型或正文。原experiment_root继续覆盖新旧目录总磁盘32GiB帽，原13/14GiB显存和60h累计桶保持。
+
+原控制器排空退出后，新账从其最终training40691/gpu87/auxiliary1463秒承接全部历史事件与CPU260秒子账；原30秒尾部不重复计，重跑筹备120秒仅加入辅助。后续累计账在`retry_s44/campaign/budget.json`，原campaign/budget.json作为旧终态保留。原工作流的既有检查、预约、监测、实际训练和成功验收/最新状态退役均由同一Runner/worker实现；不添加新算法、恢复功能、评价或测试平台。
+
+Windows只回传10份具名授权、gate、P批次、启动/继承账/首步观察及启动导入失败源码与日志，按[同步清单](../reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44/sync_manifest.json)逐份大小/SHA一致；清单本身SHA为`441b2f730cd0fe39b3386e1a272a51ebfaea80b96e544ffa1aad20432593b8cd`。初次启动封装导入失败没有载模或消费正式训练，3983字节原版与bootstrap.log/bootstrap_launch.json保留，修正后Linux进口/来源绑定预检通过再启动一次正式重跑；准备费用已包含此失败。实际进度只见交接及[首步回执](../reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44/observation.json)，不把启动等同完整成功。启动封装尚用于当前监管，暂保留；未复制原始数据、权重、query/分数或凭据至Windows，未干预中文H暂停或资产。根docs仅Windows，本地提交、不推送；不重置大清理周期。
+
 ## 2026-11-09：账号监督协议的新角色数据与实现证据
 
 用户已批准[账号监督实施范围](../reports/documentation/20261109/vendorlink_account_protocol/execution/scope.zh.md)。新Linux根为`reports/documentation/20261109/vendorlink_account_protocol/execution/`；qualification/data保存原三市场旧fit中的1578账号/31560条角色记录及来源/分量/角色索引，文件600权限。确认文本已构建但未评价。Windows仅代码、文件身份、聚合资格和核验/失败费用，未同步真实账号、正文、逐条角色或分数。原六份关系候选删除事实保持，本次没有恢复它们。
