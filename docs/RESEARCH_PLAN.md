@@ -4,7 +4,7 @@
 
 ## Evolution后续接手任务
 
-**原三市场已获准按论文账号监督共同协议实施，经必要核验和审查后按阶段门运行。** 依据[最新决定](RESEARCH_DISCUSSION.zh.md#2026-11-09批准账号监督协议实施及必要校验)和[审后协议](../reports/documentation/20261109/vendorlink_account_protocol/protocol.zh.md)，以已登记账号标签监督、独立商品文本评价，完整H保留多记录集合结构；保留VendorLink原分类器及作者集合相似度两种输出，不择弱者比较。跨账号候选发现单列为无真值的应用输出，不称已验证马甲准确率。用户现已批准按审后协议实施，见[执行范围](../reports/documentation/20261109/vendorlink_account_protocol/execution/scope.zh.md)：一次数据资格及必要新增入口/CPU-GPU核验已完成，具体实现包已获准并送定向外审；主审闭合后核即时资源，直接按D/P/M/C门连续推进，不重复同范围开始确认。旧fit账号、12/4/2/2、完整H英文母体、四个有限开发任务、三个配对seed、全部成功/停止门及4单域＋12完整轨迹/最多2worker/新60h承接不变。具体实现包已获准单次外发，外审与主审尚待闭合；不扩到未确认的其他材料。
+**原三市场已获准按论文账号监督共同协议实施，经必要核验和审查后按阶段门运行。** 依据[最新决定](RESEARCH_DISCUSSION.zh.md#2026-11-09批准账号监督协议实施及必要校验)和[审后协议](../reports/documentation/20261109/vendorlink_account_protocol/protocol.zh.md)，以已登记账号标签监督、独立商品文本评价，完整H保留多记录集合结构；保留VendorLink原分类器及作者集合相似度两种输出，不择弱者比较。跨账号候选发现单列为无真值的应用输出，不称已验证马甲准确率。用户现已批准按审后协议实施，见[执行范围](../reports/documentation/20261109/vendorlink_account_protocol/execution/scope.zh.md)：一次数据资格及必要新增入口/CPU-GPU核验已完成，定向外审五项运行控制修复与历史用途来源经主审闭合；唯一正式控制器已启动并核实两路真实更新，按D/P/M/C门连续推进。只读检查运行完整性，按整批开放条件处理结果，不重复核验或启动。旧fit账号、12/4/2/2、完整H英文母体、四个有限开发任务、三个配对seed、全部成功/停止门及4单域＋12完整轨迹/最多2worker/新60h承接不变。具体实现包的单次外审已完成，原文及主审处置保留；后续结果外审按新具体包核对，不将此次许可扩大到其他材料。
 
 六份已生成关系候选按用户确认已删除，保管见[存储记录](STORAGE.zh.md#2026-11-09-删除原三市场关系候选载荷)。不恢复候选、退役脚本或重跑关系核查。原[核查报告](../reports/documentation/20261108/vendorlink_alias_evidence/report.zh.md)仍支持“未建立可验证真实同控训练/评价集”，但这个更强任务的证据不足不再否决原论文层级的账号监督。原[全池诊断](../reports/documentation/20261108/vendorlink_fullpool/history/report.zh.md)仍为已见开发账号互斥检索，不能冒作新协议确认；旧ABC/Evolution停止、负结果、费用和接触史保持，不要求VendorLink必须遗忘。唯一当前状态见交接；中文暂停决定保持。本轮按批准范围实施，本地提交、不推送。
 

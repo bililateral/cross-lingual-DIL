@@ -4,7 +4,7 @@
 
 用户已批准[账号监督实施范围](../reports/documentation/20261109/vendorlink_account_protocol/execution/scope.zh.md)。新Linux根为`reports/documentation/20261109/vendorlink_account_protocol/execution/`；qualification/data保存原三市场旧fit中的1578账号/31560条角色记录及来源/分量/角色索引，文件600权限。确认文本已构建但未评价。Windows仅代码、文件身份、聚合资格和核验/失败费用，未同步真实账号、正文、逐条角色或分数。原六份关系候选删除事实保持，本次没有恢复它们。
 
-新隔离workspace不覆盖中文暂停或旧ABC/Evolution来源。原失败CPU夹具/GPU01 OOM与相应源码保留，本轮41项实现包已获准单次外发；当前审查尚有实际用途，临时probe/测试和来源副本待审查闭合后按科研纪律退役，先保留本地Git精确恢复入口。后续运行所需12份来源、角色数据和诊断/模型不在临时脚本退役范围；本轮无正式新模型或训练。详见[实现与费用](../reports/documentation/20261109/vendorlink_account_protocol/execution/implementation.zh.md)。
+新隔离workspace不覆盖中文暂停或旧ABC/Evolution来源。实现外审与主审已闭合，正式训练已开始；12份运行来源、角色数据、活动模型、失败/费用及审查原文继续保留。原失败及后续核验源码按精确Git恢复点保管：a32551f3157b907219c61a33456b600e30aedb47包含本轮删除的已提交源码/包，逐文件大小/SHA在删除前与Git blob相符；CPU01/02/03共用的13045字节旧control也已恢复并与原回执SHA一致后提交。13:25按[实际清理清单](../reports/documentation/20261109/vendorlink_account_protocol/execution/cleanup_receipt.json)删除Windows25文件384276字节、Linux13文件130342字节，另1个Windows新保存的恢复副本在Linux未曾存在。范围为一次性GPU probe、数据/修复CPU脚本、已留Git的失败来源副本、已审输入ZIP及本轮浏览器临时文件；正式报告/日志/费用不删。两端暂保留test_step34_account_increment.py：CPU01最初11231字节版本尚未独立恢复，不能冒称全部历史测试版本可恢复或为此重跑测试；后续CPU02/03版本已可恢复。本项保留是具体证据保管需要，不扩大为长期保存全部临时包。冻结deployment/原回执仍按当时来源保留，退役事实由清单解释，不改活动gate。详见[实现记录](../reports/documentation/20261109/vendorlink_account_protocol/execution/implementation.zh.md)及主审；本次不重置11月6日大清理周期。
 
 ## 2026-11-09 删除原三市场关系候选载荷
 
