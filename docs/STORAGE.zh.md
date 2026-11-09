@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-09 两次旧seed44权重删除与H45增量账
+
+用户确认精确5份旧权重范围后，Linux19:41:49完成删除：原execution/campaign/P/training/P_VendorLink_SEQ_s44/run的stage0.pt、stage1.pt、latest.pt，加原retry_s44对应run的stage0.pt、latest.pt，共3045165946字节（2.84GiB），所有目标普通文件、yongpeng属主、最终路径和单硬链接经核实，无另备份。旧两运行16份非权重文件SHA前后不变；当前retry_s44_15g的12份源码、gate/封装/批次及初始端点身份前后不变，当前worker未停止，更新5235→5237，活动latest仍在且无failure。Windows对应两个旧目录无权重，删除0。[回执](../reports/documentation/20261109/vendorlink_account_protocol/execution/old_s44_weight_cleanup.json)15659字节SHA256 `e16c9c98c38250fd38214728eb15dfe46da29e0b669a1fabe4f917020bc4c7fc`已SFTP回传一致。此前保管段落的“旧权重保留”仅代表当时事实，由本次许可替代；原失败、日志、费用和原始回执不改，已删权重不能由SHA/Git恢复，当前新权重不在删除范围。
+
+新第二路Linux目录execution/parallel_h45保存12份原科学源码原字节副本、新gate/批次、限定额度与操作封装，不复制共享预训练或旧成功权重，不触碰当前15GiB源码/模型。原H1/seed45运行，13GiB allocator与14GiB进程/准入；原seed44声明为完整16GiB承诺，合计30GiB。H45增量账从零计实际费用，最多training28800/GPU0/auxiliary1800秒；总原60h经用户确认调整为训练178200/GPU21600/辅助16200秒。原活动seed44继续原累计账及其辅助14400秒上限，H45辅助加其最多1800秒保证新全局16200秒，不重复原30秒尾部。primary最终累计账加H45增量账才是总账；新parallel_h45/combined_budget.json在两者结算后合账，尚未结算不能把活跃训练记为0已耗。
+
+Windows按[H45同步清单](../reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/sync_manifest.json)核对8份小载荷一致，清单2466字节SHA256 `f5dd67e1dc51fd9e5191d230d218e67ee1ec61e284665b2e10b9819cccc7162f`；无正文、账号、标签、分数、权重或凭据回传。H45科学来源与原12份大小/SHA完全一致，复用已有科学资格，不新做载模/GPU probe。封装仍为实际监管保留；CPU前置仅导入/身份/原生资源准入，未造临时核验脚本。用户已进一步批准整批自动接续，完成接续实现与适用审查后再部署，当前冻结的单条许可/额度和运行事实保留，后续补充另记。根docs仅Windows，本地提交、不推送，不重置清理周期。
+
 ## 2026-11-09 VendorLink seed44的15GiB资源修订与新重跑保管
 
 用户限定“提升到15G”，新Linux目录为`reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/`。原execution/campaign的OOM现场、成功轨迹和原retry_s44主动停止现场全部保留，不覆盖原件，不删除模型。只在新workspace的step34_vendorlink_account_policy.py改变allocator13→15GiB、整PID及准入14→16GiB三个常量；其余11份运行来源原字节复用，未改全局scripts或任何其他活动/冻结workspace。新policy5944字节SHA256 `40b2c56395d6482b52fda84be0a09fd8082570b78370a6841c3820783274d08a`，Windows具名副本供Git精确恢复；其他模块继续由原来源/Git恢复。新gate绑定修订说明、原科学审查、12份实际来源和本次小核验。整个原execution共同占用32GiB磁盘帽，不能把每次重跑各算32GiB。

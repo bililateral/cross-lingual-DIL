@@ -1,0 +1,449 @@
+{
+  "time": "2026-11-09T19:51:43.408518+08:00",
+  "status": "TWO_WORKERS_TRAINING",
+  "workers": [
+    {
+      "task": "P_VendorLink_SEQ_s44",
+      "worker": {
+        "pid": 2037915,
+        "owner": "yongpeng",
+        "created": 1794223716.68,
+        "command": [
+          "/home/yongpeng/miniconda3/envs/py310/bin/python",
+          "-B",
+          "-u",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/workspace/scripts/step34_vendorlink_account_control.py",
+          "--gate",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/gate.json",
+          "--action",
+          "train",
+          "--target",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/campaign/P/training/P_VendorLink_SEQ_s44",
+          "--deadline",
+          "1670133.683802848",
+          "--phase",
+          "P",
+          "--task",
+          "P_VendorLink_SEQ_s44"
+        ],
+        "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/workspace",
+        "reserved_bytes": 17179869184
+      },
+      "cpu_affinity": [
+        44,
+        45
+      ],
+      "first_update": {
+        "stage": 1,
+        "epoch": 0,
+        "stage_update": 1,
+        "updates": 1,
+        "optimizer_updates": 1
+      },
+      "last_update": {
+        "stage": 2,
+        "epoch": 5,
+        "stage_update": 323,
+        "updates": 8523,
+        "optimizer_updates": 1
+      },
+      "failure": false
+    },
+    {
+      "task": "P_H_SEQ_s45",
+      "worker": {
+        "pid": 2045803,
+        "owner": "yongpeng",
+        "created": 1794224841.72,
+        "command": [
+          "/home/yongpeng/miniconda3/envs/py310/bin/python",
+          "-B",
+          "-u",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step34_vendorlink_account_control.py",
+          "--gate",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/gate.json",
+          "--action",
+          "train",
+          "--target",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/campaign/P/training/P_H_SEQ_s45",
+          "--deadline",
+          "1685658.722371974",
+          "--phase",
+          "P",
+          "--task",
+          "P_H_SEQ_s45"
+        ],
+        "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace",
+        "reserved_bytes": 15032385536
+      },
+      "cpu_affinity": [
+        42,
+        43
+      ],
+      "first_update": {
+        "stage": 1,
+        "epoch": 0,
+        "stage_update": 1,
+        "updates": 1,
+        "optimizer_updates": 1
+      },
+      "last_update": {
+        "stage": 1,
+        "epoch": 1,
+        "stage_update": 337,
+        "updates": 337,
+        "optimizer_updates": 1
+      },
+      "failure": false
+    }
+  ],
+  "gpu": {
+    "free": 15254814720,
+    "total": 34190917632,
+    "processes": {
+      "2037915": 14849933312,
+      "2045803": 3271557120
+    }
+  },
+  "gate": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/gate.json",
+    "bytes": 9306,
+    "sha256": "fafda0dc48f9456a9fabac84fed5bec372c08a76a93e6b12604f64aab4882a63"
+  },
+  "quota": {
+    "global_caps": {
+      "training": 178200,
+      "gpu": 21600,
+      "auxiliary": 16200
+    },
+    "secondary_caps": {
+      "training": 28800,
+      "gpu": 0,
+      "auxiliary": 1800
+    },
+    "primary_training_base": 41230,
+    "primary_controller": {
+      "pid": 2037864,
+      "owner": "yongpeng",
+      "created": 1794223715.44,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "-u",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/launch.py"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g"
+    },
+    "primary_deadline": 1670133.683802848,
+    "primary_campaign": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/campaign",
+    "primary_reserved_training_seconds": 14400,
+    "primary_auxiliary_ceiling": 14400,
+    "incremental_only": true,
+    "original_tail_not_recharged": true
+  },
+  "incremental_budget": {
+    "used_seconds": {
+      "training": 0,
+      "gpu": 0,
+      "auxiliary": 136
+    },
+    "caps": {
+      "training": 28800,
+      "gpu": 0,
+      "auxiliary": 1800
+    },
+    "cpu_test_seconds": 0,
+    "conservative_tail_seconds": 30,
+    "events": [
+      {
+        "operation": "H45_preparation",
+        "bucket": "auxiliary",
+        "actual_seconds": 135.22652888298035,
+        "charged_seconds": 136,
+        "success": true
+      }
+    ]
+  },
+  "primary_cumulative_budget": {
+    "used_seconds": {
+      "training": 41230,
+      "gpu": 88,
+      "auxiliary": 1955
+    },
+    "caps": {
+      "training": 180000,
+      "gpu": 21600,
+      "auxiliary": 14400
+    },
+    "cpu_test_seconds": 322,
+    "conservative_tail_seconds": 30,
+    "events": [
+      {
+        "operation": "controller_setup",
+        "bucket": "auxiliary",
+        "actual_seconds": 0.0031487520318478346,
+        "charged_seconds": 1,
+        "success": true
+      },
+      {
+        "operation": "D_freeze",
+        "bucket": "auxiliary",
+        "actual_seconds": 0.0004273420199751854,
+        "charged_seconds": 1,
+        "success": true
+      },
+      {
+        "operation": "D_H1",
+        "bucket": "training",
+        "actual_seconds": 2393.607203366002,
+        "charged_seconds": 2394,
+        "success": true
+      },
+      {
+        "operation": "D_H0",
+        "bucket": "training",
+        "actual_seconds": 2395.4352660749573,
+        "charged_seconds": 2396,
+        "success": true
+      },
+      {
+        "operation": "D_V0",
+        "bucket": "training",
+        "actual_seconds": 999.2985398569144,
+        "charged_seconds": 1000,
+        "success": true
+      },
+      {
+        "operation": "D_V1",
+        "bucket": "training",
+        "actual_seconds": 999.6802788900677,
+        "charged_seconds": 1000,
+        "success": true
+      },
+      {
+        "operation": "dispatch_monitor",
+        "bucket": "auxiliary",
+        "actual_seconds": 138.02039710246027,
+        "charged_seconds": 139,
+        "success": true
+      },
+      {
+        "operation": "D_training_manifest",
+        "bucket": "auxiliary",
+        "actual_seconds": 0.0006446640472859144,
+        "charged_seconds": 1,
+        "success": true
+      },
+      {
+        "operation": "D_H0",
+        "bucket": "gpu",
+        "actual_seconds": 17.87182382401079,
+        "charged_seconds": 18,
+        "success": true
+      },
+      {
+        "operation": "D_H1",
+        "bucket": "gpu",
+        "actual_seconds": 18.96998925693333,
+        "charged_seconds": 19,
+        "success": true
+      },
+      {
+        "operation": "D_V0",
+        "bucket": "gpu",
+        "actual_seconds": 15.99059153883718,
+        "charged_seconds": 16,
+        "success": true
+      },
+      {
+        "operation": "D_V1",
+        "bucket": "gpu",
+        "actual_seconds": 15.973735251929611,
+        "charged_seconds": 16,
+        "success": true
+      },
+      {
+        "operation": "dispatch_monitor",
+        "bucket": "auxiliary",
+        "actual_seconds": 1.5293577727861702,
+        "charged_seconds": 2,
+        "success": true
+      },
+      {
+        "operation": "D_scoring_manifest",
+        "bucket": "auxiliary",
+        "actual_seconds": 0.0010843200143426657,
+        "charged_seconds": 1,
+        "success": true
+      },
+      {
+        "operation": "analysis",
+        "bucket": "auxiliary",
+        "actual_seconds": 1.490482032066211,
+        "charged_seconds": 2,
+        "success": true
+      },
+      {
+        "operation": "dispatch_monitor",
+        "bucket": "auxiliary",
+        "actual_seconds": 0.0941139271017164,
+        "charged_seconds": 1,
+        "success": true
+      },
+      {
+        "operation": "D_analysis_read",
+        "bucket": "auxiliary",
+        "actual_seconds": 0.00014345417730510235,
+        "charged_seconds": 1,
+        "success": true
+      },
+      {
+        "operation": "select_D",
+        "bucket": "auxiliary",
+        "actual_seconds": 0.00021516508422791958,
+        "charged_seconds": 1,
+        "success": true
+      },
+      {
+        "operation": "P_freeze",
+        "bucket": "auxiliary",
+        "actual_seconds": 0.0010006888769567013,
+        "charged_seconds": 1,
+        "success": true
+      },
+      {
+        "operation": "P_VendorLink_SEQ_s43",
+        "bucket": "training",
+        "actual_seconds": 4185.8078377840575,
+        "charged_seconds": 4186,
+        "success": true
+      },
+      {
+        "operation": "P_H_SEQ_s43",
+        "bucket": "training",
+        "actual_seconds": 14564.7702460289,
+        "charged_seconds": 14565,
+        "success": true
+      },
+      {
+        "operation": "P_VendorLink_SEQ_s44",
+        "bucket": "training",
+        "actual_seconds": 1605.4483831780963,
+        "charged_seconds": 1606,
+        "success": false
+      },
+      {
+        "operation": "P_H_SEQ_s44",
+        "bucket": "training",
+        "actual_seconds": 13543.088404322974,
+        "charged_seconds": 13544,
+        "success": true
+      },
+      {
+        "operation": "dispatch_monitor",
+        "bucket": "auxiliary",
+        "actual_seconds": 979.0110939296428,
+        "charged_seconds": 980,
+        "success": false
+      },
+      {
+        "operation": "single_retry_preparation",
+        "bucket": "auxiliary",
+        "actual_seconds": 120,
+        "charged_seconds": 120,
+        "success": true
+      },
+      {
+        "operation": "P_VendorLink_SEQ_s44",
+        "bucket": "training",
+        "actual_seconds": 538.1251735840924,
+        "charged_seconds": 539,
+        "success": false
+      },
+      {
+        "operation": "dispatch_monitor",
+        "bucket": "auxiliary",
+        "actual_seconds": 21.69329260662198,
+        "charged_seconds": 22,
+        "success": false
+      },
+      {
+        "operation": "15g_allocator_configuration_check",
+        "bucket": "gpu",
+        "actual_seconds": 0.26357383001595736,
+        "charged_seconds": 1,
+        "success": true
+      },
+      {
+        "operation": "15g_retry_preparation",
+        "bucket": "auxiliary",
+        "actual_seconds": 349.5640256954357,
+        "charged_seconds": 350,
+        "success": true
+      }
+    ]
+  },
+  "active_training_and_monitoring_unsettled": true,
+  "sources": [
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step34_vendorlink_account_control.py",
+      "bytes": 15182,
+      "sha256": "450e3f408c4093006a99ff29eca522811fbe80c32ee4ddc6d84f32da6f4fc95b"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step34_vendorlink_account_data.py",
+      "bytes": 13910,
+      "sha256": "8ecbf09a3bfe853a3eb3ba238c30c4562eced170f2bbce55ea14fce395e70ed1"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step34_vendorlink_account_evaluate.py",
+      "bytes": 14116,
+      "sha256": "06c121761d200bb3621f1bfc783c3a42dd842e21cf819f7bd2b15cf54eaf4360"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step34_vendorlink_account_policy.py",
+      "bytes": 5944,
+      "sha256": "e32b99e007699cc3305ecdd8d5e7b4a47ab50d8e8a5a80c99a9d9260fe268f59"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step34_vendorlink_account_run.py",
+      "bytes": 10173,
+      "sha256": "70c9dd1083ddf9f65525693eee9f80e34959e6e83dc7ee687e341264599459f0"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step29_vendorlink_data.py",
+      "bytes": 11636,
+      "sha256": "e0d2a10b9d6731967411f701e58ac2cc610d0ed7c9798640f485823954f16668"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step29_vendorlink_methods.py",
+      "bytes": 16092,
+      "sha256": "b6b5ce15248719080005f5f29c928544b0f48b59c463a62d1289b1dac613b116"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step29_vendorlink_run.py",
+      "bytes": 16484,
+      "sha256": "4509895e6c24f429ceb9d10d82ef03ddf5b21fe24f259e558067476439eebf5b"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step28_formal_queue.py",
+      "bytes": 17132,
+      "sha256": "f928e91f6f0cb82860e2b4bbb202fd1788cac56457dacdf61f91d4671b6803ef"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step30_evolution_policy.py",
+      "bytes": 13609,
+      "sha256": "a6245ce9b7e349b99bc0278d43d80abe325151fb8478cf0eee38200dca3dd971"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step30_evolution_io.py",
+      "bytes": 8472,
+      "sha256": "a0f08e5e5e8f4152fc291e39e9f68d0b693820d7ff0aa9ae81a66758410b4918"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step30_evolution_control.py",
+      "bytes": 31601,
+      "sha256": "f3ffb01dae458866ab482dc4cd14941788fb1a613d000fe24f360958bd50ba75"
+    }
+  ]
+}
