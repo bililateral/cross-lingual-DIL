@@ -11,7 +11,8 @@ SEEDS = (43, 44, 45)
 CAPS = dict(training=180000, gpu=21600, auxiliary=14400)
 LIMITS = dict(workers=2, free_gpu_bytes=14*2**30, process_gpu_bytes=14*2**30,
               allocator_bytes=13*2**30, rss_bytes=32*2**30, free_ram_bytes=40*2**30,
-              disk_bytes=32*2**30, free_disk_reserve=32*2**30, save_reserve_bytes=2*2**30)
+              disk_bytes=32*2**30, free_disk_reserve=32*2**30, save_reserve_bytes=2*2**30,
+              dispatch_free_disk_bytes=64*2**30)
 CELLS = ((0, 1), (1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3))
 
 

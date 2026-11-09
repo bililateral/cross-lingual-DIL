@@ -34,6 +34,7 @@ def resource_observation(allowed: dict, root: Path, gpu: bool, owned=(), nv=None
                        experiment_bytes=directory_bytes(root), save_reserve=save_reserve)
     observation['ready'] = (observation['ram_available']-ram_pending >= limits['free_ram_bytes'] and
                             observation['disk_free'] >= limits['free_disk_reserve']+save_reserve and
+                            observation['disk_free'] >= limits.get('dispatch_free_disk_bytes', 0) and
                             observation['experiment_bytes']+save_reserve <= limits['disk_bytes'])
     if gpu:
         from step28_formal_queue import GpuMemory
@@ -222,7 +223,8 @@ class Runner:
                                 # This operation is allotted the remaining auxiliary
                                 # bucket, measured at actual launch after any wait.
                                 job['seconds'] = min(job['seconds'], self.caps['auxiliary']-self.ledger.used['auxiliary']-
-                                                     outstanding-math.ceil(parent_active)-60)
+                                                     outstanding-math.ceil(parent_active)-
+                                                     (120 if self.halt_dispatch_on_failure else 60))
                                 if job['seconds'] <= 15:
                                     raise TimeoutError('Insufficient remaining analysis lifecycle budget')
                             self.ledger.reserve(job['bucket'], outstanding+job['seconds'])
@@ -273,12 +275,21 @@ class Runner:
                                 self.ledger.charge(job['bucket'], job['target'].name, elapsed, False)
                                 retired.add(slot)
                                 failures.append(dict(task=job['target'].name, slot=slot, error=repr(exc)))
+                            if self.halt_dispatch_on_failure:
+                                budget_stop = 'Worker launch failed; no further dispatch'
                     write(self.root/'dispatch.json', dict(active={**unreleased, **{s: x['identity'] for s, x in active.items()}},
                           retired=sorted(retired), failures=failures, pending=[j['target'].name for j in jobs[next_job:]],
                           budget_stop=budget_stop, status='RUNNING' if active else 'WAITING_RESOURCES'))
                 finally:
                     parent_active += time.monotonic()-tick
-                if self.ledger.used['auxiliary']+math.ceil(parent_active)+60 >= self.caps['auxiliary']:
+                auxiliary_reserved = sum(x['job']['seconds'] for x in active.values()
+                                         if x['job']['bucket'] == 'auxiliary') if self.halt_dispatch_on_failure else 0
+                if self.ledger.used['auxiliary']+math.ceil(parent_active)+auxiliary_reserved+60 >= self.caps['auxiliary']:
+                    if self.halt_dispatch_on_failure:
+                        # Shared controller budget: drain-by-waiting can keep
+                        # spending beyond the hard cap. Own children must stop
+                        # within the already reserved cleanup margin instead.
+                        raise TimeoutError('Auxiliary monitoring cleanup reserve reached')
                     budget_stop = 'Auxiliary monitoring budget exhausted'
                 if active or (next_job < len(jobs) and len(retired) < slots and budget_stop is None):
                     time.sleep(.2 if active else 30)

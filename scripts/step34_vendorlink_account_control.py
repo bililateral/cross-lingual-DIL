@@ -1,5 +1,6 @@
 """Finite reviewed D/P/M/C execution with source, access, and cumulative gates."""
 import argparse
+from contextlib import contextmanager, nullcontext
 import json
 import math
 from pathlib import Path
@@ -8,7 +9,7 @@ import time
 
 from step30_evolution_control import Runner
 from step30_evolution_io import Ledger
-from step34_vendorlink_account_data import Check, PYTHON, pinned, record, write
+from step34_vendorlink_account_data import Check, SharedDiskLimit, PYTHON, pinned, record, write
 from step34_vendorlink_account_policy import PROTOCOL, DOMAINS, CAPS, LIMITS, tasks, select, decide
 
 SOURCES = tuple('step34_vendorlink_account_'+n+'.py' for n in ('data', 'policy', 'run', 'evaluate', 'control'))+(
@@ -63,25 +64,29 @@ def validate_training(task, result, manifest, identity):
         pinned(b)
 
 
-def pipeline(run_phase, save):
+def pipeline(run_phase, save, measure=lambda name: nullcontext()):
     d = run_phase('D', None)
-    selected = select(d)
-    save('selection', selected)
+    with measure('select_D'):
+        selected = select(d)
+        save('selection', selected)
     p = run_phase('P', selected)
-    p_gate = decide(p)
-    save('P', p_gate)
+    with measure('decide_P'):
+        p_gate = decide(p)
+        save('P', p_gate)
     if p_gate['status'] != 'PASS_P':
         return dict(status=p_gate['status'], selected=selected, P=p_gate, application=False)
     m = run_phase('M', selected)
-    combined = {**p, **m}
-    m_gate = decide(combined, True)
-    save('M', m_gate)
+    with measure('decide_M'):
+        combined = {**p, **m}
+        m_gate = decide(combined, True)
+        save('M', m_gate)
     if m_gate['status'] != 'PASS_SYSTEM':
         return dict(status=m_gate['status'], selected=selected, P=p_gate, M=m_gate, application=True)
     c = run_phase('C', selected)
-    c_gate = decide(c, True)
-    c_gate['old_score_increment'] &= m_gate['old_score_increment']
-    save('C', c_gate)
+    with measure('decide_C'):
+        c_gate = decide(c, True)
+        c_gate['old_score_increment'] &= m_gate['old_score_increment']
+        save('C', c_gate)
     return dict(status='CONFIRMATION_PASS' if c_gate['status'] == 'PASS_SYSTEM' else c_gate['status'],
                 selected=selected, P=p_gate, M=m_gate, C=c_gate, application=True)
 
@@ -160,7 +165,8 @@ def worker(g, args):
         raise ValueError('Unknown action')
 
 
-def campaign(g, gate_path):
+def campaign(g, gate_path, started=None):
+    started = time.monotonic() if started is None else started
     root = Path(g['campaign'])
     if root.exists():
         raise ValueError('No duplicate controller or automatic campaign restart')
@@ -169,6 +175,13 @@ def campaign(g, gate_path):
     runner = Runner(g, gate_path, root, ledger, worker_entry=Path(__file__), caps=CAPS, limits=LIMITS,
                     halt_dispatch_on_failure=True)
     manifest = read(pinned(g['manifest']))
+    ledger.charge('auxiliary', 'controller_setup', time.monotonic()-started, True)
+    @contextmanager
+    def measure(name):
+        # Only small parent segments; never wrap worker execution or waiting.
+        ledger.reserve('auxiliary', 60)
+        with ledger.active(name):
+            yield
     def complete(job):
         if job['action'] == 'train':
             c = read(job['target']/'run/completion.json')
@@ -194,28 +207,34 @@ def campaign(g, gate_path):
                 seconds=hours*3600 if action == 'train' else 3600, extra=['--phase', phase, '--task', task['id']]))
         return out
     def run_phase(phase, selected):
-        specs = tasks(phase, selected) if phase != 'C' else tasks('P', selected)+tasks('M', selected)
-        write(root/phase/'batch.json', dict(tasks=specs, selected=selected, manifest=g['manifest'], gate=record(gate_path)))
+        with measure(phase+'_freeze'):
+            specs = tasks(phase, selected) if phase != 'C' else tasks('P', selected)+tasks('M', selected)
+            write(root/phase/'batch.json', dict(tasks=specs, selected=selected, manifest=g['manifest'], gate=record(gate_path)))
         if phase != 'C':
             runner.run_many(jobs(phase, specs, 'train'), 2, complete)
-        training = [record(root/t['phase']/'training'/t['id']/'run/completion.json') for t in specs]
-        write(root/phase/'training_complete.json', dict(tasks=specs, completions=training))
+        with measure(phase+'_training_manifest'):
+            training = [record(root/t['phase']/'training'/t['id']/'run/completion.json') for t in specs]
+            write(root/phase/'training_complete.json', dict(tasks=specs, completions=training))
         runner.run_many(jobs(phase, specs, 'score'), 2, complete)
-        scoring = [record(root/phase/'scoring'/t['id']/'result/completion.json') for t in specs]
-        write(root/phase/'scoring_complete.json', dict(tasks=specs, completions=scoring))
+        with measure(phase+'_scoring_manifest'):
+            scoring = [record(root/phase/'scoring'/t['id']/'result/completion.json') for t in specs]
+            write(root/phase/'scoring_complete.json', dict(tasks=specs, completions=scoring))
         job = dict(action='analyze', target=root/phase/'analysis', bucket='auxiliary', seconds=1800,
                    extra=['--phase', phase])
         runner.run_many([job], 1, complete)
-        return read(root/phase/'analysis/result/results.json')
+        with measure(phase+'_analysis_read'):
+            return read(root/phase/'analysis/result/results.json')
     try:
-        result = pipeline(run_phase, lambda name, value: write(root/'decisions'/f'{name}.json', value))
-        write(root/'quantitative_completion.json', result)
+        result = pipeline(run_phase, lambda name, value: write(root/'decisions'/f'{name}.json', value), measure)
+        with measure('quantitative_completion'):
+            write(root/'quantitative_completion.json', result)
         if result['application']:
             # Reuse M's frozen specs/selection; no new fit, labels, or training.
             job = dict(action='application', target=root/'application', bucket='gpu', seconds=3600,
                        extra=['--phase', 'M'])
             runner.run_many([job], 1, complete)
-        write(root/'completion.json', result)
+        with measure('completion'):
+            write(root/'completion.json', result)
     except BaseException as e:
         write(root/'failure.json', dict(error=repr(e), automatic_retry=False,
               released_phases=[p for p in ('D', 'P', 'M', 'C') if (root/p/'analysis/result/results.json').exists()]))
@@ -231,16 +250,26 @@ def main():
     p.add_argument('--phase')
     p.add_argument('--task')
     args = p.parse_args()
-    g = permit(args.gate)
+    started = time.monotonic()
     if args.action == 'campaign':
-        campaign(g, args.gate)
+        g = permit(args.gate)
+        campaign(g, args.gate, started)
     else:
-        if not args.target.resolve().is_relative_to(Path(g['campaign']).resolve()):
+        # Bind the marker destination to this isolated deployment before permit:
+        # source failures inside permit must reach the parent as shared failures.
+        expected_campaign = Path(__file__).resolve().parents[2]/'campaign'
+        if args.target is None or not args.target.resolve().is_relative_to(expected_campaign):
             raise ValueError('Worker target outside approved campaign')
         try:
+            g = permit(args.gate)
+        except (ValueError, OSError) as e:
+            write(args.target/'shared_failure.json', dict(error=repr(e), status='SOURCE_VALIDITY_FAILURE'))
+            raise
+        try:
             worker(g, args)
-        except ValueError as e:
-            write(args.target/'shared_failure.json', dict(error=repr(e), status='DATA_OR_PROTOCOL_VALIDITY_FAILURE'))
+        except (ValueError, SharedDiskLimit) as e:
+            status = 'SHARED_DISK_FAILURE' if isinstance(e, SharedDiskLimit) else 'DATA_OR_PROTOCOL_VALIDITY_FAILURE'
+            write(args.target/'shared_failure.json', dict(error=repr(e), status=status))
             raise
 
 

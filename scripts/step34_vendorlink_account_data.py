@@ -126,6 +126,10 @@ def allocate(parts, used, global_used, market, vendor):
                 dev=[p[0] for p in unseen[4:6]], confirm=[p[0] for p in unseen[6:8]])
 
 
+class SharedDiskLimit(RuntimeError):
+    """The experiment-wide disk constraint failed, rather than one model."""
+
+
 class Check:
     def __init__(self, root, seconds):
         self.root, self.started = Path(root), time.monotonic()
@@ -142,9 +146,11 @@ class Check:
             raise RuntimeError('Qualification deadline/RSS cap')
         if now-self.last_disk > 5:
             self.last_disk = now
-            size = sum(p.stat().st_size for p in self.root.rglob('*') if p.is_file())
+            # Reuse the already qualified atomic-rename-safe implementation.
+            from step30_evolution_io import directory_bytes
+            size = directory_bytes(self.root)
             if size > 32*2**30 or shutil.disk_usage(self.root).free < 32*2**30:
-                raise RuntimeError('Experiment disk cap/reserve')
+                raise SharedDiskLimit('Experiment disk cap/reserve')
 
 
 def prepare(config, target, check):
