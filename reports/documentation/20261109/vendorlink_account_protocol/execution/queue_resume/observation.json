@@ -1,0 +1,172 @@
+{
+  "time": "2026-11-09T20:15:00.728915+08:00",
+  "status": "DEPLOYED_WAITING_PRIMARY",
+  "resumption_controller": {
+    "time": "2026-11-09T20:13:35.798061+08:00",
+    "pid": 2051790,
+    "owner": "yongpeng",
+    "created": 1794226414.75,
+    "command": [
+      "/home/yongpeng/miniconda3/envs/py310/bin/python",
+      "-B",
+      "-u",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/workspace/scripts/step34_vendorlink_account_resume.py",
+      "--gate",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/gate.json",
+      "--action",
+      "campaign"
+    ],
+    "launch_command": [
+      "taskset",
+      "-c",
+      "44,45,46,47",
+      "/home/yongpeng/miniconda3/envs/py310/bin/python",
+      "-B",
+      "-u",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/workspace/scripts/step34_vendorlink_account_resume.py",
+      "--gate",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/gate.json",
+      "--action",
+      "campaign"
+    ],
+    "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume",
+    "cpu_affinity": [
+      44,
+      45,
+      46,
+      47
+    ],
+    "source": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/workspace/scripts/step34_vendorlink_account_resume.py",
+      "bytes": 17213,
+      "sha256": "7b746cb7844b4eaa12f58972c1b9153f5096802c9fff9ae4d80365e90dfbcc5b"
+    },
+    "gate": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/gate.json",
+      "bytes": 15535,
+      "sha256": "0a4cc11fc2a783dddc8c415f6f1a3a7843846a46b76e85d3628e84eb9f451a4b"
+    },
+    "automatic_handoff": true,
+    "automatic_retry": false
+  },
+  "state": {
+    "status": "WAIT_PRIMARY_SETTLEMENT",
+    "task": "P_VendorLink_SEQ_s45"
+  },
+  "gate": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/gate.json",
+    "bytes": 15535,
+    "sha256": "0a4cc11fc2a783dddc8c415f6f1a3a7843846a46b76e85d3628e84eb9f451a4b"
+  },
+  "source": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/workspace/scripts/step34_vendorlink_account_resume.py",
+    "bytes": 17213,
+    "sha256": "7b746cb7844b4eaa12f58972c1b9153f5096802c9fff9ae4d80365e90dfbcc5b"
+  },
+  "existing_workers": [
+    {
+      "task": "P_VendorLink_SEQ_s44",
+      "process": {
+        "pid": 2037915,
+        "owner": "yongpeng",
+        "created": 1794223716.68,
+        "command": [
+          "/home/yongpeng/miniconda3/envs/py310/bin/python",
+          "-B",
+          "-u",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/workspace/scripts/step34_vendorlink_account_control.py",
+          "--gate",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/gate.json",
+          "--action",
+          "train",
+          "--target",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/campaign/P/training/P_VendorLink_SEQ_s44",
+          "--deadline",
+          "1670133.683802848",
+          "--phase",
+          "P",
+          "--task",
+          "P_VendorLink_SEQ_s44"
+        ],
+        "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/workspace",
+        "reserved_bytes": 17179869184
+      },
+      "updates": {
+        "stage": 3,
+        "epoch": 15,
+        "stage_update": 5135,
+        "updates": 15695,
+        "optimizer_updates": 1
+      },
+      "failure": false
+    },
+    {
+      "task": "P_H_SEQ_s45",
+      "process": {
+        "pid": 2045803,
+        "owner": "yongpeng",
+        "created": 1794224841.72,
+        "command": [
+          "/home/yongpeng/miniconda3/envs/py310/bin/python",
+          "-B",
+          "-u",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step34_vendorlink_account_control.py",
+          "--gate",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/gate.json",
+          "--action",
+          "train",
+          "--target",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/campaign/P/training/P_H_SEQ_s45",
+          "--deadline",
+          "1685658.722371974",
+          "--phase",
+          "P",
+          "--task",
+          "P_H_SEQ_s45"
+        ],
+        "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace",
+        "reserved_bytes": 15032385536
+      },
+      "updates": {
+        "stage": 1,
+        "epoch": 10,
+        "stage_update": 2181,
+        "updates": 2181,
+        "optimizer_updates": 1
+      },
+      "failure": false
+    }
+  ],
+  "gpu": {
+    "free": 15154151424,
+    "total": 34190917632,
+    "processes": {
+      "2037915": 14946402304,
+      "2045803": 3275751424
+    }
+  },
+  "child_count": 0,
+  "new_campaign_exists": false,
+  "new_automatic_handoff_authorized": true,
+  "current_workers_untouched": true,
+  "H_pause": {
+    "status": "PAUSED_IDLE",
+    "active_count": 0,
+    "completed_count": 7,
+    "pending_count": 56
+  },
+  "web_review": false,
+  "scoped_waiver": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/review/waiver.json",
+    "bytes": 784,
+    "sha256": "d447cdec6894055916ee2e08191db9f2e99a4da214bb8eb61eaa35b9996a8309"
+  },
+  "cpu_source_verification": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/source_verification.json",
+    "bytes": 1064,
+    "sha256": "f896fa6ff637702c40197d2a6f85bfafd782b85b3765c3000d77ed32957b1ab8"
+  },
+  "preparation_seconds": 126,
+  "cpu_seconds": 6,
+  "budget_status": "New preparation/activity will merge into primary final cumulative ledger on handoff; active old jobs remain unsettled"
+}

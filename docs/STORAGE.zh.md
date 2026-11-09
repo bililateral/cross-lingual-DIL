@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-09 整批自动接续部署与精确来源保管
+
+Linux新根execution/queue_resume/，独立workspace包含原12份科学来源原字节及新增step34_vendorlink_account_resume.py（17213字节，SHA256 `7b746cb7844b4eaa12f58972c1b9153f5096802c9fff9ae4d80365e90dfbcc5b`）；不覆盖原campaign/retry_s44/retry_s44_15g/parallel_h45来源或模型。当前新gate的resumption.approved/review_closed已按用户“免审”和主审闭合，原gate.pending.json保留CPU拒绝启动时的原字节；gate.base.json仅为已用完的准备模板，非执行/恢复依据。原12来源的caps/limits字段用于原模块兼容性校验，实际新全局帽、逐方法资源和来源/授权在resumption字段及新增入口强制执行，不能以原字段50h/4h覆盖最新49.5h/4.5h。
+
+旧成功端点不复制、不改checkpoint身份，原gate/manifest/task/端点绑定逐份核对；当前seed44只取retry_s44_15g未来成功completion，H45只取parallel_h45成功completion，原已删两次seed44权重从不作为新输入。新控制器等待primary真实退出/释放/结账，承接其最终累计费用；先从全局帽扣H45完整28800训练/1800辅助预约，H45退出后仅加其增量实际账一次并释放余量。P六条完整才评分，原pipeline控制全部后续门；评分单路按原task顺序使用各自14/16GiB profile，M训练最多两路。新预算权威入口在交接时由queue_resume/campaign/budget.json接管；在H45合并前，该账仍须结合其独立增量账/保留额度解释，不能把parallel_h45/combined_budget.json重复相加。新准备126秒（含CPU6秒子账）在primary最终账承接时计入，等待纯休眠不计，尚未交接时不要冒称已在新主账结算。
+
+Windows[21份载荷同步](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/sync_manifest.json)全部大小/SHA一致，清单6608字节SHA256 `923bb51ad9488d3802166384f1080c1906963b22dfd756b841086fe632df036c`；包含最终新源码、两版CPU证据与精确旧版entry/check、范围/授权/免审/主审、待批及已关闭gate、真实部署回执。无正文、账号、标签、模型、分数或凭据回传。CPU01为16142字节前序入口/6031字节前序检查，CPU02为17213字节最终入口/6031字节最终检查；不冒称同一源码通过两次。新增代码只核对来源/预算/资源/前序身份，不新增GPU probe/正式数据读取或训练探针。正式新运行入口和原12来源仍为后续worker校验/导入所需，不得按“监听已启动”删除；临时CPU脚本及中间副本在Git精确恢复核对后收尾，另记实际清理。根docs只在Windows，本地提交、不推送，不重置清理周期。
+
 ## 2026-11-09 两次旧seed44权重删除与H45增量账
 
 用户确认精确5份旧权重范围后，Linux19:41:49完成删除：原execution/campaign/P/training/P_VendorLink_SEQ_s44/run的stage0.pt、stage1.pt、latest.pt，加原retry_s44对应run的stage0.pt、latest.pt，共3045165946字节（2.84GiB），所有目标普通文件、yongpeng属主、最终路径和单硬链接经核实，无另备份。旧两运行16份非权重文件SHA前后不变；当前retry_s44_15g的12份源码、gate/封装/批次及初始端点身份前后不变，当前worker未停止，更新5235→5237，活动latest仍在且无failure。Windows对应两个旧目录无权重，删除0。[回执](../reports/documentation/20261109/vendorlink_account_protocol/execution/old_s44_weight_cleanup.json)15659字节SHA256 `e16c9c98c38250fd38214728eb15dfe46da29e0b669a1fabe4f917020bc4c7fc`已SFTP回传一致。此前保管段落的“旧权重保留”仅代表当时事实，由本次许可替代；原失败、日志、费用和原始回执不改，已删权重不能由SHA/Git恢复，当前新权重不在删除范围。

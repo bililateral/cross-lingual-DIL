@@ -1,5 +1,11 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-09：整批接续限定免审并部署
+
+在已确认整批P→条件M→条件C范围后，用户进一步要求“那你TM部署啊”，执行者说明部署授权已明确、只余新增实质接续实现的定向审查；用户明确：“免审”。本次免审仅新增整批接续实现，不扩到其他方案/结果或后续改动。无需再次询问部署/开训；按[用户免审](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/review/waiver.json)与[独立主审](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/review/primary_disposition.zh.md)关闭新入口，未制作/上传新审查包、未冒称网页外审。用户另要求“记得更新文件进度记录，同时给我完整的提示词让Agent交接你的工作”；应交付可直接接手的完整提示词，清楚区分部署和实际后续已发生的交接。
+
+[接续范围](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/scope.zh.md)及新gate固定原12份科学来源、新接续来源/CPU/免审、原三个成功端点身份和两条现有监管身份/额度。新入口负责旧成功原身份引用、有限前序等待和增量费用合并，实际训练/评分/分析和全部阶段门继续调用原科学实现。CPU01/02各五项通过，最终未关闭门的真实campaign入口拒绝执行且未建claim/campaign；关闭门后唯一接续已部署并实际观察等待，不等同新VendorLink_s45已训练或P已完整。具体状态只在交接当前项及[部署观察](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/observation.json)维护。两条既有训练没有中断，源/gate未改，中文H暂停保持。新scope中的原默认审查步骤已由本次限定免审补充替代，冻结scope/原回执不追改。按已批准整批范围继续，不因换Agent或旧“单条停止”记录再索取相同许可。
+
 ## 2026-11-09：删除两次旧seed44权重、启动H_s45并恢复整批交接
 
 用户在5文件/3045165946字节及当前新训练保护范围呈现后确认：“确认，删掉这5份旧权重并更新记录，别动正在训练的这次。”仅删除原OOM的stage0/stage1/latest及原retry_s44主动停止的stage0/latest，保留原16份非权重文件和费用；[实际删除回执](../reports/documentation/20261109/vendorlink_account_protocol/execution/old_s44_weight_cleanup.json)固定逐文件身份及当前运行保护证据。旧权重无备份，不再可作载模诊断/恢复；历史错误/结论不追改。
