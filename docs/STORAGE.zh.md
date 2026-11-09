@@ -4,6 +4,8 @@
 
 本轮仅只读核对Linux进程、运行元数据、冻结源码和现有费用，未修改Linux文件、活动源码/gate或进程，未载模、测试、训练或计算指标。13份原有小证据经SFTP保存于`execution/queue_resume/diagnosis_2036/`，共23200字节，逐份大小/SHA与Linux当时原件一致，见[接收清单](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/diagnosis_2036/receive.json)。内容仅primary终态/完成/失败/账、接续状态/承接依据/账及V45身份/资源准入、H45增量账；没有正文、账号、标签、分数、权重或凭据。Windows快照名说明用途，不覆盖此前final_observation或其他冻结回执；动态状态仍只在交接当前项维护。
 
+同日23:22进度查询另经SFTP回收7份13470字节原有小证据，保存于`execution/queue_resume/progress_2322/`，逐份大小/SHA与Linux一致，见[接收清单](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/progress_2322/receive.json)。仅接续状态/dispatch/账、V45训练完成/成功结账及H45 dispatch/增量账；无正文、标签、分数、模型或凭据。原13份诊断快照保留，本次没有覆盖旧观察或改写Linux文件。
+
 primary的训练端点、尚未退役的latest、包装失败和全部费用继续保护；H45/接续来源未改，原5份旧权重及核验脚本删除事实保持。本轮无资产删除、无新临时核验脚本，无需为只读诊断恢复或重跑旧CPU证据。根docs仅Windows维护，未向Linux补传本段或接收清单，本地提交、不推送，不重置项目大清理周期。
 
 ## 2026-11-09 整批自动接续部署与精确来源保管
