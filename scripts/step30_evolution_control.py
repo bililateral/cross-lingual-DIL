@@ -94,12 +94,13 @@ def release(process):
 class Runner:
     def __init__(self, allowed: dict, gate_path: Path, root: Path, ledger: Ledger, *,
                  worker_entry: Path | None = None, caps: dict = CAPS, limits=None,
-                 wait_for_resources: bool = True):
+                 wait_for_resources: bool = True, halt_dispatch_on_failure: bool = False):
         self.allowed, self.gate_path, self.root, self.ledger = allowed, gate_path, root, ledger
         self.worker_entry = Path(__file__).resolve() if worker_entry is None else Path(worker_entry).resolve()
         self.caps = dict(caps)
         self.limits = dict(LIMITS if limits is None else limits)
         self.wait_for_resources = wait_for_resources
+        self.halt_dispatch_on_failure = halt_dispatch_on_failure
         if self.caps != ledger.caps:
             raise ValueError('Controller and ledger must use identical cumulative budgets')
         self.failed = False
@@ -206,6 +207,11 @@ class Runner:
                                 pass
                         if p.poll() is not None or error:
                             finish(slot, error)
+                            if self.halt_dispatch_on_failure and (error == 'Shared disk limit' or
+                                    (job['target']/'shared_failure.json').exists()):
+                                raise RuntimeError('Shared validity/resource failure; stop related active jobs')
+                    if failures and self.halt_dispatch_on_failure:
+                        budget_stop = 'Worker failed; drain already running jobs without new dispatch'
                     for slot in range(slots):
                         if slot in active or slot in retired or next_job == len(jobs) or budget_stop:
                             continue

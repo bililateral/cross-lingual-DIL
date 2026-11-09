@@ -152,7 +152,11 @@ def h_objective(table, group, regroup_seed, settings, teacher=None, history=Fals
         distillation = (predictions[0]-target).square().mean()
     if history and settings.method == "H_SEQ":
         raise ValueError("H_SEQ cannot consume a history sample")
-    total = (.1 if history else 1.)*supervised+.5*distillation
+    # Old Settings retain their exact defaults/serialized identity. The new
+    # account protocol passes explicit history weights in its Settings subclass.
+    alpha = getattr(settings, 'alpha', .1)
+    beta = getattr(settings, 'beta', .5)
+    total = (alpha if history else 1.)*supervised+beta*distillation
     return total, {"supervised": float(supervised.detach()), "distillation": float(distillation.detach()),
                    "weighted": float(total.detach())}
 

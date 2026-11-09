@@ -1,0 +1,101 @@
+{
+  "protocol": "vendorlink-account-20261109",
+  "approved": true,
+  "user_request": "那现在开始实现吧，只做必要的CPU和GPU校验，尽快正式运行实验",
+  "canonical": {
+    "path": "/home/yongpeng/cross-lingual/data/vendorlink/three_market_20261029/canonical.jsonl",
+    "bytes": 127537165,
+    "sha256": "fc80eaf41e712691bd15761a8854a3f094f93ce1153799dabb84a7b9753f4855",
+    "linux_only": true
+  },
+  "export_manifest": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/qualification/export/manifest.json",
+    "bytes": 7402,
+    "sha256": "3303e6a3f661502132582c1a28b907e3a9fd6568122bd056a0dd84b00a804660"
+  },
+  "protocol_source": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/protocol.zh.md",
+    "bytes": 34564,
+    "sha256": "4589fd6b71e33fdbede84ced7b7c96131d527676a8b748316b2bf73bfcd7bf64"
+  },
+  "scope_source": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/scope.zh.md",
+    "bytes": 2858,
+    "sha256": "d7ea1e700058b0ecd67032ea490446f4802b2350a3f49222e47f9f38d085ec37"
+  },
+  "implementation_sources": [
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/scripts/step34_vendorlink_account_data.py",
+      "bytes": 13694,
+      "sha256": "86149748dc323557b8f333b5b69f04b22d15810e31fff4b39f686bfdb69cc732"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/scripts/step29_vendorlink_data.py",
+      "bytes": 11636,
+      "sha256": "e0d2a10b9d6731967411f701e58ac2cc610d0ed7c9798640f485823954f16668"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/tests/test_step34_account_data.py",
+      "bytes": 3097,
+      "sha256": "ea81c5800979fea5d8dd8fa92ddd586254901811832ce483456238c3faf22d6a"
+    }
+  ],
+  "evidence_sources": [
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/evidence/reports/documentation/20261030/vendorlink/formal/gate.json",
+      "bytes": 26708,
+      "sha256": "b0f8efb8e00a158192b1e40ec4fdea06b6176e927875bf3b0a6d5e869a4dc098"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/evidence/reports/documentation/20261108/vendorlink_fullpool/inputs.json",
+      "bytes": 115350,
+      "sha256": "9106ede7c0a55a5a57a284ba5f6650159ae57e5439a6a99e168bf6af51345090"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/evidence/reports/documentation/20261108/vendorlink_fullpool/history/inputs.json",
+      "bytes": 113625,
+      "sha256": "dad4a12f1c352a5586e8e35b942f3b4cabec7aa5dc216dbcf7e393dc1319712f"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/evidence/reports/documentation/20261104/english_abc/plan.zh.txt",
+      "bytes": 16022,
+      "sha256": "8a948e53f70b7f95e38be9629cdb28fb7e7731d17ca506be3a8e90e7c4f44bbc"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/evidence/scripts/step29_vendorlink_export.py",
+      "bytes": 4642,
+      "sha256": "818d13006ef4a5b26df3cf23d84ba1d67b62cbe91e6a9aeee90ffa695f49ac17"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/evidence/scripts/step29_vendorlink_formal.py",
+      "bytes": 10143,
+      "sha256": "3f9f0d394405600a5fac5891b98ca7bcc71dba4ccf51e22b2e3ced7bb9ff3d84"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/evidence/scripts/step29_vendorlink_native.py",
+      "bytes": 17831,
+      "sha256": "103844c8e162f21089f94fd99f47e100b736c04d0dfc158a3bb41a67be8a20ce"
+    }
+  ],
+  "usage_evidence": [
+    {
+      "purpose": "old_training",
+      "source": "formal/gate.json fit_sources and step29_vendorlink_formal.load_fit",
+      "coverage": "all four fixed fit records per old fit account across all methods/orders/seeds"
+    },
+    {
+      "purpose": "qualification_scoring_and_training",
+      "source": "step29_vendorlink_export + step29_vendorlink_native",
+      "coverage": "three exported fit groups per market, checked as exact subsets; handwritten stress is not source data"
+    },
+    {
+      "purpose": "model_development_selection_and_later_scoring",
+      "source": "english_abc/plan plus both fullpool inputs",
+      "coverage": "old dev-account exports only; no additional old-fit records. Account-disjoint by original source key/split; cross-account exact overlap removed globally"
+    },
+    {
+      "purpose": "source_inventory_and_relation_audit",
+      "coverage": "metadata/data qualification, not model training/scoring/configuration selection; no restored relation payloads"
+    }
+  ]
+}

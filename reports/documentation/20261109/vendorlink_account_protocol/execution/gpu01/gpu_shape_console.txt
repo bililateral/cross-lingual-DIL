@@ -1,0 +1,48 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/scripts/step34_vendorlink_account_gpu.py", line 75, in <module>
+    probe(json.loads(args.binding.read_text()), args.root, 600)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/scripts/step34_vendorlink_account_gpu.py", line 46, in probe
+    logs.append(update_h(model, optimizer, current, history, teacher, 100+step, check))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/scripts/step29_vendorlink_methods.py", line 262, in update_h
+    logs = {"current": model.backward_h(current, seed_for(step_seed, "current"), check=check)}
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/scripts/step29_vendorlink_methods.py", line 209, in backward_h
+    z = self.records(group, check)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/scripts/step29_vendorlink_methods.py", line 196, in records
+    output, mask = self.encode(texts[start:start+self.settings.microbatch], self.settings.channel_tokens,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/scripts/step29_vendorlink_methods.py", line 187, in encode
+    output = self.encoder(**features, output_hidden_states=hidden, return_dict=True)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 1142, in forward
+    encoder_outputs = self.encoder(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 695, in forward
+    layer_outputs = layer_module(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 627, in forward
+    layer_output = apply_chunking_to_forward(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/pytorch_utils.py", line 248, in apply_chunking_to_forward
+    return forward_fn(*input_tensors)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 639, in feed_forward_chunk
+    intermediate_output = self.intermediate(attention_output)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 540, in forward
+    hidden_states = self.intermediate_act_fn(hidden_states)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/activations.py", line 78, in forward
+    return self.act(input)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 24.00 MiB. GPU 0 has a total capacity of 31.32 GiB of which 17.50 GiB is free. Including non-PyTorch memory, this process has 13.59 GiB memory in use. 13.00 GiB allowed; Of the allocated memory 12.82 GiB is allocated by PyTorch, and 168.64 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

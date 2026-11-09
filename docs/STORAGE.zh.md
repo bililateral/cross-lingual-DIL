@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-09：账号监督协议的新角色数据与实现证据
+
+用户已批准[账号监督实施范围](../reports/documentation/20261109/vendorlink_account_protocol/execution/scope.zh.md)。新Linux根为`reports/documentation/20261109/vendorlink_account_protocol/execution/`；qualification/data保存原三市场旧fit中的1578账号/31560条角色记录及来源/分量/角色索引，文件600权限。确认文本已构建但未评价。Windows仅代码、文件身份、聚合资格和核验/失败费用，未同步真实账号、正文、逐条角色或分数。原六份关系候选删除事实保持，本次没有恢复它们。
+
+新隔离workspace不覆盖中文暂停或旧ABC/Evolution来源。原失败CPU夹具/GPU01 OOM与相应源码保留，本轮41项实现包已获准单次外发；当前审查尚有实际用途，临时probe/测试和来源副本待审查闭合后按科研纪律退役，先保留本地Git精确恢复入口。后续运行所需12份来源、角色数据和诊断/模型不在临时脚本退役范围；本轮无正式新模型或训练。详见[实现与费用](../reports/documentation/20261109/vendorlink_account_protocol/execution/implementation.zh.md)。
+
 ## 2026-11-09 删除原三市场关系候选载荷
 
 用户在具体六文件/5513443字节、不另备份及原始来源保留范围呈现后确认：“确认，按此删除并制定协议”。服务器09:37:57逐份复核普通文件、属主、精确目录、大小/SHA、无额外对象及无相关活动进程后，删除Linux `/home/yongpeng/cross-lingual/reports/documentation/20261108/vendorlink_alias_evidence/final_evidence/` 下 `accounts.jsonl`、`candidate_relations.jsonl`、`claim_candidates.jsonl`、`manual_relation_decisions.jsonl`、`header_candidates.jsonl`、`html_sources.jsonl`，并移除空目录；合计6文件5513443字节，未另备份。逐文件身份与32份其他核查文件SHA保留检查见[实际回执](../reports/documentation/20261108/vendorlink_alias_evidence/data_cleanup_20261109.json)。

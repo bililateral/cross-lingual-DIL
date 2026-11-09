@@ -1,0 +1,57 @@
+{
+  "bindings": [
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/qualification/export/AlphaBay_fit.json",
+      "bytes": 2305196,
+      "sha256": "8c7571d7c9baa52caa0f4a0129dd98351491076815bc64521bce79bd5e879885"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/qualification/export/AlphaBay_qualification.json",
+      "bytes": 119920,
+      "sha256": "85f107ad7df9a7912d42b1d096e288063d9c7bda238833fabb1cb7cf72640a23"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/qualification/export/Dream_fit.json",
+      "bytes": 1117432,
+      "sha256": "d3e12e63bbbc14d092d708dccf3a07cd8b2093f47acbb9aaeb4ec4925b01336f"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/qualification/export/Dream_qualification.json",
+      "bytes": 112028,
+      "sha256": "f4162de968dd67517ff4761c56a3a50766112d62549af17c5a35dbb9dd9598b2"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/qualification/export/Agora_fit.json",
+      "bytes": 2019505,
+      "sha256": "5a07735eb5932b30f23cabafdedc29a1ee9a9e810f466401eadb3a52f8e41f1f"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261029/vendorlink/native/qualification/export/Agora_qualification.json",
+      "bytes": 120878,
+      "sha256": "ff1f2c362ea07129583225586cf210b8a384e8d1f7f556c3d4f411247a7ad063"
+    }
+  ],
+  "purposes": [
+    {
+      "purpose": "old_training",
+      "source": "formal/gate.json fit_sources and step29_vendorlink_formal.load_fit",
+      "coverage": "all four fixed fit records per old fit account across all methods/orders/seeds"
+    },
+    {
+      "purpose": "qualification_scoring_and_training",
+      "source": "step29_vendorlink_export + step29_vendorlink_native",
+      "coverage": "three exported fit groups per market, checked as exact subsets; handwritten stress is not source data"
+    },
+    {
+      "purpose": "model_development_selection_and_later_scoring",
+      "source": "english_abc/plan plus both fullpool inputs",
+      "coverage": "old dev-account exports only; no additional old-fit records. Account-disjoint by original source key/split; cross-account exact overlap removed globally"
+    },
+    {
+      "purpose": "source_inventory_and_relation_audit",
+      "coverage": "metadata/data qualification, not model training/scoring/configuration selection; no restored relation payloads"
+    }
+  ],
+  "account_count": 2052,
+  "record_count": 8208
+}

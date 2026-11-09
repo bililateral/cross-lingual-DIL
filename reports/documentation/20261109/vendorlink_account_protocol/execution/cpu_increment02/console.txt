@@ -1,0 +1,23 @@
+F....E
+======================================================================
+ERROR: test_training_scoring_and_old_heads (__main__.IncrementTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/tests/test_step34_account_increment.py", line 105, in test_training_scoring_and_old_heads
+    result = execute(model, load, job, task, identity, binding)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/scripts/step34_vendorlink_account_run.py", line 143, in execute
+    f.write(json.dumps(dict(stage=stage, epoch=epoch, stage_update=update, updates=updates,
+TypeError: dict() got multiple values for keyword argument 'current'
+
+======================================================================
+FAIL: test_actual_dispatch_failure_and_reservations (__main__.IncrementTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/workspace/tests/test_step34_account_increment.py", line 213, in test_actual_dispatch_failure_and_reservations
+    self.assertTrue(json.loads((self.root/'healthy/dispatch_receipt.json').read_text())['success'])
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.845s
+
+FAILED (failures=1, errors=1)
