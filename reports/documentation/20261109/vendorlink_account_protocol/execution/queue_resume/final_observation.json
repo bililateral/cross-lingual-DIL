@@ -1,0 +1,166 @@
+{
+  "time": "2026-11-09T20:19:41.997364+08:00",
+  "controller": {
+    "time": "2026-11-09T20:13:35.798061+08:00",
+    "pid": 2051790,
+    "owner": "yongpeng",
+    "created": 1794226414.75,
+    "command": [
+      "/home/yongpeng/miniconda3/envs/py310/bin/python",
+      "-B",
+      "-u",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/workspace/scripts/step34_vendorlink_account_resume.py",
+      "--gate",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/gate.json",
+      "--action",
+      "campaign"
+    ],
+    "launch_command": [
+      "taskset",
+      "-c",
+      "44,45,46,47",
+      "/home/yongpeng/miniconda3/envs/py310/bin/python",
+      "-B",
+      "-u",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/workspace/scripts/step34_vendorlink_account_resume.py",
+      "--gate",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/gate.json",
+      "--action",
+      "campaign"
+    ],
+    "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume",
+    "cpu_affinity": [
+      44,
+      45,
+      46,
+      47
+    ],
+    "source": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/workspace/scripts/step34_vendorlink_account_resume.py",
+      "bytes": 17213,
+      "sha256": "7b746cb7844b4eaa12f58972c1b9153f5096802c9fff9ae4d80365e90dfbcc5b"
+    },
+    "gate": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/gate.json",
+      "bytes": 15535,
+      "sha256": "0a4cc11fc2a783dddc8c415f6f1a3a7843846a46b76e85d3628e84eb9f451a4b"
+    },
+    "automatic_handoff": true,
+    "automatic_retry": false
+  },
+  "state": {
+    "status": "WAIT_PRIMARY_SETTLEMENT",
+    "task": "P_VendorLink_SEQ_s45"
+  },
+  "children": 0,
+  "new_campaign_exists": false,
+  "workers": [
+    {
+      "task": "P_VendorLink_SEQ_s44",
+      "process": {
+        "pid": 2037915,
+        "owner": "yongpeng",
+        "created": 1794223716.68,
+        "command": [
+          "/home/yongpeng/miniconda3/envs/py310/bin/python",
+          "-B",
+          "-u",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/workspace/scripts/step34_vendorlink_account_control.py",
+          "--gate",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/gate.json",
+          "--action",
+          "train",
+          "--target",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/campaign/P/training/P_VendorLink_SEQ_s44",
+          "--deadline",
+          "1670133.683802848",
+          "--phase",
+          "P",
+          "--task",
+          "P_VendorLink_SEQ_s44"
+        ],
+        "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/retry_s44_15g/workspace",
+        "reserved_bytes": 17179869184
+      },
+      "update": {
+        "stage": 3,
+        "epoch": 22,
+        "stage_update": 7524,
+        "updates": 18084
+      },
+      "failure": false,
+      "settled_budget": {
+        "training": 41230,
+        "gpu": 88,
+        "auxiliary": 1955
+      }
+    },
+    {
+      "task": "P_H_SEQ_s45",
+      "process": {
+        "pid": 2045803,
+        "owner": "yongpeng",
+        "created": 1794224841.72,
+        "command": [
+          "/home/yongpeng/miniconda3/envs/py310/bin/python",
+          "-B",
+          "-u",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace/scripts/step34_vendorlink_account_control.py",
+          "--gate",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/gate.json",
+          "--action",
+          "train",
+          "--target",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/campaign/P/training/P_H_SEQ_s45",
+          "--deadline",
+          "1685658.722371974",
+          "--phase",
+          "P",
+          "--task",
+          "P_H_SEQ_s45"
+        ],
+        "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/parallel_h45/workspace",
+        "reserved_bytes": 15032385536
+      },
+      "update": {
+        "stage": 1,
+        "epoch": 12,
+        "stage_update": 2566,
+        "updates": 2566
+      },
+      "failure": false,
+      "settled_budget": {
+        "training": 0,
+        "gpu": 0,
+        "auxiliary": 136
+      }
+    }
+  ],
+  "gpu": {
+    "free": 15154151424,
+    "total": 34190917632,
+    "processes": {
+      "2037915": 14946402304,
+      "2045803": 3275751424
+    }
+  },
+  "gate": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/gate.json",
+    "bytes": 15535,
+    "sha256": "0a4cc11fc2a783dddc8c415f6f1a3a7843846a46b76e85d3628e84eb9f451a4b"
+  },
+  "source": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/workspace/scripts/step34_vendorlink_account_resume.py",
+    "bytes": 17213,
+    "sha256": "7b746cb7844b4eaa12f58972c1b9153f5096802c9fff9ae4d80365e90dfbcc5b"
+  },
+  "cleanup": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/cleanup_receipt.json",
+    "bytes": 2743,
+    "sha256": "512b554ae354c7b4f032aa4b2a8115f9d59df309585efb88e988814d577b7518"
+  },
+  "temporary_sources_removed": true,
+  "git_recovery_commit": "1589ef658817e3e060e26cec29343c2c95492885",
+  "full_automatic_handoff_approved_and_deployed": true,
+  "no_repeated_launch": true
+}
