@@ -4,7 +4,7 @@ H/S评价补充（2026-11-02）：用户选择[方案A](../reports/seller_alias_
 
 ## 当前合同入口
 
-VendorLink账号监督共同评价（2026-11-09，**待实质决定的草案**）：用户[确认删除指定关系候选并制定协议](RESEARCH_DISCUSSION.zh.md#2026-11-09删除关系候选转回论文账号监督的共同评价)，进入[完整协议](../reports/documentation/20261109/vendorlink_account_protocol/protocol.zh.md)。目标是原论文账号监督层级的已登记账号识别，完整H多记录评分与VendorLink分类/集合输出共同评价，跨账号排序为无真值应用输出；不再把真实同控标签作为账号监督的必要前提。当前只批准删除和方案准备，数据构建/实现/预算/训练未批准；下面关系核查和代理合同保留历史，不恢复旧执行许可。
+VendorLink账号监督共同评价（2026-11-09，**待实质决定的草案**）：用户[确认删除指定关系候选并制定协议](RESEARCH_DISCUSSION.zh.md#2026-11-09删除关系候选转回论文账号监督的共同评价)，进入[完整协议](../reports/documentation/20261109/vendorlink_account_protocol/protocol.zh.md)。目标是原论文账号监督层级的已登记账号识别，完整H多记录评分与VendorLink分类/集合输出共同评价，跨账号排序为无真值应用输出；不再把真实同控标签作为账号监督的必要前提。当前只批准删除、方案准备及指定包外审；[外审与主审处置](../reports/documentation/20261109/vendorlink_account_protocol/review/primary_disposition.zh.md)补清定义和未来接线要求，数据构建/实现/预算/训练仍未批准。下面关系核查和代理合同保留历史，不恢复旧执行许可。
 
 VendorLink真实跨账号关系资格（2026-11-08）：用户已确认[原包/规范缓存核查及条件性数据准备](../reports/documentation/20261108/vendorlink_alias_evidence/scope.zh.md)，并明确纳入既有身份SQL/HTML。当前判断及证据从[核查报告](../reports/documentation/20261108/vendorlink_alias_evidence/report.zh.md)进入；训练关闭，不把同账号拆分替代用户要求的马甲关联。用户明确本轮免外审、完成主审及清理，见[主审](../reports/documentation/20261108/vendorlink_alias_evidence/review/primary_disposition.zh.md)；实际状态只维护交接唯一VendorLink项。下面全市场诊断及更早合同是已发生的代理实验依据，不恢复为当前跨账号运行许可。
 

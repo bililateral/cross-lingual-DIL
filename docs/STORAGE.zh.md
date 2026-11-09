@@ -6,7 +6,7 @@
 
 原始商品包、规范缓存、SQL/HTML、旧实验/模型和中文暂停资产不在删除范围；报告、聚合、来源哈希、费用及历史源码恢复入口保留。Windows再次核对本任务无六份候选载荷，删除0；此前未回传/入Git，现不能由Git或SHA恢复这些生成载荷。原始来源仍存在不等于获准重新生成。下节“六份候选保留”和旧manifest/completion均记录11月8日当时事实，已被本次用户决定与删除回执更新，不追改原件。
 
-本次2296字节回执经SFTP回传、落盘大小/SHA一致，SHA256 `ab5d1237d1b5c7f3943eaf39e6795d0f23a64e9d07f886cd96ac5d353f28a5c3`。新协议及候选读取说明已按[SFTP回执](../reports/documentation/20261109/vendorlink_account_protocol/sync.json)同步并逐份读回相同，根docs未同步。具体新审查包只在Windows准备，随后用户明确批准该包外发，已单次提交网页外审并保留精确输入身份；不是已删除旧核查包的恢复。本轮无新数据解析、科研计算、载模或训练；不重置原核查费用或11月6日大清理/11月21日下次到期。新[账号监督协议](../reports/documentation/20261109/vendorlink_account_protocol/protocol.zh.md)只是准备材料，不会恢复被删候选。本地提交、不推送，根docs只在Windows维护。
+本次2296字节回执经SFTP回传、落盘大小/SHA一致，SHA256 `ab5d1237d1b5c7f3943eaf39e6795d0f23a64e9d07f886cd96ac5d353f28a5c3`。新协议及候选读取说明已按[SFTP回执](../reports/documentation/20261109/vendorlink_account_protocol/sync.json)同步并逐份读回相同，根docs未同步。具体新审查包随后按用户明确许可单次外发；完整37531字节原文、主审、输入/完成身份保留，[最终同步](../reports/documentation/20261109/vendorlink_account_protocol/review/final_sync.json)覆盖审后协议与必要审查材料。不是已删除旧核查包的恢复。确认精确输入ZIP可从Git ff6a24d6恢复、10份载荷匹配清单及返回原文已保管后，Windows按[回收/清理回执](../reports/documentation/20261109/vendorlink_account_protocol/review/recovery.json)删除14个临时文件202474字节（本次输入ZIP、重复下载和具名浏览器日志/快照）；未删除正式审查原文/来源，Linux没有本次临时包副本。本轮无新数据解析、科研计算、载模或训练；不重置原核查费用或11月6日大清理/11月21日下次到期。新[账号监督协议](../reports/documentation/20261109/vendorlink_account_protocol/protocol.zh.md)只是准备材料，不会恢复被删候选。本地提交、不推送，根docs只在Windows维护。
 
 ## 2026-11-08 原三市场跨账号关系核查收尾
 
