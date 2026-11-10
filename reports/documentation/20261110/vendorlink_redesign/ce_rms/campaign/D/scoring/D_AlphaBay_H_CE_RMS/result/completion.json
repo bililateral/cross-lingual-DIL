@@ -1,0 +1,132 @@
+{
+  "task": {
+    "id": "D_AlphaBay_H_CE_RMS",
+    "phase": "D",
+    "candidate": "H_CE_RMS",
+    "method": "H_SEQ",
+    "seed": 41,
+    "epochs": 40,
+    "stages": 1,
+    "domains": [
+      "AlphaBay"
+    ],
+    "settings": {
+      "method": "H_SEQ",
+      "lambda_rank": 1.3051794547562026,
+      "lr_multiplier": 1.0,
+      "encoder_lr": 2.5e-05,
+      "head_lr": 0.0003,
+      "vendor_lr": 4e-05,
+      "weight_decay": 0.01,
+      "vendor_weight_decay": 0.0,
+      "microbatch": 8,
+      "vendor_batch": 32,
+      "channel_tokens": 256,
+      "vendor_tokens": 512,
+      "memory_groups": 6,
+      "memory_bytes": 1048576,
+      "pooling": "mean_last4_sum",
+      "head_schedule": "encoder",
+      "bce_weight": 1.0,
+      "hard_weight": 0.5,
+      "alpha": 0.07049361507739538,
+      "beta": 0.767438161798796,
+      "gamma": 1.0,
+      "auxiliary_lr": 0.0003,
+      "ce_scale_mode": "rms",
+      "diagnostics": true
+    }
+  },
+  "role": "dev",
+  "training_identity": {
+    "protocol": "vendorlink-account-ce-rms-20261110",
+    "task": {
+      "id": "D_AlphaBay_H_CE_RMS",
+      "phase": "D",
+      "candidate": "H_CE_RMS",
+      "method": "H_SEQ",
+      "seed": 41,
+      "epochs": 40,
+      "stages": 1,
+      "domains": [
+        "AlphaBay"
+      ],
+      "settings": {
+        "method": "H_SEQ",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 2.5e-05,
+        "head_lr": 0.0003,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "mean_last4_sum",
+        "head_schedule": "encoder",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.767438161798796,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "rms",
+        "diagnostics": true
+      }
+    },
+    "manifest": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/manifest.json",
+      "bytes": 5126,
+      "sha256": "bab95378ac57c754b58f0d63336e358f56965dbf93700d87965e27abc56f28ad"
+    },
+    "gate": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/ce_rms/gate.json",
+      "bytes": 9077,
+      "sha256": "e62876e429ba3754952fb774883d83738e882f0006acbda2334c0596ad7d2e28"
+    }
+  },
+  "files": {
+    "H_SEQ:R11": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/ce_rms/campaign/D/scoring/D_AlphaBay_H_CE_RMS/result/H_SEQ_R11.npy",
+      "bytes": 2385056,
+      "sha256": "6d1dea2a2e0e0c34c27cd16ae85c0aae66420c61687712650e69ee5279bec52c"
+    },
+    "H_AUX:R11": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/ce_rms/campaign/D/scoring/D_AlphaBay_H_CE_RMS/result/H_AUX_R11.npy",
+      "bytes": 2385056,
+      "sha256": "928ee50cfe096a7274c3614e73de45059477efc76780df391a17032491499064"
+    },
+    "H_SET:R11": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/ce_rms/campaign/D/scoring/D_AlphaBay_H_CE_RMS/result/H_SET_R11.npy",
+      "bytes": 2385056,
+      "sha256": "21239f20642e36798f7e6f411f92cb21b0fc5cebfcee1d6b39346a005d39609c"
+    }
+  },
+  "status": "BLIND_SCORES_COMPLETE",
+  "cells": [
+    "R11"
+  ],
+  "sources": {
+    "AlphaBay:dev": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/data/AlphaBay_dev.json",
+      "bytes": 658254,
+      "sha256": "ee725475d064cb146b5a568e7c8b18741471d10675ef48a01c96529299b51ab7"
+    },
+    "AlphaBay:gallery": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/data/AlphaBay_gallery.json",
+      "bytes": 1225706,
+      "sha256": "fc1c68bdd68eb41f42621c968a9ad16f85e1b182a5aa577e47bf730d34b8b7bb"
+    }
+  },
+  "diagnostics": {
+    "1": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/ce_rms/campaign/D/training/D_AlphaBay_H_CE_RMS/run/diagnostic_stage1.pt",
+      "bytes": 3401589,
+      "sha256": "1c2af7dd0e96ac3119811a2a0ffb40f340b38383eb7a07a6ce7b2f66106ba13d"
+    }
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "task": {
+    "id": "D_Dream_H_CE_RMS",
+    "phase": "D",
+    "candidate": "H_CE_RMS",
+    "method": "H_SEQ",
+    "seed": 41,
+    "epochs": 40,
+    "stages": 1,
+    "domains": [
+      "Dream"
+    ],
+    "settings": {
+      "method": "H_SEQ",
+      "lambda_rank": 1.3051794547562026,
+      "lr_multiplier": 1.0,
+      "encoder_lr": 2.5e-05,
+      "head_lr": 0.0003,
+      "vendor_lr": 4e-05,
+      "weight_decay": 0.01,
+      "vendor_weight_decay": 0.0,
+      "microbatch": 8,
+      "vendor_batch": 32,
+      "channel_tokens": 256,
+      "vendor_tokens": 512,
+      "memory_groups": 6,
+      "memory_bytes": 1048576,
+      "pooling": "mean_last4_sum",
+      "head_schedule": "encoder",
+      "bce_weight": 1.0,
+      "hard_weight": 0.5,
+      "alpha": 0.07049361507739538,
+      "beta": 0.767438161798796,
+      "gamma": 1.0,
+      "auxiliary_lr": 0.0003,
+      "ce_scale_mode": "rms",
+      "diagnostics": true
+    }
+  },
+  "role": "dev",
+  "training_identity": {
+    "protocol": "vendorlink-account-ce-rms-20261110",
+    "task": {
+      "id": "D_Dream_H_CE_RMS",
+      "phase": "D",
+      "candidate": "H_CE_RMS",
+      "method": "H_SEQ",
+      "seed": 41,
+      "epochs": 40,
+      "stages": 1,
+      "domains": [
+        "Dream"
+      ],
+      "settings": {
+        "method": "H_SEQ",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 2.5e-05,
+        "head_lr": 0.0003,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "mean_last4_sum",
+        "head_schedule": "encoder",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.767438161798796,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "rms",
+        "diagnostics": true
+      }
+    },
+    "manifest": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/manifest.json",
+      "bytes": 5126,
+      "sha256": "bab95378ac57c754b58f0d63336e358f56965dbf93700d87965e27abc56f28ad"
+    },
+    "gate": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/ce_rms/gate.json",
+      "bytes": 9077,
+      "sha256": "e62876e429ba3754952fb774883d83738e882f0006acbda2334c0596ad7d2e28"
+    }
+  },
+  "files": {
+    "H_SEQ:R11": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/ce_rms/campaign/D/scoring/D_Dream_H_CE_RMS/result/H_SEQ_R11.npy",
+      "bytes": 197320,
+      "sha256": "d232fc3abdd35d17a25d88b68fed1eea24f279243f60a9ce9a6dba480fd74c45"
+    },
+    "H_AUX:R11": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/ce_rms/campaign/D/scoring/D_Dream_H_CE_RMS/result/H_AUX_R11.npy",
+      "bytes": 197320,
+      "sha256": "fb8d72f4b7ba0f84e1dd099d6055d283e8b105c50315246a36d392b9a3d12aaf"
+    },
+    "H_SET:R11": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/ce_rms/campaign/D/scoring/D_Dream_H_CE_RMS/result/H_SET_R11.npy",
+      "bytes": 197320,
+      "sha256": "da3543b28af1b35d7d6b1d9465ba348aaf7dc527f15a4eb4caf320f1d3008ac4"
+    }
+  },
+  "status": "BLIND_SCORES_COMPLETE",
+  "cells": [
+    "R11"
+  ],
+  "sources": {
+    "Dream:dev": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/data/Dream_dev.json",
+      "bytes": 249461,
+      "sha256": "9039617ee8d6e07024b139d0798df7bd7095869168cd28b6921436be60a26eb5"
+    },
+    "Dream:gallery": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/data/Dream_gallery.json",
+      "bytes": 452220,
+      "sha256": "fa6c183ffc483a3b31973edff518ca00a757ea1800d3c2929db9feef638defe4"
+    }
+  },
+  "diagnostics": {
+    "1": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/ce_rms/campaign/D/training/D_Dream_H_CE_RMS/run/diagnostic_stage1.pt",
+      "bytes": 981173,
+      "sha256": "f15eea2e2991f206b4444d5c4930ef44858f784a71a341eb23a4228b4115c9a3"
+    }
+  }
+}
