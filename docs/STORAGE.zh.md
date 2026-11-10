@@ -4,9 +4,9 @@
 
 用户要求同步进度并仔细分析后，Linux既有py310只检查完整开放D/P保存字段和元数据，不载模、训练、解析原始正文/标签或预测数组。Windows在`reports/documentation/20261109/vendorlink_account_protocol/result/`保存55份387248字节必要原件/汇总，[SFTP接收](../reports/documentation/20261109/vendorlink_account_protocol/result/receive.json)逐份大小/SHA一致；52份来源快照保留原目录对应关系，另3份为保存字段核对、统计汇总和传输清单。原动态运行文件不改，原失败、费用及删除事实保持；根docs仅Windows维护。额外425字节远端结构化身份清单用于纠正人工转录哈希字符错误，不重算或重传原结果。
 
-完整13指标/108格、逐seed和均值/样本标准差/范围、原科学门与停止原因见[报告](../reports/documentation/20261109/vendorlink_account_protocol/result/report.zh.md)和[全表](../reports/documentation/20261109/vendorlink_account_protocol/result/tables.zh.md)。真实账号、正文、标签、分数数组及模型仍留Linux，训练端点保留必要复核用途，没有授权本轮删除权重。保存字段脚本是本轮具体核对来源，结果审查闭合并完成精确恢复核对后按既有规则退役；不重跑CPU/GPU测试填保管记录。
+完整13指标/108格、逐seed和均值/样本标准差/范围、原科学门与停止原因见[报告](../reports/documentation/20261109/vendorlink_account_protocol/result/report.zh.md)和[全表](../reports/documentation/20261109/vendorlink_account_protocol/result/tables.zh.md)。真实账号、正文、标签、分数数组及模型仍留Linux，训练端点保留必要复核用途，没有授权本轮删除权重。保存字段脚本是本轮具体核对来源，本轮结果审查闭合后已双端退役；实际从Git提交d279d2dd读取该11634字节源码blob，并与本地及SFTP回传的远端文件核对SHA一致，不重跑CPU/GPU测试填保管记录。
 
-用户已明确批准本次73项结果审查包，经本地Playwright MCP单次提交；[包清单](../reports/documentation/20261109/vendorlink_account_protocol/result/review_manifest.json)及[具体许可/提交](../reports/documentation/20261109/vendorlink_account_protocol/result/review/submission.json)保留。审查未闭合时保留输入ZIP及核对来源，后续按实际用途清理；不将此次许可扩大到其他材料。本轮本地提交、不推送，不重置11月6日大清理周期。
+用户已明确批准本次73项结果审查包，经本地Playwright MCP单次提交；[包清单](../reports/documentation/20261109/vendorlink_account_protocol/result/review_manifest.json)及[具体许可/提交](../reports/documentation/20261109/vendorlink_account_protocol/result/review/submission.json)保留。本轮完整回收34862字节十节原文（SHA256 `02436ae5e3311057ab97a22a8a7278c761aa339079b42253f2b55b116bcbc565`）及完成页，[独立主审](../reports/documentation/20261109/vendorlink_account_protocol/result/review/primary_disposition.zh.md)结案，无科研阻断。原送审请求/清单/提交及指标/失败/费用原件不改；只澄清当前报告状态、控制器指代、计时和时间戳边界。[回收/清理记录](../reports/documentation/20261109/vendorlink_account_protocol/result/review/recovery.json)记载Windows六份239134字节临时包/源码/重复下载和浏览器日志删除，Linux仅退役一份11634字节check_saved.py，SFTP复查不存在；输入ZIP及核对源码均实际与Git d279d2dd原blob精确比较，必要原文和正式证据保留。审查材料按[最终同步](../reports/documentation/20261109/vendorlink_account_protocol/result/review/final_sync.json)双端核对，不为删除无用包另备份或补传输入包，不扩大外发许可。本轮本地提交、不推送，不重置11月6日大清理周期。
 
 ## 2026-11-09 接手只读诊断原件回收
 
