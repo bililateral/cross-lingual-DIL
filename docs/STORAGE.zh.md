@@ -4,7 +4,9 @@
 
 本轮用户确认仅分析代码/已开放D结果和数值日志并保存方案，见[决定](RESEARCH_DISCUSSION.zh.md#2026-11-10诊断ce学习差距并保存有限改进方案)。一次Linux CPU汇总42240条更新的损失/梯度/调度计数，实际0.738532秒、向上计1秒；产物[log_summary.json](../reports/documentation/20261110/vendorlink_redesign/diagnosis/log_summary.json)只含数值统计及输入身份，不含原日志中的记录标识。诊断脚本、汇总、实际来源/端点缺失核对与[报告](../reports/documentation/20261110/vendorlink_redesign/diagnosis/report.zh.md)共4份606824字节，经[具名同步](../reports/documentation/20261110/vendorlink_redesign/diagnosis/sync.json)在Linux独立diagnosis目录逐份匹配大小/SHA。原生产来源/门/账/日志/数据不改，未载模、生成预测或训练；根docs只在Windows。
 
-本轮已准备定向诊断/方案审查输入：23项ZIP190569字节，SHA256 `b89ec6d8af32aac97fc62192ef49571414c961e49e70c2b7fa75f7beaf7585ff`，具名成员见[清单](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/manifest.json)。包只在Windows，尚未外发；不把旧具体包许可扩大。分析脚本及输入包仍用于这次待处置审查，当前保留，审查/主审收尾后按精确Git恢复与实际用途退役，不无限保留一次性脚本。本轮未产生浏览器临时文件或新增模型，不恢复已删D端点，不重置11月6日大清理及11月21日到期。本地提交、不推送。
+本轮定向诊断/方案审查输入为23项ZIP190569字节，SHA256 `b89ec6d8af32aac97fc62192ef49571414c961e49e70c2b7fa75f7beaf7585ff`，具名成员见[清单](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/manifest.json)。用户批准该具体包后，已单次上传指定网页审查，见[许可](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/authorization.json)及[提交](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/submission.json)；未向Linux复制无用ZIP。分析脚本、输入包及本次浏览器临时文件仍用于进行中的审查，Git `7e1b2f21`可精确恢复脚本和输入；审查/主审收尾后核对实际内容再退役，不无限保留一次性脚本。本轮无新增模型，不恢复已删D端点，不重置11月6日大清理及11月21日到期。本地提交、不推送。
+
+审查许可、实际发送文本、原提交和18:59进行中索引共4份3898字节另按[审查同步清单](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/sync.json)核对Linux副本，未回收外审最终报告。SSH文件助手已关闭；正在进行的网页审查保留原会话，不能把关闭SSH写成审查已结束。
 
 ## 2026-11-10 CE开发结束权重清理
 

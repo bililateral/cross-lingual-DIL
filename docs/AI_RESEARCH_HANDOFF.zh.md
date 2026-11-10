@@ -6,10 +6,10 @@
 
 ### VendorLink账号监督共同评价
 
-- **目标与范围**：完整H多记录关联先学得接近VendorLink，再检验保持及外部竞争力。用户已[确认诊断与保存方案](RESEARCH_DISCUSSION.zh.md#2026-11-10诊断ce学习差距并保存有限改进方案)：只读现有代码/开放结果，Linux数值日志汇总限1 CPU worker/2核/4GiB/600秒/20MiB；不载模、GPU、训练或上传。原运行设定仍从[设计入口](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)定位，不能凭旧88h余额重开。
+- **目标与范围**：完整H多记录关联先学得接近VendorLink，再检验保持及外部竞争力。用户已[确认诊断与保存方案](RESEARCH_DISCUSSION.zh.md#2026-11-10诊断ce学习差距并保存有限改进方案)：只读现有代码/开放结果，Linux数值日志汇总限1 CPU worker/2核/4GiB/600秒/20MiB；不载模、GPU或训练。随后明确批准下述具体包外审，未批准新候选执行。原运行设定仍从[设计入口](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)定位，不能凭旧88h余额重开。
 - **最新证据**：原D八项训练/评分完整、16:37:21以[STOP_ADAPTATION](../reports/documentation/20261110/vendorlink_redesign/implementation/campaign/completion.json)结束，P/M/C未启动。H_CE宏F1 A/B为70.1994%/74.8408%，相对V1_CLS低9.8189/15.4989pp。[当前诊断](../reports/documentation/20261110/vendorlink_redesign/diagnosis/report.zh.md)确认CE真实接线、暴露/调度正确；组内H目标很低，CE仍3.3205/3.0290，输入尺度与最终读取存在明确差异，但唯一因果根源未证实。Dream的Top1/MRR稍升，不能笼统说所有效果下降。Linux13运行来源匹配；原进程退出事实及费用见[停止核对](../reports/documentation/20261110/vendorlink_redesign/implementation/stop_observation.json)。
 - **费用与保管**：原链累计18554秒、实际工期约2小时41分23秒，链剩余0；本次独立数值汇总0.738532秒向上计1秒，不写回旧账。用户已批准并完成[16份权重清理](../reports/documentation/20261110/vendorlink_redesign/implementation/weight_cleanup.json)，无可载模旧D端点；本轮[实际缺失核对](../reports/documentation/20261110/vendorlink_redesign/diagnosis/verification.json)承接删除，不重训补诊断。日志/结果/来源、原5pp/STOP_LEARNING/71450秒旧费用保留。
-- **下一步**：诊断建议唯一CE单位RMS尺度候选及必要读取诊断；两单域、建议7h/8GiB/最多2worker均是待决定方案，不是运行许可。新结果/方案外审按具名材料许可处理，原实现外审不覆盖新结论；本轮完成文档/小证据交付，本地提交不推送。原门/来源/结果冻结，不恢复控制器、不重划或动中文暂停。
+- **下一步**：诊断建议唯一CE单位RMS尺度候选及必要读取诊断；两单域、建议7h/8GiB/最多2worker均是待决定方案，不是运行许可。用户批准23项190569字节具体包后，18:55:55已经本地Playwright MCP[单次提交](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/submission.json)，[原会话](https://chatgpt.com/c/6af2f80a-4780-83ea-9d4e-c356a7814cbe)实际开始核对清单/源码，尚未完成或主审结案；请求及可见选择器GPT-6/Pro，自述Astra Pro，后台身份未独立核实。沿原会话回收，不重复上传；本地提交不推送，原门/来源/结果冻结，不恢复控制器、不重划或动中文暂停。
 
 ### 历史权重版H主实验消融
 
