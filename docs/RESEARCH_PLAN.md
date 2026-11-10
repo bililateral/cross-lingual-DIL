@@ -2,11 +2,11 @@
 
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)，本页仅列后续动作和授权边界。有效合同及增量修复从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)进入，不复制PID、计数或过期工期。
 
-## VendorLink账号监督：已完成CE适配实现，待正式启动
+## VendorLink账号监督：按已审阶段链推进CE与遗忘检验
 
-用户已要求“此次修改免审。确定好方案就开始尽快实现”。现按[方案](../reports/documentation/20261110/vendorlink_redesign/proposal.zh.md)与[实施范围](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)完成最小实现、必要CPU/唯一GPU增量核验和主审；来源、真实接线及费用见[实现报告](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)。不再把历史“待实现批准”恢复为当前阻断，不重复GPU资格。用户随后明确“实现完成就提交外审”，现已按最新要求单次提交定向实现审查，等待完整报告后独立处置必要问题。用户最新已明确授权外审和主审问题闭合后正式开始当前D/P/M/C，不再等待重复开始确认；实施前仍核对完整审查及资源。
+[实现及必要核验](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)、完整外审和[主审](../reports/documentation/20261110/vendorlink_redesign/implementation/review/primary_disposition.zh.md)已闭合，无新增代码修复或CPU/GPU资格。按用户最新“没问题了就正式开始实验”及[现行范围补充](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)连续执行，不再恢复旧暂停或重复询问开始许可；实际状态只在交接对应项维护。
 
-下一步完成本次实现外审及主审必要处置后，按用户最新正式启动决定直接核对新入口来源、现场资源及继承费用，按既定阶段推进：D八个A/B冷启动任务，条件P六条及M六条，固定51/52/53，最多两路H＋V/H＋H、最多一条V并行；88h=80训练/4GPU/4辅助，32GiB输出帽。阶段前提失败正常停止，不追选候选、顺序或seed；不重建已合格12/4/2/2数据，不恢复旧层叠接续控制器或已删权重。完整H保留文本与多记录评分及回放/出生评分保持，当前CE只是共同学习适配。
+继续既有唯一控制器的D八个A/B冷启动、条件P六条及M六条、C完整端点确认；固定51/52/53，最多两路H＋V/H＋H、最多一条V并行，88h=80训练/4GPU/4辅助，32GiB输出帽。完整阶段后按现有门开放结果，逐域/逐seed/配对差、均值/样本SD/范围分别解释学习、遗忘、Full系统及Full−ER组件；阶段前提失败正常停止，不追选候选、顺序或seed。不要重复启动，不重建已合格12/4/2/2数据，不恢复旧层叠控制器或已删权重；当前运行的来源/gate保持冻结，按实际并发与速度更新工期。
 
 已定标准保持：H相对V_CLS逐域初学均值最多低2pp/逐seed最多低5pp，明显遗忘均值3.5pp及跨seed保护；Full同时满足旧域最终、遗忘、新域和外部基线门。取消人为GPU配额及固定GiB整PID终止，资源预留仍执行；单worker OOM退出，健康worker继续当前阶段剩余独立任务，失败不重跑，缺项不开放该批效果或下游。工程核验不证明科学目标已实现。
 
