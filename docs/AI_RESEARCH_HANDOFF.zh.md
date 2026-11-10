@@ -7,9 +7,9 @@
 ### VendorLink账号监督共同评价
 
 - **目标与范围**：当前账号CE改善H学习，再条件检验完整H保持及外部竞争力。设定从[方案与补充](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)定位；D8→条件P6/M6/C，最多两路，88h=80训练/4GPU/4辅助。正式执行授权见[用户决定](RESEARCH_DISCUSSION.zh.md#2026-11-10清理账号监督旧资产并重新设计)及[启动补充](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)。
-- **最新观测**：11月10日14:40:28[只读元数据](../reports/documentation/20261110/harness_workflow/observation.json)确认控制器2271319身份与[启动回执](../reports/documentation/20261110/vendorlink_redesign/implementation/launch.json)一致，gate SHA未变。D的AlphaBay H_base/H_CE分别4490/4488更新，另6任务待派；无记录失败/退休，D/P/M/C结果均未开放，未读取效果值。
-- **预算与工期**：已结算training0/GPU18/aux160秒；两活动训练生命周期合计暂估5339.56秒，完整承诺合计暂估21601.985秒，两项互相重叠、不得相加，监管未结费用不估算。全链34—46小时工期仅为启动时规划，阶段失败可提前结束，资源等待/退槽后按实际速度重估；88h不是工期。
-- **下一步**：现有唯一控制器完成D后按原门条件推进；完整阶段后才评分/开放，失败不重试，OOM退休槽且健康槽续领当前阶段。原5pp失败、STOP_LEARNING、71450秒费用及删除事实保持。实际来源和审查见[实现报告](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)；数据/模型留Linux，不重划、不重复启动，不动中文暂停；活动来源/gate冻结。
+- **最新观测**：11月10日18:08:45[停止核对](../reports/documentation/20261110/vendorlink_redesign/implementation/stop_observation.json)确认原控制器及同入口worker均已退出，gate及19份小来源绑定未变；D的8项训练、8项评分全部完成并通过包装验收/完成绑定，无运行失败、OOM退槽或预算停止。16:37:21保存的[终态](../reports/documentation/20261110/vendorlink_redesign/implementation/campaign/completion.json)为STOP_ADAPTATION：H_CE在AlphaBay/Dream宏F1为70.1994%/74.8408%，相对选定V1分类器低9.8189/15.4989pp，未满足D各域差距≤2pp；绝对70%门通过。CE相对H_base分别−1.2047/−0.2123pp。完整D已开放，P/M/C及应用均未启动；单seed开发筛查不能替代遗忘或Full效果检验。
+- **预算与工期**：最终账training17937/GPU123/aux494秒，累计18554秒（5小时9分14秒，含既有准备/核验）；本轮正式链13:55:58启动、16:37:21结束，实际工期约2小时41分23秒，当前链剩余0。原全链34—46小时估计以所有前置门通过为条件，本次提前按科学门结束，不再给待完成预测；88h额度未耗尽。
+- **下一步**：整理已开放D结果及学习差距，必要结果审查另按实际材料与外发许可处理；当前只有停止原因和保存字段核对，不冒称新结果已外审。新适配干预、改门或重训须另行明确，原控制器不重启。原5pp失败、STOP_LEARNING、71450秒旧费用及删除事实保持。实际来源和既有实现审查见[实现报告](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)；数据/模型留Linux，本轮未删除端点，不重划、不动中文暂停，原运行来源/gate和结果保持冻结。
 
 ### 历史权重版H主实验消融
 

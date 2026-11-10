@@ -4,11 +4,11 @@
 
 接手和日常同步按[工作流](RESEARCH_WORKFLOW.zh.md)使用一次性只读观察及具名SFTP核验；普通更新数变化不重复修改合同入口/计划。状态跃迁时核对受影响可变入口，保持活动冻结来源、历史原件和原判据。
 
-## VendorLink账号监督：按已审阶段链推进CE与遗忘检验
+## VendorLink账号监督：整理CE开发结果，后续适配另行决定
 
-[实现及必要核验](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)、完整外审和[主审](../reports/documentation/20261110/vendorlink_redesign/implementation/review/primary_disposition.zh.md)已闭合，无新增代码修复或CPU/GPU资格。按用户最新“没问题了就正式开始实验”及[现行范围补充](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)连续执行，不再恢复旧暂停或重复询问开始许可；实际状态只在交接对应项维护。
+[实现及必要核验](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)、完整外审和[主审](../reports/documentation/20261110/vendorlink_redesign/implementation/review/primary_disposition.zh.md)已闭合。用户“没问题了就正式开始实验”及[现行范围补充](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)授权的固定阶段链已实际执行；该许可包含前置门失败时停止，不包含停止后的新候选或重训。实际状态只在交接对应项维护。
 
-继续既有唯一控制器的D八个A/B冷启动、条件P六条及M六条、C完整端点确认；固定51/52/53，最多两路H＋V/H＋H、最多一条V并行，88h=80训练/4GPU/4辅助，32GiB输出帽。完整阶段后按现有门开放结果，逐域/逐seed/配对差、均值/样本SD/范围分别解释学习、遗忘、Full系统及Full−ER组件；阶段前提失败正常停止，不追选候选、顺序或seed。不要重复启动，不重建已合格12/4/2/2数据，不恢复旧层叠控制器或已删权重；当前运行的来源/gate保持冻结，按实际并发与速度更新工期。
+本链已按D筛查结束，停止证据及实际费用从交接对应项进入；原条件P/M/C未获满足，不恢复原控制器或凭预算余量续跑。后续先整理完整D保存结果，解释H_base、H_CE与两种VendorLink开发配置的逐市场差异，明确单seed开发结论及CE未带来提升的范围。若进一步提出学习适配，须针对实际目标与评分衔接给有限改动及依据，再明确候选、预算和执行范围；不为过门追加γ、顺序或seed。必要结果审查沿用现有规则，不把实现外审当作本次效果审查。原运行来源/gate、已建12/4/2/2数据和全部结果/费用保留，本轮不删除权重或重算指标。
 
 已定标准保持：H相对V_CLS逐域初学均值最多低2pp/逐seed最多低5pp，明显遗忘均值3.5pp及跨seed保护；Full同时满足旧域最终、遗忘、新域和外部基线门。取消人为GPU配额及固定GiB整PID终止，资源预留仍执行；单worker OOM退出，健康worker继续当前阶段剩余独立任务，失败不重跑，缺项不开放该批效果或下游。工程核验不证明科学目标已实现。
 

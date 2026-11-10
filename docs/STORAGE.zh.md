@@ -1,5 +1,9 @@
 # 科研文件存储与恢复
 
+## 2026-11-10 CE开发停止原因核对
+
+本轮按用户“看看实验为什么停了”，回收[停止观测](../reports/documentation/20261110/vendorlink_redesign/implementation/stop_observation.json)及其captured_files列出的8份已开放D聚合结果/决策、完整性清单和最终账/dispatch，共9份47922字节。SFTP逐份与Linux原件核对大小/SHA一致；观测文件11741字节，SHA256 `265e1cfdeeaa16d631219fd005a53b6e75e273508c0df9df567dd59787c132b8`。只检查实际进程、19份小来源绑定和8+8完成记录，未载模、重算指标、读取逐条分数/正文/标签或重新训练。Linux仅新增具名停止观察，不修改原控制器/gate、账本、结果和模型；根docs在Windows原位维护，本地提交、不推送。必要端点保留用于复核，未创建临时脚本或审查包，无新增删除；旧清理事实及11月21日大清理到期不变。
+
 ## 2026-11-10 科研工作流工具与记录整理
 
 本轮按[用户明确批准](RESEARCH_DISCUSSION.zh.md#2026-11-10批准科研工作流改善及全部本地提交推送)保留两个正式辅助工具及各自普通回归测试，见[用法](RESEARCH_WORKFLOW.zh.md)。Linux只部署至独立`reports/documentation/20261110/harness_workflow/`的scripts/tests，不改活动CE的13来源、gate、角色文件或模型。四项Linux元数据回归和四项Windows文件检查、真实SFTP上传/读回/Pull证据见[核验记录](../reports/documentation/20261110/harness_workflow/verification.json)；[观察快照](../reports/documentation/20261110/harness_workflow/observation.json)与[接收回执](../reports/documentation/20261110/harness_workflow/receive.json)仅有允许元数据，未查看未完整D效果。当前状态只在交接维护，整理前原详细表格移动至同页标时历史，未删除历史事实。
