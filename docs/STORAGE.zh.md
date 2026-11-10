@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-10 账号监督完整结果回传
+
+用户要求同步进度并仔细分析后，Linux既有py310只检查完整开放D/P保存字段和元数据，不载模、训练、解析原始正文/标签或预测数组。Windows在`reports/documentation/20261109/vendorlink_account_protocol/result/`保存55份387248字节必要原件/汇总，[SFTP接收](../reports/documentation/20261109/vendorlink_account_protocol/result/receive.json)逐份大小/SHA一致；52份来源快照保留原目录对应关系，另3份为保存字段核对、统计汇总和传输清单。原动态运行文件不改，原失败、费用及删除事实保持；根docs仅Windows维护。额外425字节远端结构化身份清单用于纠正人工转录哈希字符错误，不重算或重传原结果。
+
+完整13指标/108格、逐seed和均值/样本标准差/范围、原科学门与停止原因见[报告](../reports/documentation/20261109/vendorlink_account_protocol/result/report.zh.md)和[全表](../reports/documentation/20261109/vendorlink_account_protocol/result/tables.zh.md)。真实账号、正文、标签、分数数组及模型仍留Linux，训练端点保留必要复核用途，没有授权本轮删除权重。保存字段脚本是本轮具体核对来源，结果审查闭合并完成精确恢复核对后按既有规则退役；不重跑CPU/GPU测试填保管记录。
+
+用户已明确批准本次73项结果审查包，经本地Playwright MCP单次提交；[包清单](../reports/documentation/20261109/vendorlink_account_protocol/result/review_manifest.json)及[具体许可/提交](../reports/documentation/20261109/vendorlink_account_protocol/result/review/submission.json)保留。审查未闭合时保留输入ZIP及核对来源，后续按实际用途清理；不将此次许可扩大到其他材料。本轮本地提交、不推送，不重置11月6日大清理周期。
+
 ## 2026-11-09 接手只读诊断原件回收
 
 本轮仅只读核对Linux进程、运行元数据、冻结源码和现有费用，未修改Linux文件、活动源码/gate或进程，未载模、测试、训练或计算指标。13份原有小证据经SFTP保存于`execution/queue_resume/diagnosis_2036/`，共23200字节，逐份大小/SHA与Linux当时原件一致，见[接收清单](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/diagnosis_2036/receive.json)。内容仅primary终态/完成/失败/账、接续状态/承接依据/账及V45身份/资源准入、H45增量账；没有正文、账号、标签、分数、权重或凭据。Windows快照名说明用途，不覆盖此前final_observation或其他冻结回执；动态状态仍只在交接当前项维护。
