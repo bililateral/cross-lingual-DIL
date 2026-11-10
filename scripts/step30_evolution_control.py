@@ -95,13 +95,15 @@ def release(process):
 class Runner:
     def __init__(self, allowed: dict, gate_path: Path, root: Path, ledger: Ledger, *,
                  worker_entry: Path | None = None, caps: dict = CAPS, limits=None,
-                 wait_for_resources: bool = True, halt_dispatch_on_failure: bool = False):
+                 wait_for_resources: bool = True, halt_dispatch_on_failure: bool = False,
+                 continue_after_oom: bool = False):
         self.allowed, self.gate_path, self.root, self.ledger = allowed, gate_path, root, ledger
         self.worker_entry = Path(__file__).resolve() if worker_entry is None else Path(worker_entry).resolve()
         self.caps = dict(caps)
         self.limits = dict(LIMITS if limits is None else limits)
         self.wait_for_resources = wait_for_resources
         self.halt_dispatch_on_failure = halt_dispatch_on_failure
+        self.continue_after_oom = continue_after_oom
         if self.caps != ledger.caps:
             raise ValueError('Controller and ledger must use identical cumulative budgets')
         self.failed = False
@@ -156,10 +158,14 @@ class Runner:
         def finish(slot, error=None):
             item = active.pop(slot)
             p, job = item['process'], item['job']
+            reported_oom = (error is None and p.poll() not in (None, 0)
+                            and (job['target']/'worker_failure.json').exists()
+                            and read(job['target']/'worker_failure.json').get('kind') == 'CUDA_OOM')
             try:
                 release(p)
             except BaseException as exc:
                 error = error or repr(exc)
+                reported_oom = False
             if p.poll() is None:
                 unreleased[slot] = dict(item['identity'], release_unconfirmed=True)
             elapsed = time.monotonic()-item['started']
@@ -171,12 +177,14 @@ class Runner:
                 except BaseException as exc:
                     error = repr(exc)
             receipt = dict(success=error is None, error=error, seconds=elapsed, slot=slot,
+                           failure_kind='CUDA_OOM' if reported_oom else ('OTHER' if error else None),
                            released=p.poll() is not None, peak_gpu_bytes=item['peak_gpu'], peak_rss_bytes=item['peak_rss'])
             write(job['target']/'dispatch_receipt.json', receipt)
             self.ledger.charge(job['bucket'], job['target'].name, elapsed, error is None)
             if error is not None:
                 retired.add(slot)
-                failures.append(dict(task=job['target'].name, slot=slot, error=error))
+                failures.append(dict(task=job['target'].name, slot=slot, error=error,
+                                     kind='CUDA_OOM' if reported_oom else 'OTHER'))
         try:
             initialized = time.monotonic()
             try:
@@ -199,7 +207,9 @@ class Runner:
                                 item['peak_gpu'] = max(item['peak_gpu'], occupied)
                                 if time.monotonic() >= item['deadline']-15:
                                     error = 'Full worker lifecycle deadline'
-                                elif rss > self.limits['rss_bytes'] or occupied > self.limits['process_gpu_bytes']:
+                                elif (rss > self.limits['rss_bytes'] or
+                                      (self.limits.get('process_gpu_bytes') is not None
+                                       and occupied > self.limits['process_gpu_bytes'])):
                                     error = 'Worker RAM/GPU limit'
                                 elif (directory_bytes(Path(self.allowed['experiment_root'])) > self.limits['disk_bytes']
                                       or shutil.disk_usage(self.root).free < self.limits['free_disk_reserve']):
@@ -211,12 +221,16 @@ class Runner:
                             if self.halt_dispatch_on_failure and (error == 'Shared disk limit' or
                                     (job['target']/'shared_failure.json').exists()):
                                 raise RuntimeError('Shared validity/resource failure; stop related active jobs')
-                    if failures and self.halt_dispatch_on_failure:
+                    if (failures and self.halt_dispatch_on_failure and
+                            (not self.continue_after_oom or any(f.get('kind') != 'CUDA_OOM' for f in failures))):
                         budget_stop = 'Worker failed; drain already running jobs without new dispatch'
                     for slot in range(slots):
                         if slot in active or slot in retired or next_job == len(jobs) or budget_stop:
                             continue
                         job = dict(jobs[next_job])
+                        if (job.get('gpu_family') == 'V' and
+                                any(x['job'].get('gpu_family') == 'V' for x in active.values())):
+                            continue  # New account protocol permits at most one V worker.
                         outstanding = sum(x['job']['seconds'] for x in active.values() if x['job']['bucket'] == job['bucket'])
                         try:
                             if job['action'] == 'analyze':
@@ -237,7 +251,9 @@ class Runner:
                                 break
                             continue  # In-flight reservations can be released after completion.
                         owned = [x['identity'] for x in active.values()]
-                        observation = resource_observation(self.allowed, self.root, gpu, owned, nv, limits=self.limits)
+                        admission_limits = dict(self.limits)
+                        admission_limits['free_gpu_bytes'] = job.get('reserved_bytes', self.limits['free_gpu_bytes'])
+                        observation = resource_observation(self.allowed, self.root, gpu, owned, nv, limits=admission_limits)
                         write(job['target']/'admission.json', observation)
                         if not observation['ready']:
                             if not active and not self.wait_for_resources:
@@ -257,7 +273,7 @@ class Runner:
                                     stdout=output, stderr=subprocess.STDOUT, start_new_session=True, umask=0o077)
                             p = psutil.Process(process.pid)
                             identity = dict(pid=p.pid, owner=p.username(), created=p.create_time(), command=argv,
-                                            cwd=p.cwd(), reserved_bytes=self.limits['free_gpu_bytes'])
+                                            cwd=p.cwd(), reserved_bytes=admission_limits['free_gpu_bytes'])
                             # taskset execs in place, so the command after exec omits its own wrapper.
                             identity['command'] = argv[3:]
                             active[slot] = dict(process=process, job=job, identity=identity, started=started,

@@ -1,0 +1,146 @@
+"""Frozen candidates, phases, and unrounded account-protocol decisions."""
+from dataclasses import asdict, dataclass
+import math
+import statistics
+
+from step29_vendorlink_methods import Settings
+
+PROTOCOL = 'vendorlink-account-ce-20261110'
+DOMAINS = ('AlphaBay', 'Dream', 'Agora')
+SEEDS = (51, 52, 53)
+CAPS = dict(training=80*3600, gpu=4*3600, auxiliary=4*3600)
+LIMITS = dict(workers=2, free_gpu_bytes=5*2**30, process_gpu_bytes=None,
+              allocator_bytes=None, vendor_reserve_bytes=17*2**30,
+              rss_bytes=16*2**30, free_ram_bytes=20*2**30,
+              disk_bytes=32*2**30, free_disk_reserve=32*2**30, save_reserve_bytes=2*2**30,
+              dispatch_free_disk_bytes=64*2**30)
+CELLS = ((0, 1), (1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3))
+
+
+@dataclass(frozen=True)
+class AccountSettings(Settings):
+    alpha: float = .07049361507739538
+    beta: float = .767438161798796
+    gamma: float = 1.
+    auxiliary_lr: float = 3e-4
+
+    def __post_init__(self):
+        super().__post_init__()
+        if not all(math.isfinite(v) and v >= 0 for v in (self.alpha, self.beta, self.auxiliary_lr)):
+            raise ValueError('Finite nonnegative historical weights required')
+        if self.gamma not in (0., 1.):
+            raise ValueError('Only the frozen zero/one CE intervention is allowed')
+
+
+def settings(candidate, method):
+    changes = {}
+    if candidate in ('H_base', 'H_CE'):
+        changes = dict(pooling='mean_last4_sum', encoder_lr=2.5e-5, head_lr=3e-4,
+                       lr_multiplier=1., head_schedule='encoder', gamma=float(candidate == 'H_CE'))
+    elif candidate == 'V1':
+        changes = dict(vendor_lr=2e-5)
+    elif candidate != 'V0':
+        raise ValueError('Unknown fixed candidate')
+    if candidate.startswith('V') != (method == 'VendorLink_SEQ'):
+        raise ValueError('Candidate/method family mismatch')
+    return asdict(AccountSettings(method, **changes))
+
+
+def tasks(phase, selection=None):
+    if phase == 'D':
+        return [dict(id='D_'+d+'_'+c, phase='D', candidate=c, method=m, seed=41, epochs=40,
+                     stages=1, domains=[d], settings=settings(c, m))
+                for d in DOMAINS[:2] for c, m in (
+                    ('H_base', 'H_SEQ'), ('H_CE', 'H_SEQ'), ('V0', 'VendorLink_SEQ'), ('V1', 'VendorLink_SEQ'))]
+    if phase not in ('P', 'M') or set(selection) != {'H', 'V'}:
+        raise ValueError('Frozen D selection required')
+    if selection['H'] != 'H_CE' or selection['V'] not in ('V0', 'V1'):
+        raise ValueError('Only the single adapted H and frozen V selection may proceed')
+    methods = ('H_SEQ', 'VendorLink_SEQ') if phase == 'P' else ('H_ER', 'H_full')
+    return [dict(id=f'{phase}_{m}_s{s}', phase=phase, candidate=selection['V' if m.startswith('Vendor') else 'H'],
+                 method=m, seed=s, epochs=40, stages=3, domains=list(DOMAINS),
+                 settings=settings(selection['V' if m.startswith('Vendor') else 'H'], m))
+            for s in SEEDS for m in methods]
+
+
+def select(development):
+    def score(domain, candidate, reading):
+        row, = development['D_'+domain+'_'+candidate][reading]
+        if row['seed'] != 41 or not math.isfinite(row['R11']):
+            raise ValueError('Complete finite fixed D endpoints required')
+        return row['R11']
+    # Validate the same eight tasks, including both V readings and the H_base control.
+    for task in tasks('D'):
+        for reading in (('V_CLS', 'V_SET') if task['method'] == 'VendorLink_SEQ' else ('H_SEQ',)):
+            score(task['domains'][0], task['candidate'], reading)
+    v = [statistics.mean(score(d, 'V'+str(i), 'V_CLS') for d in DOMAINS[:2]) for i in (0, 1)]
+    selected = dict(H='H_CE', V='V'+str(int(v[1]-v[0] > .001)))
+    checks = {d: dict(H=score(d, 'H_CE', 'H_SEQ'), V=score(d, selected['V'], 'V_CLS'),
+                      CE_minus_base=score(d, 'H_CE', 'H_SEQ')-score(d, 'H_base', 'H_SEQ')) for d in DOMAINS[:2]}
+    passed = all(r['H'] >= .70 and r['H']-r['V'] >= -.02 for r in checks.values())
+    return dict(status='PASS_D' if passed else 'STOP_ADAPTATION', selected=selected, checks=checks)
+
+
+def task_domains(task):
+    domains = tuple(task['domains'])
+    if (len(domains) != task['stages'] or
+            (task['phase'] == 'D' and (len(domains) != 1 or domains[0] not in DOMAINS[:2])) or
+            (task['phase'] in ('P', 'M') and domains != DOMAINS)):
+        raise ValueError('Actual task domains do not match the frozen stage')
+    return domains
+
+
+def summarize(cells):
+    r = dict(cells)
+    r.update(Q=(r['R11']+r['R22'])/2, O=(r['R31']+r['R32'])/2,
+             N=(r['R22']+r['R33'])/2, Z=r['R33'], GB=r['R22']-r['R12'], GC=r['R33']-r['R23'])
+    r['F'] = r['Q']-r['O']
+    return r
+
+
+def decide(results, mechanism=False):
+    required = ['H_SEQ', 'V_CLS', 'V_SET']+(['H_ER', 'H_full'] if mechanism else [])
+    for m in required:
+        if [r['seed'] for r in results[m]] != list(SEEDS):
+            raise ValueError('Three fixed complete paired seeds required')
+        for row in results[m]:
+            if any(not math.isfinite(v) for k, v in row.items() if k != 'seed'):
+                raise ValueError('Nonfinite result')
+    def values(m, k): return [r[k] for r in results[m]]
+    def mean(m, k): return statistics.mean(values(m, k))
+    def diffs(a, b, k): return [x-y for x, y in zip(values(a, k), values(b, k))]
+    def lower(a, b, keys, avg, individual):
+        return all(statistics.mean(diffs(a, b, k)) >= avg and min(diffs(a, b, k)) >= individual for k in keys)
+    def gain(m): return all(mean(m, k) >= .05 and min(values(m, k)) >= 0 for k in ('GB', 'GC'))
+    learning = (all(mean('H_SEQ', k) >= .70 and min(values('H_SEQ', k)) >= .60
+                   and lower('H_SEQ', 'V_CLS', (k,), -.02, -.05)
+                   and mean('V_CLS', k) >= .70
+                   for k in ('R11', 'R22', 'R33')) and gain('H_SEQ'))
+    forgetting = (mean('H_SEQ', 'F') >= .035 and sum(v >= .03 for v in values('H_SEQ', 'F')) >= 2
+                  and min(values('H_SEQ', 'F')) >= 0)
+    checks = dict(learning=learning, meaningful_forgetting=forgetting)
+    if not mechanism:
+        return dict(status='PASS_P' if learning and forgetting else
+                    ('STOP_LEARNING' if not learning else 'STOP_NO_MEANINGFUL_FORGETTING'), checks=checks)
+    def improvement(a, b, threshold, third_floor):
+        old = diffs(a, b, 'O')
+        forget = [-v for v in diffs(a, b, 'F')]
+        return all(statistics.mean(v) >= threshold and sum(x > 0 for x in v) >= 2
+                   and (third_floor is None or min(v) >= third_floor) for v in (old, forget))
+    initial = (lower('H_full', 'H_SEQ', ('R11', 'R22'), -.01, -.03)
+               and all(mean('H_full', k) >= .70 and min(values('H_full', k)) >= .60
+                       for k in ('R11', 'R22', 'R33'))
+               and lower('H_full', 'V_CLS', ('R11', 'R22', 'R33'), -.02, -.05))
+    new = (all(mean('H_full', k) >= .70 for k in ('R22', 'R33')) and gain('H_full')
+           and all(lower('H_full', m, ('R22', 'R33'), -.02, -.05) for m in ('H_SEQ', 'V_CLS', 'V_SET')))
+    external = all(statistics.mean(diffs('H_full', m, 'O')) >= .02
+                   and sum(v > 0 for v in diffs('H_full', m, 'O')) >= 2
+                   and min(diffs('H_full', m, 'O')) >= -.01 for m in ('V_CLS', 'V_SET'))
+    retention = improvement('H_full', 'H_SEQ', .03, -.01)
+    checks.update(retention=retention, initial_protection=initial, new_protection=new, external=external)
+    system = all(checks.values())
+    extra = (system and improvement('H_full', 'H_ER', .02, None)
+             and lower('H_full', 'H_ER', ('R11', 'R22'), -.01, -.03)
+             and lower('H_full', 'H_ER', ('R22', 'R33'), -.02, -.05))
+    return dict(status='PASS_SYSTEM' if system else 'STOP_NO_H_ADVANTAGE', checks=checks,
+                old_score_increment=extra)
