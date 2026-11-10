@@ -2,6 +2,8 @@
 
 ## 2026-11-10 CE诊断外审收尾及RMS两任务
 
+20:56进度查询仅回传一份[只读元数据快照](../reports/documentation/20261110/vendorlink_redesign/ce_rms/progress_20261110_205605.json)，7006字节、SHA256 `e6bc619cf65ad9a9f3464acb1ca737cbaff69de89e88f42f9cc14304e874d05c`与Linux原件一致，含进程身份、更新、账本、GPU元数据及短窗吞吐估计；未读未完整阶段效果、模型、标签或逐条分数，未改运行来源/进程/账本。无临时脚本或重复载荷，根docs仅Windows维护，本地提交不推送。
+
 原诊断数值汇总、来源核对和报告保留，原CPU0.738532秒计1秒与旧训练18554秒各归原账。完整[外审原文](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/external/report.zh.md)40343字节、SHA256 `2c14d9061e799dc6195b246a3529372e4ccb611071553287026811377539b4d1`已回收，主审结案及网页关闭见[索引](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/recovery.json)。原送审身份和报告提交时内容冻结，不将诊断改写成已验证有效。
 
 新两任务的[gate](../reports/documentation/20261110/vendorlink_redesign/ce_rms/gate.json)、[执行补充](../reports/documentation/20261110/vendorlink_redesign/ce_rms/scope.zh.md)、CPU两份回执及活动13来源部署到Linux独立ce_rms根；原implementation/中文暂停/共享模型及角色数据不改。科学CPU2.883711秒、资源兼容CPU1.399675秒，合计计5秒；另保守登记30秒准备成本，原Ledger独立30秒收尾费。新正式权重、辅助分类头、正文和分数只留Linux，当前均有后续评分/诊断用途，不删除；根docs只在Windows维护。
