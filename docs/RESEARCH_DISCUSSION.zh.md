@@ -2,7 +2,7 @@
 
 ## 2026-11-10：清理账号监督旧资产并重新设计
 
-用户最新进一步要求：“实现完成就提交外审”。据此准备当前代码、必要核验、主审及直接背景的定向包，经指定本地Playwright MCP提交网页GPT 6 Pro；许可限本次实现材料，不含真实账号/正文/标签/预测/权重/凭据，不授权开训。该要求替代本次实现继续免网页审查的安排，既有主审与核验事实保留。
+用户最新进一步要求：“实现完成就提交外审”。据此准备当前代码、必要核验、主审及直接背景的定向包，经指定本地Playwright MCP提交网页GPT 6 Pro；许可限本次实现材料，不含真实账号/正文/标签/预测/权重/凭据，不授权开训。该要求替代本次实现继续免网页审查的安排，既有主审与核验事实保留。当前40项/143125字节包（SHA256 `1ea3f81020f46ee03979701473a85efef520faba8ea38d7faa2e8d02a29c1ab1`）已在原会话单次发送，页面已开始读取包并核对实现，见[提交回执](../reports/documentation/20261110/vendorlink_redesign/implementation/review/submission.json)。模型选择器GPT-6/Pro与审查者自述GPT-6 Astra Pro分别保存，后台身份未独立验证；正式训练继续关闭。
 
 用户随后明确：“此次修改免审。确定好方案就开始尽快实现”。据已呈现的88h补正版开始新CE及调度实现，并仅做方案§9必要CPU和一次H GPU增量核验，见[本轮实施范围](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)。本次CE与调度变更按这条明确免审指令完成实现及主审，不再为同一变更新开网页轮次，也不扩大到未来结果。必要5项CPU及一次真实BERT GPU增量证据见[实现报告](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)。正式D/P/M/C、真实数据评分、候选输出与监听仍关闭，先别启动训练保持。
 

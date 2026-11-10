@@ -4,7 +4,7 @@
 
 ## VendorLink账号监督：已完成CE适配实现，待正式启动
 
-用户已要求“此次修改免审。确定好方案就开始尽快实现”。现按[方案](../reports/documentation/20261110/vendorlink_redesign/proposal.zh.md)与[实施范围](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)完成最小实现、必要CPU/唯一GPU增量核验和主审；来源、真实接线及费用见[实现报告](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)。不再把历史“待实现批准”恢复为当前阻断，不重复GPU资格。用户随后明确“实现完成就提交外审”，现按最新要求提交定向实现审查，回收后独立处置必要问题。正式D/P/M/C仍按最新“先别启动训练”保持关闭，没有监听。
+用户已要求“此次修改免审。确定好方案就开始尽快实现”。现按[方案](../reports/documentation/20261110/vendorlink_redesign/proposal.zh.md)与[实施范围](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)完成最小实现、必要CPU/唯一GPU增量核验和主审；来源、真实接线及费用见[实现报告](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)。不再把历史“待实现批准”恢复为当前阻断，不重复GPU资格。用户随后明确“实现完成就提交外审”，现已按最新要求单次提交定向实现审查，等待完整报告后独立处置必要问题。正式D/P/M/C仍按最新“先别启动训练”保持关闭，没有监听。
 
 下一步先完成本次明确要求的实现外审及主审处置；取得明确的正式启动决定后，核对新入口来源、现场资源及继承费用，按既定阶段推进：D八个A/B冷启动任务，条件P六条及M六条，固定51/52/53，最多两路H＋V/H＋H、最多一条V并行；88h=80训练/4GPU/4辅助，32GiB输出帽。阶段前提失败正常停止，不追选候选、顺序或seed；不重建已合格12/4/2/2数据，不恢复旧层叠接续控制器或已删权重。完整H保留文本与多记录评分及回放/出生评分保持，当前CE只是共同学习适配。
 
