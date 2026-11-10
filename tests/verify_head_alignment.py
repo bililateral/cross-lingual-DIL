@@ -46,7 +46,7 @@ def reference(head, query, galleries):
 
 
 def accounts(domain, n=4):
-    return [dict(account_uid=f'{domain}_a{i}', records=[dict(uid=f'{domain}_{i}_{j}', title='sample title', description='sample description')
+    return [dict(account_uid=f'{domain}_a{i:02d}', records=[dict(uid=f'{domain}_{i}_{j}', title='sample title', description='sample description')
             for j in range(12)]) for i in range(n)]
 
 
