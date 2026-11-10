@@ -8,7 +8,7 @@
 
 [实现及必要核验](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)、完整外审和[主审](../reports/documentation/20261110/vendorlink_redesign/implementation/review/primary_disposition.zh.md)已闭合。用户“没问题了就正式开始实验”及[现行范围补充](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)授权的固定阶段链已实际执行；该许可包含前置门失败时停止，不包含停止后的新候选或重训。实际状态只在交接对应项维护。
 
-本链已按D筛查结束，停止证据及实际费用从交接对应项进入；原条件P/M/C未获满足，不恢复原控制器或凭预算余量续跑。后续先整理完整D保存结果，解释H_base、H_CE与两种VendorLink开发配置的逐市场差异，明确单seed开发结论及CE未带来提升的范围。若进一步提出学习适配，须针对实际目标与评分衔接给有限改动及依据，再明确候选、预算和执行范围；不为过门追加γ、顺序或seed。必要结果审查沿用现有规则，不把实现外审当作本次效果审查。原运行来源/gate、已建12/4/2/2数据和全部结果/费用保留，本轮不删除权重或重算指标。
+本链已按D筛查结束，原条件P/M/C未获满足，不恢复原控制器或凭预算余量续跑。[已授权诊断与有限方案](../reports/documentation/20261110/vendorlink_redesign/diagnosis/report.zh.md)从实际CE链、数值日志和三种输出差异提出唯一CE单位RMS尺度候选；保留H多记录主评分及全部历史结构，未来只建议A/B各一次同seed开发，补分类/集合诊断以区分概率损失、表示与读取。候选、建议7h/8GiB/最多2worker及新的评价读取须实质决定后才能实施，不因当前诊断确认自动开训。未满足主学习门即停止，不追加γ/学习率/轮数/seed；原D权重已按另项许可删除，不能安排载模旧端点或为补诊断重训旧八项。必要结果/方案外审按具体材料许可办理，不把原实现外审当效果证据。
 
 已定标准保持：H相对V_CLS逐域初学均值最多低2pp/逐seed最多低5pp，明显遗忘均值3.5pp及跨seed保护；Full同时满足旧域最终、遗忘、新域和外部基线门。取消人为GPU配额及固定GiB整PID终止，资源预留仍执行；单worker OOM退出，健康worker继续当前阶段剩余独立任务，失败不重跑，缺项不开放该批效果或下游。工程核验不证明科学目标已实现。
 

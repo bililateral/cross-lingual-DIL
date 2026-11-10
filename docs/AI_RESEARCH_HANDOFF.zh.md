@@ -6,10 +6,10 @@
 
 ### VendorLink账号监督共同评价
 
-- **目标与范围**：当前账号CE改善H学习，再条件检验完整H保持及外部竞争力。设定从[方案与补充](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)定位；D8→条件P6/M6/C，最多两路，88h=80训练/4GPU/4辅助。正式执行授权见[用户决定](RESEARCH_DISCUSSION.zh.md#2026-11-10清理账号监督旧资产并重新设计)及[启动补充](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)。
-- **最新观测**：11月10日18:08:45[停止核对](../reports/documentation/20261110/vendorlink_redesign/implementation/stop_observation.json)确认原控制器及同入口worker均已退出，gate及19份小来源绑定未变；D的8项训练、8项评分全部完成并通过包装验收/完成绑定，无运行失败、OOM退槽或预算停止。16:37:21保存的[终态](../reports/documentation/20261110/vendorlink_redesign/implementation/campaign/completion.json)为STOP_ADAPTATION：H_CE在AlphaBay/Dream宏F1为70.1994%/74.8408%，相对选定V1分类器低9.8189/15.4989pp，未满足D各域差距≤2pp；绝对70%门通过。CE相对H_base分别−1.2047/−0.2123pp。完整D已开放，P/M/C及应用均未启动；单seed开发筛查不能替代遗忘或Full效果检验。
-- **预算与工期**：最终账training17937/GPU123/aux494秒，累计18554秒（5小时9分14秒，含既有准备/核验）；本轮正式链13:55:58启动、16:37:21结束，实际工期约2小时41分23秒，当前链剩余0。原全链34—46小时估计以所有前置门通过为条件，本次提前按科学门结束，不再给待完成预测；88h额度未耗尽。
-- **下一步与保管**：整理已开放D结果及学习差距，必要结果审查另按实际材料与外发许可处理；当前只有停止原因和保存字段核对，不冒称新结果已外审。用户确认精确范围后，11月10日18:27:29已[删除本批16份权重](../reports/documentation/20261110/vendorlink_redesign/implementation/weight_cleanup.json)，3483476608字节（约3.24GiB），196份非权重文件大小/SHA保持，Windows无该批权重；无备份，现无可载模复用的D端点。原结果、日志、配置、审查及费用保留，进一步载模诊断不再可用；新适配干预、改门或重训须另行明确，原控制器不重启。原5pp失败、STOP_LEARNING、71450秒旧费用及删除事实保持。实际来源和既有实现审查见[实现报告](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)；不重划、不动中文暂停，原运行来源/gate和结果保持冻结。本次清理本地提交，未沿用上一工作流任务的推送许可。
+- **目标与范围**：完整H多记录关联先学得接近VendorLink，再检验保持及外部竞争力。用户已[确认诊断与保存方案](RESEARCH_DISCUSSION.zh.md#2026-11-10诊断ce学习差距并保存有限改进方案)：只读现有代码/开放结果，Linux数值日志汇总限1 CPU worker/2核/4GiB/600秒/20MiB；不载模、GPU、训练或上传。原运行设定仍从[设计入口](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)定位，不能凭旧88h余额重开。
+- **最新证据**：原D八项训练/评分完整、16:37:21以[STOP_ADAPTATION](../reports/documentation/20261110/vendorlink_redesign/implementation/campaign/completion.json)结束，P/M/C未启动。H_CE宏F1 A/B为70.1994%/74.8408%，相对V1_CLS低9.8189/15.4989pp。[当前诊断](../reports/documentation/20261110/vendorlink_redesign/diagnosis/report.zh.md)确认CE真实接线、暴露/调度正确；组内H目标很低，CE仍3.3205/3.0290，输入尺度与最终读取存在明确差异，但唯一因果根源未证实。Dream的Top1/MRR稍升，不能笼统说所有效果下降。Linux13运行来源匹配；原进程退出事实及费用见[停止核对](../reports/documentation/20261110/vendorlink_redesign/implementation/stop_observation.json)。
+- **费用与保管**：原链累计18554秒、实际工期约2小时41分23秒，链剩余0；本次独立数值汇总0.738532秒向上计1秒，不写回旧账。用户已批准并完成[16份权重清理](../reports/documentation/20261110/vendorlink_redesign/implementation/weight_cleanup.json)，无可载模旧D端点；本轮[实际缺失核对](../reports/documentation/20261110/vendorlink_redesign/diagnosis/verification.json)承接删除，不重训补诊断。日志/结果/来源、原5pp/STOP_LEARNING/71450秒旧费用保留。
+- **下一步**：诊断建议唯一CE单位RMS尺度候选及必要读取诊断；两单域、建议7h/8GiB/最多2worker均是待决定方案，不是运行许可。新结果/方案外审按具名材料许可处理，原实现外审不覆盖新结论；本轮完成文档/小证据交付，本地提交不推送。原门/来源/结果冻结，不恢复控制器、不重划或动中文暂停。
 
 ### 历史权重版H主实验消融
 

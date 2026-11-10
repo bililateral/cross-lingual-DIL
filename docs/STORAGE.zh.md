@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-10 CE学习差距数值诊断
+
+本轮用户确认仅分析代码/已开放D结果和数值日志并保存方案，见[决定](RESEARCH_DISCUSSION.zh.md#2026-11-10诊断ce学习差距并保存有限改进方案)。一次Linux CPU汇总42240条更新的损失/梯度/调度计数，实际0.738532秒、向上计1秒；产物[log_summary.json](../reports/documentation/20261110/vendorlink_redesign/diagnosis/log_summary.json)只含数值统计及输入身份，不含原日志中的记录标识。诊断脚本、汇总、实际来源/端点缺失核对与[报告](../reports/documentation/20261110/vendorlink_redesign/diagnosis/report.zh.md)共4份606824字节，经[具名同步](../reports/documentation/20261110/vendorlink_redesign/diagnosis/sync.json)在Linux独立diagnosis目录逐份匹配大小/SHA。原生产来源/门/账/日志/数据不改，未载模、生成预测或训练；根docs只在Windows。
+
+本轮已准备定向诊断/方案审查输入：23项ZIP190569字节，SHA256 `b89ec6d8af32aac97fc62192ef49571414c961e49e70c2b7fa75f7beaf7585ff`，具名成员见[清单](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/manifest.json)。包只在Windows，尚未外发；不把旧具体包许可扩大。分析脚本及输入包仍用于这次待处置审查，当前保留，审查/主审收尾后按精确Git恢复与实际用途退役，不无限保留一次性脚本。本轮未产生浏览器临时文件或新增模型，不恢复已删D端点，不重置11月6日大清理及11月21日到期。本地提交、不推送。
+
 ## 2026-11-10 CE开发结束权重清理
 
 用户要求删除刚结束实验的模型权重，执行者先核对真实终态、无相关活动进程及后续加载依赖，呈现Linux精确16份、3483476608字节（约3.24GiB）的范围与不可恢复后果，用户明确“确认”。Linux18:27:29完成删除：`vendorlink_redesign/implementation/campaign/D/training/`内AlphaBay/Dream各H_base、H_CE、V0、V1共8任务的`run/stage0.pt`与`run/stage1.pt`。目标均为yongpeng所有、普通文件、单硬链接，最终路径及删除前大小/SHA逐份核实；未备份，全部目标复查不存在。该批D已完整训练/评分并以STOP_ADAPTATION结束，原P/M冷启动不加载D权重，未启动后续阶段或重训。
