@@ -108,7 +108,7 @@ def head_update(head, optimizer, features, accounts, group, lookup, settings, st
     global_loss, correct = 0., 0
     if full_pool:
         index = gallery_indices(accounts, group, lookup, step_seed)
-        galleries = features[index]
+        galleries = features[torch.tensor(index, dtype=torch.long, device=features.device)]
         classes = {a['account_uid']: k for k, a in enumerate(accounts)}
         for view in group.views:
             check()

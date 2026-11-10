@@ -82,7 +82,8 @@ try:
         logs = h.head_update(actual, opt, features, a, group, lookup, s, 123, True)
         z = features[[lookup[r.uid] for v in group.views for r in v.records]]
         base_loss, _ = h_objective(h.original_table(expected_head, z), group, seed_for(123, 'regroup'), s)
-        ce = sum(F.cross_entropy(reference(expected_head, features[[lookup[r.uid] for r in v.records]], features[indices])[None],
+        ref_galleries = torch.stack([torch.stack([features[i] for i in row]) for row in indices])
+        ce = sum(F.cross_entropy(reference(expected_head, features[[lookup[r.uid] for r in v.records]], ref_galleries)[None],
             torch.tensor([[x['account_uid'] for x in a].index(v.identity)])) for v in group.views)/len(group.views)
         (base_loss+ce).backward()
         torch.nn.utils.clip_grad_norm_(expected_head.parameters(), 1.)
