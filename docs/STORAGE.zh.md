@@ -2,6 +2,8 @@
 
 ## 2026-11-10 账号监督旧权重和专用脚本清理
 
+用户随后明确提交新方案外审，本轮在同一`vendorlink_redesign/`保存定向请求、[成员清单](../reports/documentation/20261110/vendorlink_redesign/review_manifest.json)、20项146545字节输入ZIP和[许可/提交证据](../reports/documentation/20261110/vendorlink_redesign/review/submission.json)。新方案本体29502字节/SHA `6fb6aa3b9d77d3bc2cc1a0ae853a350810373477d3a7a95959fd921bc5e87f6c`不改；新请求/ZIP/清单提交后保留原字节。3份旧step34源码仅从Git f0c2872f直接读入ZIP内存，未恢复本地活动入口；其余成员为现有代码、已开放汇总/元数据及必要旧审查，无原始账号正文、模型或凭据。输入包在审查尚未回收/处置前保留，当前审查材料仅Windows保管；没有为送审访问Linux数据、载模或测试，也不变更原清理事实和费用。
+
 用户明确清理旧20261109账号监督实验并重新设计，在已列明34权重/70份Linux脚本/13份Windows脚本的确认中，特别要求包含OOM后新增的临时唯一接续控制器。本次逐份核对最终路径、yongpeng属主、普通文件、单硬链接、精确来源及相关进程已退出后执行；旧`queue_resume/state.json`为COMPLETE，不修改它或其他冻结原件。
 
 Linux10:58:22已删除旧execution内34份权重共12198384250字节（11.36GiB）、70脚本962847字节及9份对应字节码138108字节，无权重备份；其中包括`queue_resume/workspace/scripts/step34_vendorlink_account_resume.py`、retry_s44/retry_s44_15g和parallel_h45启动包装器。其余467份非目标文件逐份大小/SHA前后不变，原始数据、已建角色、结果、日志、失败、费用、共享BERT及其他实验资产保留。Windows已删除13份123745字节专用脚本，没有本批权重；两端实际路径/哈希/结果见[Linux回执](../reports/documentation/20261110/vendorlink_redesign/cleanup_linux.json)和[Windows回执](../reports/documentation/20261110/vendorlink_redesign/cleanup_windows.json)，[原盘点](../reports/documentation/20261110/vendorlink_redesign/cleanup_inventory.json)保留删除前状态。
