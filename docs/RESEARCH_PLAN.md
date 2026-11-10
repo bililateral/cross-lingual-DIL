@@ -4,11 +4,11 @@
 
 接手和日常同步按[工作流](RESEARCH_WORKFLOW.zh.md)使用一次性只读观察及具名SFTP核验；普通更新数变化不重复修改合同入口/计划。状态跃迁时核对受影响可变入口，保持活动冻结来源、历史原件和原判据。
 
-## VendorLink账号监督：固定参考档案诊断
+## VendorLink账号监督：登记参考档案与后续共同协议
 
 原CE、RMS及用户免审批准的[四条评分头试验](../reports/documentation/20261110/vendorlink_redesign/head_alignment/scope.zh.md)均已按原门结束，[评分头结果/主审](../reports/documentation/20261110/vendorlink_redesign/head_alignment/result/report.zh.md)与此前[RMS改善及边界](../reports/documentation/20261110/vendorlink_redesign/ce_rms/result/report.zh.md)保留。冻结RMS后追加全池CE未优于继续训练对照，B仍未过学习门；不将候选作为已获改进接入Full/ER，不恢复原控制器。运行状态与计数只见交接。
 
-用户已批准并免审[reference诊断](../reports/documentation/20261110/vendorlink_redesign/reference/scope.zh.md)：先以现有RMS固定A/B的fit前4/全部12参考，保持dev Q2/候选/原H评分，检查参考资料来源和覆盖量；新30分钟分桶，零训练、零权重删除，四读取完整后统一开放。FIT12为唯一候选，失败不搜其他子集/数量；通过也不追认原G4门，后续正式共同协议须给V_SET相同档案、保留V_CLS强对手。本轮不打开confirm/Agora，不做端到端训练或多seed持续学习。
+用户免审批准的[reference诊断](../reports/documentation/20261110/vendorlink_redesign/reference/scope.zh.md)已完整结束，[结果/主审](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)支持固定FIT12方向在本次开发门可行；保留B的FIT4较高这一反向数量效应，不按市场择优改候选。下一步建议固定登记账号的FIT12共同协议，明确V_SET同档案、V_CLS原强读取、各阶段当前encoder重新编码，再检验多seed初学和H_SEQ遗忘；当前无该后续训练许可。原V1权重已依旧许可删除，新V_SET条件的评分不能伪称可直接复用旧G4值，基线恢复/公平开发/轨迹/预算必须纳入后续具体方案。原G4失败不追认，confirm/Agora仍未开放，零训练/零权重删除的本轮范围已完。
 
 既定研究目标保持：初学对V_CLS三seed均值最多低2pp/逐seed最多低5pp；明显遗忘均值3.5pp并保护新域；Full还须同时改善旧域最终、保持及外部竞争力。取消人为GPU硬帽及OOM槽退休/健康槽续领当前阶段、失败不重试、缺项不开放的已定行为保留，但不授予新运行。原RMS及四条head的必要恢复/复核资产保留；原CE16份已删权重不恢复。旧20261109的5pp门、STOP_LEARNING/71450秒及后续各账不追改。中文暂停、Evolution/ABC结案均不动；本地提交、不推送。
 ## Evolution：已结束路线与保留边界

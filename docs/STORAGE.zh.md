@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-10 固定参考档案诊断完成
+
+[reference结果/主审](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)及[24项具名结果](../reports/documentation/20261110/vendorlink_redesign/reference/transfer.json)已回传并核对大小/SHA，共32642字节；四份评分矩阵共5164752字节留Linux，没有同步账号正文/逐query分数。零训练、零权重删除，原RMS六份877291968字节与head_alignment四份6312188字节继续保留，正式新入口和14份旧依赖保持冻结身份。
+
+一次性CPU脚本Windows `tests/verify_vendorlink_reference.py` 与Linux `reports/documentation/20261110/vendorlink_redesign/reference/verify.py` 各3529字节已删除；已将本地实字节与Git `300b5f522312af6747034a5d321086345c711f24:tests/verify_vendorlink_reference.py`逐字节核对一致，远端删除前也核对属主/最终路径/大小/SHA与正式依赖。SHA256为`66e94f44ef54d389b3a55a37931e2da08890bf7a856cdebe3cdc6a0c00284289`，Linux[回执](../reports/documentation/20261110/vendorlink_redesign/reference/cleanup.json)及原CPU日志/通过/费用保留。手写输入均在CPU进程内存，无临时模型或数据文件需另删。恢复源码不授予重跑。
+
+用户本轮免外审，无外发包或网页。结果/清单/报告26项48837字节及15运行来源的两端身份见[reference/sync.json](../reports/documentation/20261110/vendorlink_redesign/reference/sync.json)。根docs仅Windows维护，本地提交不推送；此次局部收尾不重置11月6日大清理/11月21日到期。
+
 ## 2026-11-10 RMS与评分头结果回传及核验收尾
 
 RMS两任务的完整聚合结果、费用、完成身份、原评分绑定及[逐轮数值诊断](../reports/documentation/20261110/vendorlink_redesign/ce_rms/result/report.zh.md)已回传。评分头四条亦已完整结束；[完整结果/主审](../reports/documentation/20261110/vendorlink_redesign/head_alignment/result/report.zh.md)、数值日志汇总、59项具名完成/指标/费用/身份材料已按[result/transfer.json](../reports/documentation/20261110/vendorlink_redesign/head_alignment/result/transfer.json)回传并核对大小/SHA，共141353字节。没有同步账号正文、逐查询分数或模型载荷。正式15来源、原数值日志/分数、两fit缓存、四份新head（6312188字节）及恢复这些head所需的6份原RMS资产留Linux供必要复核；本轮不新增权重删除。
