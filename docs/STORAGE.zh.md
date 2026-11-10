@@ -1,4 +1,11 @@
 # 科研文件存储与恢复
+## 2026-11-10 FIT12实施、启动与临时核验收尾
+
+[固定合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)、[实施主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/implementation.zh.md)、CPU01及来源/启动/观测证据已保管；两端具名核对见[同步](../reports/documentation/20261110/vendorlink_redesign/fit_reference/sync.json)。新运行来源独立于所有旧冻结workspace，13正式依赖和新活动权重保持；账号正文、完整分数、模型和原角色数据留Linux。
+
+单次CPU核验通过后，Windows `tests/verify_vendorlink_fit12.py` 与Linux本根 `verify.py` 各10062字节已删除。Windows实际读取Git `f5394f07:tests/verify_vendorlink_fit12.py` blob与待删源码逐字节一致；两端SHA256 `8d820a1053e2664e7cc7f7d940e74ef0f5ab26e560ec62714f36037a5f3318b0`。Linux精确属主/路径/单硬链接及非运行依赖核对见[回执](../reports/documentation/20261110/vendorlink_redesign/fit_reference/cleanup.json)，该回执仅陈述Linux删除，Windows删除由本记录及实际Git差异证明。手写输入/小张量由TemporaryDirectory收尾，不留临时模型。核验日志/回执和历史部署清单原字节保留，恢复源码不授予重跑。
+
+本轮不删除RMS：23:32:48六份877291968字节实际存在/属主核对见[核对](../reports/documentation/20261110/vendorlink_redesign/fit_reference/verification.json)，不是此次新训练的热启动权重。另一会话的四head/33CPU夹具清理按下节独立许可保留，不覆盖其回执。没有外审包或浏览器；根docs仅Windows维护，本地提交不推送，局部收尾不重置大清理周期。
 
 ## 2026-11-10 评分头与Evolution CPU模型夹具清理
 

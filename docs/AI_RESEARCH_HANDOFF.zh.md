@@ -7,8 +7,9 @@
 ### VendorLink账号监督共同评价
 
 - **目标与最新授权**：完整H先学得接近VendorLink，再检验遗忘、保持及外部竞争力。用户已确认“按此实施并条件开训”，本轮免外审；采用[固定FIT12共同协议](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)，参考[决定记录](RESEARCH_DISCUSSION.zh.md#2026-11-10批准fit12共同协议实施及条件开训)。RMS母体/V1、seed51/52/53、ABC/40epoch；P六条通过才M六条，通过才C，最多12轨迹/36域阶段，新独立88h=80/4/4、最多两路。原G4失败和费用不改。
-- **当前工作**：已保存具体合同并修改三个现有入口，正在Linux既有py310完成必要CPU增量核验和来源/现场准入，尚未启动本轮训练。复用已完成RMS训练、FIT12评分及未变历史机制/GPU证据，不重复单域D、资格盘点或GPU探针。本轮变动是FIT12实际读取、当前端点重编码、固定阶段接续，不新增损失/候选。
-- **推进与失败边界**：通过必要核验后直接启动P并按合同条件接续；每域初学对V_CLS均值−2pp/逐seed−5pp、平均遗忘3.5pp及原Full保持/新域/外部竞争力门保持。P/M整批完整才开dev；C只在M系统门通过后开放完整confirm矩阵。取消显存硬帽，OOM槽退出、健康槽续领当前阶段、失败不重跑、缺项不进下游；资源不足只由唯一控制器等待，不恢复旧链。
+- **最新运行**：11月10日23:30:26已[双路正式启动](../reports/documentation/20261110/vendorlink_redesign/fit_reference/launch.json)，控制器2507659。23:31:29[只读观测](../reports/documentation/20261110/vendorlink_redesign/fit_reference/launch_observation.json)确认控制器及两worker属主/创建时刻/命令/cwd匹配、gate未变：H_SEQ_s51为77更新，V_s51为301更新，P另四条待派，0失败/0退休槽，全部阶段效果尚未开放。23:32:48[核对](../reports/documentation/20261110/vendorlink_redesign/fit_reference/verification.json)确认13来源、RMS六权重保留。不要凭此旧快照替代下次现场核对。
+- **推进与失败边界**：现有唯一控制器继续P并按合同条件接续；每域初学对V_CLS均值−2pp/逐seed−5pp、平均遗忘3.5pp及原Full保持/新域/外部竞争力门保持。P/M整批完整才开dev；C只在M系统门通过后开放完整confirm矩阵。取消显存硬帽，OOM槽退出、健康槽续领当前阶段、失败不重跑、缺项不进下游；资源不足只由唯一控制器等待，不恢复旧链。
+- **核验与工期**：[主审/必要CPU](../reports/documentation/20261110/vendorlink_redesign/fit_reference/implementation.zh.md)五组一次通过，2.672493秒计3秒，未新增GPU测试。P预计启动后10—14h，约11月11日09:30—13:30；全链条件均过且双路可用约35—46h，约11月12日10:30—21:30，排队/退槽需重估。全链预计62—76累计小时，硬帽88h=80/4/4；23:31账已结aux66秒，活动训练生命周期约127秒尚未结算，不能写训练未发生。一次性CPU源码两端各10062字节已清理，精确恢复Git f5394f07；原证据和13运行来源保留。
 - **开发依据及保管**：[reference完整结果](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)为PASS_REFERENCE_DIAGNOSTIC，FIT12 A83.7424%/B89.0658%，新旧含义和单seed/已见dev边界保持，原累计93秒。RMS六份877291968字节及两fit缓存保留；用户随后选定清理，23:23:42已[删除四head和33份旧CPU微型模型](../reports/documentation/20261110/vendorlink_redesign/head_alignment/weight_cleanup.json)，共37份6624499字节，344份保护文件大小/SHA保持，精确旧源码恢复入口见[核对](../reports/documentation/20261110/vendorlink_redesign/head_alignment/weight_cleanup_recovery.json)，不再可加载已删head/夹具。新轨迹从共同预训练BERT开始，开发权重不作热启动。中文暂停不动，真实文本/分数/模型留Linux，原位文档、本地提交不推送。
 ### 历史权重版H主实验消融
 
