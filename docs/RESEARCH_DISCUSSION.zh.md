@@ -2642,3 +2642,11 @@ S_default与历史H都保持lambda_rank=1、LR倍率=1及原rank；前者记录�
 最小实现、三项实际核验与独立处置见[implementation](../reports/documentation/20261026/continual_defaults/implementation.zh.txt)和[qualification/primary](../reports/documentation/20261026/continual_defaults/qualification/primary.zh.txt)。cpu01零失败，累计7/120秒，未启动正式补充训练。38个旧冻结来源同字节复用，原runner一项小改，新增适配/入口/CPU及本轮范围；当前45项资格来源逐项一致。
 按本轮直接实现/提交外审要求，经本地Playwright将369325字节/72成员新实现包单次提交原会话，11:26显示生成；具体身份、发送全文及实际页面见[提交回执](../reports/documentation/20261026/continual_defaults/review/submission.json)。本次许可不依赖此前仅指定旧结果ZIP的上传批准；包内仅新增实现、手写证据与直接适用背景，没有正式数据/标签源、模型或Memory载荷。
 正式18条队列与评价配置须在相应预算/数据范围确定后填入既有编排；本轮未签正式门或创建自动开训。旧120确认群已见和H_pos_tuned对历史H的混合干预边界保持，当前L²R/GCR运行不变，先等新完整外审并独立处置。
+
+## 2026-11-10：批准FIT12共同协议实施及条件开训
+
+用户：“那就按你的想法做，先确定具体方案再开始实施，只做必要的测试，我理解这次实验修改较小所以不需要外审。RMS 权重文件要删吗？”
+
+完整呈现FIT12参考角色、RMS/V1、seed51/52/53/40轮、P六条→条件M六条/C、新88h（80/4/4）、最多2worker/每worker2核、32GiB输出、无GPU人为硬帽、OOM槽退出/健康槽续领/不重试/缺项不进下游、必要CPU及适用GPU证据复用、资源不足单次等待、原位留证/本地提交不推送后，用户确认：“确认，按此实施并条件开训”。具体安排见[本次合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)，本轮免网页外审；确认覆盖实施、核验、启动及条件接续，不逐普通步骤重问。
+
+RMS权重保留：它们是已完成诊断的实际来源，磁盘约0.817GiB且不占闲置显存；新三seed轨迹冷启动，不把开发权重混入复验。旧诊断的“不自动后续”保持其历史身份，新明确许可仅覆盖本合同，不恢复旧控制器或改变中文暂停、旧负结果和原账。

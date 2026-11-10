@@ -6,11 +6,10 @@
 
 ### VendorLink账号监督共同评价
 
-- **目标与有效范围**：完整H多记录关联先学得接近VendorLink，再检验遗忘、保持及外部竞争力。用户免审批准的[固定参考档案诊断](../reports/documentation/20261110/vendorlink_redesign/reference/scope.zh.md)已完成，原话见[决定](RESEARCH_DISCUSSION.zh.md#2026-11-10批准rms模型的四次参考档案评分诊断)。A/B原RMS模型各以fit原顺序前4/全部12条作参考、共享原dev Q2/全候选，零训练；只新增fit兼作登记参考用途。confirm/Agora未读，原G4失败保持；没有后续自动链或权重删除。
-- **最新完成与结果**：reference于22:47:09启动、22:47:28结束，墙钟18.781秒；22:48:14[观测](../reports/documentation/20261110/vendorlink_redesign/reference/observation.json)及[核对](../reports/documentation/20261110/vendorlink_redesign/reference/verification.json)确认整批完整、15来源匹配、控制器/评分进程退出、零运行失败。唯一FIT12候选宏F1 A83.7424%/B89.0658%，对V1_CLS为+3.7241/−1.2739pp，两域诊断门均过，状态PASS_REFERENCE_DIAGNOSTIC。FIT4为82.3565%/89.8089%，B虽较高也不改选；完整[结果/主审与13指标](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)已回传。新增参考内容/训练可见性条件有实质影响，但当前单seed/已见dev不证明独立泛化或抗遗忘。
-- **背景与下一步**：此前[评分头试验](../reports/documentation/20261110/vendorlink_redesign/head_alignment/result/report.zh.md)仍为有效STOP_LEARNING，额外全池CE未改善原G4；其训练fit近饱和而dev未改善的诊断保持。当前新进展来自固定模型的参考读取变化，不是新训练收益。建议围绕FIT12登记资料固定共同协议，给V_SET相同档案、保留V_CLS，再检验多seed初学与H_SEQ明显遗忘前提；每阶段必须用当前encoder重编码旧档案，不跨模型复用今天的缓存。正式协议/基线恢复/轨迹/预算尚未批准，不自动Full/ER/P/M/C。
-- **费用与保管**：reference GPU24/辅助69秒，共93秒，零训练；必要CPU一次1.767360秒计2秒已包含，未超30分钟分桶。此前head_alignment累计1177秒（含结果汇总1秒）、RMS原账均保持。初学均值2pp/逐seed5pp、遗忘均值3.5pp及新域保护目标不变。四份新head6312188字节及原RMS六份877291968字节均未删除；本轮一次性CPU脚本两端各3529字节已清理，精确恢复Git300b5f52，见[保管说明](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md#5-费用资源与清理)。中文暂停、封存边界不动，本地提交、不推送。
-
+- **目标与最新授权**：完整H先学得接近VendorLink，再检验遗忘、保持及外部竞争力。用户已确认“按此实施并条件开训”，本轮免外审；采用[固定FIT12共同协议](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)，参考[决定记录](RESEARCH_DISCUSSION.zh.md#2026-11-10批准fit12共同协议实施及条件开训)。RMS母体/V1、seed51/52/53、ABC/40epoch；P六条通过才M六条，通过才C，最多12轨迹/36域阶段，新独立88h=80/4/4、最多两路。原G4失败和费用不改。
+- **当前工作**：已保存具体合同并修改三个现有入口，正在Linux既有py310完成必要CPU增量核验和来源/现场准入，尚未启动本轮训练。复用已完成RMS训练、FIT12评分及未变历史机制/GPU证据，不重复单域D、资格盘点或GPU探针。本轮变动是FIT12实际读取、当前端点重编码、固定阶段接续，不新增损失/候选。
+- **推进与失败边界**：通过必要核验后直接启动P并按合同条件接续；每域初学对V_CLS均值−2pp/逐seed−5pp、平均遗忘3.5pp及原Full保持/新域/外部竞争力门保持。P/M整批完整才开dev；C只在M系统门通过后开放完整confirm矩阵。取消显存硬帽，OOM槽退出、健康槽续领当前阶段、失败不重跑、缺项不进下游；资源不足只由唯一控制器等待，不恢复旧链。
+- **开发依据及保管**：[reference完整结果](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)为PASS_REFERENCE_DIAGNOSTIC，FIT12 A83.7424%/B89.0658%，新旧含义和单seed/已见dev边界保持，原累计93秒。全部RMS六份877291968字节及四head权重继续保留；新轨迹从共同预训练BERT开始，开发权重不作热启动。中文暂停不动，真实文本/分数/模型留Linux，原位文档、本地提交不推送。
 ### 历史权重版H主实验消融
 
 保持暂停，等待用户明确恢复。最近保存观测为11月10日10:16:16，PAUSED_IDLE、7完成/0活动/56待派，见[核对](../reports/documentation/20261109/vendorlink_account_protocol/result/check.json)；本轮未重新巡检。范围见[正式许可](../reports/documentation/20261107/h_ablation_start/authorization.json)、[暂停补充](../reports/documentation/20261107/h_ablation_pause/scope.zh.md)。不能因VendorLink运行恢复或删除marker；恢复须承接原队列及账本。

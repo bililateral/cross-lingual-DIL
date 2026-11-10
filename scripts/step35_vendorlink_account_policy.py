@@ -5,14 +5,14 @@ import statistics
 
 from step29_vendorlink_methods import Settings
 
-PROTOCOL = 'vendorlink-account-ce-rms-20261110'
+PROTOCOL = 'vendorlink-account-fit12-20261110'
 DOMAINS = ('AlphaBay', 'Dream', 'Agora')
 SEEDS = (51, 52, 53)
-CAPS = dict(training=6*3600, gpu=1800, auxiliary=1800)
+CAPS = dict(training=80*3600, gpu=4*3600, auxiliary=4*3600)
 LIMITS = dict(workers=2, free_gpu_bytes=5*2**30, process_gpu_bytes=None,
               allocator_bytes=None, vendor_reserve_bytes=17*2**30,
               rss_bytes=16*2**30, free_ram_bytes=20*2**30,
-              disk_bytes=8*2**30, free_disk_reserve=32*2**30, save_reserve_bytes=2*2**30,
+              disk_bytes=32*2**30, free_disk_reserve=32*2**30, save_reserve_bytes=2*2**30,
               dispatch_free_disk_bytes=64*2**30)
 CELLS = ((0, 1), (1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3))
 
@@ -42,7 +42,7 @@ def settings(candidate, method):
         changes = dict(pooling='mean_last4_sum', encoder_lr=2.5e-5, head_lr=3e-4,
                        lr_multiplier=1., head_schedule='encoder', gamma=float(candidate != 'H_base'),
                        ce_scale_mode='rms' if candidate == 'H_CE_RMS' else 'unit',
-                       diagnostics=candidate == 'H_CE_RMS')
+                       diagnostics=False)
     elif candidate == 'V1':
         changes = dict(vendor_lr=2e-5)
     elif candidate != 'V0':
@@ -53,11 +53,14 @@ def settings(candidate, method):
 
 
 def tasks(phase, selection=None):
-    if phase == 'D':
-        return [dict(id='D_'+d+'_H_CE_RMS', phase='D', candidate='H_CE_RMS', method='H_SEQ',
-                     seed=41, epochs=40, stages=1, domains=[d], settings=settings('H_CE_RMS', 'H_SEQ'))
-                for d in DOMAINS[:2]]
-    raise ValueError('This finite RMS campaign permits only the two D tasks')
+    if phase not in ('P', 'M') or selection != dict(H='H_CE_RMS', V='V1'):
+        raise ValueError('Only the fixed FIT12 RMS/V1 P/M trajectories are approved')
+    methods = ('H_SEQ', 'VendorLink_SEQ') if phase == 'P' else ('H_ER', 'H_full')
+    return [dict(id=f'{phase}_{m}_s{s}', phase=phase,
+                 candidate=selection['V' if m.startswith('Vendor') else 'H'],
+                 method=m, seed=s, epochs=40, stages=3, domains=list(DOMAINS),
+                 settings=settings(selection['V' if m.startswith('Vendor') else 'H'], m))
+            for s in SEEDS for m in methods]
 
 
 def select(development, baseline):

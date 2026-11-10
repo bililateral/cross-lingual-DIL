@@ -10,7 +10,7 @@ import time
 from step30_evolution_control import Runner
 from step30_evolution_io import Ledger
 from step35_vendorlink_account_io import Check, SharedDiskLimit, PYTHON, pinned, record, write
-from step35_vendorlink_account_policy import PROTOCOL, DOMAINS, CAPS, LIMITS, tasks, select, decide, task_domains
+from step35_vendorlink_account_policy import PROTOCOL, DOMAINS, CAPS, LIMITS, tasks, decide, task_domains
 
 SOURCES = tuple('step35_vendorlink_account_'+n+'.py' for n in ('io', 'policy', 'methods', 'run', 'evaluate', 'control'))+(
     'step29_vendorlink_data.py', 'step29_vendorlink_methods.py', 'step29_vendorlink_run.py',
@@ -96,14 +96,32 @@ def validate_training(task, result, manifest, identity):
 
 
 def pipeline(run_phase, save, baseline, measure=lambda name: nullcontext()):
-    d = run_phase('D', None)
-    with measure('select_D'):
-        d_gate = select(d, baseline)
-        save('D', d_gate)
-        selected = d_gate['selected']
+    if (baseline['status'] != 'PASS_REFERENCE_DIAGNOSTIC'
+            or set(baseline['checks']) != set(DOMAINS[:2])
+            or not all(r['candidate_pass'] for r in baseline['checks'].values())):
+        raise ValueError('Completed fixed FIT12 development evidence required')
+    selected = dict(H='H_CE_RMS', V='V1')
+    with measure('fixed_selection'):
         save('selection', selected)
-    return dict(status=d_gate['status'], D=d_gate, selected=selected, application=False,
-                next_phase_authorized=False)
+    p = run_phase('P', selected)
+    with measure('decide_P'):
+        p_gate = decide(p)
+        save('P', p_gate)
+    if p_gate['status'] != 'PASS_P':
+        return dict(status=p_gate['status'], selected=selected, P=p_gate, application=False)
+    m = run_phase('M', selected)
+    with measure('decide_M'):
+        m_gate = decide({**p, **m}, True)
+        save('M', m_gate)
+    if m_gate['status'] != 'PASS_SYSTEM':
+        return dict(status=m_gate['status'], selected=selected, P=p_gate, M=m_gate, application=True)
+    c = run_phase('C', selected)
+    with measure('decide_C'):
+        c_gate = decide(c, True)
+        c_gate['old_score_increment'] &= m_gate['old_score_increment']
+        save('C', c_gate)
+    return dict(status='CONFIRMATION_PASS' if c_gate['status'] == 'PASS_SYSTEM' else c_gate['status'],
+                selected=selected, P=p_gate, M=m_gate, C=c_gate, application=True)
 
 
 def worker(g, args):
@@ -205,8 +223,8 @@ def campaign(g, gate_path, started=None):
             if not (job['target']/'result/completion.json').is_file():
                 raise ValueError('Missing complete scoring output')
             if job['action'] == 'score':
-                from step35_vendorlink_account_evaluate import validate_rms_scores
-                validate_rms_scores(read(job['target']/'result/completion.json'))
+                from step35_vendorlink_account_evaluate import validate_scores
+                validate_scores(read(job['target']/'result/completion.json'))
         elif not (job['target']/'result/results.json').is_file():
             raise ValueError('Missing complete analysis')
     def run_phase(phase, selected):

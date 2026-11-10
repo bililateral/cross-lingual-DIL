@@ -4,13 +4,11 @@
 
 接手和日常同步按[工作流](RESEARCH_WORKFLOW.zh.md)使用一次性只读观察及具名SFTP核验；普通更新数变化不重复修改合同入口/计划。状态跃迁时核对受影响可变入口，保持活动冻结来源、历史原件和原判据。
 
-## VendorLink账号监督：登记参考档案与后续共同协议
+## VendorLink账号监督：FIT12共同协议
 
-原CE、RMS及用户免审批准的[四条评分头试验](../reports/documentation/20261110/vendorlink_redesign/head_alignment/scope.zh.md)均已按原门结束，[评分头结果/主审](../reports/documentation/20261110/vendorlink_redesign/head_alignment/result/report.zh.md)与此前[RMS改善及边界](../reports/documentation/20261110/vendorlink_redesign/ce_rms/result/report.zh.md)保留。冻结RMS后追加全池CE未优于继续训练对照，B仍未过学习门；不将候选作为已获改进接入Full/ER，不恢复原控制器。运行状态与计数只见交接。
+用户已确认[固定FIT12合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)实施、必要核验后条件开训，本轮免网页外审。直接复用[reference开发门通过](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)，不重复D；H保留RMS及完整多记录/历史机制，V1保持强分类读取，V_SET与H使用同一FIT12资料。三seed冷启动P六条检验逐域相近学习和平均3.5pp遗忘；通过才M六条，再按系统门决定C。新88累计小时/最多两路/无显存硬帽及OOM续领按合同执行，不借旧预算、不追加参数搜索。
 
-用户免审批准的[reference诊断](../reports/documentation/20261110/vendorlink_redesign/reference/scope.zh.md)已完整结束，[结果/主审](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)支持固定FIT12方向在本次开发门可行；保留B的FIT4较高这一反向数量效应，不按市场择优改候选。下一步建议固定登记账号的FIT12共同协议，明确V_SET同档案、V_CLS原强读取、各阶段当前encoder重新编码，再检验多seed初学和H_SEQ遗忘；当前无该后续训练许可。原V1权重已依旧许可删除，新V_SET条件的评分不能伪称可直接复用旧G4值，基线恢复/公平开发/轨迹/预算必须纳入后续具体方案。原G4失败不追认，confirm/Agora仍未开放，零训练/零权重删除的本轮范围已完。
-
-既定研究目标保持：初学对V_CLS三seed均值最多低2pp/逐seed最多低5pp；明显遗忘均值3.5pp并保护新域；Full还须同时改善旧域最终、保持及外部竞争力。取消人为GPU硬帽及OOM槽退休/健康槽续领当前阶段、失败不重试、缺项不开放的已定行为保留，但不授予新运行。原RMS及四条head的必要恢复/复核资产保留；原CE16份已删权重不恢复。旧20261109的5pp门、STOP_LEARNING/71450秒及后续各账不追改。中文暂停、Evolution/ABC结案均不动；本地提交、不推送。
+必要实现仅覆盖新参考读取、跨端点重编码与P/M/C接续；复用适用GPU/CPU证据，只补实际增量。每阶段整批完整才开放，未过科学门正常停止；M完整时跨账号top10仅作无真值应用。RMS权重保留，旧G4/CE/评分头失败、全部旧费用不追改。确认文本仍由条件门保护，中文暂停及旧Evolution/ABC结案不动。当前实施/运行状态只见交接对应项，本地提交不推送。
 ## Evolution：已结束路线与保留边界
 
 以下记录已结束路线的既有范围，不是当前待启动任务。用户当时接受方向咨询建议，明确“继续推进，采用双路同时运行”，并批准开发数据构建与固定96条fit语言判断。历史来源为[六轨迹执行范围](../reports/documentation/20261108/evolution_registered/execution/scope.zh.md)、[许可](../reports/documentation/20261108/evolution_registered/execution/authorization.json)及[实现证据](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)；已核实结束状态见交接唯一Evolution项。原[30轨迹草案](../reports/documentation/20261108/evolution_registered/proposal.zh.md)只作来源，后续24条及24小时预算未获准。

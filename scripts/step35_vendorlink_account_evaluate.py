@@ -1,4 +1,4 @@
-"""Q2/G4 scoring, current-encoder old V heads, and whole-batch result release."""
+"""Q2/FIT12 scoring, current-encoder old V heads, and whole-batch release."""
 import gc
 import json
 import math
@@ -17,7 +17,7 @@ from step35_vendorlink_account_run import restore
 def load_role(binding, domain, role, expected):
     rows = json.loads(pinned(binding).read_text())
     ids = [r['account_uid'] for r in rows]
-    size = {'gallery': 4, 'dev': 2, 'confirm': 2}[role]
+    size = {'fit': 12, 'gallery': 4, 'dev': 2, 'confirm': 2}[role]
     if ids != sorted(set(ids)) or len(ids) != expected or any(len(r['records']) != size for r in rows):
         raise ValueError('Frozen role size/order changed')
     views = [View(f"{domain}:{role}:{r['account_uid']}",
@@ -147,6 +147,20 @@ def validate_rms_scores(completion):
         pinned(binding)
 
 
+def validate_scores(completion):
+    task, role = completion['task'], completion['role']
+    readers = ('V_SET', 'V_CLS', 'V_CLS_ads') if task['method'] == 'VendorLink_SEQ' else (task['method'],)
+    cells = [f'R{t}{j}' for t, j in CELLS]
+    if (completion['status'] != 'BLIND_SCORES_COMPLETE' or role not in ('dev', 'confirm')
+            or completion['cells'] != cells or completion.get('reference_role') != 'fit'
+            or completion.get('reference_records') != 12
+            or set(completion['files']) != {m+':'+c for m in readers for c in cells}
+            or set(completion['sources']) != {d+':'+r for d in task_domains(task) for r in (role, 'fit')}):
+        raise ValueError('Complete current-endpoint FIT12 matrices required before release')
+    for binding in completion['files'].values():
+        pinned(binding)
+
+
 def score(task, completion, manifest, binding, root, role, check):
     if root.exists() or completion['status'] != 'TRAINING_COMPLETE_EVALUATION_CLOSED':
         raise ValueError('Complete training and fresh blind scoring required')
@@ -155,13 +169,13 @@ def score(task, completion, manifest, binding, root, role, check):
     root.mkdir(parents=True)
     cells = ((1, 1),) if task['phase'] == 'D' else CELLS
     domains = task_domains(task)
-    sources = {d+':'+r: manifest['files'][d+':'+r] for d in domains for r in (role, 'gallery')}
+    sources = {d+':'+r: manifest['files'][d+':'+r] for d in domains for r in (role, 'fit')}
     write(root/'access.json', dict(role=role, sources=sources, training_identity=completion['identity']))
     inputs, exports = {}, {}
     for domain in domains:
         n = manifest['counts'][domain]['eligible_accounts']
         qids, query = load_role(sources[domain+':'+role], domain, role, n)
-        gids, gallery = load_role(sources[domain+':gallery'], domain, 'gallery', n)
+        gids, gallery = load_role(sources[domain+':fit'], domain, 'fit', n)
         if qids != gids:
             raise ValueError('Query/gallery registered classes differ')
         if ({r.uid for v in query for r in v.records} & {r.uid for v in gallery for r in v.records}
@@ -209,6 +223,7 @@ def score(task, completion, manifest, binding, root, role, check):
             torch.cuda.empty_cache()
     result = dict(task=task, role=role, training_identity=completion['identity'], files=exports,
                   status='BLIND_SCORES_COMPLETE', cells=[f'R{t}{j}' for t, j in cells], sources=sources,
+                  reference_role='fit', reference_records=12,
                   diagnostics=completion.get('diagnostics', {}))
     if task['settings'].get('diagnostics'):
         validate_rms_scores(result)
@@ -220,8 +235,7 @@ def analyze(completions, expected_tasks, root):
     if root.exists() or [c['task'] for c in completions] != expected_tasks:
         raise ValueError('Whole fixed batch must finish before opening any result')
     for c in completions:
-        if c['task']['settings'].get('diagnostics'):
-            validate_rms_scores(c)
+        validate_scores(c)
     root.mkdir(parents=True)
     write(root/'access.json', dict(tasks=expected_tasks, opening='whole_batch_once'))
     all_metrics, results = {}, {}
@@ -262,11 +276,11 @@ def application(gate, selected, root, check):
     root.mkdir(parents=True)
     campaign, binding = Path(gate['campaign']), gate['model_binding']
     manifest = json.loads(pinned(gate['manifest']).read_text())
-    sources = {d: manifest['files'][d+':gallery'] for d in DOMAINS}
+    sources = {d: manifest['files'][d+':fit'] for d in DOMAINS}
     write(root/'access.json', dict(sources=sources, purpose='unlabelled_candidate_discovery', uses_deleted_alias_data=False))
     all_items = []
     for domain in DOMAINS:
-        ids, views = load_role(sources[domain], domain, 'gallery', manifest['counts'][domain]['eligible_accounts'])
+        ids, views = load_role(sources[domain], domain, 'fit', manifest['counts'][domain]['eligible_accounts'])
         all_items.extend((v.uid, i, domain, v) for i, v in zip(ids, views))
     all_items.sort(key=lambda row: row[0])
     views = [r[3] for r in all_items]
