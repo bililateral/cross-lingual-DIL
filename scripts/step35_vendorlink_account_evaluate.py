@@ -115,6 +115,38 @@ def metrics(scores, labels, class_count):
     return result
 
 
+@torch.no_grad()
+def diagnostic_readings(q, g, payload, classes):
+    if (payload['classes'] != classes or q.shape[-1] != payload['dimension']
+            or g.shape[-1] != payload['dimension']
+            or payload['scale'] != math.sqrt(payload['dimension'])):
+        raise ValueError('Auxiliary class order/dimension/scale mismatch')
+    w, b = (payload['state'][k].to(q) for k in ('weight', 'bias'))
+    if w.shape != (len(classes), q.shape[-1]) or b.shape != (len(classes),):
+        raise ValueError('Incomplete diagnostic classifier')
+    logits = torch.nn.functional.linear(q*payload['scale'], w, b)
+    auxiliary = logits.softmax(-1).mean(1)
+    u, v = q.mean(1), g.mean(1)
+    denominator = u.square().sum(1)[:, None]+v.square().sum(1)[None, :]
+    if (denominator <= 0).any():
+        raise ValueError('Nonpositive diagnostic set denominator')
+    collection = 2*(u@v.T)/denominator
+    outputs = {'H_AUX': auxiliary, 'H_SET': collection}
+    if any(x.shape != (len(q), len(classes)) or not torch.isfinite(x).all() for x in outputs.values()):
+        raise ValueError('Incomplete/nonfinite diagnostic reading')
+    return {name: x.cpu().numpy().astype(np.float64) for name, x in outputs.items()}
+
+
+def validate_rms_scores(completion):
+    if (completion['status'] != 'BLIND_SCORES_COMPLETE' or completion['role'] != 'dev'
+            or completion['cells'] != ['R11']
+            or set(completion['files']) != {'H_SEQ:R11', 'H_AUX:R11', 'H_SET:R11'}
+            or set(completion.get('diagnostics', {})) != {'1'}):
+        raise ValueError('All three same-endpoint D readings are required before opening')
+    for binding in list(completion['files'].values())+list(completion['diagnostics'].values()):
+        pinned(binding)
+
+
 def score(task, completion, manifest, binding, root, role, check):
     if root.exists() or completion['status'] != 'TRAINING_COMPLETE_EVALUATION_CLOSED':
         raise ValueError('Complete training and fresh blind scoring required')
@@ -150,6 +182,18 @@ def score(task, completion, manifest, binding, root, role, check):
             path = root/f'{name}_{cell}.npy'
             np.save(path, values)
             exports[name+':'+cell] = record(path)
+            if task['settings'].get('diagnostics'):
+                diagnostic_binding = completion['diagnostics'][str(stage)]
+                payload = torch.load(pinned(diagnostic_binding), map_location='cpu', weights_only=False)
+                if (payload['identity'] != completion['identity'] or payload['task'] != task
+                        or payload['model_binding'] != binding or payload['stage'] != stage
+                        or payload['endpoint'] != endpoint):
+                    raise ValueError('Diagnostic head must belong to this exact trained endpoint')
+                for label, matrix in diagnostic_readings(q, g, payload, classes).items():
+                    p = root/f'{label}_{cell}.npy'
+                    np.save(p, matrix)
+                    exports[label+':'+cell] = record(p)
+                del payload
             if name == 'V_SET':
                 if t >= j and domain not in heads:
                     raise ValueError('Missing learned old head')
@@ -164,7 +208,10 @@ def score(task, completion, manifest, binding, root, role, check):
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
     result = dict(task=task, role=role, training_identity=completion['identity'], files=exports,
-                  status='BLIND_SCORES_COMPLETE', cells=[f'R{t}{j}' for t, j in cells], sources=sources)
+                  status='BLIND_SCORES_COMPLETE', cells=[f'R{t}{j}' for t, j in cells], sources=sources,
+                  diagnostics=completion.get('diagnostics', {}))
+    if task['settings'].get('diagnostics'):
+        validate_rms_scores(result)
     write(root/'completion.json', result)
     return result
 
@@ -172,6 +219,9 @@ def score(task, completion, manifest, binding, root, role, check):
 def analyze(completions, expected_tasks, root):
     if root.exists() or [c['task'] for c in completions] != expected_tasks:
         raise ValueError('Whole fixed batch must finish before opening any result')
+    for c in completions:
+        if c['task']['settings'].get('diagnostics'):
+            validate_rms_scores(c)
     root.mkdir(parents=True)
     write(root/'access.json', dict(tasks=expected_tasks, opening='whole_batch_once'))
     all_metrics, results = {}, {}
@@ -185,6 +235,8 @@ def analyze(completions, expected_tasks, root):
             n = scores.shape[1]
             truth = np.repeat(np.arange(n), 2) if method == 'V_CLS_ads' else np.arange(n)
             m = metrics(scores, truth, n)
+            if len(m) != 13 or any(not math.isfinite(v) for v in m.values()):
+                raise ValueError('Thirteen complete finite metrics required')
             rows.setdefault(method, {})[cell] = m['macro_F1']
             all_metrics[c['task']['id']+':'+name] = m
         per_task = {}

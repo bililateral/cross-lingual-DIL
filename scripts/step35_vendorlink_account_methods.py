@@ -1,6 +1,7 @@
 """Current-account CE on the original H representation and encoder gradient path."""
 from dataclasses import asdict
 from pathlib import Path
+import math
 
 import torch
 from torch import nn
@@ -17,6 +18,9 @@ class AccountModel(Model):
         self.auxiliary_head = None
         self.auxiliary_classes = ()
         self.auxiliary_optimizer = None
+
+    def ce_scale(self):
+        return math.sqrt(2*self.encoder.config.hidden_size) if self.settings.ce_scale_mode == 'rms' else 1.
 
     def start_account_stage(self, classes, initialization_seed):
         if self.settings.method == 'VendorLink_SEQ' or len(classes) < 2 or len(set(classes)) != len(classes):
@@ -54,11 +58,25 @@ class AccountModel(Model):
                 raise ValueError('Current CE head and optimizer must be initialized')
             lookup = {identity: k for k, identity in enumerate(self.auxiliary_classes)}
             labels = torch.tensor([lookup[v.identity] for v in group.views for _ in v.records], device=z.device)
-            ce = F.cross_entropy(self.auxiliary_head(leaf), labels, reduction='mean')
+            logits = self.auxiliary_head(leaf * self.ce_scale())
+            ce = F.cross_entropy(logits, labels, reduction='mean')
             ce_gradient, = torch.autograd.grad(ce, leaf, retain_graph=True)
             logs.update(ce=float(ce.detach()), gamma=self.settings.gamma, ce_records=len(labels),
                         record_gradient_CE_norm=float(ce_gradient.detach().norm()),
                         current_weighted=logs['weighted']+self.settings.gamma*float(ce.detach()))
+            if self.settings.diagnostics:
+                with torch.no_grad():
+                    values = logits.detach()
+                    wrong = values.clone()
+                    wrong.scatter_(1, labels[:, None], -torch.inf)
+                    margins = values.gather(1, labels[:, None]).squeeze(1)-wrong.amax(1)
+                    norms = self.auxiliary_head.weight.detach().norm(dim=1)
+                    logs.update(ce_scale=self.ce_scale(),
+                        ce_correct=int((values.argmax(1) == labels).sum()),
+                        ce_margin_sum=float(margins.sum()),
+                        ce_logit_std_sum=float(values.std(dim=1, unbiased=False).sum()),
+                        auxiliary_row_norm_mean=float(norms.mean()),
+                        auxiliary_effective_row_norm_mean=float(norms.mean())*self.ce_scale())
             if self.settings.gamma:
                 (self.settings.gamma*ce).backward()
         if leaf.grad is None or not torch.isfinite(leaf.grad).all():

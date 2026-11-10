@@ -5,14 +5,14 @@ import statistics
 
 from step29_vendorlink_methods import Settings
 
-PROTOCOL = 'vendorlink-account-ce-20261110'
+PROTOCOL = 'vendorlink-account-ce-rms-20261110'
 DOMAINS = ('AlphaBay', 'Dream', 'Agora')
 SEEDS = (51, 52, 53)
-CAPS = dict(training=80*3600, gpu=4*3600, auxiliary=4*3600)
+CAPS = dict(training=6*3600, gpu=1800, auxiliary=1800)
 LIMITS = dict(workers=2, free_gpu_bytes=5*2**30, process_gpu_bytes=None,
               allocator_bytes=None, vendor_reserve_bytes=17*2**30,
               rss_bytes=16*2**30, free_ram_bytes=20*2**30,
-              disk_bytes=32*2**30, free_disk_reserve=32*2**30, save_reserve_bytes=2*2**30,
+              disk_bytes=8*2**30, free_disk_reserve=32*2**30, save_reserve_bytes=2*2**30,
               dispatch_free_disk_bytes=64*2**30)
 CELLS = ((0, 1), (1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3))
 
@@ -23,6 +23,8 @@ class AccountSettings(Settings):
     beta: float = .767438161798796
     gamma: float = 1.
     auxiliary_lr: float = 3e-4
+    ce_scale_mode: str = 'unit'
+    diagnostics: bool = False
 
     def __post_init__(self):
         super().__post_init__()
@@ -30,13 +32,17 @@ class AccountSettings(Settings):
             raise ValueError('Finite nonnegative historical weights required')
         if self.gamma not in (0., 1.):
             raise ValueError('Only the frozen zero/one CE intervention is allowed')
+        if self.ce_scale_mode not in ('unit', 'rms'):
+            raise ValueError('Only unit or dimension-derived RMS input is defined')
 
 
 def settings(candidate, method):
     changes = {}
-    if candidate in ('H_base', 'H_CE'):
+    if candidate in ('H_base', 'H_CE', 'H_CE_RMS'):
         changes = dict(pooling='mean_last4_sum', encoder_lr=2.5e-5, head_lr=3e-4,
-                       lr_multiplier=1., head_schedule='encoder', gamma=float(candidate == 'H_CE'))
+                       lr_multiplier=1., head_schedule='encoder', gamma=float(candidate != 'H_base'),
+                       ce_scale_mode='rms' if candidate == 'H_CE_RMS' else 'unit',
+                       diagnostics=candidate == 'H_CE_RMS')
     elif candidate == 'V1':
         changes = dict(vendor_lr=2e-5)
     elif candidate != 'V0':
@@ -48,35 +54,27 @@ def settings(candidate, method):
 
 def tasks(phase, selection=None):
     if phase == 'D':
-        return [dict(id='D_'+d+'_'+c, phase='D', candidate=c, method=m, seed=41, epochs=40,
-                     stages=1, domains=[d], settings=settings(c, m))
-                for d in DOMAINS[:2] for c, m in (
-                    ('H_base', 'H_SEQ'), ('H_CE', 'H_SEQ'), ('V0', 'VendorLink_SEQ'), ('V1', 'VendorLink_SEQ'))]
-    if phase not in ('P', 'M') or set(selection) != {'H', 'V'}:
-        raise ValueError('Frozen D selection required')
-    if selection['H'] != 'H_CE' or selection['V'] not in ('V0', 'V1'):
-        raise ValueError('Only the single adapted H and frozen V selection may proceed')
-    methods = ('H_SEQ', 'VendorLink_SEQ') if phase == 'P' else ('H_ER', 'H_full')
-    return [dict(id=f'{phase}_{m}_s{s}', phase=phase, candidate=selection['V' if m.startswith('Vendor') else 'H'],
-                 method=m, seed=s, epochs=40, stages=3, domains=list(DOMAINS),
-                 settings=settings(selection['V' if m.startswith('Vendor') else 'H'], m))
-            for s in SEEDS for m in methods]
+        return [dict(id='D_'+d+'_H_CE_RMS', phase='D', candidate='H_CE_RMS', method='H_SEQ',
+                     seed=41, epochs=40, stages=1, domains=[d], settings=settings('H_CE_RMS', 'H_SEQ'))
+                for d in DOMAINS[:2]]
+    raise ValueError('This finite RMS campaign permits only the two D tasks')
 
 
-def select(development):
-    def score(domain, candidate, reading):
-        row, = development['D_'+domain+'_'+candidate][reading]
+def select(development, baseline):
+    def score(source, domain, candidate, reading):
+        row, = source['D_'+domain+'_'+candidate][reading]
         if row['seed'] != 41 or not math.isfinite(row['R11']):
             raise ValueError('Complete finite fixed D endpoints required')
         return row['R11']
-    # Validate the same eight tasks, including both V readings and the H_base control.
-    for task in tasks('D'):
-        for reading in (('V_CLS', 'V_SET') if task['method'] == 'VendorLink_SEQ' else ('H_SEQ',)):
-            score(task['domains'][0], task['candidate'], reading)
-    v = [statistics.mean(score(d, 'V'+str(i), 'V_CLS') for d in DOMAINS[:2]) for i in (0, 1)]
-    selected = dict(H='H_CE', V='V'+str(int(v[1]-v[0] > .001)))
-    checks = {d: dict(H=score(d, 'H_CE', 'H_SEQ'), V=score(d, selected['V'], 'V_CLS'),
-                      CE_minus_base=score(d, 'H_CE', 'H_SEQ')-score(d, 'H_base', 'H_SEQ')) for d in DOMAINS[:2]}
+    for d in DOMAINS[:2]:
+        for reading in ('H_SEQ', 'H_AUX', 'H_SET'):
+            score(development, d, 'H_CE_RMS', reading)
+    selected = dict(H='H_CE_RMS', V='V1')
+    checks = {d: dict(H=score(development, d, 'H_CE_RMS', 'H_SEQ'),
+                      V=score(baseline, d, 'V1', 'V_CLS'),
+                      RMS_minus_CE=score(development, d, 'H_CE_RMS', 'H_SEQ')-score(baseline, d, 'H_CE', 'H_SEQ'),
+                      RMS_minus_base=score(development, d, 'H_CE_RMS', 'H_SEQ')-score(baseline, d, 'H_base', 'H_SEQ'))
+              for d in DOMAINS[:2]}
     passed = all(r['H'] >= .70 and r['H']-r['V'] >= -.02 for r in checks.values())
     return dict(status='PASS_D' if passed else 'STOP_ADAPTATION', selected=selected, checks=checks)
 

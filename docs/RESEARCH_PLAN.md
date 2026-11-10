@@ -4,12 +4,11 @@
 
 接手和日常同步按[工作流](RESEARCH_WORKFLOW.zh.md)使用一次性只读观察及具名SFTP核验；普通更新数变化不重复修改合同入口/计划。状态跃迁时核对受影响可变入口，保持活动冻结来源、历史原件和原判据。
 
-## VendorLink账号监督：整理CE开发结果，后续适配另行决定
+## VendorLink账号监督：CE固定RMS尺度有限开发
 
 [实现及必要核验](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)、完整外审和[主审](../reports/documentation/20261110/vendorlink_redesign/implementation/review/primary_disposition.zh.md)已闭合。用户“没问题了就正式开始实验”及[现行范围补充](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)授权的固定阶段链已实际执行；该许可包含前置门失败时停止，不包含停止后的新候选或重训。实际状态只在交接对应项维护。
 
-本链已按D筛查结束，原条件P/M/C未获满足，不恢复原控制器或凭预算余量续跑。[已授权诊断与有限方案](../reports/documentation/20261110/vendorlink_redesign/diagnosis/report.zh.md)从实际CE链、数值日志和三种输出差异提出唯一CE单位RMS尺度候选；保留H多记录主评分及全部历史结构，未来只建议A/B各一次同seed开发，补分类/集合诊断以区分概率损失、表示与读取。候选、建议7h/8GiB/最多2worker及新的评价读取须实质决定后才能实施，不因当前诊断确认自动开训。未满足主学习门即停止，不追加γ/学习率/轮数/seed；原D权重已按另项许可删除，不能安排载模旧端点或为补诊断重训旧八项。必要结果/方案外审按具体材料许可办理，不把原实现外审当效果证据。
-
+原CE链已按D筛查结束，不恢复原控制器或挪用余额。[诊断与有限方案](../reports/documentation/20261110/vendorlink_redesign/diagnosis/report.zh.md)及[本次执行补充](../reports/documentation/20261110/vendorlink_redesign/ce_rms/scope.zh.md)仅改变辅助CE输入尺度，保留H多记录主评分和历史结构；用户已明确主审、必要核验后直接启动A/B两任务。固定seed41/40epoch，新7h/8GiB/最多2worker，旧H/V结果复用、三读取只作诊断，两项完整后一次分析；任一主学习门失败即停，全部通过也不自动P/M/C。后续持续学习安排需依据新证据另行决定，不加γ/LR/epoch/seed搜索。旧D权重已删，不补载模或重训旧八项；实际进度只见交接。
 已定标准保持：H相对V_CLS逐域初学均值最多低2pp/逐seed最多低5pp，明显遗忘均值3.5pp及跨seed保护；Full同时满足旧域最终、遗忘、新域和外部基线门。取消人为GPU配额及固定GiB整PID终止，资源预留仍执行；单worker OOM退出，健康worker继续当前阶段剩余独立任务，失败不重跑，缺项不开放该批效果或下游。工程核验不证明科学目标已实现。
 
 原20261109完整结果的5pp门、STOP_LEARNING和71450秒费用保持；后设3.5pp不追改验收。原关系候选已删，跨账号发现仍为无真值应用输出，不报已验证马甲准确率。旧ABC/Evolution结案及中文暂停不动。状态只在交接唯一当前项维护；根docs仅Windows，本地提交、不推送。

@@ -84,6 +84,7 @@ def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
     replay = s.method in ('H_ER', 'H_full')
     memory = Memory(seed_for(seed, DOMAINS, 'reservoir'), s)
     optimizer, heads, endpoints, updates = None, {}, {}, 0
+    diagnostics = {}
     workload = dict(current_ads=0, current_updates=0, history_ads=0, history_groups=0,
                     teacher_ads=0, teacher_groups=0)
     base = dict(identity=identity, task=task, model_binding=binding)
@@ -163,9 +164,17 @@ def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
                 write(job/f'memory_stage{stage}.json', dict(bytes=len(memory.bytes()), seen=memory.seen,
                     candidates=len(memory_candidates), groups=[dict(uid=r['group']['uid'], origin=r['origin']) for r in memory.entries]))
             save_endpoint(stage)
+            if s.diagnostics:
+                diagnostic = dict(**base, stage=stage, endpoint=endpoints[str(stage)],
+                    dimension=2*model.encoder.config.hidden_size, scale=model.ce_scale(),
+                    classes=list(model.auxiliary_classes),
+                    state={k: v.detach().cpu().clone() for k, v in model.auxiliary_head.state_dict().items()})
+                diagnostic_path = job/f'diagnostic_stage{stage}.pt'
+                atomic_tensor(diagnostic_path, diagnostic, check)
+                diagnostics[str(stage)] = record(diagnostic_path)
             del accounts, memory_candidates, batches, batch, history, teacher
         result = dict(status='TRAINING_COMPLETE_EVALUATION_CLOSED', **base, endpoints=endpoints,
-                      updates=updates, workload=workload)
+                      updates=updates, workload=workload, diagnostics=diagnostics)
         write(job/'workload.json', workload)
         write(job/'completion.json', result)
         return result

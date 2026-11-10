@@ -39,7 +39,7 @@ def make_jobs(root, phase, specs, action):
                  (4 if vendor else (6 if task['method'] == 'H_SEQ' else 10)))
         target = root/phase/('training' if action == 'train' else 'scoring')/task['id']
         out.append(dict(action=action, target=target, bucket='training' if action == 'train' else 'gpu',
-            seconds=hours*3600 if action == 'train' else 3600, extra=['--phase', phase, '--task', task['id']],
+            seconds=hours*3600 if action == 'train' else 900, extra=['--phase', phase, '--task', task['id']],
             gpu_family='V' if vendor else 'H',
             reserved_bytes=LIMITS['vendor_reserve_bytes'] if vendor else LIMITS['free_gpu_bytes']))
     return out
@@ -55,7 +55,7 @@ def permit(path):
     expected = {Path(g['workspace']).resolve()/'scripts'/name for name in SOURCES}
     if {Path(b['path']).resolve() for b in g['sources']} != expected:
         raise ValueError('Actual entry and every direct runtime dependency must be bound')
-    for b in g['sources']+[g['scope'], g['protocol_source'], g['review_disposition'], g['manifest'], g['cpu'], g['gpu']]:
+    for b in g['sources']+[g['scope'], g['protocol_source'], g['review_disposition'], g['manifest'], g['cpu'], g['gpu'], g['baseline']]:
         pinned(b)
     if Path(__file__).resolve().parent != Path(g['workspace']).resolve()/'scripts':
         raise ValueError('Use the isolated bound workspace')
@@ -88,37 +88,22 @@ def validate_training(task, result, manifest, identity):
         raise ValueError('Actual exposure/update count incomplete')
     for b in result['endpoints'].values():
         pinned(b)
+    if task['settings'].get('diagnostics'):
+        if set(result.get('diagnostics', {})) != {str(i) for i in range(1, task['stages']+1)}:
+            raise ValueError('Diagnostic archive missing before latest retirement')
+        for b in result['diagnostics'].values():
+            pinned(b)
 
 
-def pipeline(run_phase, save, measure=lambda name: nullcontext()):
+def pipeline(run_phase, save, baseline, measure=lambda name: nullcontext()):
     d = run_phase('D', None)
     with measure('select_D'):
-        d_gate = select(d)
+        d_gate = select(d, baseline)
         save('D', d_gate)
         selected = d_gate['selected']
         save('selection', selected)
-    if d_gate['status'] != 'PASS_D':
-        return dict(status=d_gate['status'], D=d_gate, selected=selected, application=False)
-    p = run_phase('P', selected)
-    with measure('decide_P'):
-        p_gate = decide(p)
-        save('P', p_gate)
-    if p_gate['status'] != 'PASS_P':
-        return dict(status=p_gate['status'], selected=selected, P=p_gate, application=False)
-    m = run_phase('M', selected)
-    with measure('decide_M'):
-        combined = {**p, **m}
-        m_gate = decide(combined, True)
-        save('M', m_gate)
-    if m_gate['status'] != 'PASS_SYSTEM':
-        return dict(status=m_gate['status'], selected=selected, P=p_gate, M=m_gate, application=True)
-    c = run_phase('C', selected)
-    with measure('decide_C'):
-        c_gate = decide(c, True)
-        c_gate['old_score_increment'] &= m_gate['old_score_increment']
-        save('C', c_gate)
-    return dict(status='CONFIRMATION_PASS' if c_gate['status'] == 'PASS_SYSTEM' else c_gate['status'],
-                selected=selected, P=p_gate, M=m_gate, C=c_gate, application=True)
+    return dict(status=d_gate['status'], D=d_gate, selected=selected, application=False,
+                next_phase_authorized=False)
 
 
 def worker(g, args):
@@ -219,6 +204,9 @@ def campaign(g, gate_path, started=None):
         elif job['action'] in ('score', 'application'):
             if not (job['target']/'result/completion.json').is_file():
                 raise ValueError('Missing complete scoring output')
+            if job['action'] == 'score':
+                from step35_vendorlink_account_evaluate import validate_rms_scores
+                validate_rms_scores(read(job['target']/'result/completion.json'))
         elif not (job['target']/'result/results.json').is_file():
             raise ValueError('Missing complete analysis')
     def run_phase(phase, selected):
@@ -234,13 +222,14 @@ def campaign(g, gate_path, started=None):
         with measure(phase+'_scoring_manifest'):
             scoring = [record(root/phase/'scoring'/t['id']/'result/completion.json') for t in specs]
             write(root/phase/'scoring_complete.json', dict(tasks=specs, completions=scoring))
-        job = dict(action='analyze', target=root/phase/'analysis', bucket='auxiliary', seconds=1800,
+        job = dict(action='analyze', target=root/phase/'analysis', bucket='auxiliary', seconds=600,
                    extra=['--phase', phase])
         runner.run_many([job], 1, complete)
         with measure(phase+'_analysis_read'):
             return read(root/phase/'analysis/result/results.json')
     try:
-        result = pipeline(run_phase, lambda name, value: write(root/'decisions'/f'{name}.json', value), measure)
+        result = pipeline(run_phase, lambda name, value: write(root/'decisions'/f'{name}.json', value),
+                          read(pinned(g['baseline'])), measure)
         with measure('quantitative_completion'):
             write(root/'quantitative_completion.json', result)
         if result['application']:

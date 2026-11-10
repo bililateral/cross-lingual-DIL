@@ -1,0 +1,197 @@
+- main [ref=e66]:
+  - generic [ref=e76]:
+    - generic:
+      - button "vendorlink ce diagnosis review 20261110.zh 的文件操作" [ref=e79] [cursor=pointer]:
+        - generic [ref=e80]: vendorlink ce diagnosis review 20261110.zh
+      - generic:
+        - group "编辑历史" [ref=e92]
+        - group "查看器控件" [ref=e102]
+        - group "文件操作" [ref=e108]
+    - generic [ref=e123]:
+      - textbox "输入内容，或键入 '/' 调出命令…" [active] [ref=e129]:
+        - heading "VendorLink 账号监督：CE 结果诊断与固定 RMS 尺度候选独立审查" [level=1] [ref=e130]
+        - paragraph [ref=e131]
+        - heading "一、总体裁决" [level=2] [ref=e136]
+        - paragraph [ref=e137]
+        - paragraph [ref=e139]
+        - paragraph [ref=e142]
+        - paragraph [ref=e145]
+        - heading "三个最终问题的明确回答" [level=3] [ref=e147]
+        - table [ref=e148]
+        - paragraph [ref=e169]
+        - heading "二、附件核验、实际阅读范围与证据层级" [level=2] [ref=e172]
+        - heading "2.1 本轮实际核验" [level=3] [ref=e173]
+        - table [ref=e174]
+        - paragraph [ref=e200]: 上述结论来自对实际 ZIP 和成员字节的校验，不是照抄清单。后文证据代号及原包路径见附录。
+        - heading "2.2 本轮阅读和核算做到了什么" [level=3] [ref=e201]
+        - paragraph [ref=e202]
+        - paragraph [ref=e205]: "核对包括任务数、轮次、更新与暴露总数、已存统计值的有限性和范围一致性、(\\exp(-\\mathrm{CE})) 的算术关系、开发指标差值、V 选择门及费用加总。没有从逐条分数重新计算任何科研指标。"
+        - heading "2.3 不能声称本轮独立验证的内容" [level=3] [ref=e206]
+        - paragraph [ref=e207]
+        - paragraph [ref=e209]: 因此：
+        - list [ref=e210]
+        - paragraph [ref=e223]: 这些是证据限度，不是新增科研停止条件。
+        - heading "三、CE 是否真正接线：成立，未发现具体错误" [level=2] [ref=e224]
+        - heading "3.1 记录、标签和类别映射一致" [level=3] [ref=e225]
+        - paragraph [ref=e226]
+        - paragraph [ref=e228]: 这是真实的全当前市场类别 CE，而不是只对当前群的八个账号分类。没有发现标签顺序错位、类别数被缩成群大小或旧市场辅助类别混入的证据。
+        - heading "3.2 detach 没有截断最后的 encoder 更新" [level=3] [ref=e229]
+        - paragraph [ref=e230]: 实际链路可以写为：
+        - paragraph [ref=e231]: "[z=f_\\theta(\\text{text}),\\qquad\\ell=z.\\mathrm{detach}().\\mathrm{requires_grad},]"
+        - paragraph [ref=e232]: "[g_\\ell=\\nabla_\\ell L_H+\\gamma\\nabla_\\ell L_{\\mathrm{CE}},\\qquad\\nabla_\\theta L=J_{f_\\theta}^{\\top}g_\\ell .]"
+        - paragraph [ref=e233]
+        - paragraph [ref=e235]: 因此，不存在“看见 detach 就断言只训练辅助头”的依据，也没有发现 CE 因诊断调用被重复累计两次。
+        - heading "3.3 参数更新与历史边界" [level=3] [ref=e236]
+        - paragraph [ref=e237]
+        - paragraph [ref=e239]
+        - heading "3.4 保存数值提供了额外支持，但不是效果证明" [level=3] [ref=e241]
+        - paragraph [ref=e242]
+        - table [ref=e244]
+        - paragraph [ref=e258]
+        - paragraph [ref=e260]: 这里的“更新数”沿日志定义是 optimizer 调用计数，不意味着每一步、每个参数都发生非零数值变化。
+        - heading "四、已保存数字支持的诊断" [level=2] [ref=e261]
+        - heading "4.1 原 D 的停止结论正确，不能改写为运行失败" [level=3] [ref=e262]
+        - paragraph [ref=e263]
+        - table [ref=e265]
+        - paragraph [ref=e307]: 绝对 70% 门通过，相对 V1_CLS 的逐市场 2pp 门失败，STOP_ADAPTATION 与实际代码一致。
+        - paragraph [ref=e308]
+        - paragraph [ref=e310]
+        - heading "4.2 没有支持“少跑数据或学习率没接上”的数值异常" [level=3] [ref=e315]
+        - table [ref=e316]
+        - paragraph [ref=e336]
+        - paragraph [ref=e339]
+        - heading "4.3 CE 与准确率必须继续分开" [level=3] [ref=e341]
+        - paragraph [ref=e342]
+        - table [ref=e344]
+        - paragraph [ref=e395]: 因为
+        - paragraph [ref=e396]: "[\\overline{\\mathrm{CE}}=-\\frac1N\\sum_{r=1}^{N}\\log p_r(y_r),]"
+        - paragraph [ref=e397]: 所以
+        - paragraph [ref=e398]: "[e^{-\\overline{\\mathrm{CE}}}=\\left(\\prod_{r=1}^{N}p_r(y_r)\\right)^{1/N}]"
+        - paragraph [ref=e399]
+        - paragraph [ref=e402]
+        - paragraph [ref=e404]
+        - heading "4.4 记录梯度比不能转写成 encoder 贡献比或梯度冲突" [level=3] [ref=e408]
+        - paragraph [ref=e409]
+        - table [ref=e411]
+        - paragraph [ref=e428]
+        - paragraph [ref=e430]: 末期比值上升也包含 H 梯度分母明显变小的作用，不能直接等同于某个训练机制“突然变强”。V1 末轮同样 100% 触发裁剪却具有较好开发表现，因此频繁裁剪不能独立充当根因；无依据要求拆优化器、换 clip 或增加梯度冲突算法。
+        - heading "4.5 原 rank 已包含局部 softmax CE" [level=3] [ref=e431]
+        - paragraph [ref=e432]: 对只有一个正视图的查询，原 rank 为：
+        - paragraph [ref=e433]: "[\\log!\\left(1+\\sum_{n\\in\\mathcal N}e^{s_n-s_+}\\right)=\\log!\\left(e^{s_+}+\\sum_{n\\in\\mathcal N}e^{s_n}\\right)-s_+.]"
+        - paragraph [ref=e434]
+        - paragraph [ref=e436]: 它不是全 546 / 157 账号候选池上的 H 主评分 CE。H 已有全类别辅助分类监督，但最终 pair/聚合分数仍仅在训练群内直接竞争。把已有 rank 改名或重复加一遍“组内集合 CE”不能补齐这个差别。
+        - paragraph [ref=e437]
+        - heading "五、单位范数、初始化与固定 RMS 候选的数学审查" [level=2] [ref=e439]
+        - heading "5.1 两项尺度推导正确" [level=3] [ref=e440]
+        - paragraph [ref=e441]: 对实际非零的通道向量，令
+        - paragraph [ref=e442]
+        - paragraph [ref=e444]: 两通道各 768 维，因此 (D=1536)，且
+        - paragraph [ref=e445]: "[|z_H|_2=1,\\qquad\\operatorname{RMS}(z_H)=\\sqrt{\\frac{|z_H|_2^2}{D}}=\\frac1{\\sqrt{1536}}\\approx0.0255155.]"
+        - paragraph [ref=e446]
+        - paragraph [ref=e448]
+        - paragraph [ref=e450]: 辅助头每个权重独立以标准差 0.02 初始化，bias 为 0。对固定输入 (z_H)，在初始化分布下：
+        - paragraph [ref=e451]: "[\\operatorname{Var}(w_k^\\top z_H)=0.02^2|z_H|_2^2=0.02^2,]"
+        - paragraph [ref=e452]
+        - paragraph [ref=e454]: "[0.02\\sqrt{1536}=0.7838367177.]"
+        - paragraph [ref=e455]
+        - heading "5.2 推导成立，不等于原尺度被证明错误" [level=3] [ref=e457]
+        - paragraph [ref=e458]: 令有效分类权重 (U=cW)，则
+        - paragraph [ref=e459]: "[W(cz_H)+b=Uz_H+b.]"
+        - paragraph [ref=e460]
+        - paragraph [ref=e463]: 单记录梯度为：
+        - paragraph [ref=e464]: "[\\nabla_{z_H}L_{\\mathrm{CE}}=cW^\\top(p-y),\\qquad\\nabla_WL_{\\mathrm{CE}}=c(p-y)z_H^\\top,]"
+        - paragraph [ref=e465]
+        - paragraph [ref=e467]: 另需避免将它完全等同于“对全部 logits 改温度”：学习后的 bias 非零时，(cWz+b) 与 (c(Wz+b)) 不同。报告继续使用“固定 CE 输入尺度”这一名称合适。
+        - heading "5.3 是否有足够动机进入有限检验？" [level=3] [ref=e468]
+        - paragraph [ref=e469]
+        - paragraph [ref=e471]: 依据是：
+        - list [ref=e472]
+        - paragraph [ref=e482]
+        - paragraph [ref=e484]: 若该候选失败，能否继续研究其他方向需另看新诊断及用户决定，不能预先写成自动追加实验。
+        - heading "六、两个新单域任务是否足够回答问题" [level=2] [ref=e485]
+        - heading "6.1 足够回答局部筛查，不足够确认总体效果" [level=3] [ref=e486]
+        - paragraph [ref=e487]: 两个新任务应回答：
+        - blockquote [ref=e488]
+        - paragraph [ref=e490]
+        - paragraph [ref=e492]
+        - paragraph [ref=e494]: 这不是全持续学习过程的独立因果消融；只有一个训练 seed，且开发文本已反复接触。成功只能先称“这个固定开发设置下的正向适配与学习筛查通过”；失败则保持该固定筛查的失败，不能普遍否定所有尺度或 CE 方法。
+        - heading "6.2 原学习门的实际数值" [level=3] [ref=e495]
+        - paragraph [ref=e496]: 由旧 V1_CLS 的未舍入宏 F1 得到：
+        - table [ref=e497]
+        - paragraph [ref=e511]
+        - heading "6.3 对照复用与公平性" [level=3] [ref=e513]
+        - paragraph [ref=e514]
+        - paragraph [ref=e516]: 不需要为了形式上的开发次数对称给 V 新增搜索，也不需要增加三条旧 H_base 完整轨迹。旧权重删除不影响使用已保存指标作对照，但禁止虚构旧模型新的三读取结果。
+        - paragraph [ref=e517]
+        - heading "6.4 P/M/C 必须继续单独处理" [level=3] [ref=e519]
+        - paragraph [ref=e520]
+        - heading "七、三读取与最少诊断的具体实施契约" [level=2] [ref=e522]
+        - paragraph [ref=e523]: 本节落实报告已经承诺的内容，不把“待实现”本身计为新缺陷。
+        - heading "7.1 三个读取必须由同一个新 H 端点产生" [level=3] [ref=e524]
+        - table [ref=e525]
+        - paragraph [ref=e543]: 辅助分类公式应明确为：
+        - paragraph [ref=e544]: "[P(c\\mid q)=\\frac12\\sum_{r=1}^{2}\\operatorname{softmax}!\\left(W\\sqrt D,z_H(q_r)+b\\right)_c .]"
+        - paragraph [ref=e545]
+        - paragraph [ref=e547]: 集合读取应为：
+        - paragraph [ref=e548]: "[u=\\frac12\\sum_{r=1}^{2}z_H(q_r),\\qquadv=\\frac14\\sum_{s=1}^{4}z_H(g_s),\\qquadS_{\\mathrm{set}}(q,g)=\\frac{2u^\\top v}{|u|_2^2+|v|_2^2}.]"
+        - paragraph [ref=e549]
+        - heading "7.2 辅助头必须在 latest 退役前保存，且与端点绑定" [level=3] [ref=e551]
+        - paragraph [ref=e552]
+        - paragraph [ref=e554]: 因此新归档必须在这一步之前完成，保存必要的 W/b、类别顺序、D/scale、task/stage/training_identity，以及对应 H 端点的身份。真实 score 应恢复并使用这些内容，completion 应绑定其来源；不能只增加一个不被正式入口调用的辅助函数。
+        - paragraph [ref=e555]: 两市场 float32 W/b 的原始参数共
+        - paragraph [ref=e556]: "[(546+157)(1536+1)\\times4=4,322,044\\ \\text{字节}\\approx4.122\\ \\text{MiB},]"
+        - paragraph [ref=e557]
+        - heading "7.3 完整性应检查读取集合，而不是只检查完成标签" [level=3] [ref=e559]
+        - paragraph [ref=e560]
+        - paragraph [ref=e562]
+        - heading "7.4 新诊断的解释限度" [level=3] [ref=e564]
+        - paragraph [ref=e565]
+        - paragraph [ref=e567]: 训练 argmax 正确数/总数、margin、logit 尺度和头范数是合理的最少观测。实现时要写明聚合口径：训练正确率按记录计，CE 按记录加权；margin 是真实类 logit 减最大错误类 logit；logit 尺度采用哪一种跨类统计应固定。它们是在线训练模式观测，不冒充终点独立 dev 表现。无需为补这些标量额外训练或读取 confirm。
+        - heading "7.5 必要核验应保持小范围" [level=3] [ref=e568]
+        - paragraph [ref=e569]: 报告提出的三类受影响 CPU 核验适当：
+        - list [ref=e570]
+        - paragraph [ref=e579]: γ=0 不应要求所有 CE 诊断日志与旧值相同，因为未参与反传的 CE 输入也已经改变。预算预约参数可以在同一小范围入口检查中覆盖，不需要另造通用平台。
+        - paragraph [ref=e580]: 标量乘法和新增纯读取不增加 BERT 训练前向轨迹。没有已证实缺口支持默认重跑整轮 GPU probe、双路长测或故意制造真实 OOM；若未来实际改动超出已述范围，再只核验受影响部分。
+        - heading "八、7h、8GiB 与资源安排的裁决" [level=2] [ref=e581]
+        - heading "8.1 总量有实测依据" [level=3] [ref=e582]
+        - paragraph [ref=e583]
+        - paragraph [ref=e585]: "[4845.885883+1847.728365=6693.614248\\ \\text{秒}=1.8593373\\ \\text{累计小时}.]"
+        - paragraph [ref=e586]: 原两次 H_CE 主评分合计：
+        - paragraph [ref=e587]: "[18.756070+8.480113=27.236183\\ \\text{秒}.]"
+        - paragraph [ref=e588]
+        - paragraph [ref=e590]
+        - heading "8.2 必须补齐的预约接口：R-01" [level=3] [ref=e593]
+        - paragraph [ref=e594]
+        - list [ref=e596]
+        - paragraph [ref=e604]
+        - paragraph [ref=e606]: 不需要因此增大 7h 总额、改变预约算法、修改 OOM 规则或重开旧调度审查。报告已说要修改相应任务入口，但尚缺上述单项数值，所以不能把“7h 完整预约可覆盖”当作已经接好的配置。
+        - heading "8.3 8GiB 是新增磁盘帽，峰值估计应包含原子保存暂存" [level=3] [ref=e607]
+        - paragraph [ref=e608]
+        - paragraph [ref=e610]
+        - heading "8.4 其他资源限制无需重设计" [level=3] [ref=e613]
+        - paragraph [ref=e614]
+        - paragraph [ref=e616]: 旧短测约 3.97GiB 和长训首段占用不是新峰值保证。保留实际资源准入、费用及峰值记录即可；失败槽退出、健康槽继续当前阶段剩余独立任务、失败项不重试、缺项不开放的既定规则保持，不要求新监听或通用恢复体系。
+        - heading "九、结构化发现及处置分类" [level=2] [ref=e617]
+        - heading "A. 已证实科学阻断" [level=3] [ref=e618]
+        - table [ref=e619]
+        - heading "B. 可复现性缺陷与必须补齐的接口" [level=3] [ref=e637]
+        - table [ref=e638]
+        - paragraph [ref=e660]: I-01 / I-02 是对报告原承诺的具体落实，不能把尚未实现本身写成已发生科研错误，也不要求重训旧对照。
+        - heading "C. 合理但非必要的建议" [level=3] [ref=e661]
+        - table [ref=e662]
+        - heading "D. 范围外过度设计" [level=3] [ref=e685]
+        - paragraph [ref=e686]: 下列要求没有从本轮具体证据推出，不应作为候选有限检验的前提：
+        - list [ref=e687]
+        - heading "十、可回收的最终结论" [level=2] [ref=e709]
+        - paragraph [ref=e710]
+        - paragraph [ref=e712]
+        - paragraph [ref=e714]
+        - paragraph [ref=e716]
+        - heading "附录：证据索引与实际阅读范围" [level=2] [ref=e718]
+        - paragraph [ref=e719]: 下列路径均相对于用户提供的 ZIP 根目录。简写前缀：
+        - list [ref=e720]
+        - table [ref=e727]
+        - paragraph [ref=e825]: 本报告所有项目事实均来自上述附件，数学结论由所示源码公式直接推导。没有使用包外私有材料补齐缺失证据，也没有用旧实现审查替代本轮效果判断。
+        - paragraph [ref=e826]
+      - button "⋮⋮"
+      - button "⋮⋮"
