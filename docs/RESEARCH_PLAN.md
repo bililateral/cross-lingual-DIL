@@ -2,15 +2,15 @@
 
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)，本页仅列后续动作和授权边界。有效合同及增量修复从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)进入，不复制PID、计数或过期工期。
 
-## VendorLink账号监督：重新设计学习适配
+## VendorLink账号监督：已完成CE适配实现，待正式启动
 
-用户现已要求方案补正免审并开始实现，按[实施范围](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)推进；依据[新有限草案](../reports/documentation/20261110/vendorlink_redesign/proposal.zh.md)作实质决定：原H1保留文本/多记录关联与完整历史机制，仅建议增加当前市场账号CE辅助训练；D以原H1的γ=0作同配置对照，H的评价仍用多记录评分。建议8个A/B单域任务后，按前提进入6条P和6条M，固定seed51/52/53、最多两路H＋V/H＋H、修订后88累计小时（training80/GPU4/aux4）/32GiB输出帽。候选、选择/停止及质量保护均写在草案；当前仅清理和设计获准，没有新训练、实现、数据重划或监听许可。
+用户已要求“此次修改免审。确定好方案就开始尽快实现”。现按[方案](../reports/documentation/20261110/vendorlink_redesign/proposal.zh.md)与[实施范围](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)完成最小实现、必要CPU/唯一GPU增量核验和主审；来源、真实接线及费用见[实现报告](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)。不再把历史“待实现批准”恢复为当前阻断，不重复GPU资格。用户随后明确“实现完成就提交外审”，现按最新要求提交定向实现审查，回收后独立处置必要问题。正式D/P/M/C仍按最新“先别启动训练”保持关闭，没有监听。
 
-用户已明确后续平均遗忘门3.5pp、H相对V_CLS逐域初学均值最多落后2pp/逐seed最多5pp；最新取消人为GPU allocator配额和固定GiB整PID终止，替代此前15/16及15/15.5设想。后续须在实际入口落实无硬cap、真实资源准入与失败处理，不因占用超过估计就中止健康训练；取消硬限不授权抢占他人资源或承诺不发生物理OOM。用户随后明确单worker OOM退出后，健康worker继续领取当前阶段剩余独立任务，失败那条不自动重跑，缺项不进入下一阶段；已同步方案，后续实现须核对真实续领、失败不重新入队和缺项阻断，不能只证明当前任务未被中止。本轮仍仅更新文档，不实现、测试、开训或监听。V为压低峰值而临时提出的梯度检查点及额外GPU测试已撤回。新辅助损失、组合成功门、完整科学范围及预算尚待最终决定。用户已要求回收外审并完成必要修改，现从[已闭合主审](../reports/documentation/20261110/vendorlink_redesign/review/primary_disposition.zh.md)和补正版继续：记录表示保持/√2、辅助optimizer明确为固定AdamW，D误停边界写清；用户随后要求修复预约不足，已将训练余量72→80h、总帽80→88h，保持任务数和预计实耗，主审核算覆盖原上沿末两任务预约。当前落实88h配置与方案§9已有的必要CPU/一次H GPU增量证据，正式D/P/M/C不启动；不重做旧资格或重复方案外审。主审闭合不授权实现、训练、确认文本或其他新包外发；先别启动训练的决定保持。
+下一步先完成本次明确要求的实现外审及主审处置；取得明确的正式启动决定后，核对新入口来源、现场资源及继承费用，按既定阶段推进：D八个A/B冷启动任务，条件P六条及M六条，固定51/52/53，最多两路H＋V/H＋H、最多一条V并行；88h=80训练/4GPU/4辅助，32GiB输出帽。阶段前提失败正常停止，不追选候选、顺序或seed；不重建已合格12/4/2/2数据，不恢复旧层叠接续控制器或已删权重。完整H保留文本与多记录评分及回放/出生评分保持，当前CE只是共同学习适配。
 
-原[完整结果](../reports/documentation/20261109/vendorlink_account_protocol/result/report.zh.md)及[定向结果主审](../reports/documentation/20261109/vendorlink_account_protocol/result/review/primary_disposition.zh.md)继续有效，原5pp门、STOP_LEARNING及60h历史账不改；不能用后设3.5pp重写已发生验收，也不靠换顺序、削弱对手或少学新域达标。旧脚本/权重按用户后续清理决定退役，保管见[存储记录](STORAGE.zh.md#2026-11-10-账号监督旧权重和专用脚本清理)；后续只从精确Git恢复所需函数，不恢复旧层叠重跑/接续控制器。已建角色数据和全部结果证据保留，无需再次下载/资格盘点。状态仅在交接对应项维护。
+已定标准保持：H相对V_CLS逐域初学均值最多低2pp/逐seed最多低5pp，明显遗忘均值3.5pp及跨seed保护；Full同时满足旧域最终、遗忘、新域和外部基线门。取消人为GPU配额及固定GiB整PID终止，资源预留仍执行；单worker OOM退出，健康worker继续当前阶段剩余独立任务，失败不重跑，缺项不开放该批效果或下游。工程核验不证明科学目标已实现。
 
-原跨账号关系候选已删，不恢复；[关系核查](../reports/documentation/20261108/vendorlink_alias_evidence/report.zh.md)仍未建立真实同控训练/评价集，但该更强任务的不足不否决原论文账号监督层级。继续保留跨账号无真值候选发现作为应用输出，不报已验证马甲关系准确率。旧ABC/Evolution负结果、停止、费用和接触史保持；中文暂停不动。本轮原位维护记录、本地提交、不推送。
+原20261109完整结果的5pp门、STOP_LEARNING和71450秒费用保持；后设3.5pp不追改验收。原关系候选已删，跨账号发现仍为无真值应用输出，不报已验证马甲准确率。旧ABC/Evolution结案及中文暂停不动。状态只在交接唯一当前项维护；根docs仅Windows，本地提交、不推送。
 
 ## Evolution：已结束路线与保留边界
 
