@@ -8,7 +8,7 @@ Linux10:58:22已删除旧execution内34份权重共12198384250字节（11.36GiB�
 
 全部70份远端及13份本地源码，均实际读取Git提交`f0c2872f96a469140fab6837f360de811cc00834`对应blob并核对大小/SHA，见[精确恢复映射](../reports/documentation/20261110/vendorlink_redesign/source_recovery.json)。其中CPU01原`execution/cpu_increment01/test_source.py`11231字节确实已跟踪，SHA256 `685efce8d858a01f94f556b5bcf36b774ed3bb0ba222cb3300432f9eb0a65e66`；此前“原CPU01源码无法恢复”的保管疑点据实际文件闭合，不靠重跑CPU补证，也不冒称以当前最新版代替旧版。共享root scripts保留，仅删除本轮专用step34及测试；Linux隔离workspace共享模块的副本已退役，原共享源不受影响。
 
-本节后续许可替代下面旧时点的“训练端点/正式来源保留”安排，旧叙述保留当时含义。Git只能恢复源码，不能恢复模型；恢复不授予测试、载模或训练。旧结果外审的文件和网页由另一Agent结案，本轮未修改；原费用71450秒及失败账不清零。新草案、清理回执和资源观测保存在`reports/documentation/20261110/vendorlink_redesign/`，6份328441字节材料经SFTP核对双端大小/SHA一致，见[同步回执](../reports/documentation/20261110/vendorlink_redesign/sync.json)；根docs仍仅Windows。不推送、不重置11月6日大清理周期。
+本节后续许可替代下面旧时点的“训练端点/正式来源保留”安排，旧叙述保留当时含义。Git只能恢复源码，不能恢复模型；恢复不授予测试、载模或训练。旧结果外审的文件和网页由另一Agent结案，本轮未修改；原费用71450秒及失败账不清零。新草案、清理回执和资源观测保存在`reports/documentation/20261110/vendorlink_redesign/`，6份328441字节材料经SFTP核对双端大小/SHA一致，见[原同步回执](../reports/documentation/20261110/vendorlink_redesign/sync.json)。随后用户明确单worker OOM后健康worker续领当前阶段独立任务，本次只更新方案及现有记录；Linux旧方案先与上述原身份核对，再经SFTP更新并独立下载核对，29502字节/SHA与Windows一致，见[本次方案同步](../reports/documentation/20261110/vendorlink_redesign/sync_oom_update.json)。原同步/清理回执保留当时字节，原方案由Git e659ea65恢复；临时核对副本已清理，未实现、测试、训练或监听，根docs仍仅Windows。不推送、不重置11月6日大清理周期。
 
 ## 2026-11-10 账号监督完整结果回传
 
