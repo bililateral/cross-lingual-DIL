@@ -2,9 +2,42 @@
 
 ## 当前工作
 
-本表是本页唯一当前状态入口，每条研究线保留一项；已结案工作保留必要结果和依赖入口。服务器及外审状态分别采用各行注明的观测时点。整理文档不代表新的服务器观测，旧PID仍须按科研纪律第7节核实。时间均为UTC+8；服务器与客户端存在时钟偏差，分别按回执标明，未调整时钟。合同总入口见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)，通用后续安排见[计划](RESEARCH_PLAN.md)。
+本区是唯一当前状态入口；按研究线小节读取，再按链接补证据。科学设定见[设计入口](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)，后续安排见[计划](RESEARCH_PLAN.md)，工具及状态/预算口径见[工作流](RESEARCH_WORKFLOW.zh.md)。观测注明时点，不能凭旧PID或快照推断实时状态；时间为UTC+8，服务器/客户端时钟差异不追改。
 
-**文件维护（2026-11-06）**：两端大清理已完成，共删189路径、硬链接去重载荷6.14GiB。用户明确保留20份旧核验权重，允许并已删除旧失败9路径/3底层权重；Optuna、ABC36/H27基线、64活动来源及原有未提交修改保护通过。下次清理到期2026-11-21。清理现场HPO处于trial_10、ABC监听存在，未读效果；具体时点/保管/同步见[清理记录](../reports/maintenance/20261106/summary.zh.txt)。
+### VendorLink账号监督共同评价
+
+- **目标与范围**：当前账号CE改善H学习，再条件检验完整H保持及外部竞争力。设定从[方案与补充](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)定位；D8→条件P6/M6/C，最多两路，88h=80训练/4GPU/4辅助。正式执行授权见[用户决定](RESEARCH_DISCUSSION.zh.md#2026-11-10清理账号监督旧资产并重新设计)及[启动补充](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)。
+- **最新观测**：11月10日14:40:28[只读元数据](../reports/documentation/20261110/harness_workflow/observation.json)确认控制器2271319身份与[启动回执](../reports/documentation/20261110/vendorlink_redesign/implementation/launch.json)一致，gate SHA未变。D的AlphaBay H_base/H_CE分别4490/4488更新，另6任务待派；无记录失败/退休，D/P/M/C结果均未开放，未读取效果值。
+- **预算与工期**：已结算training0/GPU18/aux160秒；两活动训练生命周期合计暂估5339.56秒，完整承诺合计暂估21601.985秒，两项互相重叠、不得相加，监管未结费用不估算。全链34—46小时工期仅为启动时规划，阶段失败可提前结束，资源等待/退槽后按实际速度重估；88h不是工期。
+- **下一步**：现有唯一控制器完成D后按原门条件推进；完整阶段后才评分/开放，失败不重试，OOM退休槽且健康槽续领当前阶段。原5pp失败、STOP_LEARNING、71450秒费用及删除事实保持。实际来源和审查见[实现报告](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)；数据/模型留Linux，不重划、不重复启动，不动中文暂停；活动来源/gate冻结。
+
+### 历史权重版H主实验消融
+
+保持暂停，等待用户明确恢复。最近保存观测为11月10日10:16:16，PAUSED_IDLE、7完成/0活动/56待派，见[核对](../reports/documentation/20261109/vendorlink_account_protocol/result/check.json)；本轮未重新巡检。范围见[正式许可](../reports/documentation/20261107/h_ablation_start/authorization.json)、[暂停补充](../reports/documentation/20261107/h_ablation_pause/scope.zh.md)。不能因VendorLink运行恢复或删除marker；恢复须承接原队列及账本。
+
+### 已结案研究线
+
+以下仅为结案结论及入口；详细计数、费用、审查和保管见原件及下方标时历史，不恢复为活动队列。
+
+| 研究线 | 已固定结论与证据 |
+|---|---|
+| Evolution已登记账号检索 | [STOP_LEARNING及完整分析](../reports/documentation/20261108/evolution_registered/result/report.zh.md)；6条结束、24权重按许可删除，完整H未检验 |
+| ABC英文适配 | [前置门正常停止](../reports/seller_alias_continual/20261107/history_result/source_receipts/abc_formal/completion.json)，无正式候选训练，不改门重启 |
+| L²R／ER+GCR | [完整结果主审](../reports/seller_alias_continual/20261101/comparison_result/review/primary_disposition.zh.txt)结案；限固定中文合成任务 |
+| S_default＋历史H | [完整分析](../reports/seller_alias_continual/20261102/defaults_result/report.zh.txt)及结果审查结案，原独立确认共同门失败保持 |
+| FOREVER | [完整结果](../reports/seller_alias_continual/20261103/forever_result/report.zh.txt)、外审及清理结案，原H27依赖保管见存储 |
+| 原五方法45条 | [完整结果主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)结案，H−S原O/F共同门false保持 |
+| H_pos_tuned历史系数Optuna | [结果与限制](../reports/seller_alias_continual/20261107/history_result/report.zh.md)、外审及清理结案；选定H供暂停消融使用 |
+
+### 文件保管与本轮交付
+
+[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。本轮用户批准工作流改进并要求将全部本地commit推送远端，替代本轮旧的仅本地交付限定；未扩大科研权限。推送以实际远端ref核对为准。
+
+## 近期执行与审查历史
+
+### 2026-11-10 工作流整理前的详细状态快照
+
+以下为原顶部截至14:04提交时的完整记录，保留当时授权、观测、费用和保管。当前状态以上方小节为准，历史交付限定不覆盖后续用户明确决定。
 
 | 研究线与目标 | 有效范围与实际入口 | 最新已核实状态与证据 | 下一步与边界 |
 |---|---|---|---|
@@ -17,8 +50,6 @@
 | **FOREVER与H比较**：完整结果、外审与权重清理已结案 | 用户11月3日要求同步分析，并补充完成后删除本轮无用权重；[完整范围](../reports/seller_alias_continual/20261103/forever_result/scope.zh.txt)承接原9条/原H27/新120群和116h。原H−FOREVER O/F共同门及N/Z点保护保持，不重训、重采样或调参；旧H−S失败不变。 | [完成与回传](../reports/seller_alias_continual/20261103/forever_result/receive.json)：9条/27新端点、54模型/108格/4320前向、324群指标及原统计完整，1217份80030940字节大小/SHA一致，65来源核对。[分析](../reports/seller_alias_continual/20261103/forever_result/report.zh.txt)：最终三域MAP H=.495696158、FOREVER=.439113584；ΔO=.051289815，95%区间[.044615565,.058220721]；ΔF=−.028793115，区间[−.034897381,−.022876487]，N/Z为正，原主门通过。九配对O/F/N/Z方向均有利于H，全部22指标与N/A覆盖见[全表](../reports/seller_alias_continual/20261103/forever_result/tables.zh.txt)。原累计26.342856任务小时及失败账保持。 | 客户端11月3日10:20:41[完整回收外审](../reports/seller_alias_continual/20261103/forever_result/review/recovery.json)，[独立主审](../reports/seller_alias_continual/20261103/forever_result/review/primary_disposition.zh.txt)逐项结案，无必修或必要补实验；仅精化概率损失和进程时刻差异两处措辞，原结果不改。服务器10:30:52[实际清理](../reports/seller_alias_continual/20261103/forever_result/cleanup_receipt.json)27权重/35218653363逻辑字节（32.80GiB），1215文件SHA、14项保管元数据和原H27保留检查通过；原H27供H_pos_history。原链3485029/Vendor worker4147594继续，无FOREVER子进程；本轮清理未启动调参，H_pos_history后续以本表新监听授权为准。最终[费用](../reports/seller_alias_continual/20261103/forever_result/budget.json)准备633.731048/900秒，含本轮413秒及失败账；总26.457578任务小时。分析/审查/清理剩余0，[最终同步](../reports/seller_alias_continual/20261103/forever_result/final_sync.json)仅本轮分析/审查/回执，根docs仅Windows，本地提交不推送。 |
 | **原五方法45条**：已结案，提供结论与后续基线 | 固定五系统、三循环、s4—s6与新120群的已完成范围，见[结果报告](../reports/seller_alias_continual/20261026/continual_result/report.zh.txt)和[结果主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)。后续范围由各自合同另定。 | 10月26日02:08:11训练／确认／分析收尾，结果外审与主审已结案，剩余工作0。H−S最终旧域MAP有正向证据，原O/F共同主门false保持。 | 保留结果与后续所需H/S54端点；已删三臂81份权重不可由SHA恢复。不重训翻转判据，不把最终排序收益写成额外抗遗忘已确认。 |
 | **H_pos_tuned历史权重Optuna**：正式结果、分析与外审已结案 | 原[280小时完整执行许可](../reports/documentation/20261103/history_wait/authorization.json)与两系数/12候选/条件九复验合同保持。用户11月7日要求同步分析，并批准[本轮具体结果包](../reports/seller_alias_continual/20261107/history_result/review/authorization.json)外发；不新增实验、标签或重采样。 | 服务器02:17:34正式完成，09:54起[现场核对](../reports/seller_alias_continual/20261107/history_result/observation.json)无failure/相关活动进程，58来源匹配；45条/38880更新/135端点、18配对运行的54状态/108格/4320确认前向齐全。[5058份回传](../reports/seller_alias_continual/20261107/history_result/receive.json)305105336字节SHA一致；[保存字段核对](../reports/seller_alias_continual/20261107/history_result/saved_check.json)通过。trial3参数不变，[新确认MAP .498592213→.500216498](../reports/seller_alias_continual/20261107/history_result/report.zh.md)，差+.001624285的95%条件区间为正，原主要门true；O/F辅助有利、N点值略低、域C/BCA及分类代价保留。 | 客户端10:41观察网页完整答复，[10成员结果包](../reports/seller_alias_continual/20261107/history_result/review/recovery.json)大小/SHA及内部载荷核验通过，[7项主审处置](../reports/seller_alias_continual/20261107/history_result/review/primary_disposition.zh.md)已关闭，无开放必修或补实验；仅补中文ABC绝对F仍正等解释，专用页已关闭。训练/确认/统计/分析/审查剩余0。原正式155.537093任务小时、工期55h46m40s；[同账收尾](../reports/seller_alias_continual/20261107/history_result/budget.json)保守1080秒后总155.837093h。[210项结果/审查同步](../reports/seller_alias_continual/20261107/history_result/final_sync.json)及清单/回执双端核对完成，临时包已清理，根docs仅Windows。新H27和原H27保留，选定版仍是拟议消融母体；不把本轮比较替代Full−ER或原H−S失败。 |
-
-## 近期执行与审查历史
 
 ### 2026-11-05 ABC自动接续授权之前
 
@@ -583,4 +614,4 @@ Step28-v13 v1.3—v1.12、V8、V9、V9.1、V9.2、V9.3-R2关闭路线不重启�
 
 本页精简前的详细接手流水可通过已交付提交9bf7ed58的[交接原文](https://github.com/bililateral/cross-lingual-DIL/blob/9bf7ed58dd8e7f3bad58d6ac1420a4d89f02f07b/docs/AI_RESEARCH_HANDOFF.zh.md)回溯。更早重构前的[原交接](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/AI_RESEARCH_HANDOFF.zh.md)、[原进展](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/PROJECT_PROGRESS.md)、[原设计](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/CURRENT_EXPERIMENT_DESIGN.md)、[原计划](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/RESEARCH_PLAN.md)继续可追溯。这些是固定历史版本；原合同、报告、审查及运行证据保持原字节，不另存重构前文档副本。
 
-当前状态只原位更新顶部表格与所属实际status；通用规则见[科研纪律](RESEARCH_DISCIPLINE.zh.md)，合同索引见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)，后续动作见[计划](RESEARCH_PLAN.md)。新进展不再向历史索引或其他入口追加第二份“当前”。
+当前状态只原位更新顶部对应小节与所属实际status；通用规则见[科研纪律](RESEARCH_DISCIPLINE.zh.md)，合同索引见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)，后续动作见[计划](RESEARCH_PLAN.md)。新进展不再向历史索引或其他入口追加第二份“当前”。

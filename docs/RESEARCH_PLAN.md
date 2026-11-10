@@ -2,6 +2,8 @@
 
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)，本页仅列后续动作和授权边界。有效合同及增量修复从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)进入，不复制PID、计数或过期工期。
 
+接手和日常同步按[工作流](RESEARCH_WORKFLOW.zh.md)使用一次性只读观察及具名SFTP核验；普通更新数变化不重复修改合同入口/计划。状态跃迁时核对受影响可变入口，保持活动冻结来源、历史原件和原判据。
+
 ## VendorLink账号监督：按已审阶段链推进CE与遗忘检验
 
 [实现及必要核验](../reports/documentation/20261110/vendorlink_redesign/implementation/report.zh.md)、完整外审和[主审](../reports/documentation/20261110/vendorlink_redesign/implementation/review/primary_disposition.zh.md)已闭合，无新增代码修复或CPU/GPU资格。按用户最新“没问题了就正式开始实验”及[现行范围补充](../reports/documentation/20261110/vendorlink_redesign/implementation/scope.zh.md)连续执行，不再恢复旧暂停或重复询问开始许可；实际状态只在交接对应项维护。

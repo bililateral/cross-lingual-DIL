@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-10 科研工作流工具与记录整理
+
+本轮按[用户明确批准](RESEARCH_DISCUSSION.zh.md#2026-11-10批准科研工作流改善及全部本地提交推送)保留两个正式辅助工具及各自普通回归测试，见[用法](RESEARCH_WORKFLOW.zh.md)。Linux只部署至独立`reports/documentation/20261110/harness_workflow/`的scripts/tests，不改活动CE的13来源、gate、角色文件或模型。四项Linux元数据回归和四项Windows文件检查、真实SFTP上传/读回/Pull证据见[核验记录](../reports/documentation/20261110/harness_workflow/verification.json)；[观察快照](../reports/documentation/20261110/harness_workflow/observation.json)与[接收回执](../reports/documentation/20261110/harness_workflow/receive.json)仅有允许元数据，未查看未完整D效果。当前状态只在交接维护，整理前原详细表格移动至同页标时历史，未删除历史事实。
+
+传输批处理及逐份读回文件在每次唯一`.research-sync-*`目录验证后自动清理；测试临时目录自动删除。本轮临时`.playwright-mcp/harness-source-manifest.json`及正式目录中仅用于本次Pull的receive_manifest.json收尾删除，正式源码身份清单/接收回执/核验/观察保留，没有新增权重、原始数据或审查包；不动其他浏览器文件及其他任务。根docs仅Windows维护，工具使用和元数据证据按具名清单同步；局部收尾不重置11月6日大清理及11月21日到期。用户明确要求本次连同全部本地commit推送，Git交付按实际远端ref核对，不沿用旧不推送限制。
+
 ## 2026-11-10 账号监督旧权重和专用脚本清理
 
 本次实现审查已经回收并主审闭合：[原文](../reports/documentation/20261110/vendorlink_redesign/implementation/review/external/report.zh.md)36462字节/SHA256 `93685fa3997a300f86623c742aa1899ee9b85363d707a135e7226678e6e18020`、主审、原提交/许可/清单及精确源码证据保留，见[回收记录](../reports/documentation/20261110/vendorlink_redesign/implementation/review/recovery.json)。上传ZIP40项143125字节已实际从Git `aed2138b` 读取原blob并逐字节核对，随后与本轮14份浏览器临时日志/快照和1份重复下载一起清理，共16文件874363字节，见[精确清理回执](../reports/documentation/20261110/vendorlink_redesign/implementation/review/cleanup.json)。专用审查已结束且页面不再存在，无待发送操作；未为本轮另建测试或启动包装脚本。原13运行源码及正式D/P/M/C活动状态、端点、共享BERT保留Linux，旧CPU/GPU一次性脚本双端退役事实保持。正式gate、scope、主审及审查原文SFTP核对见[开训前来源回执](../reports/documentation/20261110/vendorlink_redesign/implementation/launch_preflight.json)，本地来源恢复点 `0d36c3f2`；启动后不改冻结gate/scope/运行源码。启动及首更小回执回传Windows；本轮11项97623字节闭合/启动/观察材料[最终同步](../reports/documentation/20261110/vendorlink_redesign/implementation/review/final_sync.json)逐份大小/SHA一致，不含正文/账号/标签/预测/权重。根docs仅Windows，本地提交不推送，不重置11月6日大清理周期。

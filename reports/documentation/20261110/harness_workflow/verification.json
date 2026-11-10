@@ -1,0 +1,92 @@
+{
+  "verified_client": "2026-11-10T14:46:23.5360048+08:00",
+  "purpose": "Approved workflow and mechanical tooling improvement; no scientific changes",
+  "sources": [
+    {
+      "sha256": "9d12c2e40109553a2c28009583e2c14c3eb7a78d27db03d3f5e40134b32835f5",
+      "bytes": 7755,
+      "path": "scripts/research_observe.py"
+    },
+    {
+      "sha256": "603ea86c32da222922487bf097c877acd03842472e424297805a3185631e4fc5",
+      "bytes": 6829,
+      "path": "scripts/research_files.ps1"
+    },
+    {
+      "sha256": "9fe32f49ddabc3a5e546acaac7c7ba18aa979b878b6cc6e92ffe555d76bee7b6",
+      "bytes": 3985,
+      "path": "tests/test_research_observe.py"
+    },
+    {
+      "sha256": "41482ae9e0485667cc60c7c92327d6372c0d9c6287b4fcab6ef606a67545366d",
+      "bytes": 1963,
+      "path": "tests/research_files.tests.ps1"
+    }
+  ],
+  "linux_python": "/home/yongpeng/miniconda3/envs/py310/bin/python",
+  "linux_deployment": "/home/yongpeng/cross-lingual/reports/documentation/20261110/harness_workflow",
+  "linux_tests": {
+    "cases": [
+      "real process identity mismatch",
+      "JSON object contract",
+      "partial update redaction",
+      "real child lifecycle, separate wrapper status, no effect reads/no file writes"
+    ],
+    "tests": 4,
+    "errors": 0,
+    "elapsed_seconds": 0.009,
+    "failures": 0
+  },
+  "windows_file_checks": {
+    "checks": 4,
+    "result": "PASS",
+    "cases": [
+      "identity roundtrip",
+      "tampered identity rejected",
+      "outside path rejected",
+      "review record missing disposition rejected"
+    ]
+  },
+  "sftp_actual": {
+    "pull_readback_all_match": true,
+    "push_files": 2,
+    "pull_files": 1,
+    "structured_stdout_verified": true,
+    "observation_receive": "receive.json",
+    "push_readback_all_match": true,
+    "source_manifest": "source_manifest.json"
+  },
+  "cleanup": {
+    "no_weights_or_raw_payloads_created": true,
+    "windows_deleted": [
+      {
+        "sha256": "8c494769aaafddba1757a5b765b702a4bd0fa4d3d394a56694c57a1e4e301277",
+        "bytes": 449,
+        "path": ".playwright-mcp/harness-source-manifest.json"
+      },
+      {
+        "sha256": "20755b19a4300e8861fb73cc1beeda327680f37d9432a228b0bb523f0a78eb81",
+        "bytes": 171,
+        "path": "reports/documentation/20261110/harness_workflow/receive_manifest.json"
+      }
+    ],
+    "retained_remote": "Two reusable Python sources plus observation; ordinary tests retained",
+    "sftp_temp_directories": "Unique local directories removed by finally; checked absent",
+    "test_temp_directories": "Python TemporaryDirectory and PowerShell finally cleaned",
+    "remote_temporary_files_created": 0
+  },
+  "frozen_experiment": {
+    "effects_read": false,
+    "sources_modified": false,
+    "ledger_modified": false,
+    "source_gate_sha_at_observation": "2d96aa85abd1e1b40391bbe6dc6c072d38b9c2cc1a489da1a64274aa4b0f5b64",
+    "new_training": 0,
+    "gate_modified": false
+  },
+  "review": "Mechanical documentation/tooling only; no scientific semantics changed, no new external review",
+  "git_authorization": "User explicitly requested all local commits pushed to existing research branch; remote ref verified after push",
+  "implementation_corrections": [
+    "SFTP terminal diagnostics routed to host so stdout receipt remains valid JSON; verified with actual Pull",
+    "OrderedDictionary byte totals explicitly summed numerically; valid-manifest regression now asserts actual byte sum"
+  ]
+}
