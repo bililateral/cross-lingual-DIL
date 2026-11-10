@@ -64,7 +64,9 @@ def permit(path):
     root = Path(g['experiment_root']).resolve()
     if any(not Path(g[k]).resolve().is_relative_to(root) for k in ('workspace', 'campaign')):
         raise ValueError('New outputs must stay inside this experiment')
-    if read(g['gpu']['path'])['status'] != 'PASS' or read(g['cpu']['path'])['exit_code'] != 0:
+    cpu = read(g['cpu']['path'])
+    if (read(g['gpu']['path'])['status'] != 'PASS' or cpu['status'] != 'PASS'
+            or cpu['tests'] < 1 or cpu['errors'] or cpu['failures']):
         raise ValueError('Actual necessary CPU/GPU evidence must pass')
     manifest = read(g['manifest']['path'])
     if manifest['status'] != 'QUALIFIED' or any(manifest['counts'][d]['eligible_accounts'] < 128 for d in DOMAINS):

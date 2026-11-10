@@ -283,10 +283,46 @@ class Increment(unittest.TestCase):
         write(Path(os.environ['STEP35_TEST_ROOT'])/'dispatch_evidence.json',
               dict(actual_child_processes=True, state=state, healthy_receipts=[one, two], budget=ledger.used))
 
+    def test_bound_permit_receipt_and_actual_exception_classification(self):
+        workspace = Path(control.__file__).resolve().parent.parent
+        binding = self.root/'binding.json'
+        write(binding, {'status': 'QUALIFIED', 'counts': {d: {'eligible_accounts': 128} for d in policy.DOMAINS}})
+        cpu, gpu = self.root/'cpu.json', self.root/'gpu.json'
+        write(cpu, dict(status='PASS', tests=4, errors=0, failures=0))
+        write(gpu, dict(status='PASS'))
+        g = dict(protocol=policy.PROTOCOL, approved=True, review_closed=True,
+                 caps=policy.CAPS, limits=policy.LIMITS, automatic_retry=False,
+                 worker_failure_policy='retire_oom_continue_current_phase_no_retry',
+                 workspace=str(workspace), experiment_root=str(workspace.parent),
+                 campaign=str(workspace.parent/'campaign'),
+                 sources=[record(workspace/'scripts'/name) for name in control.SOURCES],
+                 scope=record(binding), protocol_source=record(binding), review_disposition=record(binding),
+                 manifest=record(binding), cpu=record(cpu), gpu=record(gpu))
+        gate = self.root/'handwritten_gate.json'
+        write(gate, g)
+        self.assertEqual(control.permit(gate), g)
+        write(cpu, dict(status='FAIL', tests=4, errors=1, failures=0))
+        g['cpu'] = record(cpu)
+        write(gate, g)
+        with self.assertRaisesRegex(ValueError, 'CPU/GPU evidence'):
+            control.permit(gate)
+        # Invoke main's actual worker exception path, without a GPU allocation.
+        fake_entry = self.root/'workspace/scripts/control.py'
+        for index, (error, kind) in enumerate(((torch.cuda.OutOfMemoryError('probe'), 'CUDA_OOM'),
+                                             (RuntimeError('ordinary fault'), 'OTHER'))):
+            target = self.root/'campaign'/str(index)
+            argv = ['control', '--gate', str(gate), '--action', 'train', '--target', str(target)]
+            with patch.object(control, '__file__', str(fake_entry)), patch.object(sys, 'argv', argv), \
+                 patch.object(control, 'permit', return_value={}), patch.object(control, 'worker', side_effect=error):
+                with self.assertRaises(RuntimeError):
+                    control.main()
+            self.assertEqual(json.loads((target/'worker_failure.json').read_text())['kind'], kind)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--only', help='Run only the specifically affected increment check')
     args = parser.parse_args()
     if sys.platform != 'linux' or Path(sys.executable).resolve() != Path('/home/yongpeng/miniconda3/envs/py310/bin/python').resolve():
         raise RuntimeError('Existing Linux py310 only')
@@ -294,7 +330,9 @@ if __name__ == '__main__':
     os.environ['STEP35_TEST_ROOT'] = str(args.output)
     torch.set_num_threads(2)
     torch.set_num_interop_threads(2)
-    result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(Increment))
+    suite = (unittest.TestSuite([Increment(args.only)]) if args.only else
+             unittest.defaultTestLoader.loadTestsFromTestCase(Increment))
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
     seconds = time.monotonic()-STARTED
     write(args.output/'receipt.json', dict(status='PASS' if result.wasSuccessful() else 'FAIL',
         tests=result.testsRun, failures=len(result.failures), errors=len(result.errors), seconds=seconds,
