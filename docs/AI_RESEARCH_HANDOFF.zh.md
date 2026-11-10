@@ -7,9 +7,10 @@
 ### VendorLink账号监督共同评价
 
 - **目标与范围**：完整H多记录关联先学得接近VendorLink，再检验保持及外部竞争力。用户最新明确主审、必要修改/测试后直接启动已呈现RMS候选，见[决定](RESEARCH_DISCUSSION.zh.md#2026-11-10主审后直接执行ce-rms两任务)及[执行补充](../reports/documentation/20261110/vendorlink_redesign/ce_rms/scope.zh.md)：仅A/B各一条seed41/40epoch，原12/4/2/2角色，最多2worker、新7h/8GiB，无自动P/M/C。
-- **最新证据**：完整[外审](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/external/report.zh.md)回收，诊断可信、尺度候选可有限检验，未证明有效。预算单项预约及三读取/归档/D停止接口已落实；[主审](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/primary_disposition.zh.md)和[CPU增量核验](../reports/documentation/20261110/vendorlink_redesign/ce_rms/cpu.json)闭合，四组PASS、2.883711秒计3秒；未变GPU链证据复用，没有新GPU probe。专用网页已关闭，未重送包。
+- **最新证据**：完整[外审](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/external/report.zh.md)回收，诊断可信、尺度候选可有限检验，未证明有效。预算单项预约及三读取/归档/D停止接口已落实；[主审](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/primary_disposition.zh.md)和[CPU增量核验](../reports/documentation/20261110/vendorlink_redesign/ce_rms/cpu.json)闭合，科学增量四组PASS、2.883711秒计3秒；另针对其他用户GPU已可观察但旧准入一律拒绝的问题补四个资源分支，1.399675秒计2秒，当前科学路径未变，不再要求全卡无CUDA进程。未变GPU链证据复用，没有新GPU probe。专用网页已关闭，未重送包。
 - **历史与保管**：原D八项STOP_ADAPTATION和18554秒保持，P/M/C未启动；数值诊断另计1秒。原16份权重已[删除](../reports/documentation/20261110/vendorlink_redesign/implementation/weight_cleanup.json)，不载模或重训旧八项；原结果作为绑定对照。当前新运行身份从ce_rms gate/launch进入，旧implementation不改，中文暂停不动。
-- **下一步**：核对精确新来源/资源后单次直接启动两任务；两训练及全部三读取完整后一次开放13指标。H主门仍各域≥70%且对V1_CLS≥−2pp，诊断读取不替代主门；无论通过/失败本轮都结束。OOM槽退休、健康槽续领当前阶段独立任务、失败不自动重试、缺项不开放。维护原位记录、本地提交不推送。
+- **当前运行与下一步**：19:40:25已[单次启动](../reports/documentation/20261110/vendorlink_redesign/ce_rms/launch.json)，19:43:41[只读观测](../reports/documentation/20261110/vendorlink_redesign/ce_rms/observation.json)控制器2383275、两worker2383289/2383290的身份均匹配；A/B分别208/204更新、零失败。[首更新](../reports/documentation/20261110/vendorlink_redesign/ce_rms/start_observation.json)两条均实际使用sqrt1536=39.1918359与gamma1。两训练及全部三读取完整后一次开放13指标。H主门仍各域≥70%且对V1_CLS≥−2pp，诊断读取不替代主门；无论通过/失败本轮都结束。OOM槽退休、健康槽续领当前阶段独立任务、失败不自动重试、缺项不开放。预计两路约1.5—2.3小时工期，早期共享GPU速度下约21:10—22:00结束（非保证）；训练累计约2—3小时，仍受新7h分桶及每任务3h帽约束。必要临时源码/外审包按[清理回执](../reports/documentation/20261110/vendorlink_redesign/ce_rms/cleanup.json)退役，活动13来源及新权重保留。本地提交不推送。
+
 ### 历史权重版H主实验消融
 
 保持暂停，等待用户明确恢复。最近保存观测为11月10日10:16:16，PAUSED_IDLE、7完成/0活动/56待派，见[核对](../reports/documentation/20261109/vendorlink_account_protocol/result/check.json)；本轮未重新巡检。范围见[正式许可](../reports/documentation/20261107/h_ablation_start/authorization.json)、[暂停补充](../reports/documentation/20261107/h_ablation_pause/scope.zh.md)。不能因VendorLink运行恢复或删除marker；恢复须承接原队列及账本。
@@ -30,7 +31,7 @@
 
 ### 文件保管与本轮交付
 
-[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。本轮用户批准工作流改进并要求将全部本地commit推送远端，替代本轮旧的仅本地交付限定；未扩大科研权限。推送以实际远端ref核对为准。
+[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。此前工作流整理批次的推送许可及实际交付保持历史身份，不扩展到后续新科研材料。本轮CE RMS按已确认范围只作本地提交、不推送；运行来源、原始证据及清理恢复入口分别保管。
 
 ## 近期执行与审查历史
 

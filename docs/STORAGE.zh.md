@@ -1,13 +1,14 @@
 # 科研文件存储与恢复
 
-## 2026-11-10 CE学习差距数值诊断
+## 2026-11-10 CE诊断外审收尾及RMS两任务
 
-本轮用户确认仅分析代码/已开放D结果和数值日志并保存方案，见[决定](RESEARCH_DISCUSSION.zh.md#2026-11-10诊断ce学习差距并保存有限改进方案)。一次Linux CPU汇总42240条更新的损失/梯度/调度计数，实际0.738532秒、向上计1秒；产物[log_summary.json](../reports/documentation/20261110/vendorlink_redesign/diagnosis/log_summary.json)只含数值统计及输入身份，不含原日志中的记录标识。诊断脚本、汇总、实际来源/端点缺失核对与[报告](../reports/documentation/20261110/vendorlink_redesign/diagnosis/report.zh.md)共4份606824字节，经[具名同步](../reports/documentation/20261110/vendorlink_redesign/diagnosis/sync.json)在Linux独立diagnosis目录逐份匹配大小/SHA。原生产来源/门/账/日志/数据不改，未载模、生成预测或训练；根docs只在Windows。
+原诊断数值汇总、来源核对和报告保留，原CPU0.738532秒计1秒与旧训练18554秒各归原账。完整[外审原文](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/external/report.zh.md)40343字节、SHA256 `2c14d9061e799dc6195b246a3529372e4ccb611071553287026811377539b4d1`已回收，主审结案及网页关闭见[索引](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/recovery.json)。原送审身份和报告提交时内容冻结，不将诊断改写成已验证有效。
 
-本轮定向诊断/方案审查输入为23项ZIP190569字节，SHA256 `b89ec6d8af32aac97fc62192ef49571414c961e49e70c2b7fa75f7beaf7585ff`，具名成员见[清单](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/manifest.json)。用户批准该具体包后，已单次上传指定网页审查，见[许可](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/authorization.json)及[提交](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/submission.json)；未向Linux复制无用ZIP。分析脚本、输入包及本次浏览器临时文件仍用于进行中的审查，Git `7e1b2f21`可精确恢复脚本和输入；审查/主审收尾后核对实际内容再退役，不无限保留一次性脚本。本轮无新增模型，不恢复已删D端点，不重置11月6日大清理及11月21日到期。本地提交、不推送。
+新两任务的[gate](../reports/documentation/20261110/vendorlink_redesign/ce_rms/gate.json)、[执行补充](../reports/documentation/20261110/vendorlink_redesign/ce_rms/scope.zh.md)、CPU两份回执及活动13来源部署到Linux独立ce_rms根；原implementation/中文暂停/共享模型及角色数据不改。科学CPU2.883711秒、资源兼容CPU1.399675秒，合计计5秒；另保守登记30秒准备成本，原Ledger独立30秒收尾费。新正式权重、辅助分类头、正文和分数只留Linux，当前均有后续评分/诊断用途，不删除；根docs只在Windows维护。
 
-审查许可、实际发送文本、原提交和18:59进行中索引共4份3898字节另按[审查同步清单](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/sync.json)核对Linux副本，未回收外审最终报告。SSH文件助手已关闭；正在进行的网页审查保留原会话，不能把关闭SSH写成审查已结束。
+审查和必要核验结束后，按[清理清单](../reports/documentation/20261110/vendorlink_redesign/ce_rms/cleanup.json)删除Windows16文件382218字节，包括原诊断脚本、23项输入ZIP、两份一次性核验脚本和12份本次浏览器临时副本。Linux[删除19文件131168字节](../reports/documentation/20261110/vendorlink_redesign/ce_rms/cleanup_remote.json)：上述三份一次性脚本及CPU手写输入/小权重/分数；保留原始核验日志、指标、回执和审查原文。删除前实际核对Git恢复字节：诊断脚本/ZIP来自7e1b2f21，尺度CPU来自91f4933c，资源CPU来自a9b755a7；每份大小/SHA一致。正式gate绑定的13运行模块、scope/主审/CPU回执等保护清单未动，无本轮正式权重或其他实验资产删除。
 
+本轮SFTP证据身份见[同步回执](../reports/documentation/20261110/vendorlink_redesign/ce_rms/sync.json)；本地提交不推送。局部清理不重置11月6日大清理及11月21日到期。最新运行只在交接唯一对应项维护。
 ## 2026-11-10 CE开发结束权重清理
 
 用户要求删除刚结束实验的模型权重，执行者先核对真实终态、无相关活动进程及后续加载依赖，呈现Linux精确16份、3483476608字节（约3.24GiB）的范围与不可恢复后果，用户明确“确认”。Linux18:27:29完成删除：`vendorlink_redesign/implementation/campaign/D/training/`内AlphaBay/Dream各H_base、H_CE、V0、V1共8任务的`run/stage0.pt`与`run/stage1.pt`。目标均为yongpeng所有、普通文件、单硬链接，最终路径及删除前大小/SHA逐份核实；未备份，全部目标复查不存在。该批D已完整训练/评分并以STOP_ADAPTATION结束，原P/M冷启动不加载D权重，未启动后续阶段或重训。
