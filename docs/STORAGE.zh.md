@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-10 评分头与Evolution CPU模型夹具清理
+
+用户在只读盘点后选中四份head及33份CPU微型夹具，明确“删掉，做好记录，及时更新文件记录”。Linux23:23:42完成删除37份6624499字节（约6.32MiB）：head_alignment四任务LOCAL/FULL_POOL的`run/head.pt`共6312188字节；11月8日Evolution的cpu01/02/03分别1/8/24份微型模型，共312311字节。精确路径/大小/SHA、yongpeng属主、普通文件/单硬链接、无相关活动进程及删除后不存在检查见[实际删除回执](../reports/documentation/20261110/vendorlink_redesign/head_alignment/weight_cleanup.json)。无备份，已删模型不能由Git或SHA恢复，不再支持加载这些head或旧CPU夹具；失败、负结果及费用保持。
+
+344份保护文件删除前后大小/SHA完全一致，包括CPU01失败及CPU02/03通过/费用/日志、正式来源、原结果/分数、两个fit缓存及RMS六份877291968字节。未改新FIT12工作、中文暂停、共享预训练或其他资产。Windows对应近期目录无模型，删除0；仅必要[源码恢复核对](../reports/documentation/20261110/vendorlink_redesign/head_alignment/weight_cleanup_recovery.json)与删除回执保留，均经SFTP核对：恢复记录5097字节/SHA `ef2b8dbb5300044b07d2c9184a5153808b25ccb38fee9e2b75c57fcdbe470c73`；删除回执164068字节/SHA `f7ca0d7d528404e0183e14005a41206cd330e1e1a61d5ff5599336b2e8311169`。未生成临时脚本、解包副本或模型备份。
+
+17份CPU实际来源已在Windows内存读取Git原字节，与CPU01原deployment_manifest及CPU02/03_sources逐份SHA一致。CPU01失败夹具、通过夹具及科学依赖从Git713d9929/d721ece8恢复；CPU02/03旧control的11911字节精确版由`713d9929:reports/documentation/20261108/evolution_registered/execution/deployment.zip`中`scripts/step31_evolution_registered_control.py`恢复，不能用后续独立源码替代；详见恢复核对的逐文件入口。未恢复或运行源码。根docs只在Windows维护，本地提交不推送；下方旧“保留四head”是删除前事实，不追改原审查/完成/来源绑定。局部清理不重置11月6日大清理及11月21日到期。
+
 ## 2026-11-10 固定参考档案诊断完成
 
 [reference结果/主审](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)及[24项具名结果](../reports/documentation/20261110/vendorlink_redesign/reference/transfer.json)已回传并核对大小/SHA，共32642字节；四份评分矩阵共5164752字节留Linux，没有同步账号正文/逐query分数。零训练、零权重删除，原RMS六份877291968字节与head_alignment四份6312188字节继续保留，正式新入口和14份旧依赖保持冻结身份。
