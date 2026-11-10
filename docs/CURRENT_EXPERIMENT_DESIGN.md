@@ -3,6 +3,8 @@
 H/S评价补充（2026-11-02）：用户选择[方案A](../reports/seller_alias_continual/20261102/defaults_result/scope.zh.txt)，在既有四种配置的共同60群旧开发集保存分数上计算全22指标、配对条件区间及未定义覆盖/合并分类指标。新增2小时CPU，无GPU/新确认/重训；实现与结果按本次增量外审，不改旧训练与独立确认原件。实际进度仍见交接顶部。
 
 ## 当前合同入口
+VendorLink固定参考档案诊断（2026-11-10）：从[reference范围与主审](../reports/documentation/20261110/vendorlink_redesign/reference/scope.zh.md)进入。用户批准并免审A/B原RMS上的FIT4/FIT12四读取，保留H原多记录评分与dev Q2，新增fit兼作登记参考用途；不训练、不删除权重、不改原G4结论、不自动后续。必要CPU证据与15来源由reference gate绑定，运行状态见交接。
+
 VendorLink评分头对齐（2026-11-10，**四条已按原学习门结案**）：科学范围从[四条试验](../reports/documentation/20261110/vendorlink_redesign/head_alignment/scope.zh.md)、[实施主审及增量核验](../reports/documentation/20261110/vendorlink_redesign/head_alignment/primary.zh.md)、[完整结果及主审](../reports/documentation/20261110/vendorlink_redesign/head_alignment/result/report.zh.md)进入。A/B各LOCAL/FULL_POOL，冻结原RMS encoder/辅助头，保留原H监督及评分，候选增加fit内全池Q2/G4分数CE；seed41/10轮、5h分桶、最多2worker。本轮免外审，来源由head_alignment gate绑定；无后续自动链或新候选许可，当前状态只看交接。
 
 其起点是已完成的[CE RMS两任务范围](../reports/documentation/20261110/vendorlink_redesign/ce_rms/scope.zh.md)及[结果诊断](../reports/documentation/20261110/vendorlink_redesign/ce_rms/result/report.zh.md)：原STOP_ADAPTATION保持，RMS确有适配改善但B主学习门未过。原[诊断与方案审查](../reports/documentation/20261110/vendorlink_redesign/diagnosis/review/primary_disposition.zh.md)保留原身份，当前有限head试验不是完整H抗遗忘确认。
