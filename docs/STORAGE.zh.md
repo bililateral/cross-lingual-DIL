@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-10 CE开发结束权重清理
+
+用户要求删除刚结束实验的模型权重，执行者先核对真实终态、无相关活动进程及后续加载依赖，呈现Linux精确16份、3483476608字节（约3.24GiB）的范围与不可恢复后果，用户明确“确认”。Linux18:27:29完成删除：`vendorlink_redesign/implementation/campaign/D/training/`内AlphaBay/Dream各H_base、H_CE、V0、V1共8任务的`run/stage0.pt`与`run/stage1.pt`。目标均为yongpeng所有、普通文件、单硬链接，最终路径及删除前大小/SHA逐份核实；未备份，全部目标复查不存在。该批D已完整训练/评分并以STOP_ADAPTATION结束，原P/M冷启动不加载D权重，未启动后续阶段或重训。
+
+[删除回执](../reports/documentation/20261110/vendorlink_redesign/implementation/weight_cleanup.json)保留逐文件身份及196份非权重文件的删除前身份，删除后全部大小/SHA一致，相关进程仍已退出。原结果、完整性/验收、日志、源码/gate、审查和费用账保留；共享预训练、其他研究线及中文H暂停资产不在范围。Windows同执行根无模型权重，删除0；回执经SFTP回传，49252字节、SHA256 `aab79233da457f7609b4bae53ce5c97456e1d70830d419ce8f1eb348dfa1001c`与Linux一致。无临时脚本或重复载荷产生，仅保留必要回执；根docs仅Windows维护，本次本地提交，不沿用此前工作流任务的推送许可。局部清理不重置11月6日大清理和11月21日到期；下方旧端点保留记载是删除前事实，Git/SHA不能恢复本次已删模型。
+
 ## 2026-11-10 CE开发停止原因核对
 
 本轮按用户“看看实验为什么停了”，回收[停止观测](../reports/documentation/20261110/vendorlink_redesign/implementation/stop_observation.json)及其captured_files列出的8份已开放D聚合结果/决策、完整性清单和最终账/dispatch，共9份47922字节。SFTP逐份与Linux原件核对大小/SHA一致；观测文件11741字节，SHA256 `265e1cfdeeaa16d631219fd005a53b6e75e273508c0df9df567dd59787c132b8`。只检查实际进程、19份小来源绑定和8+8完成记录，未载模、重算指标、读取逐条分数/正文/标签或重新训练。Linux仅新增具名停止观察，不修改原控制器/gate、账本、结果和模型；根docs在Windows原位维护，本地提交、不推送。必要端点保留用于复核，未创建临时脚本或审查包，无新增删除；旧清理事实及11月21日大清理到期不变。
