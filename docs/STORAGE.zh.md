@@ -2,7 +2,7 @@
 
 ## 2026-11-10 账号监督旧权重和专用脚本清理
 
-用户随后明确提交新方案外审，本轮在同一`vendorlink_redesign/`保存定向请求、[成员清单](../reports/documentation/20261110/vendorlink_redesign/review_manifest.json)、20项146545字节输入ZIP和[许可/提交证据](../reports/documentation/20261110/vendorlink_redesign/review/submission.json)。新方案本体29502字节/SHA `6fb6aa3b9d77d3bc2cc1a0ae853a350810373477d3a7a95959fd921bc5e87f6c`不改；新请求/ZIP/清单提交后保留原字节。3份旧step34源码仅从Git f0c2872f直接读入ZIP内存，未恢复本地活动入口；其余成员为现有代码、已开放汇总/元数据及必要旧审查，无原始账号正文、模型或凭据。输入包在审查尚未回收/处置前保留，当前审查材料仅Windows保管；没有为送审访问Linux数据、载模或测试，也不变更原清理事实和费用。
+用户随后明确提交新方案外审，原20项146545字节输入ZIP、29502字节方案（SHA `6fb6aa3b9d77d3bc2cc1a0ae853a350810373477d3a7a95959fd921bc5e87f6c`）由Git d14e998a精确保留；[成员清单](../reports/documentation/20261110/vendorlink_redesign/review_manifest.json)、请求和[许可/提交](../reports/documentation/20261110/vendorlink_redesign/review/submission.json)原件不改。用户再要求回收和必要修改后，完整外审405行/35666字节/SHA `687bb25efa28ea9715e6e36b5db43b44ea2cff9432654383242205a57b08b529`已经下载核对，与[主审](../reports/documentation/20261110/vendorlink_redesign/review/primary_disposition.zh.md)及补正版保留。R01/R02闭合后实际读取Git原ZIP及19份来源核对，清理Windows输入ZIP、浏览器重复下载与两份本轮临时快照，共4份459756字节；必要原文/完成页/来源保留，见[回收清理记录](../reports/documentation/20261110/vendorlink_redesign/review/recovery.json)。3份旧step34仍只读Git，没有恢复活动脚本。用户随后要求修复预算预约不足，最终补正版31751字节/SHA `8cb8aca91cdf1cbb3873a764860bd2350b8f4e13a8850bcac9fee82c3b96f030`（88h=80/4/4，任务量不变）及回收材料仅Windows；本次未访问Linux，远端仍是下面sync_oom_update所记旧版本，不冒称双端同步。专用网页已关闭，无新测试/训练/数据访问，不变更原清理事实、费用或大清理周期。
 
 用户明确清理旧20261109账号监督实验并重新设计，在已列明34权重/70份Linux脚本/13份Windows脚本的确认中，特别要求包含OOM后新增的临时唯一接续控制器。本次逐份核对最终路径、yongpeng属主、普通文件、单硬链接、精确来源及相关进程已退出后执行；旧`queue_resume/state.json`为COMPLETE，不修改它或其他冻结原件。
 
