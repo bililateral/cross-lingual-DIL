@@ -1,5 +1,15 @@
 # 科研文件存储与恢复
 
+## 2026-11-10 账号监督旧权重和专用脚本清理
+
+用户明确清理旧20261109账号监督实验并重新设计，在已列明34权重/70份Linux脚本/13份Windows脚本的确认中，特别要求包含OOM后新增的临时唯一接续控制器。本次逐份核对最终路径、yongpeng属主、普通文件、单硬链接、精确来源及相关进程已退出后执行；旧`queue_resume/state.json`为COMPLETE，不修改它或其他冻结原件。
+
+Linux10:58:22已删除旧execution内34份权重共12198384250字节（11.36GiB）、70脚本962847字节及9份对应字节码138108字节，无权重备份；其中包括`queue_resume/workspace/scripts/step34_vendorlink_account_resume.py`、retry_s44/retry_s44_15g和parallel_h45启动包装器。其余467份非目标文件逐份大小/SHA前后不变，原始数据、已建角色、结果、日志、失败、费用、共享BERT及其他实验资产保留。Windows已删除13份123745字节专用脚本，没有本批权重；两端实际路径/哈希/结果见[Linux回执](../reports/documentation/20261110/vendorlink_redesign/cleanup_linux.json)和[Windows回执](../reports/documentation/20261110/vendorlink_redesign/cleanup_windows.json)，[原盘点](../reports/documentation/20261110/vendorlink_redesign/cleanup_inventory.json)保留删除前状态。
+
+全部70份远端及13份本地源码，均实际读取Git提交`f0c2872f96a469140fab6837f360de811cc00834`对应blob并核对大小/SHA，见[精确恢复映射](../reports/documentation/20261110/vendorlink_redesign/source_recovery.json)。其中CPU01原`execution/cpu_increment01/test_source.py`11231字节确实已跟踪，SHA256 `685efce8d858a01f94f556b5bcf36b774ed3bb0ba222cb3300432f9eb0a65e66`；此前“原CPU01源码无法恢复”的保管疑点据实际文件闭合，不靠重跑CPU补证，也不冒称以当前最新版代替旧版。共享root scripts保留，仅删除本轮专用step34及测试；Linux隔离workspace共享模块的副本已退役，原共享源不受影响。
+
+本节后续许可替代下面旧时点的“训练端点/正式来源保留”安排，旧叙述保留当时含义。Git只能恢复源码，不能恢复模型；恢复不授予测试、载模或训练。旧结果外审的文件和网页由另一Agent结案，本轮未修改；原费用71450秒及失败账不清零。新草案、清理回执和资源观测保存在`reports/documentation/20261110/vendorlink_redesign/`，6份328441字节材料经SFTP核对双端大小/SHA一致，见[同步回执](../reports/documentation/20261110/vendorlink_redesign/sync.json)；根docs仍仅Windows。不推送、不重置11月6日大清理周期。
+
 ## 2026-11-10 账号监督完整结果回传
 
 用户要求同步进度并仔细分析后，Linux既有py310只检查完整开放D/P保存字段和元数据，不载模、训练、解析原始正文/标签或预测数组。Windows在`reports/documentation/20261109/vendorlink_account_protocol/result/`保存55份387248字节必要原件/汇总，[SFTP接收](../reports/documentation/20261109/vendorlink_account_protocol/result/receive.json)逐份大小/SHA一致；52份来源快照保留原目录对应关系，另3份为保存字段核对、统计汇总和传输清单。原动态运行文件不改，原失败、费用及删除事实保持；根docs仅Windows维护。额外425字节远端结构化身份清单用于纠正人工转录哈希字符错误，不重算或重传原结果。

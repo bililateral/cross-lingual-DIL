@@ -2,11 +2,15 @@
 
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)，本页仅列后续动作和授权边界。有效合同及增量修复从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)进入，不复制PID、计数或过期工期。
 
-## VendorLink账号监督：当前执行安排
+## VendorLink账号监督：重新设计学习适配
 
-**原三市场账号监督D/P已按原门正常结束；当前完成结果交付与定向审查。** [完整结果及主审分析](../reports/documentation/20261109/vendorlink_account_protocol/result/report.zh.md)保留H的实际学习、跨seed遗忘和相对能力不足，原STOP_LEARNING不追改；原P未过，因此无Full/ER、C或应用输出，不按剩余预算自动继续。用户已批准的[73项结果包审查](../reports/documentation/20261109/vendorlink_account_protocol/result/review/authorization.json)已完整回收并[主审结案](../reports/documentation/20261109/vendorlink_account_protocol/result/review/primary_disposition.zh.md)，未发现需要重训或改变科学结论的确定错误；当前结果交付及临时材料收尾完成，后续实验等待新的具体科学决定。若继续研究，先针对已定位的初学竞争力缺口或探索性机制比较说明有限新安排，再作实质决定，不换seed/顺序或事后放宽本次判据。原[协议](../reports/documentation/20261109/vendorlink_account_protocol/protocol.zh.md)、[实施范围](../reports/documentation/20261109/vendorlink_account_protocol/execution/scope.zh.md)和[接续补充](../reports/documentation/20261109/vendorlink_account_protocol/execution/queue_resume/scope.zh.md)保留来源身份、失败及60h累计账；训练端点尚有结果复核用途，未纳入本轮删除范围。当前状态仅见交接顶部。
+下一步按[新有限草案](../reports/documentation/20261110/vendorlink_redesign/proposal.zh.md)作实质决定：原H1保留文本/多记录关联与完整历史机制，仅建议增加当前市场账号CE辅助训练；D以原H1的γ=0作同配置对照，H的评价仍用多记录评分。建议8个A/B单域任务后，按前提进入6条P和6条M，固定seed51/52/53、最多两路H＋V/H＋H、新80累计小时/32GiB输出帽。候选、选择/停止及质量保护均写在草案；当前仅清理和设计获准，没有新训练、实现、数据重划或监听许可。
 
-六份已生成关系候选按用户确认已删除，保管见[存储记录](STORAGE.zh.md#2026-11-09-删除原三市场关系候选载荷)。不恢复候选、退役脚本或重跑关系核查。原[核查报告](../reports/documentation/20261108/vendorlink_alias_evidence/report.zh.md)仍支持“未建立可验证真实同控训练/评价集”，但这个更强任务的证据不足不再否决原论文层级的账号监督。原[全池诊断](../reports/documentation/20261108/vendorlink_fullpool/history/report.zh.md)仍为已见开发账号互斥检索，不能冒作新协议确认；旧ABC/Evolution停止、负结果、费用和接触史保持，不要求VendorLink必须遗忘。唯一当前状态见交接；中文暂停决定保持。本轮按批准范围实施，本地提交、不推送。
+用户已明确后续平均遗忘门3.5pp、H相对V_CLS逐域初学均值最多落后2pp/逐seed最多5pp；最新取消人为GPU allocator配额和固定GiB整PID终止，替代此前15/16及15/15.5设想。后续须在实际入口落实无硬cap、真实资源准入与失败处理，不因占用超过估计就中止健康训练；取消硬限不授权抢占他人资源或承诺不发生物理OOM。V为压低峰值而临时提出的梯度检查点及额外GPU测试已撤回。新辅助损失、组合成功门、完整科学范围及预算尚待决定；方案/实现按具体增量审查及外发许可办理，不重开旧审查。
+
+原[完整结果](../reports/documentation/20261109/vendorlink_account_protocol/result/report.zh.md)及[定向结果主审](../reports/documentation/20261109/vendorlink_account_protocol/result/review/primary_disposition.zh.md)继续有效，原5pp门、STOP_LEARNING及60h历史账不改；不能用后设3.5pp重写已发生验收，也不靠换顺序、削弱对手或少学新域达标。旧脚本/权重按用户后续清理决定退役，保管见[存储记录](STORAGE.zh.md#2026-11-10-账号监督旧权重和专用脚本清理)；后续只从精确Git恢复所需函数，不恢复旧层叠重跑/接续控制器。已建角色数据和全部结果证据保留，无需再次下载/资格盘点。状态仅在交接对应项维护。
+
+原跨账号关系候选已删，不恢复；[关系核查](../reports/documentation/20261108/vendorlink_alias_evidence/report.zh.md)仍未建立真实同控训练/评价集，但该更强任务的不足不否决原论文账号监督层级。继续保留跨账号无真值候选发现作为应用输出，不报已验证马甲关系准确率。旧ABC/Evolution负结果、停止、费用和接触史保持；中文暂停不动。本轮原位维护记录、本地提交、不推送。
 
 ## Evolution：已结束路线与保留边界
 
