@@ -1,0 +1,141 @@
+{
+  "observed_at": "2026-11-10T14:11:11.221323+00:00",
+  "root": "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/head_alignment",
+  "observer_sha256": "9d12c2e40109553a2c28009583e2c14c3eb7a78d27db03d3f5e40134b32835f5",
+  "controller": {
+    "exists": false,
+    "matches": false,
+    "expected": {
+      "owner": "yongpeng",
+      "created": 1794318672.91,
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "-u",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/head_alignment/workspace/scripts/step35_vendorlink_head_control.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/head_alignment/gate.json",
+        "--action",
+        "campaign"
+      ],
+      "pid": 2462885,
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/head_alignment/workspace"
+    }
+  },
+  "launch_gate_matches": true,
+  "dispatch": {
+    "status": "COMPLETE",
+    "pending": [],
+    "retired": [],
+    "budget_stop": null
+  },
+  "dispatch_failure_count": 0,
+  "controller_error_present": false,
+  "active": [],
+  "training": [
+    {
+      "task": "D_AlphaBay_FULL_POOL",
+      "phase": "D",
+      "counters": {
+        "stage": 1,
+        "epoch": 9,
+        "stage_update": 2040,
+        "updates": 2040,
+        "total_updates": 2040
+      },
+      "updates_mtime_utc": "2026-11-10T14:00:44.116366+00:00",
+      "training_completion_record_exists": true,
+      "wrapper_validation_success": true,
+      "worker_released": true,
+      "failure_record_exists": false
+    },
+    {
+      "task": "D_AlphaBay_LOCAL",
+      "phase": "D",
+      "counters": {
+        "stage": 1,
+        "epoch": 9,
+        "stage_update": 2040,
+        "updates": 2040,
+        "total_updates": 2040
+      },
+      "updates_mtime_utc": "2026-11-10T13:57:40.767372+00:00",
+      "training_completion_record_exists": true,
+      "wrapper_validation_success": true,
+      "worker_released": true,
+      "failure_record_exists": false
+    },
+    {
+      "task": "D_Dream_FULL_POOL",
+      "phase": "D",
+      "counters": {
+        "stage": 1,
+        "epoch": 9,
+        "stage_update": 600,
+        "updates": 600,
+        "total_updates": 600
+      },
+      "updates_mtime_utc": "2026-11-10T13:53:27.332911+00:00",
+      "training_completion_record_exists": true,
+      "wrapper_validation_success": true,
+      "worker_released": true,
+      "failure_record_exists": false
+    },
+    {
+      "task": "D_Dream_LOCAL",
+      "phase": "D",
+      "counters": {
+        "stage": 1,
+        "epoch": 9,
+        "stage_update": 600,
+        "updates": 600,
+        "total_updates": 600
+      },
+      "updates_mtime_utc": "2026-11-10T13:58:55.423741+00:00",
+      "training_completion_record_exists": true,
+      "wrapper_validation_success": true,
+      "worker_released": true,
+      "failure_record_exists": false
+    }
+  ],
+  "campaign_failure_record_exists": false,
+  "campaign_completion_record_exists": true,
+  "scientific_decisions": {
+    "D": {
+      "analysis_record_exists": true,
+      "decision_record_exists": true,
+      "status": "NOT_READ"
+    },
+    "P": {
+      "analysis_record_exists": false,
+      "decision_record_exists": false,
+      "status": "NOT_READ"
+    },
+    "M": {
+      "analysis_record_exists": false,
+      "decision_record_exists": false,
+      "status": "NOT_READ"
+    },
+    "C": {
+      "analysis_record_exists": false,
+      "decision_record_exists": false,
+      "status": "NOT_READ"
+    }
+  },
+  "budget": {
+    "settled_seconds": {
+      "gpu": 96,
+      "auxiliary": 100,
+      "training": 980
+    },
+    "caps_seconds": {
+      "training": 14400,
+      "gpu": 1800,
+      "auxiliary": 1800
+    },
+    "active_lifecycle_estimate_seconds": {},
+    "active_full_commitment_estimate_seconds": {},
+    "note": "Active lifecycle and full commitment overlap; never add both. Estimates use matching process creation/deadline; reservations are not expenditure. Monitoring not estimated; no ledger writes."
+  },
+  "consistency": "Sequential live snapshot, not an atomic campaign transaction"
+}

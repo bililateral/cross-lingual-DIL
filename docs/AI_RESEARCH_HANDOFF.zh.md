@@ -6,10 +6,10 @@
 
 ### VendorLink账号监督共同评价
 
-- **目标与当前授权**：完整H多记录关联先学得接近VendorLink，再检验遗忘、保持及外部竞争力。用户在RMS结果后明确免外审、必要测试后直接训练，并确认[四条评分头范围](../reports/documentation/20261110/vendorlink_redesign/head_alignment/scope.zh.md)，原话见[决定](RESEARCH_DISCUSSION.zh.md#2026-11-10免审并批准四条冻结编码器评分头试验)。A/B各LOCAL/FULL_POOL，复用RMS终点、冻结encoder/辅助头，原H监督与实际评分保留，候选额外fit内全池Q2/G4 CE；seed41/10轮、最多2worker、新5h分桶，无自动Full/ER/P/M/C。必要增量核验及主审闭合后直接启动，不再索要同范围许可。
-- **已完成RMS结果**：两训练及六读取完整，21:09:12结束，零运行失败，原STOP_ADAPTATION保持。H主宏F1为79.5391%/85.3503%，比旧CE提高9.3396/10.5096pp；A已过学习门，B对V1_CLS仍低4.9894pp。辅助分类84.6764%/91.2951%，不能替代主门；H_SET未超过主H，不单独归因MLP。完整[结果及诊断](../reports/documentation/20261110/vendorlink_redesign/ce_rms/result/report.zh.md)、[原指标](../reports/documentation/20261110/vendorlink_redesign/ce_rms/campaign/D/analysis/result/metrics.json)和[现场核对](../reports/documentation/20261110/vendorlink_redesign/ce_rms/result/verification.json)已回传。累计7633秒，额外日志汇总1秒，原账本不改。
-- **新运行与下一步**：[主审](../reports/documentation/20261110/vendorlink_redesign/head_alignment/primary.zh.md)及必要CPU/GPU已闭合，21:51:13[单次启动](../reports/documentation/20261110/vendorlink_redesign/head_alignment/launch.json)。21:55:56[观测](../reports/documentation/20261110/vendorlink_redesign/head_alignment/observation.json)确认控制器及两个活动worker五项身份匹配、gate未变：A FULL_POOL927/2040，B FULL_POOL600/600已成功释放，健康槽续领A LOCAL1194/2040，B LOCAL待派；零失败/退休/预算停止，评分/效果未开放。[首更证据](../reports/documentation/20261110/vendorlink_redesign/head_alignment/first_updates.json)确认候选实际使用546/157全候选、首步16个Q，encoder/辅助头0更新、pair head1更新；LOCAL全池项未启用。A最近222.55秒增加817步，约3.67步/秒，余训练约5分钟；计后处理/波动，整批估22:01—22:06完成、总工期约10—15分钟，累计训练约15—22分钟（估计非保证；硬帽仍各train1h/累计5h）。已结GPU42/aux72/train107秒，另有活动训练生命周期约406.091秒暂估；承诺7201.982秒与其重叠不可相加。CPU三次共实际7.477446秒计9秒含两次失败，GPU一次2.863294秒计3秒。原RMS6份资产及当前15来源/活动缓存保留；临时脚本和手写载荷已按[回执](../reports/documentation/20261110/vendorlink_redesign/head_alignment/cleanup.json)两端清理。待四条及全部评分完整后统一分析，不恢复旧实验。
-- **判据与保管**：全部四条训练/评分完整后一次开放，主门A≥78.0183150%、B≥88.3397028%，同时看FULL_POOL−LOCAL及−RMS。单开发seed/冻结表示试验不能证明完整H抗遗忘；后续仍须独立持续学习比较。OOM槽退休、健康槽续领当前阶段独立任务，失败不重试，缺项不开放/续阶段。原角色不重划，confirm不开放，中文暂停不动。本地提交、不推送；必要临时核验/汇总源码精确可恢复后收尾。
+- **目标与有效范围**：完整H多记录关联先学得接近VendorLink，再检验遗忘、保持及外部竞争力。用户免外审并批准的[四条评分头试验](../reports/documentation/20261110/vendorlink_redesign/head_alignment/scope.zh.md)已按范围完成，原话见[决定](RESEARCH_DISCUSSION.zh.md#2026-11-10免审并批准四条冻结编码器评分头试验)。A/B各LOCAL/FULL_POOL、RMS终点冻结encoder/辅助头、原H监督/评分保留、候选额外fit内全池Q2/G4 CE，seed41/10轮；原确认不包含自动Full/ER/P/M/C或新搜索。
+- **最新完成与结果**：21:51:13启动，22:01:12结束，墙钟9分58.5秒。22:11:11[观测](../reports/documentation/20261110/vendorlink_redesign/head_alignment/result/observation.json)及[来源/进程核对](../reports/documentation/20261110/vendorlink_redesign/head_alignment/result/verification.json)确认控制器与全部11个工作进程退出、四train/四score及分析完整、15来源匹配、无运行失败。原判定STOP_LEARNING：FULL_POOL主宏F1 A78.7520%/B85.3503%，LOCAL79.6250%/85.3503%；候选−对照为−0.8730/0pp。A仍过78.0183%门，B距88.3397%门仍差2.9894pp，对V1_CLS低4.9894pp。完整[结果/主审](../reports/documentation/20261110/vendorlink_redesign/head_alignment/result/report.zh.md)及13指标已回传；未开confirm或后续阶段。
+- **诊断与下一步**：[数值日志](../reports/documentation/20261110/vendorlink_redesign/head_alignment/result/log_summary.json)显示新增第一轮fit全池正确率A3273/3276、B942/942，末轮均100%；CE继续下降却未改善dev，四条5280更新无梯度裁剪触发。支持“冻结RMS后继续拟合fit不足以改善未见文本关联”，不支持再堆末端轮数，也不证明简单解冻必能解决。此前[RMS改善](../reports/documentation/20261110/vendorlink_redesign/ce_rms/result/report.zh.md)保持：H79.5391%/85.3503%，比旧CE提高9.3396/10.5096pp；辅助分类不能替代主评分。下一步需要明确针对泛化缺口的新方案与范围，当前无新训练许可；不恢复旧控制器或因本次失败否定整个H。
+- **费用与保管**：本批训练980/GPU96/辅助100秒，共1176秒；结果数值日志汇总另记辅助1秒，共1177秒，原账本不改。单开发seed/冻结表示不构成抗遗忘确认；初学2pp/逐seed5pp、遗忘均值3.5pp及新域保护目标保持。原角色/confirm边界、中文暂停不动。原RMS6份资产、4份新head及必要来源/日志留Linux供复核；临时核验脚本与手写载荷此前已按[回执](../reports/documentation/20261110/vendorlink_redesign/head_alignment/cleanup.json)清理。本地提交、不推送。
 
 ### 历史权重版H主实验消融
 
@@ -31,7 +31,7 @@
 
 ### 文件保管与本轮交付
 
-[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。此前工作流整理批次的推送许可及实际交付保持历史身份，不扩展到后续新科研材料。本轮CE RMS按已确认范围只作本地提交、不推送；运行来源、原始证据及清理恢复入口分别保管。
+[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。此前工作流整理批次的推送许可及实际交付保持历史身份，不扩展到后续新科研材料。本轮评分头结果按已确认范围只作本地提交、不推送；运行来源、原始证据及清理恢复入口分别保管。
 
 ## 近期执行与审查历史
 
