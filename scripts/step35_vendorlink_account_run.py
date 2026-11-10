@@ -57,7 +57,7 @@ def make_model(binding, task, device='cuda:0'):
     if task['method'] != 'VendorLink_SEQ':
         # Recompute transformer activations during backward with the original
         # dropout RNG restored. Same inputs/objective; avoids retaining all
-        # 88 full-length channel graphs in the approved 13 GiB allocation.
+        # 88 full-length channel graphs. No artificial GPU allocation cap.
         encoder.gradient_checkpointing_enable(gradient_checkpointing_kwargs={'use_reentrant': False})
     tokenizer = BertTokenizer.from_pretrained(binding['directory'], local_files_only=True, do_lower_case=True)
     if not tokenizer.do_lower_case:
