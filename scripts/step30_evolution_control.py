@@ -57,9 +57,28 @@ def resource_observation(allowed: dict, root: Path, gpu: bool, owned=(), nv=None
                     commitments.append(dict(**row, unreflected_bytes=remaining))
                 except psutil.NoSuchProcess:
                     commitments.append(dict(**row, exited=True))
-            if set(used)-{r['pid'] for r in commitments if not r.get('exited')}:
-                return dict(observation, ready=False, hold='Unrecognized GPU commitment',
-                            unknown_pids=sorted(set(used)-{r['pid'] for r in commitments if not r.get('exited')}))
+            unknown = sorted(set(used)-{r['pid'] for r in commitments if not r.get('exited')})
+            foreign = []
+            for pid in unknown:
+                if not allowed.get('allow_observed_foreign_gpu_processes', False):
+                    return dict(observation, ready=False, hold='Unrecognized GPU commitment', unknown_pids=unknown)
+                try:
+                    process = psutil.Process(pid)
+                    owner, created, command = process.username(), process.create_time(), process.cmdline()
+                    if owner == psutil.Process().username() or not command:
+                        return dict(observation, ready=False, hold='Unbound same-owner or unidentified GPU process', unknown_pids=unknown)
+                    try:
+                        cwd = process.cwd()
+                    except psutil.AccessDenied:
+                        cwd = 'ACCESS_DENIED'
+                    foreign.append(dict(pid=pid, owner=owner, created=created, command=command,
+                                        cwd=cwd, observed_bytes=used[pid], reserved_bytes=0))
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    return dict(observation, ready=False, hold='Foreign GPU identity not observable', unknown_pids=unknown)
+            # NVML free already excludes these observed allocations. No claim is
+            # made about another user's future reservation; our own outstanding
+            # reservations remain deducted below. Never control foreign jobs.
+            observation['observed_foreign_gpu_processes'] = foreign
             observation.update(gpu_free=memory['free'], unreflected_commitments=unreflected, commitments=commitments)
             observation['ready'] &= memory['free']-unreflected >= limits['free_gpu_bytes']
         finally:
