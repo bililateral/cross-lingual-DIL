@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-10 RMS结果回传与评分头核验收尾
+
+RMS两任务的完整聚合结果、费用、完成身份、原评分绑定及[逐轮数值诊断](../reports/documentation/20261110/vendorlink_redesign/ce_rms/result/report.zh.md)已回传；原始分数、角色正文与6份stage/辅助资产继续留Linux，后者有用户已确认的评分头接续加载用途。新head_alignment使用15份具名运行来源，其中13份旧模块未变，不热改ce_rms或其他实验资产；活动fit缓存/新head和原RMS端点继续保留。
+
+[本轮清理](../reports/documentation/20261110/vendorlink_redesign/head_alignment/cleanup.json)删除Windows两份一次性源码15825字节：RMS日志汇总及head CPU/GPU核验；Linux删除相应两源码和18个手写输入/小模型/缓存/评分载荷，共20项220280字节。两端各一份9518字节重复待删清单也已移除，其全部内容已被正式删除回执保留；总数分别Windows3项25343字节、Linux21项229798字节。未删除正式训练来源、活动状态、必要原件或权重。核验失败版本和通过版本均经[Git精确字节恢复检查](../reports/documentation/20261110/vendorlink_redesign/head_alignment/source_recovery.json)：aedbfe04、0cdcd632、5cd26360；恢复文件不授予重跑许可。必要CPU失败/通过、GPU、手写运行日志/指标及费用保留。
+
+用户本轮免外审，没有制作或上传新包、没有打开外审网页。根docs仅Windows维护，本地提交不推送；具名SFTP身份见本轮sync.json。局部收尾不重置11月6日大清理及11月21日到期。
+
 ## 2026-11-10 CE诊断外审收尾及RMS两任务
 
 20:56进度查询仅回传一份[只读元数据快照](../reports/documentation/20261110/vendorlink_redesign/ce_rms/progress_20261110_205605.json)，7006字节、SHA256 `e6bc619cf65ad9a9f3464acb1ca737cbaff69de89e88f42f9cc14304e874d05c`与Linux原件一致，含进程身份、更新、账本、GPU元数据及短窗吞吐估计；未读未完整阶段效果、模型、标签或逐条分数，未改运行来源/进程/账本。无临时脚本或重复载荷，根docs仅Windows维护，本地提交不推送。
