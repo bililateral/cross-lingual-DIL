@@ -2,6 +2,8 @@
 
 ## 2026-11-11 FIT12六条ER/Full接续与核验收尾
 
+12:55:33新增一次[只读进度快照](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/progress_20261111_125533.json)，9056字节、SHA256 `ac0c34f5656a671c4ccee86f8956a06abb5b2a960d6f6dfe349ba7928a9e61c7`，SFTP回传后大小/SHA与Linux一致。只取精确运行身份、更新计数、完成/失败是否存在及费用字段，未读取M效果、正文、权重或confirm；未改运行来源、进程或账本，无新增测试/临时脚本。当前计数只更新交接，不复制到计划或合同。
+
 用户明确继续同配置三个seed的ER/Full；[接续范围](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)、[实施主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/implementation.zh.md)、gate及13正式来源独立保管于Linux `fit_reference/mechanism/`，不覆盖原P冻结来源/裁决。13份50115字节范围、部署、CPU、启动及12:45:18队列/费用快照经SFTP两端核对，映射见[同步](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/sync.json)。快照不冒充后续实时状态，当前唯一状态入口仍在交接。
 
 单次Linux CPU四项通过后，Windows `tests/verify_vendorlink_mechanism.py` 与Linux本根 `verify.py` 各8514字节已清理，SHA256 `6b45cceaa2ccde88fca43e589164aac16b8e4ef0edcdfd23b2b00e0e62d33543`。Windows删除前实际读取 `c0fadd35:tests/verify_vendorlink_mechanism.py` 的Git blob逐字节核对；Linux已核对最终路径/属主/单硬链接及非正式依赖，见[回执](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/cleanup.json)。该回执只陈述Linux删除，Windows实际删除由本记录与Git差异证明。手写输入随TemporaryDirectory收尾，原日志/CPU回执/历史部署清单保留；恢复源码不授权重跑。
