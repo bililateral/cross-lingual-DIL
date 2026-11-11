@@ -1,4 +1,9 @@
 # 科研文件存储与恢复
+
+## 2026-11-11 FIT12进度证据回传
+
+10:03:46[只读进度快照](../reports/documentation/20261110/vendorlink_redesign/fit_reference/progress_20261111_100346.json)经SFTP回传，11558字节、SHA256 `0a37536845aa23821d62af71b51b5a10bd4ee3ca958f2884046450169f1e68ae`与Linux一致。只记录进程、计数、收尾验收及账本/GPU元数据，未读取模型或效果；原gate、来源、进程与账本未改。无临时脚本或载荷，当前进度见交接，本地提交不推送。
+
 ## 2026-11-10 FIT12实施、启动与临时核验收尾
 
 [固定合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)、[实施主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/implementation.zh.md)、CPU01及来源/启动/观测证据已保管；两端具名核对见[同步](../reports/documentation/20261110/vendorlink_redesign/fit_reference/sync.json)。新运行来源独立于所有旧冻结workspace，13正式依赖和新活动权重保持；账号正文、完整分数、模型和原角色数据留Linux。
