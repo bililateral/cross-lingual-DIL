@@ -8,7 +8,9 @@
 
 用户已确认[固定FIT12合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)实施、必要核验后条件开训，本轮免网页外审。直接复用[reference开发门通过](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)，不重复D；H保留RMS及完整多记录/历史机制，V1保持强分类读取，V_SET与H使用同一FIT12资料。三seed冷启动P六条检验逐域相近学习和平均3.5pp遗忘；通过才M六条，再按系统门决定C。新88累计小时/最多两路/无显存硬帽及OOM续领按合同执行，不借旧预算、不追加参数搜索。
 
-必要实现仅覆盖新参考读取、跨端点重编码与P/M/C接续；复用适用GPU/CPU证据，只补实际增量。每阶段整批完整才开放，未过科学门正常停止；M完整时跨账号top10仅作无真值应用。RMS权重保留，旧G4/CE/评分头失败、全部旧费用不追改。确认文本仍由条件门保护，中文暂停及旧Evolution/ABC结案不动。当前实施/运行状态只见交接对应项，本地提交不推送。
+按[完整结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/report.zh.md)保留已通过的初学能力与外部比较证据，以及新学习增量/明显遗忘未同时通过的原裁决；现行条件链结束，不重新派发P或越过门启动ER/Full/C。完整H历史机制的额外作用仍未验证，不能从H_SEQ优势推出。若后续调整问题，先分别处理高学前水平下的固定增量要求与H_SEQ遗忘幅度不足，不盲调已适配的学习配置，不制造遗忘或改写已见结果。新的具体科学选择及执行范围另行确认，旧余额不构成新执行许可。
+
+RMS和本轮正式端点保留供必要核对，旧G4/CE/评分头失败与全部费用不追改。原阶段开放和故障规则保持历史身份，confirm未开；中文暂停及旧Evolution/ABC结案不动。当前状态仅交接对应项，本地提交不推送。
 ## Evolution：已结束路线与保留边界
 
 以下记录已结束路线的既有范围，不是当前待启动任务。用户当时接受方向咨询建议，明确“继续推进，采用双路同时运行”，并批准开发数据构建与固定96条fit语言判断。历史来源为[六轨迹执行范围](../reports/documentation/20261108/evolution_registered/execution/scope.zh.md)、[许可](../reports/documentation/20261108/evolution_registered/execution/authorization.json)及[实现证据](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)；已核实结束状态见交接唯一Evolution项。原[30轨迹草案](../reports/documentation/20261108/evolution_registered/proposal.zh.md)只作来源，后续24条及24小时预算未获准。

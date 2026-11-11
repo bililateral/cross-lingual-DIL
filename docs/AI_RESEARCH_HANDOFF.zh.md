@@ -7,10 +7,10 @@
 ### VendorLink账号监督共同评价
 
 - **目标与最新授权**：完整H先学得接近VendorLink，再检验遗忘、保持及外部竞争力。用户已确认“按此实施并条件开训”，本轮免外审；采用[固定FIT12共同协议](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)，参考[决定记录](RESEARCH_DISCUSSION.zh.md#2026-11-10批准fit12共同协议实施及条件开训)。RMS母体/V1、seed51/52/53、ABC/40epoch；P六条通过才M六条，通过才C，最多12轨迹/36域阶段，新独立88h=80/4/4、最多两路。原G4失败和费用不改。
-- **最新运行**：11月10日23:30:26[双路正式启动](../reports/documentation/20261110/vendorlink_redesign/fit_reference/launch.json)，控制器2507659。11月11日10:03:46[只读快照](../reports/documentation/20261110/vendorlink_redesign/fit_reference/progress_20261111_100346.json)确认P训练6/6验收、worker均释放；H_SEQ各23640、V各23720更新，共142080，最后一条H_s53约10:02完成。整批训练清单已写，P评分0/6验收，seed51两项在跑、四项待派（为评分），控制器/两评分worker身份匹配、gate未变；0失败/0退槽/无预算停止。P分析与门尚未生成，M/C未开始，未查看效果。启动时[首更新](../reports/documentation/20261110/vendorlink_redesign/fit_reference/launch_observation.json)及[来源核对](../reports/documentation/20261110/vendorlink_redesign/fit_reference/verification.json)保留。
-- **推进与失败边界**：现有唯一控制器继续P并按合同条件接续；每域初学对V_CLS均值−2pp/逐seed−5pp、平均遗忘3.5pp及原Full保持/新域/外部竞争力门保持。P/M整批完整才开dev；C只在M系统门通过后开放完整confirm矩阵。取消显存硬帽，OOM槽退出、健康槽续领当前阶段、失败不重跑、缺项不进下游；资源不足只由唯一控制器等待，不恢复旧链。
-- **核验与工期**：[主审/必要CPU](../reports/documentation/20261110/vendorlink_redesign/fit_reference/implementation.zh.md)五组一次通过，2.672493秒计3秒，未新增GPU测试。P训练实过约10小时32分，尚余P评分与分析；启动时P10—14h及全链35—46h（各门均过且双路可用）均为规划值。10:03:46已结training66942/GPU0/aux1162秒，共68104秒；两项活动评分累计约182.73秒未结，约1801.99秒完整承诺不是实耗，监控未结费用未估算。全链预计62—76累计小时，硬帽88h=80/4/4。一次性CPU源码两端各10062字节已清理，精确恢复Git f5394f07；原证据和13运行来源保留。
-- **开发依据及保管**：[reference完整结果](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)为PASS_REFERENCE_DIAGNOSTIC，FIT12 A83.7424%/B89.0658%，新旧含义和单seed/已见dev边界保持，原累计93秒。RMS六份877291968字节及两fit缓存保留；用户随后选定清理，23:23:42已[删除四head和33份旧CPU微型模型](../reports/documentation/20261110/vendorlink_redesign/head_alignment/weight_cleanup.json)，共37份6624499字节，344份保护文件大小/SHA保持，精确旧源码恢复入口见[核对](../reports/documentation/20261110/vendorlink_redesign/head_alignment/weight_cleanup_recovery.json)，不再可加载已删head/夹具。新轨迹从共同预训练BERT开始，开发权重不作热启动。中文暂停不动，真实文本/分数/模型留Linux，原位文档、本地提交不推送。
+- **最新运行与结果**：11月11日10:13:56[完整结束](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/completion.json)，P六训练/六评分、142080更新全部验收；12:12:16[现场快照](../reports/documentation/20261110/vendorlink_redesign/fit_reference/progress_20261111_121216.json)及12:14:45[核对](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/check.json)确认控制器已退出、无精确入口活动进程、0失败/0退槽/无预算停止，13来源及gate未变。M/C/应用未启动。完整dev已开放，[结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/report.zh.md)解释原STOP_LEARNING：H初学A82.8877%/B92.0736%/C90.7556%，绝对/对V_CLS相近门全过；仅Dream新增学习4.1047pp未到5pp，且平均F1.1331pp、三个seed0.5635/1.2581/1.5778pp未到明显遗忘要求。不是OOM或H仍普遍学差。
+- **下一步与结论边界**：现行条件链按P科学停止门结束，不重启、不自动ER/Full/C、不用剩余预算追加搜索。H_SEQ的旧域最终O86.3475%，对同FIT12的V_SET高6.2665pp、遗忘少2.0866pp，三个seed方向一致；完整H历史机制尚未检验。Dream学前87.9689%使固定5pp增量门的解释需谨慎，但移除该门也不消除1.1331pp遗忘不足。新的应用效用或历史机制问题须先形成具体有限安排再确认，不能为了遗忘破坏SEQ或追改原验收。confirm保持未开。
+- **核验与费用**：原[实施主审/CPU](../reports/documentation/20261110/vendorlink_redesign/fit_reference/implementation.zh.md)及GPU复用证据保留；本次无新增测试或载模，仅保存聚合字段汇总。正式工期10小时43分30秒，现行链剩余0；[原账](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/budget.json)训练66942/GPU1305/辅助1198秒，共69445秒，本次汇总另计辅助1秒、合计69446秒。88h分桶上限未耗尽，原35—46h全链估计的条件没有成立。一次性CPU源码此前已两端清理，Git f5394f07可恢复。
+- **保管与交付**：新24份正式端点7845094494字节在Linux保留；RMS六份877291968字节及两fit缓存沿既定决定保留，不将负结果等同删除授权。10份207833字节小结果/来源/费用[同步核对](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/sync.json)一致；逐查询分数、正文、模型仍留Linux。开发依据见[reference](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)，单seed/已见dev边界保持；已删四head/33夹具的[独立清理事实](../reports/documentation/20261110/vendorlink_redesign/head_alignment/weight_cleanup.json)不变。中文暂停不动，无新增外审包或临时模型，本地提交、不推送。
 ### 历史权重版H主实验消融
 
 保持暂停，等待用户明确恢复。最近保存观测为11月10日10:16:16，PAUSED_IDLE、7完成/0活动/56待派，见[核对](../reports/documentation/20261109/vendorlink_account_protocol/result/check.json)；本轮未重新巡检。范围见[正式许可](../reports/documentation/20261107/h_ablation_start/authorization.json)、[暂停补充](../reports/documentation/20261107/h_ablation_pause/scope.zh.md)。不能因VendorLink运行恢复或删除marker；恢复须承接原队列及账本。
@@ -31,9 +31,13 @@
 
 ### 文件保管与本轮交付
 
-[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。此前工作流整理批次的推送许可及实际交付保持历史身份，不扩展到后续新科研材料。本轮评分头结果按已确认范围只作本地提交、不推送；运行来源、原始证据及清理恢复入口分别保管。
+[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。此前工作流整理批次的推送许可及实际交付保持历史身份，不扩展到后续新科研材料。本轮FIT12结果按已确认范围只作本地提交、不推送；运行来源、原始证据及清理恢复入口分别保管。
 
 ## 近期执行与审查历史
+
+### 2026-11-11 FIT12完整结果开放前
+
+11月10日23:30:26双路启动；11月11日10:03:46[当时快照](../reports/documentation/20261110/vendorlink_redesign/fit_reference/progress_20261111_100346.json)为六训练验收、评分0/6验收，两项评分在跑，分析/门未生成且未看效果。当时已结68104秒，活动评分及监控尚未结；该旧快照不代表后续仍在运行。启动身份、首更新、CPU/source核对及原工期预估见fit_reference原件；当前结束与全部费用见顶部唯一对应项。
 
 ### 2026-11-10 工作流整理前的详细状态快照
 

@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-11 FIT12 P结果回传与停止主审
+
+[完整报告](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/report.zh.md)、[保存字段汇总及来源核对](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/check.json)保留原STOP_LEARNING及其两项具体原因，不修改原gate、运行源码、结果或账本。10份207833字节已开放汇总/完成/费用及本轮核对由SFTP回传，逐项大小/SHA一致，远端原始路径与本地副本映射见[同步](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/sync.json)。报告、同步映射及其小汇总镜像SFTP保管到Linux同一result目录，原campaign文件不覆盖；根docs只在Windows维护。
+
+12:12:16[只读快照](../reports/documentation/20261110/vendorlink_redesign/fit_reference/progress_20261111_121216.json)5121字节、SHA256 `576bb12dfd4afc3eb6f2eab24a2f712a463bb10a101949ef714fdf224eadc5cb`两端一致。12:14:45核实24份新正式端点7845094494字节属主/大小保持，未载模或重读大权重哈希；RMS、原始文本/分数/日志及全部旧来源继续留Linux，没有删除许可扩展。confirm未开，M/ER/Full及应用未启动。本次无测试脚本、临时模型、外审包或科研重跑；原一次性CPU清理及另一会话head/夹具清理事实保持。本地提交、不推送，不重置大清理周期。
+
 ## 2026-11-11 FIT12进度证据回传
 
 10:03:46[只读进度快照](../reports/documentation/20261110/vendorlink_redesign/fit_reference/progress_20261111_100346.json)经SFTP回传，11558字节、SHA256 `0a37536845aa23821d62af71b51b5a10bd4ee3ca958f2884046450169f1e68ae`与Linux一致。只记录进程、计数、收尾验收及账本/GPU元数据，未读取模型或效果；原gate、来源、进程与账本未改。无临时脚本或载荷，当前进度见交接，本地提交不推送。
