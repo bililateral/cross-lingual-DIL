@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-11 FIT12六条ER/Full接续与核验收尾
+
+用户明确继续同配置三个seed的ER/Full；[接续范围](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)、[实施主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/implementation.zh.md)、gate及13正式来源独立保管于Linux `fit_reference/mechanism/`，不覆盖原P冻结来源/裁决。13份50115字节范围、部署、CPU、启动及12:45:18队列/费用快照经SFTP两端核对，映射见[同步](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/sync.json)。快照不冒充后续实时状态，当前唯一状态入口仍在交接。
+
+单次Linux CPU四项通过后，Windows `tests/verify_vendorlink_mechanism.py` 与Linux本根 `verify.py` 各8514字节已清理，SHA256 `6b45cceaa2ccde88fca43e589164aac16b8e4ef0edcdfd23b2b00e0e62d33543`。Windows删除前实际读取 `c0fadd35:tests/verify_vendorlink_mechanism.py` 的Git blob逐字节核对；Linux已核对最终路径/属主/单硬链接及非正式依赖，见[回执](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/cleanup.json)。该回执只陈述Linux删除，Windows实际删除由本记录与Git差异证明。手写输入随TemporaryDirectory收尾，原日志/CPU回执/历史部署清单保留；恢复源码不授权重跑。
+
+新M的正式来源、活动状态及新权重保留。P的24端点、RMS六权重及两fit缓存均保持Linux既有保管，无新模型删除；账号正文和逐条分数未同步Windows。新M沿用原88h累计账及整个FIT12根32GiB输出帽，不重置原失败和费用。根docs只在Windows维护；本轮免外审，无新上传包或网页，本地提交不推送。此次局部收尾不重置11月6日大清理及11月21日到期。
+
 ## 2026-11-11 FIT12 P结果回传与停止主审
 
 [完整报告](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/report.zh.md)、[保存字段汇总及来源核对](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/check.json)保留原STOP_LEARNING及其两项具体原因，不修改原gate、运行源码、结果或账本。10份207833字节已开放汇总/完成/费用及本轮核对由SFTP回传，逐项大小/SHA一致，远端原始路径与本地副本映射见[同步](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/sync.json)。报告、同步映射及其小汇总镜像SFTP保管到Linux同一result目录，原campaign文件不覆盖；根docs只在Windows维护。

@@ -10,7 +10,7 @@
 
 保留[完整P结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/report.zh.md)及原失败裁决。用户11月11日已明确把新增学习均值要求改为4pp，并要求继续同配置同seed的ER/Full，按[接续补充](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)执行六条M，复用P对照，不重跑P或修改冻结记录。原明显遗忘前提不再阻止这次明确的M探索；旧3.5pp资格未满足仍报告，原效果幅度/初学/新域保护逐项评价，不自动开放confirm，不为取得预期结果调参。
 
-新独立workspace/campaign仍共用原88h总账及整个FIT12根的32GiB磁盘帽。只补接续、累计费用、4pp及历史消费验收所需CPU；未变训练、评分及GPU证据复用，主审/准入后直接开训。M完整后沿原无真值候选输出安排，量化不利不以候选挽回；真实OOM与健康槽接续等原规则不变。
+新独立workspace/campaign仍共用原88h总账及整个FIT12根的32GiB磁盘帽。接续、累计费用、4pp及历史消费验收的必要CPU与[主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/implementation.zh.md)已闭合；未变训练、评分及GPU证据复用，按[新gate](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/gate.json)交由当前唯一控制器连续完成六条，不重启旧控制器或追加测试。M完整后沿原无真值候选输出安排，量化不利不以候选挽回；真实OOM与健康槽接续等原规则不变。
 
 RMS和本轮正式端点保留供必要核对，旧G4/CE/评分头失败与全部费用不追改。原阶段开放和故障规则保持历史身份，confirm未开；中文暂停及旧Evolution/ABC结案不动。当前状态仅交接对应项，本地提交不推送。
 ## Evolution：已结束路线与保留边界
