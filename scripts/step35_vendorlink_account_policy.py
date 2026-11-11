@@ -5,7 +5,7 @@ import statistics
 
 from step29_vendorlink_methods import Settings
 
-PROTOCOL = 'vendorlink-account-fit12-20261110'
+PROTOCOL = 'vendorlink-account-fit12-mechanism-20261111'
 DOMAINS = ('AlphaBay', 'Dream', 'Agora')
 SEEDS = (51, 52, 53)
 CAPS = dict(training=80*3600, gpu=4*3600, auxiliary=4*3600)
@@ -112,7 +112,7 @@ def decide(results, mechanism=False):
     def diffs(a, b, k): return [x-y for x, y in zip(values(a, k), values(b, k))]
     def lower(a, b, keys, avg, individual):
         return all(statistics.mean(diffs(a, b, k)) >= avg and min(diffs(a, b, k)) >= individual for k in keys)
-    def gain(m): return all(mean(m, k) >= .05 and min(values(m, k)) >= 0 for k in ('GB', 'GC'))
+    def gain(m): return all(mean(m, k) >= .04 and min(values(m, k)) >= 0 for k in ('GB', 'GC'))
     learning = (all(mean('H_SEQ', k) >= .70 and min(values('H_SEQ', k)) >= .60
                    and lower('H_SEQ', 'V_CLS', (k,), -.02, -.05)
                    and mean('V_CLS', k) >= .70
@@ -140,8 +140,9 @@ def decide(results, mechanism=False):
     retention = improvement('H_full', 'H_SEQ', .03, -.01)
     checks.update(retention=retention, initial_protection=initial, new_protection=new, external=external)
     system = all(checks.values())
-    extra = (system and improvement('H_full', 'H_ER', .02, None)
+    extra_conditions = (improvement('H_full', 'H_ER', .02, None)
              and lower('H_full', 'H_ER', ('R11', 'R22'), -.01, -.03)
              and lower('H_full', 'H_ER', ('R22', 'R33'), -.02, -.05))
     return dict(status='PASS_SYSTEM' if system else 'STOP_NO_H_ADVANTAGE', checks=checks,
-                old_score_increment=extra)
+                old_score_increment=system and extra_conditions,
+                old_score_increment_conditions=extra_conditions)

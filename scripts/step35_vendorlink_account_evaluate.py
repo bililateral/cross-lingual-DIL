@@ -268,6 +268,11 @@ def analyze(completions, expected_tasks, root):
     return results
 
 
+def application_completion(gate, task):
+    campaign = Path(gate['prior_campaign'] if task['phase'] == 'P' else gate['campaign'])
+    return campaign/task['phase']/'training'/task['id']/'run/completion.json'
+
+
 def application(gate, selected, root, check):
     from collections import Counter
     from step35_vendorlink_account_policy import tasks
@@ -288,7 +293,7 @@ def application(gate, selected, root, check):
     chosen = [t for t in tasks('M', selected)+tasks('P', selected) if t['method'] in ('H_full', 'VendorLink_SEQ')]
     rankings, frequencies, file_bindings = {}, Counter(), []
     for task in chosen:
-        completion_path = campaign/task['phase']/'training'/task['id']/'run/completion.json'
+        completion_path = application_completion(gate, task)
         completion = json.loads(completion_path.read_text())
         endpoint = completion['endpoints']['3']
         model, heads = restore(binding, task, pinned(endpoint), completion['identity'], 3)

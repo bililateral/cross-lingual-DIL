@@ -8,7 +8,9 @@
 
 用户已确认[固定FIT12合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)实施、必要核验后条件开训，本轮免网页外审。直接复用[reference开发门通过](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)，不重复D；H保留RMS及完整多记录/历史机制，V1保持强分类读取，V_SET与H使用同一FIT12资料。三seed冷启动P六条检验逐域相近学习和平均3.5pp遗忘；通过才M六条，再按系统门决定C。新88累计小时/最多两路/无显存硬帽及OOM续领按合同执行，不借旧预算、不追加参数搜索。
 
-按[完整结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/report.zh.md)保留已通过的初学能力与外部比较证据，以及新学习增量/明显遗忘未同时通过的原裁决；现行条件链结束，不重新派发P或越过门启动ER/Full/C。完整H历史机制的额外作用仍未验证，不能从H_SEQ优势推出。若后续调整问题，先分别处理高学前水平下的固定增量要求与H_SEQ遗忘幅度不足，不盲调已适配的学习配置，不制造遗忘或改写已见结果。新的具体科学选择及执行范围另行确认，旧余额不构成新执行许可。
+保留[完整P结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/report.zh.md)及原失败裁决。用户11月11日已明确把新增学习均值要求改为4pp，并要求继续同配置同seed的ER/Full，按[接续补充](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)执行六条M，复用P对照，不重跑P或修改冻结记录。原明显遗忘前提不再阻止这次明确的M探索；旧3.5pp资格未满足仍报告，原效果幅度/初学/新域保护逐项评价，不自动开放confirm，不为取得预期结果调参。
+
+新独立workspace/campaign仍共用原88h总账及整个FIT12根的32GiB磁盘帽。只补接续、累计费用、4pp及历史消费验收所需CPU；未变训练、评分及GPU证据复用，主审/准入后直接开训。M完整后沿原无真值候选输出安排，量化不利不以候选挽回；真实OOM与健康槽接续等原规则不变。
 
 RMS和本轮正式端点保留供必要核对，旧G4/CE/评分头失败与全部费用不追改。原阶段开放和故障规则保持历史身份，confirm未开；中文暂停及旧Evolution/ABC结案不动。当前状态仅交接对应项，本地提交不推送。
 ## Evolution：已结束路线与保留边界

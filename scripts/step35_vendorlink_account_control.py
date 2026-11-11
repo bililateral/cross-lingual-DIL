@@ -71,7 +71,34 @@ def permit(path):
     manifest = read(g['manifest']['path'])
     if manifest['status'] != 'QUALIFIED' or any(manifest['counts'][d]['eligible_accounts'] < 128 for d in DOMAINS):
         raise ValueError('One-shot data qualification must pass')
+    continued_baseline(g)
     return g
+
+
+def continued_baseline(g):
+    """Bind the completed P and its costs without rewriting its failed decision."""
+    if g.get('continuation_after_p_stop') is not True:
+        raise ValueError('Explicit six-task mechanism continuation required')
+    prior = g['prior_P']
+    values = {k: read(pinned(prior[k])) for k in ('gate', 'batch', 'decision', 'completion', 'budget', 'results')}
+    old = values['gate']
+    if (values['completion']['status'] != 'STOP_LEARNING'
+            or values['decision'] != values['completion']['P']
+            or values['decision']['checks'] != dict(learning=False, meaningful_forgetting=False)
+            or values['batch']['tasks'] != tasks('P', dict(H='H_CE_RMS', V='V1'))
+            or values['batch']['gate'] != prior['gate']
+            or old['manifest'] != g['manifest'] or old['model_binding'] != g['model_binding']
+            or old['caps'] != g['caps'] or old['limits'] != g['limits']
+            or Path(old['experiment_root']).resolve() != Path(g['experiment_root']).resolve()
+            or old['campaign'] != g['prior_campaign']
+            or Path(g['campaign']).resolve() == Path(old['campaign']).resolve()
+            or any(g['prior_seconds'][k] < values['budget']['used_seconds'][k] for k in CAPS)
+            or g['baseline'] != prior['results']):
+        raise ValueError('Fixed P identity, unchanged configuration and cumulative costs required')
+    baseline = values['results']
+    if not decide(baseline)['checks']['learning']:
+        raise ValueError('The fixed P must meet the newly approved four-point learning requirement')
+    return baseline
 
 
 def validate_training(task, result, manifest, identity):
@@ -86,6 +113,12 @@ def validate_training(task, result, manifest, identity):
                   *task['epochs'] for d in task_domains(task))
     if result['updates'] != updates or result['workload']['current_ads'] != ads:
         raise ValueError('Actual exposure/update count incomplete')
+    if task['method'] in ('H_ER', 'H_full'):
+        history_updates = sum(3*len(group_chunks(list(range(manifest['counts'][d]['eligible_accounts'])), 8))
+                              *task['epochs'] for d in task_domains(task)[1:])
+        if (result['workload']['history_groups'] != history_updates
+                or result['workload']['history_ads'] <= 0 or result['workload']['teacher_groups'] <= 0):
+            raise ValueError('Every later-domain update must actually consume retained history')
     for b in result['endpoints'].values():
         pinned(b)
     if task['settings'].get('diagnostics'):
@@ -96,32 +129,23 @@ def validate_training(task, result, manifest, identity):
 
 
 def pipeline(run_phase, save, baseline, measure=lambda name: nullcontext()):
-    if (baseline['status'] != 'PASS_REFERENCE_DIAGNOSTIC'
-            or set(baseline['checks']) != set(DOMAINS[:2])
-            or not all(r['candidate_pass'] for r in baseline['checks'].values())):
-        raise ValueError('Completed fixed FIT12 development evidence required')
+    admission = decide(baseline)
+    if not admission['checks']['learning']:
+        raise ValueError('Fixed completed P learning requirement failed')
     selected = dict(H='H_CE_RMS', V='V1')
     with measure('fixed_selection'):
         save('selection', selected)
-    p = run_phase('P', selected)
-    with measure('decide_P'):
-        p_gate = decide(p)
-        save('P', p_gate)
-    if p_gate['status'] != 'PASS_P':
-        return dict(status=p_gate['status'], selected=selected, P=p_gate, application=False)
+        save('continuation_basis', dict(learning_gain_min=.04, original_P_unchanged=True,
+             baseline_checks=admission['checks'], meaningful_forgetting_required_for_this_M=False))
     m = run_phase('M', selected)
     with measure('decide_M'):
-        m_gate = decide({**p, **m}, True)
+        combined = {**baseline, **m}
+        m_gate = decide(combined, True)
         save('M', m_gate)
-    if m_gate['status'] != 'PASS_SYSTEM':
-        return dict(status=m_gate['status'], selected=selected, P=p_gate, M=m_gate, application=True)
-    c = run_phase('C', selected)
-    with measure('decide_C'):
-        c_gate = decide(c, True)
-        c_gate['old_score_increment'] &= m_gate['old_score_increment']
-        save('C', c_gate)
-    return dict(status='CONFIRMATION_PASS' if c_gate['status'] == 'PASS_SYSTEM' else c_gate['status'],
-                selected=selected, P=p_gate, M=m_gate, C=c_gate, application=True)
+        save('comparison_results', combined)
+    return dict(status='EXPLORATORY_M_COMPLETE', selected=selected, M=m_gate,
+                substantive_checks={k: v for k, v in m_gate['checks'].items() if k != 'meaningful_forgetting'},
+                original_P_unchanged=True, confirmation=False, application=True)
 
 
 def worker(g, args):
@@ -130,12 +154,10 @@ def worker(g, args):
     root, campaign = Path(g['experiment_root']), Path(g['campaign'])
     check = Check(root, max(1, args.deadline-time.monotonic()))
     manifest = read(pinned(g['manifest']))
+    if args.phase != 'M':
+        raise ValueError('This continuation only runs M; P is reused and confirmation remains closed')
     batch = read(campaign/args.phase/'batch.json')
-    if args.phase in ('M', 'C') and read(campaign/'decisions/P.json')['status'] != 'PASS_P':
-        raise ValueError('Historical mechanisms are closed until P passes')
-    if args.phase == 'C' and read(campaign/'decisions/M.json')['status'] != 'PASS_SYSTEM':
-        raise ValueError('Confirmation is closed until M passes')
-    expected = tasks(args.phase, batch['selected']) if args.phase != 'C' else tasks('P', batch['selected'])+tasks('M', batch['selected'])
+    expected = tasks('M', batch['selected'])
     if batch['tasks'] != expected or batch['manifest'] != g['manifest'] or batch['gate'] != record(args.gate):
         raise ValueError('Frozen batch identity mismatch')
     if args.action in ('train', 'score', 'application'):
@@ -169,9 +191,7 @@ def worker(g, args):
             for b in frozen['completions']:
                 pinned(b)
             completion = read(origin/'completion.json')
-            role = 'confirm' if args.phase == 'C' else 'dev'
-            if role == 'confirm' and read(campaign/'decisions/M.json')['status'] != 'PASS_SYSTEM':
-                raise ValueError('Confirmation is closed')
+            role = 'dev'
             validate_training(task, completion, manifest, identity)
             score(task, completion, manifest, g['model_binding'], args.target/'result', role, check)
     elif args.action == 'analyze':
@@ -228,11 +248,12 @@ def campaign(g, gate_path, started=None):
         elif not (job['target']/'result/results.json').is_file():
             raise ValueError('Missing complete analysis')
     def run_phase(phase, selected):
+        if phase != 'M':
+            raise ValueError('Only the six fixed mechanism tasks may be dispatched')
         with measure(phase+'_freeze'):
-            specs = tasks(phase, selected) if phase != 'C' else tasks('P', selected)+tasks('M', selected)
+            specs = tasks('M', selected)
             write(root/phase/'batch.json', dict(tasks=specs, selected=selected, manifest=g['manifest'], gate=record(gate_path)))
-        if phase != 'C':
-            runner.run_many(make_jobs(root, phase, specs, 'train'), 2, complete)
+        runner.run_many(make_jobs(root, phase, specs, 'train'), 2, complete)
         with measure(phase+'_training_manifest'):
             training = [record(root/t['phase']/'training'/t['id']/'run/completion.json') for t in specs]
             write(root/phase/'training_complete.json', dict(tasks=specs, completions=training))
@@ -247,7 +268,7 @@ def campaign(g, gate_path, started=None):
             return read(root/phase/'analysis/result/results.json')
     try:
         result = pipeline(run_phase, lambda name, value: write(root/'decisions'/f'{name}.json', value),
-                          read(pinned(g['baseline'])), measure)
+                          continued_baseline(g), measure)
         with measure('quantitative_completion'):
             write(root/'quantitative_completion.json', result)
         if result['application']:
@@ -269,7 +290,7 @@ def main():
     p.add_argument('--action', choices=['campaign', 'train', 'score', 'analyze', 'application'], required=True)
     p.add_argument('--target', type=Path)
     p.add_argument('--deadline', type=float)
-    p.add_argument('--phase')
+    p.add_argument('--phase', choices=('M',))
     p.add_argument('--task')
     args = p.parse_args()
     started = time.monotonic()
