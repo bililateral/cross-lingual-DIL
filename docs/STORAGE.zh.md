@@ -2,6 +2,8 @@
 
 ## 2026-11-11 FIT12六条ER/Full接续与核验收尾
 
+19:06:17新增[只读进度快照](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/progress_20261111_190617.json)，10225字节、SHA256 `f5b805d80423c211a2d7e8a10b1106d7d211011cd4ba4a604368e0a8b0a90979`，SFTP回传后大小/SHA与Linux一致。核实唯一控制器及两活动worker身份、训练更新/验收/失败标志、GPU与同账费用；另只读seed51两份训练dispatch_receipt的seconds估计工期，未读M效果或载模。当前交接更新为本次时点，12:55原快照保留；计划与设计入口已核对有效范围、无待修正动态进度，不复制计数。未生成临时脚本或新增计算，不改冻结运行来源与账本，本地提交不推送。
+
 12:55:33新增一次[只读进度快照](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/progress_20261111_125533.json)，9056字节、SHA256 `ac0c34f5656a671c4ccee86f8956a06abb5b2a960d6f6dfe349ba7928a9e61c7`，SFTP回传后大小/SHA与Linux一致。只取精确运行身份、更新计数、完成/失败是否存在及费用字段，未读取M效果、正文、权重或confirm；未改运行来源、进程或账本，无新增测试/临时脚本。当前计数只更新交接，不复制到计划或合同。
 
 用户明确继续同配置三个seed的ER/Full；[接续范围](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)、[实施主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/implementation.zh.md)、gate及13正式来源独立保管于Linux `fit_reference/mechanism/`，不覆盖原P冻结来源/裁决。13份50115字节范围、部署、CPU、启动及12:45:18队列/费用快照经SFTP两端核对，映射见[同步](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/sync.json)。快照不冒充后续实时状态，当前唯一状态入口仍在交接。
