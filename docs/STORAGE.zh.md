@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-12 历史评分随机模式诊断保管与退役
+
+[完整诊断与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/report.zh.md)、九端点/54群数值汇总、实际来源、CPU/启动/完成/费用及[收尾](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/closure.json)两端具名保管，映射见[sync](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/sync.json)。仅AlphaBay既有fit及原stage1六群索引用于重建，正文/账号/逐对分数只在Linux内存，不保存新载荷或回传；不读dev/confirm/Agora文本。九份实际访问权重收尾大小/SHA不变，全部原权重保留，新增训练权重0。原P/M结果、来源和88h费用不改；新诊断按独立1h许可收尾计261秒。
+
+一次性源码精确恢复点为`e878b15a:scripts/step35_vendorlink_history_diagnose.py`，15580字节/SHA `9d6522aa3078ebe1c7f3bd9e6d060fcf8cd97b578c116097049b5f414682af0a`，Windows实际读取Git blob逐字节核对见[恢复记录](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/recovery.json)。随后删除Windows该源码及Linux `fit_reference/mechanism/diagnosis/diagnose.py`；两端下载临时清单`diagnosis/download.json`各2861字节在内容已并入收尾/同步记录后删除。各端实际删除2项18441字节，Linux先核最终路径/属主/普通文件/单硬链接及原进程退出；Windows按精确工作区路径删除。源码恢复不授予重新载模/诊断或训练，SHA不能恢复权重。
+
+本轮免外审，无网页或外审包；SFTP连接中断后只恢复传输，没有重复GPU任务。根docs只在Windows维护，本地提交不推送；局部清理不重置大清理周期。
+
 ## 2026-11-12 FIT12六条ER/Full结果保管
 
 [结果与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md)、整批完成/判定/费用、13指标及逐seed汇总、数值历史日志汇总、来源核对和两次现场观察共20项404970字节已具名SFTP回传并核对大小/SHA；本轮报告及其引用小证据镜像同字节保管到Linux `fit_reference/mechanism/result/`，映射见[同步记录](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/sync.json)。原campaign、gate、13运行来源和P失败原件不覆盖，根docs只在Windows维护。

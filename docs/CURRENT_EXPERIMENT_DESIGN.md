@@ -4,7 +4,7 @@ H/S评价补充（2026-11-02）：用户选择[方案A](../reports/seller_alias_
 
 ## 当前合同入口
 
-VendorLink历史评分随机模式诊断（2026-11-12）：用户明确批准[固定九端点范围](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/scope.zh.md)并免审；只对原AlphaBay六记忆群作16次固定dropout前向及确定性误差分解。新1h预算、不更新权重、不读dev/confirm/Agora，不自动实现或启动候选训练；实际进度仍只在交接维护。
+VendorLink历史评分随机模式诊断（2026-11-12）：用户明确批准[固定九端点范围](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/scope.zh.md)并免审；仅原AlphaBay六记忆群、16次固定dropout前向及确定性误差分解，新1h预算、不更新权重、不读dev/confirm/Agora。[完整诊断与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/report.zh.md)提出仅出生评分分支使用确定性学生的有限候选，不授予新实现/训练或confirm权限；当前状态仍只在交接维护。
 
 VendorLink FIT12持续学习（2026-11-10/11）：原[合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)、[gate](../reports/documentation/20261110/vendorlink_redesign/fit_reference/gate.json)、[实施主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/implementation.zh.md)和[P完整裁决](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/report.zh.md)冻结。后续用户明确的[六条M接续补充](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)：同RMS/FIT12与seed/配置，复用P，新增学习4pp，在保留原P失败的前提下探索ER/Full；仍88h同账、无自动confirm，同轮免审。本次实际入口及必要核验由[新gate](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/gate.json)和[接续主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/implementation.zh.md)绑定；完成后的[结果主审及13指标](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md)保留实际效果和原判据，不授权自动C或新候选，当前实际状态只见交接。
 
