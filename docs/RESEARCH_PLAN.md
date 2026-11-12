@@ -8,7 +8,7 @@
 
 [原FIT12合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)与用户明确的[六条M补充](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)及[完整结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md)共同界定这轮有限开发比较。原P的STOP_LEARNING及5pp/3.5pp裁决保持；后续4pp和明确M许可不追认P通过。既定训练、评分和无真值应用范围已完成，不重启控制器，不因有剩余88h预算自动新增任务或开放confirm。
 
-下一步应针对完整历史约束在当前RMS/FIT12母体上未增加保持这一具体缺口，区分已证实的同配置差异与尚未证实的教师目标、约束尺度、记忆覆盖原因。已保存历史标量有尺度线索，不能据此直接指定有效新参数；若用户要求进一步诊断或候选实验，先给有限范围、可证伪假设及资源/开放条件，沿用有效证据，不重复完整英文适配或大范围HPO。保留Full对外部方法的正向结果及Full−SEQ/ER的不利结果，不以候选发现输出挽回机制结论。
+先完成用户已批准且免审的[历史评分随机模式诊断](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/scope.zh.md)：固定九端点、原六群、AlphaBay fit和16次dropout前向，区分未学习新域即存在的随机目标误差与Dream后的确定性漂移。不训练、不改系数，沿用实际teacher/records/table/h_pool入口；完整结果后再判断唯一优先训练候选及必要对照，不自动接续。已保存标量不能直接指定有效β，诊断本身也不证明dev收益；SEQ遗忘不足与Full机制不利分别处理，保留对外部方法的正向结果。新候选须具体确定，避免重复完整英文适配或大范围HPO。
 
 RMS、P及M正式端点继续保留供有明确权限的必要核对，旧G4/CE/评分头失败和全部费用不追改。确认集保持关闭，已见开发结果不能变回独立验证。中文暂停和旧Evolution/ABC结案不动；当前状态仅维护交接对应项，本地提交不推送。
 
