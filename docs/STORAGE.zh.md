@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-12 FIT12六条ER/Full结果保管
+
+[结果与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md)、整批完成/判定/费用、13指标及逐seed汇总、数值历史日志汇总、来源核对和两次现场观察共20项404970字节已具名SFTP回传并核对大小/SHA；本轮报告及其引用小证据镜像同字节保管到Linux `fit_reference/mechanism/result/`，映射见[同步记录](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/sync.json)。原campaign、gate、13运行来源和P失败原件不覆盖，根docs只在Windows维护。
+
+新24份M端点7837240866字节保留Linux，原24份P端点和RMS权重/缓存继续保留；七份无真值应用输出122234401字节仅核对身份后留Linux，不向Windows复制账号候选载荷。真实文本、Memory、逐查询分数、权重及confirm未同步。正式运行源码和原始数值日志仍有复核用途，不删除。没有新核验脚本、临时模型或外审包，本轮免外审按已有范围执行。
+
+传输用两份临时清单 `result/download.json`（3313字节）和 `result/final_download.json`（2112字节）在映射合并并核对后，两端均已删除，各5425字节；精确大小/SHA及删除状态保留在sync记录。本轮一次保存字段汇总误指未建立镜像的失败保留于final_check，辅助保守计30秒，加三次必要汇总共34秒，不覆盖原控制器账或将其写成训练失败。当前交接原位更新、计划和设计入口清除已结束的自动接续措辞，本地提交不推送；局部收尾不重置11月6日大清理及11月21日到期。
+
 ## 2026-11-11 FIT12六条ER/Full接续与核验收尾
 
 19:06:17新增[只读进度快照](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/progress_20261111_190617.json)，10225字节、SHA256 `f5b805d80423c211a2d7e8a10b1106d7d211011cd4ba4a604368e0a8b0a90979`，SFTP回传后大小/SHA与Linux一致。核实唯一控制器及两活动worker身份、训练更新/验收/失败标志、GPU与同账费用；另只读seed51两份训练dispatch_receipt的seconds估计工期，未读M效果或载模。当前交接更新为本次时点，12:55原快照保留；计划与设计入口已核对有效范围、无待修正动态进度，不复制计数。未生成临时脚本或新增计算，不改冻结运行来源与账本，本地提交不推送。

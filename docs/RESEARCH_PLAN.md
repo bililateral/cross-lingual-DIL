@@ -4,15 +4,14 @@
 
 接手和日常同步按[工作流](RESEARCH_WORKFLOW.zh.md)使用一次性只读观察及具名SFTP核验；普通更新数变化不重复修改合同入口/计划。状态跃迁时核对受影响可变入口，保持活动冻结来源、历史原件和原判据。
 
-## VendorLink账号监督：FIT12共同协议
+## VendorLink账号监督：FIT12共同协议后续
 
-用户已确认[固定FIT12合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)实施、必要核验后条件开训，本轮免网页外审。直接复用[reference开发门通过](../reports/documentation/20261110/vendorlink_redesign/reference/report.zh.md)，不重复D；H保留RMS及完整多记录/历史机制，V1保持强分类读取，V_SET与H使用同一FIT12资料。三seed冷启动P六条检验逐域相近学习和平均3.5pp遗忘；通过才M六条，再按系统门决定C。新88累计小时/最多两路/无显存硬帽及OOM续领按合同执行，不借旧预算、不追加参数搜索。
+[原FIT12合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)与用户明确的[六条M补充](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)及[完整结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md)共同界定这轮有限开发比较。原P的STOP_LEARNING及5pp/3.5pp裁决保持；后续4pp和明确M许可不追认P通过。既定训练、评分和无真值应用范围已完成，不重启控制器，不因有剩余88h预算自动新增任务或开放confirm。
 
-保留[完整P结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/report.zh.md)及原失败裁决。用户11月11日已明确把新增学习均值要求改为4pp，并要求继续同配置同seed的ER/Full，按[接续补充](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)执行六条M，复用P对照，不重跑P或修改冻结记录。原明显遗忘前提不再阻止这次明确的M探索；旧3.5pp资格未满足仍报告，原效果幅度/初学/新域保护逐项评价，不自动开放confirm，不为取得预期结果调参。
+下一步应针对完整历史约束在当前RMS/FIT12母体上未增加保持这一具体缺口，区分已证实的同配置差异与尚未证实的教师目标、约束尺度、记忆覆盖原因。已保存历史标量有尺度线索，不能据此直接指定有效新参数；若用户要求进一步诊断或候选实验，先给有限范围、可证伪假设及资源/开放条件，沿用有效证据，不重复完整英文适配或大范围HPO。保留Full对外部方法的正向结果及Full−SEQ/ER的不利结果，不以候选发现输出挽回机制结论。
 
-新独立workspace/campaign仍共用原88h总账及整个FIT12根的32GiB磁盘帽。接续、累计费用、4pp及历史消费验收的必要CPU与[主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/implementation.zh.md)已闭合；未变训练、评分及GPU证据复用，按[新gate](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/gate.json)交由当前唯一控制器连续完成六条，不重启旧控制器或追加测试。M完整后沿原无真值候选输出安排，量化不利不以候选挽回；真实OOM与健康槽接续等原规则不变。
+RMS、P及M正式端点继续保留供有明确权限的必要核对，旧G4/CE/评分头失败和全部费用不追改。确认集保持关闭，已见开发结果不能变回独立验证。中文暂停和旧Evolution/ABC结案不动；当前状态仅维护交接对应项，本地提交不推送。
 
-RMS和本轮正式端点保留供必要核对，旧G4/CE/评分头失败与全部费用不追改。原阶段开放和故障规则保持历史身份，confirm未开；中文暂停及旧Evolution/ABC结案不动。当前状态仅交接对应项，本地提交不推送。
 ## Evolution：已结束路线与保留边界
 
 以下记录已结束路线的既有范围，不是当前待启动任务。用户当时接受方向咨询建议，明确“继续推进，采用双路同时运行”，并批准开发数据构建与固定96条fit语言判断。历史来源为[六轨迹执行范围](../reports/documentation/20261108/evolution_registered/execution/scope.zh.md)、[许可](../reports/documentation/20261108/evolution_registered/execution/authorization.json)及[实现证据](../reports/documentation/20261108/evolution_registered/execution/implementation.zh.md)；已核实结束状态见交接唯一Evolution项。原[30轨迹草案](../reports/documentation/20261108/evolution_registered/proposal.zh.md)只作来源，后续24条及24小时预算未获准。
