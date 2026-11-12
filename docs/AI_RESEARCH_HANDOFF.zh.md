@@ -6,15 +6,15 @@
 
 ### VendorLink账号监督共同评价
 
-- **目标与有效范围**：完整H在原论文账号监督应用中先学得接近VendorLink，再检验少忘旧域、旧域最终更强和新域保护。11月11日用户明确将新增学习均值5pp改4pp，并继续同配置/同三个seed的ER/Full，见[决定](RESEARCH_DISCUSSION.zh.md#2026-11-11保留p原裁决并继续同配置erfull)及[接续补充](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)。RMS/FIT12/V1、seed51/52/53、ABC/40epoch、88h=80/4/4/最多两路保持，同轮免外审。此次明确M不追改原P的STOP_LEARNING及3.5pp资格，不自动C。
-- **最新完成与主审**：11月12日09:54:19整批完成，09:57:36[现场观察](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/progress_20261112_095736.json)确认控制器及worker退出。六训练/六dev评分/应用均验收完整，0训练或评分失败/0退槽/无预算停止，共141840更新及92880历史群消费；C未运行。[完整结果与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md)：SEQ/ER/Full旧域最终O为86.3475/86.6435/85.6785%，F为1.1331/1.0672/1.4660pp。Full−SEQ的O −0.6690pp、遗忘增加0.3329pp、Agora −1.4857pp，三个seed方向均不利；Full−ER平均亦不利。Full对V_SET的O +5.5975pp、F减少1.7537pp、Agora +1.7956pp，三个seed均有利，但不能归因于新增历史机制。M科学状态STOP_NO_H_ADVANTAGE，执行状态EXPLORATORY_M_COMPLETE。
-- **最新改进诊断与主审**：用户11月12日确认并免审的[固定九端点诊断](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/scope.zh.md)已于10:52:18完成，10:53:27确认进程退出。三seed/原六历史群、16次固定dropout前向及确定性对照全部完整，0更新/0失败，未读dev/confirm/Agora；见[结果与单一改进建议](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/report.zh.md)。第一域尚无新学习时，eval自比MSE为0、train MSE为2.0762/2.1749/2.6095；学完Dream后Full/ER在记忆群上的确定性MSE均值0.0632/10.7280，局部正负排序均保持。Full确实保住记忆评分，却未转化为原dev优势；随机一致性要求已证实，性能损失唯一根因及新改动效果未证实。
-- **具体卡点与下一步**：Full相近学习通过，但保持与新域增益不成立；SEQ平均F仅1.1331pp，明显遗忘前提仍未满足。唯一优先候选是仅出生评分MSE使用确定性学生，保留当前学习/回放监督原随机模式、完整H结构与原系数；需处理实际SDPA dropout及激活检查点，不能简单全局eval。建议新增Full三seed、复用旧SEQ/ER/V/Full对照；具体实现、42h规划和后续审查/执行尚未授权，不自动训练或开confirm。小记忆误差不替代全候选能力，不能降低门或换seed/顺序制造优势。
-- **费用与保管**：原P/M含收尾共62小时47分54秒，原88h账和[原最终核对](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/final_check.json)不改。新诊断GPU主体148.5988秒，按退出观测上界保守计GPU220秒、辅助41秒，共261秒/新1h；见[收尾](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/closure.json)。24份M端点7837240866字节、P/RMS和七份应用载荷继续Linux保管；本次访问的九权重及来源/fit收尾SHA未变。诊断证据/报告两端具名同步，一次性脚本已Git精确保管后两端退役，无新训练权重或外审包；中文暂停不动，本地提交不推送。
+- **目标与有效范围**：完整H先学得接近VendorLink，再检验稳定少忘旧域、旧域最终更强和新域保护。用户11月12日确认确定性出生评分候选，并明确“直接免审吧，做完必要的测试后直接开始训练”，见[决定](RESEARCH_DISCUSSION.zh.md#2026-11-12批准确定性出生评分full候选并免审后开训)及[本轮合同](../reports/documentation/20261112/vendorlink_deterministic/scope.zh.md)。只新增Full seed51/52/53、ABC/40epoch、同RMS/FIT12；仅出生MSE学生无dropout，原当前/历史监督随机模式及系数/六群Memory保持。新独立42h=40训练/1GPU/1辅助、最多两路，无人为显存硬帽；不自动confirm、参数搜索或新增应用输出。
+- **已完成结果及卡点**：原六条M及后处理完整、0训练/评分失败，执行EXPLORATORY_M_COMPLETE、科学STOP_NO_H_ADVANTAGE；[结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md)中SEQ/ER/Full旧域O为86.3475/86.6435/85.6785%，F为1.1331/1.0672/1.4660pp。Full对SEQ/ER不利而对V_SET有外部优势，后者不能归因历史机制；原P的5pp/3.5pp失败与后续4pp决定分别保留。SEQ遗忘空间不足是新Full无法改变的独立限制。
+- **实现与正式运行**：[九端点诊断与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/report.zh.md)已完整结束；新候选[必要核验及主审](../reports/documentation/20261112/vendorlink_deterministic/implementation.zh.md)闭合，CPU四项一次通过、真实BERT单路核验通过，分别计辅助5/GPU10秒。11月12日12:00:46[单次启动](../reports/documentation/20261112/vendorlink_deterministic/launch.json)；[12:02:24现场](../reports/documentation/20261112/vendorlink_deterministic/launch_observation.json)核实控制器2969588及两worker2969599/2969600，属主/命令/cwd/内核start_ticks和boot身份对应，13来源保持。seed51/52各实际160次更新，均在AlphaBay首epoch，seed53待派；0完成、2运行、1待派，无失败/退休。整PID当时显存约3.02/3.00GiB、RSS各约1.99GiB；不是双路全程峰值。首域没有历史回放，正式确定性保持从第二域开始，当前作用证据来自必要核验；未查看新效果。
+- **下一步与费用**：同一控制器按2-worker上限继续，空槽领取seed53；三条完整后串行GPU评分、完整评分后一次CPU分析并结束，无confirm/应用接续。12:02:24已结training0/GPU10/auxiliary68秒，活动两条已用约195.7秒尚未落账，监管活动也仍累计，不能写实际训练消耗为0。新42h分桶不变；启动前规划27—33累计训练小时、双路18—24小时工期，暂估11月13日06:00—12:00训练结束，另留串行评分/分析时间，后两域实际吞吐及共享资源可改变估计。
+- **来源与保管**：新工作根为`reports/documentation/20261112/vendorlink_deterministic`，实际入口为Linux同根`workspace/scripts/step35_vendorlink_account_control.py`；[正式门](../reports/documentation/20261112/vendorlink_deterministic/gate.json)和[13来源](../reports/documentation/20261112/vendorlink_deterministic/final_sources.json)绑定Git `c902ada1`及通过回执。原P/M/诊断来源、结果及费用冻结，原权重保留；三条从预训练冷启动，原P/M含收尾62h47m54s及诊断261s各自保管。一次性核验脚本已精确Git恢复核对后两端退役，日志/费用保留；[同步](../reports/documentation/20261112/vendorlink_deterministic/sync.json)仅小证据，真实数据/Memory/权重留Linux。根docs留Windows，本地提交不推送。
 
 ### 历史权重版H主实验消融
 
-保持暂停，等待用户明确恢复。最近保存观测为11月10日10:16:16，PAUSED_IDLE、7完成/0活动/56待派，见[核对](../reports/documentation/20261109/vendorlink_account_protocol/result/check.json)；本轮未重新巡检。范围见[正式许可](../reports/documentation/20261107/h_ablation_start/authorization.json)、[暂停补充](../reports/documentation/20261107/h_ablation_pause/scope.zh.md)。不能因VendorLink运行恢复或删除marker；恢复须承接原队列及账本。
+保持暂停，等待用户明确恢复。[11月12日12:02:24只读核对](../reports/documentation/20261112/vendorlink_deterministic/launch_observation.json)仍为PAUSED_IDLE、7完成/0活动/56待派、无退休；暂停marker/continuation存在，监管1412412属主/命令/cwd/start_ticks匹配且无子进程。原已结训练84533.078403秒、辅助1563.688573秒、确认0不变。范围见[正式许可](../reports/documentation/20261107/h_ablation_start/authorization.json)、[暂停补充](../reports/documentation/20261107/h_ablation_pause/scope.zh.md)。不能因VendorLink运行恢复或删除marker；恢复须承接原队列及账本。
 
 ### 已结案研究线
 
@@ -32,7 +32,7 @@
 
 ### 文件保管与本轮交付
 
-[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。此前工作流整理批次的推送许可及实际交付保持历史身份，不扩展到后续新科研材料。本轮FIT12结果按已确认范围只作本地提交、不推送；运行来源、原始证据及清理恢复入口分别保管。
+[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。此前工作流整理批次的推送许可及实际交付保持历史身份，不扩展到后续新科研材料。本轮确定性Full按已确认范围只作本地提交、不推送；运行来源、原始证据及清理恢复入口分别保管。
 
 ## 近期执行与审查历史
 
@@ -520,7 +520,7 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 
 当前执行状态只看顶部表格；本节是证据导航。按本轮实际变化确定最小核验，未变且适用的证据可复用，不因换Agent递归重读或重跑全部历史。
 
-本次接手以顶部唯一对应项及[VendorLink执行安排](RESEARCH_PLAN.md#vendorlink账号监督当前执行安排)为准：当前推进已批准的账号监督D/P/M/C实验，来源、审查处置和实际入口由[设计入口](CURRENT_EXPERIMENT_DESIGN.md)定位。原固定全市场开发诊断已经完成，是当前问题的已见背景；Evolution和旧ABC按各自停止结论保持结束。先沿用已批准合同、充分核验和唯一活动控制器，只读核对真实状态，不重做资格、旧诊断或训练。新数据、候选、预算、判据、失败重试和外发包仍按其具体范围；中文消融暂停决定保持。
+本次接手以顶部唯一对应项及[VendorLink执行安排](RESEARCH_PLAN.md#vendorlink账号监督fit12共同协议后续)为准：当前推进已批准的确定性出生评分Full三条候选，原P/M及九端点诊断已完成，来源、主审处置和实际入口由[设计入口](CURRENT_EXPERIMENT_DESIGN.md)定位。Evolution和旧ABC按各自停止结论保持结束。沿用已批准合同、充分核验和唯一活动控制器，只读核对真实状态，不重做资格、旧诊断或训练。新数据、候选、预算、判据、失败重试和外发包仍按其具体范围；中文消融暂停决定保持。
 
 接手首先核对本地分支/工作区、当前文档与来源回执。涉及活动作业或资源时，按第7节只读核对精确Linux目录，不凭旧PID/摘要判断状态；纯文档接手更新不冒充新的服务器观测。旧的Windows资格例外已经完成，后续科研执行默认Linux既有py310。身份语义、未冻结分域、PGP计数勘误、原始结果优先及避免重复核验的具体边界均见上方计划；不要把已改写展示表中的H行当实测证据。
 

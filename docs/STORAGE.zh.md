@@ -1,5 +1,15 @@
 # 科研文件存储与恢复
 
+## 2026-11-12 确定性出生评分Full部署与核验收尾
+
+新独立根为Linux `/home/yongpeng/cross-lingual/reports/documentation/20261112/vendorlink_deterministic`；[范围](../reports/documentation/20261112/vendorlink_deterministic/scope.zh.md)、[实现核验/主审](../reports/documentation/20261112/vendorlink_deterministic/implementation.zh.md)、[正式门](../reports/documentation/20261112/vendorlink_deterministic/gate.json)、13份生产来源、资格原件和启动证据在本根保管。生产来源精确版本为Git `c902ada1`，五份修改、八份与旧M相同；正式运行使用本根workspace，不覆盖旧P/M来源。20项62777字节小证据通过具名SFTP双端核对大小/SHA，见[同步映射](../reports/documentation/20261112/vendorlink_deterministic/sync.json)；该清单自身6351字节、SHA256 `23e1866ca0a7c8b63ac5117dd3d99737bc071120f4449df19e2a8049b6925622`也一致。13份实际部署源码与Windows生产文件身份逐份相同。动态运行状态只在交接对应项维护。
+
+必要CPU四项及一次真实BERT GPU核验的result/stdout/stderr/receipt全部保留，无失败版本；CPU生命周期4.516809秒计辅助5秒，GPU9.592766秒计10秒。新42h账在本根campaign/budget.json，预置training0/GPU10/auxiliary35秒（CPU5＋保守部署核对30），原Ledger另计30秒收尾和实际监管；旧P/M、九端点诊断保持各自原账，不借额度或重置费用。本次用户明确免方案/实现外审，无网页或新上传包。
+
+一次性测试源码精确恢复点为`c902ada1:tests/verify_vendorlink_deterministic.py`，15623字节/SHA256 `e4d7eb3bfa2ef46d018e2712e71e740ff14f534f4e5166b2f525b7eae119e1ff`。Windows实际读取Git blob逐字节核对，见[恢复记录](../reports/documentation/20261112/vendorlink_deterministic/qualification/recovery.json)；[Windows回执](../reports/documentation/20261112/vendorlink_deterministic/qualification/cleanup_windows.json)和[Linux回执](../reports/documentation/20261112/vendorlink_deterministic/qualification/cleanup_linux.json)分别记录精确一份源码删除。Linux仅删除本根qualification/verify.py，先核最终路径/属主/普通文件/单硬链接、两个核验进程退出、非正式13来源；Windows仅删除工作区tests对应文件。原始上传清单继续作为发生时证据，不因临时文件退役而追改；正式门绑定通过回执，不依赖该脚本存在。恢复源码不授权重跑。
+
+原P/M/RMS端点、原数据和共享预训练全部保留；新正式紧凑端点及在用最新恢复状态仍只在Linux，完整轨迹验收后latest按原许可退役。真实正文、身份标签、Memory、逐查询分数和权重未回传，confirm未读。中文H暂停不动；根docs只维护Windows，本轮本地提交不推送。局部核验收尾不重置11月6日大清理和11月21日到期。
+
 ## 2026-11-12 历史评分随机模式诊断保管与退役
 
 [完整诊断与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/report.zh.md)、九端点/54群数值汇总、实际来源、CPU/启动/完成/费用及[收尾](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/closure.json)两端具名保管，映射见[sync](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/sync.json)。仅AlphaBay既有fit及原stage1六群索引用于重建，正文/账号/逐对分数只在Linux内存，不保存新载荷或回传；不读dev/confirm/Agora文本。九份实际访问权重收尾大小/SHA不变，全部原权重保留，新增训练权重0。原P/M结果、来源和88h费用不改；新诊断按独立1h许可收尾计261秒。
