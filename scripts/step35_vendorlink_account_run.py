@@ -76,7 +76,7 @@ def atomic_tensor(path, value, check, replace=False):
 
 
 def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
-    if job.exists() or asdict(model.settings) != task['settings'] or task['stages'] not in (1, 3):
+    if job.exists() or model.settings != AccountSettings(**task['settings']) or task['stages'] not in (1, 3):
         raise ValueError('Fresh fixed task and actual configuration required')
     job.mkdir(parents=True)
     seed, s = task['seed'], model.settings
@@ -87,6 +87,8 @@ def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
     diagnostics = {}
     workload = dict(current_ads=0, current_updates=0, history_ads=0, history_groups=0,
                     teacher_ads=0, teacher_groups=0)
+    if s.deterministic_history:
+        workload['deterministic_history_groups'] = 0
     base = dict(identity=identity, task=task, model_binding=binding)
     def save_endpoint(stage):
         value = dict(**base, stage=stage, updates=updates,
@@ -143,6 +145,10 @@ def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
                     if history is not None:
                         workload['history_groups'] += 1
                         workload['history_ads'] += sum(len(v.records) for v in history.views)
+                        if s.deterministic_history:
+                            if not logs.get('deterministic_birth', {}).get('deterministic'):
+                                raise ValueError('Deterministic birth branch was not executed')
+                            workload['deterministic_history_groups'] += 1
                     with (job/'updates.jsonl').open('a', encoding='utf-8') as f:
                         f.write(json.dumps(dict(stage=stage, epoch=epoch, stage_update=update, updates=updates, total_updates=updates,
                             current_ids=current, history_group=None if history is None else history.uid,

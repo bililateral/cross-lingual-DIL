@@ -6,6 +6,7 @@ import statistics
 from step29_vendorlink_methods import Settings
 
 PROTOCOL = 'vendorlink-account-fit12-mechanism-20261111'
+DETERMINISTIC_PROTOCOL = 'vendorlink-fit12-deterministic-history-20261112'
 DOMAINS = ('AlphaBay', 'Dream', 'Agora')
 SEEDS = (51, 52, 53)
 CAPS = dict(training=80*3600, gpu=4*3600, auxiliary=4*3600)
@@ -15,6 +16,8 @@ LIMITS = dict(workers=2, free_gpu_bytes=5*2**30, process_gpu_bytes=None,
               disk_bytes=32*2**30, free_disk_reserve=32*2**30, save_reserve_bytes=2*2**30,
               dispatch_free_disk_bytes=64*2**30)
 CELLS = ((0, 1), (1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3))
+DETERMINISTIC_CAPS = dict(training=40*3600, gpu=3600, auxiliary=3600)
+DETERMINISTIC_LIMITS = dict(LIMITS, disk_bytes=12*2**30)
 
 
 @dataclass(frozen=True)
@@ -25,6 +28,7 @@ class AccountSettings(Settings):
     auxiliary_lr: float = 3e-4
     ce_scale_mode: str = 'unit'
     diagnostics: bool = False
+    deterministic_history: bool = False
 
     def __post_init__(self):
         super().__post_init__()
@@ -34,6 +38,8 @@ class AccountSettings(Settings):
             raise ValueError('Only the frozen zero/one CE intervention is allowed')
         if self.ce_scale_mode not in ('unit', 'rms'):
             raise ValueError('Only unit or dimension-derived RMS input is defined')
+        if type(self.deterministic_history) is not bool or (self.deterministic_history and self.method != 'H_full'):
+            raise ValueError('Deterministic birth preservation is only defined for Full')
 
 
 def settings(candidate, method):
@@ -49,7 +55,9 @@ def settings(candidate, method):
         raise ValueError('Unknown fixed candidate')
     if candidate.startswith('V') != (method == 'VendorLink_SEQ'):
         raise ValueError('Candidate/method family mismatch')
-    return asdict(AccountSettings(method, **changes))
+    value = asdict(AccountSettings(method, **changes))
+    value.pop('deterministic_history')  # Preserve the exact prior task identities.
+    return value
 
 
 def tasks(phase, selection=None):
@@ -61,6 +69,37 @@ def tasks(phase, selection=None):
                  method=m, seed=s, epochs=40, stages=3, domains=list(DOMAINS),
                  settings=settings(selection['V' if m.startswith('Vendor') else 'H'], m))
             for s in SEEDS for m in methods]
+
+
+def deterministic_tasks(selection):
+    result = [t for t in tasks('M', selection) if t['method'] == 'H_full']
+    for task in result:
+        task['id'] = task['id'].replace('H_full_', 'H_full_det_')
+        task['settings']['deterministic_history'] = True
+    return result
+
+
+def deterministic_comparison(baseline, candidate):
+    """One fixed intervention; retain original gates and descriptive old-Full pairs."""
+    if set(candidate) != {'H_full'}:
+        raise ValueError('Only the three new Full trajectories may be analyzed')
+    original = decide(baseline, True)
+    combined = {**baseline, **candidate}
+    current = decide(combined, True)
+    pairs = {}
+    for comparator in ('H_full', 'H_ER', 'H_SEQ', 'V_CLS', 'V_SET'):
+        rows = []
+        for new, old in zip(candidate['H_full'], baseline[comparator], strict=True):
+            if new['seed'] != old['seed']:
+                raise ValueError('Same-seed comparisons required')
+            rows.append(dict(seed=new['seed'], O=new['O']-old['O'], F_reduction=old['F']-new['F'],
+                **{k: new[k]-old[k] for k in ('Q', 'R11', 'R22', 'R33', 'GB', 'GC')}))
+        pairs[comparator] = dict(rows=rows,
+            means={k: statistics.mean(r[k] for r in rows) for k in rows[0] if k != 'seed'},
+            positive_seeds={k: sum(r[k] > 0 for r in rows) for k in ('O', 'F_reduction', 'R33')})
+    return dict(status='DETERMINISTIC_HISTORY_EXPERIMENT_COMPLETE', original_M=original, candidate_M=current,
+                comparisons=pairs, confirmation=False, application=False, automatic_followup=False,
+                interpretation='Old-Full differences are descriptive; original effect/quality/forgetting gates remain separate')
 
 
 def select(development, baseline):

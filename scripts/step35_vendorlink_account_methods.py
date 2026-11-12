@@ -1,5 +1,6 @@
 """Current-account CE on the original H representation and encoder gradient path."""
-from dataclasses import asdict
+from contextlib import contextmanager
+from dataclasses import asdict, replace
 from pathlib import Path
 import math
 
@@ -8,8 +9,29 @@ from torch import nn
 from torch.nn import functional as F
 
 from step29_vendorlink_data import seed_for
-from step29_vendorlink_methods import Model, h_objective, make_optimizer
+from step29_vendorlink_methods import Model, assignment, h_pool, h_objective, make_optimizer
 from step29_vendorlink_run import rng_state, restore_rng, set_rates
+
+
+@contextmanager
+def deterministic_student(encoder):
+    """Keep BERT training/checkpointing, with zero dropout through recomputation."""
+    from transformers.models.bert.modeling_bert import BertSdpaSelfAttention
+    changed = []
+    device = next(encoder.parameters()).device
+    devices = [device.index or 0] if device.type == 'cuda' else []
+    with torch.random.fork_rng(devices=devices):
+        try:
+            for module in encoder.modules():
+                attribute = ('p' if isinstance(module, nn.Dropout) else
+                             'dropout_prob' if isinstance(module, BertSdpaSelfAttention) else None)
+                if attribute is not None:
+                    changed.append((module, attribute, getattr(module, attribute)))
+                    setattr(module, attribute, 0.)
+            yield
+        finally:
+            for module, attribute, value in changed:
+                setattr(module, attribute, value)
 
 
 class AccountModel(Model):
@@ -44,14 +66,11 @@ class AccountModel(Model):
         with torch.no_grad():
             values = self.table(z.detach())
         proxy = values.detach().requires_grad_(True)
-        loss, logs = h_objective(proxy, group, seed_for(step_seed, 'regroup'), self.settings, teacher, history)
+        objective_settings = (replace(self.settings, method='H_ER', deterministic_history=False)
+                              if history and self.settings.deterministic_history else self.settings)
+        loss, logs = h_objective(proxy, group, seed_for(step_seed, 'regroup'), objective_settings, teacher, history)
         gradient, = torch.autograd.grad(loss, proxy)
-        leaf = z.detach().requires_grad_(True)
-        i, j = torch.triu_indices(len(z), len(z), 1, device=z.device)
-        for k in range(0, len(i), 512):
-            check()
-            u, v = leaf[i[k:k+512]], leaf[j[k:k+512]]
-            self.head(torch.cat(((u-v).abs(), u*v), 1)).flatten().backward(gradient[k:k+512])
+        leaf = self.pair_backward(z, gradient, check)
         logs['record_gradient_H_norm'] = float(leaf.grad.detach().norm())
         if not history:
             if self.auxiliary_head is None or self.auxiliary_optimizer is None:
@@ -84,6 +103,36 @@ class AccountModel(Model):
         z.backward(leaf.grad)  # H + CE reach the same, single original encoder graph.
         return logs
 
+    def pair_backward(self, z, gradient, check):
+        leaf = z.detach().requires_grad_(True)
+        i, j = torch.triu_indices(len(z), len(z), 1, device=z.device)
+        for k in range(0, len(i), 512):
+            check()
+            u, v = leaf[i[k:k+512]], leaf[j[k:k+512]]
+            self.head(torch.cat(((u-v).abs(), u*v), 1)).flatten().backward(gradient[k:k+512])
+        return leaf
+
+    def backward_birth(self, group, teacher, check=lambda: None):
+        if not self.settings.deterministic_history or teacher is None:
+            raise ValueError('Deterministic Full and retained birth teacher required')
+        # The context covers z.backward: checkpoint recomputation must see p=0.
+        with deterministic_student(self.encoder):
+            z = self.records(group, check)
+            with torch.no_grad():
+                values = self.table(z.detach())
+            proxy = values.detach().requires_grad_(True)
+            slots = assignment(group)
+            target = h_pool(teacher.to(proxy), slots).detach()
+            mse = (h_pool(proxy, slots)-target).square().mean()
+            loss = self.settings.beta*mse
+            gradient, = torch.autograd.grad(loss, proxy)
+            leaf = self.pair_backward(z, gradient, check)
+            if leaf.grad is None or not torch.isfinite(leaf.grad).all():
+                raise ValueError('Missing/nonfinite deterministic preservation gradient')
+            z.backward(leaf.grad)
+            return dict(distillation=float(mse.detach()), weighted=float(loss.detach()),
+                        record_gradient_norm=float(leaf.grad.detach().norm()), deterministic=True)
+
 
 def gradient_norm(parameters):
     grads = [p.grad.detach().float().norm() for p in parameters if p.grad is not None]
@@ -107,6 +156,11 @@ def update_account(model, optimizer, current, history, teacher, step_seed, check
     logs['current_encoder_gradient_norm'] = gradient_norm(model.encoder.parameters())
     if history is not None:
         logs['history'] = model.backward_h(history, seed_for(step_seed, 'history'), teacher, True, check)
+        if model.settings.deterministic_history:
+            birth = model.backward_birth(history, teacher, check)
+            logs['deterministic_birth'] = birth
+            logs['history']['distillation'] = birth['distillation']
+            logs['history']['weighted'] += birth['weighted']
     logs['total_encoder_gradient_norm'] = gradient_norm(model.encoder.parameters())
     norm = torch.nn.utils.clip_grad_norm_(original+extra, 1., error_if_nonfinite=True)
     check()

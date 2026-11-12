@@ -10,7 +10,9 @@ import time
 from step30_evolution_control import Runner
 from step30_evolution_io import Ledger
 from step35_vendorlink_account_io import Check, SharedDiskLimit, PYTHON, pinned, record, write
-from step35_vendorlink_account_policy import PROTOCOL, DOMAINS, CAPS, LIMITS, tasks, decide, task_domains
+from step35_vendorlink_account_policy import (PROTOCOL, DOMAINS, CAPS, LIMITS, tasks, decide, task_domains,
+    DETERMINISTIC_PROTOCOL, DETERMINISTIC_CAPS, DETERMINISTIC_LIMITS,
+    deterministic_tasks, deterministic_comparison)
 
 SOURCES = tuple('step35_vendorlink_account_'+n+'.py' for n in ('io', 'policy', 'methods', 'run', 'evaluate', 'control'))+(
     'step29_vendorlink_data.py', 'step29_vendorlink_methods.py', 'step29_vendorlink_run.py',
@@ -19,6 +21,10 @@ SOURCES = tuple('step35_vendorlink_account_'+n+'.py' for n in ('io', 'policy', '
 
 def read(path):
     return json.loads(Path(path).read_text())
+
+
+def phase_tasks(g, selected):
+    return (deterministic_tasks(selected) if g['protocol'] == DETERMINISTIC_PROTOCOL else tasks('M', selected))
 
 
 def configure_compute():
@@ -37,6 +43,8 @@ def make_jobs(root, phase, specs, action):
         vendor = task['method'] == 'VendorLink_SEQ'
         hours = ((1.5 if vendor else 3) if phase == 'D' else
                  (4 if vendor else (6 if task['method'] == 'H_SEQ' else 10)))
+        if task['settings'].get('deterministic_history'):
+            hours = 13
         target = root/phase/('training' if action == 'train' else 'scoring')/task['id']
         out.append(dict(action=action, target=target, bucket='training' if action == 'train' else 'gpu',
             seconds=hours*3600 if action == 'train' else 900, extra=['--phase', phase, '--task', task['id']],
@@ -47,9 +55,12 @@ def make_jobs(root, phase, specs, action):
 
 def permit(path):
     g = read(path)
+    deterministic = g['protocol'] == DETERMINISTIC_PROTOCOL
+    caps, limits = (DETERMINISTIC_CAPS, DETERMINISTIC_LIMITS) if deterministic else (CAPS, LIMITS)
     if (sys.platform != 'linux' or Path(sys.executable).resolve() != Path(PYTHON).resolve()
-            or g['protocol'] != PROTOCOL or g['approved'] is not True or g['review_closed'] is not True
-            or g['caps'] != CAPS or g['limits'] != LIMITS or g['automatic_retry'] is not False
+            or g['protocol'] not in (PROTOCOL, DETERMINISTIC_PROTOCOL)
+            or g['approved'] is not True or g['review_closed'] is not True
+            or g['caps'] != caps or g['limits'] != limits or g['automatic_retry'] is not False
             or g['worker_failure_policy'] != 'retire_oom_continue_current_phase_no_retry'):
         raise ValueError('Reviewed source-bound approved account protocol required')
     expected = {Path(g['workspace']).resolve()/'scripts'/name for name in SOURCES}
@@ -77,6 +88,8 @@ def permit(path):
 
 def continued_baseline(g):
     """Bind the completed P and its costs without rewriting its failed decision."""
+    if g['protocol'] == DETERMINISTIC_PROTOCOL:
+        return deterministic_baseline(g)
     if g.get('continuation_after_p_stop') is not True:
         raise ValueError('Explicit six-task mechanism continuation required')
     prior = g['prior_P']
@@ -101,6 +114,30 @@ def continued_baseline(g):
     return baseline
 
 
+def deterministic_baseline(g):
+    """Read only already-opened P/M evidence; new budget does not erase old costs."""
+    p, m = g['prior_P'], g['prior_M']
+    pv = {k: read(pinned(p[k])) for k in ('gate', 'batch', 'decision', 'completion', 'budget', 'results')}
+    mv = {k: read(pinned(m[k])) for k in ('gate', 'batch', 'completion', 'budget', 'results')}
+    selected = dict(H='H_CE_RMS', V='V1')
+    if (pv['completion']['status'] != 'STOP_LEARNING'
+            or pv['completion']['P'] != pv['decision']
+            or pv['batch']['tasks'] != tasks('P', selected) or pv['batch']['gate'] != p['gate']
+            or mv['completion']['status'] != 'EXPLORATORY_M_COMPLETE'
+            or mv['completion']['confirmation'] is not False
+            or mv['batch']['tasks'] != tasks('M', selected) or mv['batch']['gate'] != m['gate']
+            or mv['gate']['prior_P'] != p or g['baseline'] != p['results']
+            or any(v['gate']['manifest'] != g['manifest'] or v['gate']['model_binding'] != g['model_binding']
+                   for v in (pv, mv))
+            or any(Path(v['gate']['experiment_root']).resolve() == Path(g['experiment_root']).resolve()
+                   for v in (pv, mv))):
+        raise ValueError('Completed unchanged P/M and identical scientific inputs required')
+    baseline = {**pv['results'], **mv['results']}
+    if decide(baseline, True) != mv['completion']['M']:
+        raise ValueError('Old M decision or complete baseline differs')
+    return baseline
+
+
 def validate_training(task, result, manifest, identity):
     if (result['task'] != task or result['identity'] != identity
             or result['status'] != 'TRAINING_COMPLETE_EVALUATION_CLOSED'
@@ -119,6 +156,9 @@ def validate_training(task, result, manifest, identity):
         if (result['workload']['history_groups'] != history_updates
                 or result['workload']['history_ads'] <= 0 or result['workload']['teacher_groups'] <= 0):
             raise ValueError('Every later-domain update must actually consume retained history')
+        if (task['settings'].get('deterministic_history') and
+                result['workload'].get('deterministic_history_groups') != history_updates):
+            raise ValueError('Every history update must execute the deterministic birth branch')
     for b in result['endpoints'].values():
         pinned(b)
     if task['settings'].get('diagnostics'):
@@ -128,7 +168,7 @@ def validate_training(task, result, manifest, identity):
             pinned(b)
 
 
-def pipeline(run_phase, save, baseline, measure=lambda name: nullcontext()):
+def pipeline(run_phase, save, baseline, measure=lambda name: nullcontext(), deterministic=False):
     admission = decide(baseline)
     if not admission['checks']['learning']:
         raise ValueError('Fixed completed P learning requirement failed')
@@ -138,6 +178,12 @@ def pipeline(run_phase, save, baseline, measure=lambda name: nullcontext()):
         save('continuation_basis', dict(learning_gain_min=.04, original_P_unchanged=True,
              baseline_checks=admission['checks'], meaningful_forgetting_required_for_this_M=False))
     m = run_phase('M', selected)
+    if deterministic:
+        with measure('deterministic_comparison'):
+            result = deterministic_comparison(baseline, m)
+            save('deterministic_comparison', result)
+            save('comparison_results', dict(baseline=baseline, candidate=m))
+        return result
     with measure('decide_M'):
         combined = {**baseline, **m}
         m_gate = decide(combined, True)
@@ -152,12 +198,12 @@ def worker(g, args):
     from step35_vendorlink_account_run import make_model, execute
     from step35_vendorlink_account_evaluate import score, analyze
     root, campaign = Path(g['experiment_root']), Path(g['campaign'])
-    check = Check(root, max(1, args.deadline-time.monotonic()))
+    check = Check(root, max(1, args.deadline-time.monotonic()), g['limits'])
     manifest = read(pinned(g['manifest']))
     if args.phase != 'M':
         raise ValueError('This continuation only runs M; P is reused and confirmation remains closed')
     batch = read(campaign/args.phase/'batch.json')
-    expected = tasks('M', batch['selected'])
+    expected = phase_tasks(g, batch['selected'])
     if batch['tasks'] != expected or batch['manifest'] != g['manifest'] or batch['gate'] != record(args.gate):
         raise ValueError('Frozen batch identity mismatch')
     if args.action in ('train', 'score', 'application'):
@@ -167,7 +213,7 @@ def worker(g, args):
     if args.action in ('train', 'score'):
         task = next(t for t in expected if t['id'] == args.task)
         origin = campaign/task['phase']/'training'/task['id']/'run'
-        identity = dict(protocol=PROTOCOL, task=task, manifest=g['manifest'], gate=record(args.gate))
+        identity = dict(protocol=g['protocol'], task=task, manifest=g['manifest'], gate=record(args.gate))
         if args.action == 'train':
             requested = []
             def load_fit(domain):
@@ -202,6 +248,8 @@ def worker(g, args):
             raise ValueError('Incomplete whole scoring batch')
         analyze([read(pinned(b)) for b in completed['completions']], expected, args.target/'result')
     elif args.action == 'application':
+        if g['protocol'] == DETERMINISTIC_PROTOCOL:
+            raise ValueError('This intervention does not authorize another application batch')
         if args.target != campaign/'application':
             raise ValueError('Wrong application destination')
         from step35_vendorlink_account_evaluate import application
@@ -218,8 +266,8 @@ def campaign(g, gate_path, started=None):
     if root.exists():
         raise ValueError('No duplicate controller or automatic campaign restart')
     root.mkdir(parents=True)
-    ledger = Ledger(root, g['prior_seconds'], g['cpu_test_seconds'], caps=CAPS)
-    runner = Runner(g, gate_path, root, ledger, worker_entry=Path(__file__), caps=CAPS, limits=LIMITS,
+    ledger = Ledger(root, g['prior_seconds'], g['cpu_test_seconds'], caps=g['caps'])
+    runner = Runner(g, gate_path, root, ledger, worker_entry=Path(__file__), caps=g['caps'], limits=g['limits'],
                     halt_dispatch_on_failure=True, continue_after_oom=True)
     manifest = read(pinned(g['manifest']))
     ledger.charge('auxiliary', 'controller_setup', time.monotonic()-started, True)
@@ -233,7 +281,7 @@ def campaign(g, gate_path, started=None):
         if job['action'] == 'train':
             c = read(job['target']/'run/completion.json')
             task = c['task']
-            identity = dict(protocol=PROTOCOL, task=task, manifest=g['manifest'], gate=record(gate_path))
+            identity = dict(protocol=g['protocol'], task=task, manifest=g['manifest'], gate=record(gate_path))
             validate_training(task, c, manifest, identity)
             latest = job['target']/'run/latest.pt'
             old = record(latest)
@@ -251,13 +299,14 @@ def campaign(g, gate_path, started=None):
         if phase != 'M':
             raise ValueError('Only the six fixed mechanism tasks may be dispatched')
         with measure(phase+'_freeze'):
-            specs = tasks('M', selected)
+            specs = phase_tasks(g, selected)
             write(root/phase/'batch.json', dict(tasks=specs, selected=selected, manifest=g['manifest'], gate=record(gate_path)))
         runner.run_many(make_jobs(root, phase, specs, 'train'), 2, complete)
         with measure(phase+'_training_manifest'):
             training = [record(root/t['phase']/'training'/t['id']/'run/completion.json') for t in specs]
             write(root/phase/'training_complete.json', dict(tasks=specs, completions=training))
-        runner.run_many(make_jobs(root, phase, specs, 'score'), 2, complete)
+        runner.run_many(make_jobs(root, phase, specs, 'score'),
+                        1 if g['protocol'] == DETERMINISTIC_PROTOCOL else 2, complete)
         with measure(phase+'_scoring_manifest'):
             scoring = [record(root/phase/'scoring'/t['id']/'result/completion.json') for t in specs]
             write(root/phase/'scoring_complete.json', dict(tasks=specs, completions=scoring))
@@ -268,7 +317,7 @@ def campaign(g, gate_path, started=None):
             return read(root/phase/'analysis/result/results.json')
     try:
         result = pipeline(run_phase, lambda name, value: write(root/'decisions'/f'{name}.json', value),
-                          continued_baseline(g), measure)
+                          continued_baseline(g), measure, deterministic=g['protocol'] == DETERMINISTIC_PROTOCOL)
         with measure('quantitative_completion'):
             write(root/'quantitative_completion.json', result)
         if result['application']:

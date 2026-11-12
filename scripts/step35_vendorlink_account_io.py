@@ -14,8 +14,9 @@ class SharedDiskLimit(RuntimeError):
 
 
 class Check:
-    def __init__(self, root, seconds):
+    def __init__(self, root, seconds, limits=None):
         self.root = Path(root)
+        self.limits = LIMITS if limits is None else limits
         self.started = time.monotonic()
         self.deadline = self.started + seconds
         self.peak_rss = 0
@@ -28,10 +29,10 @@ class Check:
         self.peak_rss = max(self.peak_rss, psutil.Process().memory_info().rss)
         if now >= self.deadline - 5:
             raise TimeoutError('Worker lifecycle deadline')
-        if self.peak_rss > LIMITS['rss_bytes']:
+        if self.peak_rss > self.limits['rss_bytes']:
             raise RuntimeError('Worker RSS cap')
         if now - self.last_disk > 5:
             self.last_disk = now
-            if (directory_bytes(self.root) > LIMITS['disk_bytes']
-                    or shutil.disk_usage(self.root).free < LIMITS['free_disk_reserve']):
+            if (directory_bytes(self.root) > self.limits['disk_bytes']
+                    or shutil.disk_usage(self.root).free < self.limits['free_disk_reserve']):
                 raise SharedDiskLimit('Experiment disk cap/reserve')
