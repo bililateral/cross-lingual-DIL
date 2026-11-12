@@ -10,7 +10,7 @@
 - **已完成结果及卡点**：原六条M及后处理完整、0训练/评分失败，执行EXPLORATORY_M_COMPLETE、科学STOP_NO_H_ADVANTAGE；[结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md)中SEQ/ER/Full旧域O为86.3475/86.6435/85.6785%，F为1.1331/1.0672/1.4660pp。Full对SEQ/ER不利而对V_SET有外部优势，后者不能归因历史机制；原P的5pp/3.5pp失败与后续4pp决定分别保留。SEQ遗忘空间不足是新Full无法改变的独立限制。
 - **实现与正式运行**：[九端点诊断与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/report.zh.md)已完整结束；新候选[必要核验及主审](../reports/documentation/20261112/vendorlink_deterministic/implementation.zh.md)闭合，CPU四项一次通过、真实BERT单路核验通过，分别计辅助5/GPU10秒。11月12日12:00:46[单次启动](../reports/documentation/20261112/vendorlink_deterministic/launch.json)；[12:02:24现场](../reports/documentation/20261112/vendorlink_deterministic/launch_observation.json)核实控制器2969588及两worker2969599/2969600，属主/命令/cwd/内核start_ticks和boot身份对应，13来源保持。seed51/52各实际160次更新，均在AlphaBay首epoch，seed53待派；0完成、2运行、1待派，无失败/退休。整PID当时显存约3.02/3.00GiB、RSS各约1.99GiB；不是双路全程峰值。首域没有历史回放，正式确定性保持从第二域开始，当前作用证据来自必要核验；未查看新效果。
 - **下一步与费用**：同一控制器按2-worker上限继续，空槽领取seed53；三条完整后串行GPU评分、完整评分后一次CPU分析并结束，无confirm/应用接续。12:02:24已结training0/GPU10/auxiliary68秒，活动两条已用约195.7秒尚未落账，监管活动也仍累计，不能写实际训练消耗为0。新42h分桶不变；启动前规划27—33累计训练小时、双路18—24小时工期，暂估11月13日06:00—12:00训练结束，另留串行评分/分析时间，后两域实际吞吐及共享资源可改变估计。
-- **来源与保管**：新工作根为`reports/documentation/20261112/vendorlink_deterministic`，实际入口为Linux同根`workspace/scripts/step35_vendorlink_account_control.py`；[正式门](../reports/documentation/20261112/vendorlink_deterministic/gate.json)和[13来源](../reports/documentation/20261112/vendorlink_deterministic/final_sources.json)绑定Git `c902ada1`及通过回执。原P/M/诊断来源、结果及费用冻结，原权重保留；三条从预训练冷启动，原P/M含收尾62h47m54s及诊断261s各自保管。一次性核验脚本已精确Git恢复核对后两端退役，日志/费用保留；[同步](../reports/documentation/20261112/vendorlink_deterministic/sync.json)仅小证据，真实数据/Memory/权重留Linux。根docs留Windows，本地提交不推送。
+- **来源与保管**：新工作根为`reports/documentation/20261112/vendorlink_deterministic`，实际入口为Linux同根`workspace/scripts/step35_vendorlink_account_control.py`；[正式门](../reports/documentation/20261112/vendorlink_deterministic/gate.json)和[13来源](../reports/documentation/20261112/vendorlink_deterministic/final_sources.json)绑定Git `c902ada1`及通过回执。原P/M/诊断来源、结果及费用冻结，原权重保留；三条从预训练冷启动，原P/M含收尾62h47m54s及诊断261s各自保管。一次性核验脚本已精确Git恢复核对后两端退役，日志/费用保留；[同步](../reports/documentation/20261112/vendorlink_deterministic/sync.json)仅小证据，真实数据/Memory/权重留Linux。根docs留Windows；Git交付按下方本轮最新推送授权执行。
 
 ### 历史权重版H主实验消融
 
@@ -32,7 +32,7 @@
 
 ### 文件保管与本轮交付
 
-[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。此前工作流整理批次的推送许可及实际交付保持历史身份，不扩展到后续新科研材料。本轮确定性Full按已确认范围只作本地提交、不推送；运行来源、原始证据及清理恢复入口分别保管。
+[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。11月12日用户已[批准纪律必要修订及全部本地提交推送](RESEARCH_DISCUSSION.zh.md#2026-11-12批准纪律歧义修订及全部本地提交推送)，本次交付包括当前科研分支此前未推送成果和本轮修订，替代这些提交原本地交付限定，不扩大到未来新提交或其他分支。纪律第2/4/5/6/8/9/10节及AGENTS对应入口已澄清；工作流、设计入口和计划按职责检查，无需复制条款。运行来源、原始证据及清理恢复入口分别保管，未改Linux活动作业；推送成功以实际远端ref核对为准。
 
 ## 近期执行与审查历史
 
