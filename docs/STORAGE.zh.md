@@ -2,6 +2,8 @@
 
 ## 2026-11-12 确定性出生评分Full部署与核验收尾
 
+21:34:13新增[只读进度快照](../reports/documentation/20261112/vendorlink_deterministic/progress_20261112_213413.json)，7382字节、SHA256 `fada3e234ca2df3b1c0cac02400b96cc7876a87d19fd56727e397f8d15c18601`，SFTP回传并核对大小/SHA。仅运行身份、训练计数/完成验收标志、GPU、账本及阶段文件是否存在；另只读两份已完成dispatch_receipt的seconds及stage端点文件mtime估计工期，不读取模型或新效果。快照kernel_identity中worker无start_ticks/boot_id预存基准，boot_matches=false不能解释为身份不符；其五项进程身份均匹配，控制器内核基准也匹配，未据缺失字段干预作业。当前交接原位更新，计划/设计入口接续逻辑仍适用，无新测试、临时脚本或载荷。本次新增记录本地提交，上一轮全部提交已推送的事实不扩大为本次新推送许可。
+
 新独立根为Linux `/home/yongpeng/cross-lingual/reports/documentation/20261112/vendorlink_deterministic`；[范围](../reports/documentation/20261112/vendorlink_deterministic/scope.zh.md)、[实现核验/主审](../reports/documentation/20261112/vendorlink_deterministic/implementation.zh.md)、[正式门](../reports/documentation/20261112/vendorlink_deterministic/gate.json)、13份生产来源、资格原件和启动证据在本根保管。生产来源精确版本为Git `c902ada1`，五份修改、八份与旧M相同；正式运行使用本根workspace，不覆盖旧P/M来源。20项62777字节小证据通过具名SFTP双端核对大小/SHA，见[同步映射](../reports/documentation/20261112/vendorlink_deterministic/sync.json)；该清单自身6351字节、SHA256 `23e1866ca0a7c8b63ac5117dd3d99737bc071120f4449df19e2a8049b6925622`也一致。13份实际部署源码与Windows生产文件身份逐份相同。动态运行状态只在交接对应项维护。
 
 必要CPU四项及一次真实BERT GPU核验的result/stdout/stderr/receipt全部保留，无失败版本；CPU生命周期4.516809秒计辅助5秒，GPU9.592766秒计10秒。新42h账在本根campaign/budget.json，预置training0/GPU10/auxiliary35秒（CPU5＋保守部署核对30），原Ledger另计30秒收尾和实际监管；旧P/M、九端点诊断保持各自原账，不借额度或重置费用。本次用户明确免方案/实现外审，无网页或新上传包。
