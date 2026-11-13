@@ -8,6 +8,8 @@ CPU与源身份按[sync](../reports/documentation/20261113/h_ablation_retry_s6/s
 
 本地提交`038a646dd5bdc30b4c842006c93095f9ae7668a9`保管实际各版核验源码及未上传ZIP；从Git原始blob逐份核大小/SHA与执行版本一致后，已按[Windows回执](../reports/documentation/20261113/h_ablation_retry_s6/cleanup.json)删除本次8份无用核验/来源副本、模板及免审后无用ZIP，共156282字节；Linux按[回执](../reports/documentation/20261113/h_ablation_retry_s6/cleanup_linux.json)删除同7份（没有ZIP）共56188字节，活动包装/主审/授权及原绑定来源前后不变。CPU01/02各自源码和最终预算核验可从该commit对应路径精确恢复，原同步清单保留清理前事实，不追改。运行入口、正式request、所有通过/失败和费用原件继续保留；未删除模型或其他研究线资产，没有启动网页会话。Git仅本地，用户已有结果表修改保持未提交；局部收尾不重置大清理周期。
 
+排空后原失败目录7文件33030字节已原样移至Linux campaign内`attempts/ABC_s6_ER/attempt0`，前后大小/SHA一致；完整实际路径与原规范路径映射见[回执](../reports/documentation/20261113/h_ablation_retry_s6/state/attempt_resolution.json)，没有删除其旧访问/失败内容或费用。新尝试使用全新规范目录；原成功任务和Full27不移动。β旧wait目录原样保留在其原root下`wait_before_chinese_retry_s6`，新依赖gate另存、不覆盖原gate/launch。随后[首更/身份/归档/费用核对与新门](../reports/documentation/20261113/h_ablation_retry_s6/final_sync.json)共9项具名SFTP回传并逐份核大小/SHA一致，新βgate按原Linux对应目录保管，未另造同内容副本；回传内容限技术元数据，不含失败startup/正式标签/模型载荷。临时只读观察在首更后结束，无额外常驻监听。
+
 ## 2026-11-13 晚间运行进度证据
 
 本轮只读核对中文消融及既有β等待进程，Linux保存[具名观测](../reports/documentation/20261113/h_ablation_resume/progress_20261113_193435.json)，通过SFTP回传同名Windows路径，22397字节、SHA256 `23ad45a514c4d8f57d240070908dc528739d1e5b16b5bb9e2e38c4b71865fec6`逐项一致。内容限定实际进程身份、更新计数、成功/失败调度回执、OOM技术诊断及资源/费用元数据；未读取或回传科学效果、标签、正文、Memory或权重。原始旧观测保留，当前状态仅原位更新交接；未写活动账本、改运行源码或操作已有进程。SSH/SFTP均已退出，没有生成临时脚本、下载副本或压缩包，没有删除模型。用户结果表已有修改继续保留、不纳入本次提交；本轮仅本地Git，不沿用旧推送许可。局部记录更新不重置大清理周期。
