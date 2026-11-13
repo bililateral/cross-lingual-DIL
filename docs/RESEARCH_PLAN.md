@@ -4,6 +4,8 @@
 
 接手和日常同步按[工作流](RESEARCH_WORKFLOW.zh.md)使用一次性只读观察及具名SFTP核验；普通更新数变化不重复修改合同入口/计划。状态跃迁时核对受影响可变入口，保持活动冻结来源、历史原件和原判据。
 
+中文消融本轮已出现单任务技术失败，后续仍按原规则由健康槽继续固定队列，失败槽退休、不自动重试；完整性未满足就不进入确认、分析或依赖它的β探针。β现有唯一等待保留，不能以健康队列排空代替完整成功；若需补失败轨迹或改变前置条件，先明确新的处置范围。实际故障、当前身份及预算只见交接与原始观测，不修改冻结合同。
+
 ## VendorLink账号监督：FIT12共同协议后续
 
 [原FIT12合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)与用户明确的[六条M补充](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)及[完整结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md)共同界定这轮有限开发比较。原P的STOP_LEARNING及5pp/3.5pp裁决保持；后续4pp和明确M许可不追认P通过。既定训练、评分和无真值应用范围已完成，不重启控制器，不因有剩余88h预算自动新增任务或开放confirm。
