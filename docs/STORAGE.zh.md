@@ -1,5 +1,23 @@
 # 科研文件存储与恢复
 
+## 2026-11-13 VendorLink指定权重及早期GPU状态清理
+
+按用户先选中P/M/新Full60份、再明确追加早期18份GPU状态的[具体指令](RESEARCH_DISCUSSION.zh.md#2026-11-13明确删除vendorlink部分权重及早期gpu核验状态)，Linux于11:09:35完成逐文件删除。精确路径、大小、SHA、属主/inode、实际删除时间及前后核对保留在[原始回执](../reports/documentation/20261113/vendorlink_weight_cleanup/receipt.json)，同字节保管于Linux同名目录；312139字节、SHA256 `ac296ac950905dd80fe2d5395a2dc0e75e4b1ab7cb23050d12a8e4398427b642`已具名SFTP回传并在Windows核对。
+
+| 实际删除对象 | 文件数 | 字节 |
+|---|---:|---:|
+| FIT12 P：H_SEQ、VendorLink_SEQ，各seed51/52/53、stage0—3 | 24 | 7845094494 |
+| FIT12 M：H_ER、旧H_full，各seed51/52/53、stage0—3 | 24 | 7837240866 |
+| 确定性出生评分Full：seed51/52/53、stage0—3 | 12 | 3918621201 |
+| 10月29—30日原生VendorLink G1短测/恢复检查完整状态 | 18 | 23432023643 |
+| 合计 | 78 | 43032980204（40.0776GiB） |
+
+删除限于原P、M及确定性Full的三个campaign内具名端点，以及10月29/30日`vendorlink/native/qualification/g1`内具名状态，逐文件unlink、未递归删目录。78份均为当前用户所有的普通单硬链接文件，最终路径在对应根内，无相关活动进程；60正式端点实际SHA与各自成功completion保存值逐份相同，18早期状态记录删除前实际SHA。删除后全部78路径不存在；544份非权重文件元数据、其中118份必要内容SHA，以及19项完成/门/来源绑定证据不变。原ABC36和RMS6共42份权重的大小、mtime、inode等元数据不变；两份fit特征缓存、共享BERT及中文H资产不在删除范围。Windows对应实验根未发现训练权重文件，因此本端模型删除0。未新建权重备份或搬运模型，未载模、解析标签或Memory载荷；正式训练Memory摘要等单独证据保留，早期完整状态内的优化器/RNG等随这18份已退役文件一并删除。
+
+早期18份来自10月29日9GiB上限下首次G1尝试及10月30日放开该上限后的单路G1核验，用于四方法短更新和恢复/重复更新比较，不是18条完整正式训练。原失败1次有效更新、后续G1通过15次及用户“按单路资格结案”决定见[资格汇总](../reports/documentation/20261030/vendorlink/native/received/result_summary.json)和原日志。此前清理未覆盖这18份，是已结束核验的收尾遗漏；通过/失败、恢复比较及源码记录仍保留，无未决G2或必要恢复用途。正式源码和历史结果不因本次删除追改，SHA不能恢复已删模型，恢复源码也不授权重训或重跑资格。
+
+原ABC36是11月4日18:30完成的四方法/三市场原批次在ABC顺序的保留部分（4方法×3seed×3阶段），当时[删除BCA/CAB72并保留ABC](../reports/seller_alias_continual/20261104/vendorlink_result/cleanup_scope.zh.txt)供英文前置评价；11月7日前置门停止后，11月8日[两SEQ全市场池诊断](../reports/documentation/20261108/vendorlink_fullpool/scope.zh.md)及[ER/Full同池补齐](../reports/documentation/20261108/vendorlink_fullpool/history/scope.zh.md)也实际使用了这些权重。上述用途均结束，当前无已批准后续加载任务；本次用户询问用途，未选中ABC36或RMS6删除，故保留。完整结果、审查、原失败及累计费用继续保管，本次文件管理不改正式账。根docs仅更新Windows，本地提交不推送；本轮为局部清理，不重置11月6日大清理及11月21日到期。
+
 ## 2026-11-13 中文H消融原队列恢复
 
 用户明确恢复中文消融，既有监管/原workspace/原账继续使用。[恢复前核对](../reports/documentation/20261113/h_ablation_resume/preflight.json)、[原resume入口回执](../reports/documentation/20261113/h_ablation_resume/resume.json)、[三条首更新观察](../reports/documentation/20261113/h_ablation_resume/observation.json)在Linux同名独立证据目录保管，共3份61974字节，经具名SFTP回传后逐份核大小/SHA。它们不替代原正式门、batch、暂停及continuation原件，不另造活动状态；当前唯一进度维护交接对应小节。实际入口只解除原pause_dispatch并写原last_request，没有新控制器或科研来源变更。
