@@ -4,7 +4,9 @@
 
 [本次独立目录](../reports/documentation/20261113/h_ablation_retry_s6/scope.zh.md)保管单条重试授权、限定免审、CPU01/02/03、独立主审、正式request及实际接管证据；运行包装在同根workspace/scripts/retry_once.py，调用原已审freeze/drain和原controller/dispatch，不覆盖活动50科研来源。原失败目录在实际排空后才整体原样归档，后续资产路径和实际发生状态见运行回执，不提前声称已移动或开训。Full27、原成功端点及现有worker均保护。
 
-CPU与源身份按[sync](../reports/documentation/20261113/h_ablation_retry_s6/sync.json)核对11项，正式接管来源/小回执按[deployment_sync](../reports/documentation/20261113/h_ablation_retry_s6/deployment_sync.json)核对16项，具名SFTP与Windows大小/SHA一致；root docs只在Windows更新，正文/标签/预测/Memory/权重不回传。准备原始区间及子账单独保留，1380秒已在接管时一次进入原辅助账，CPU7秒不另加；预算不扩大。100094字节具体包获本次免审后未上传，属于后续常规收尾对象；当前运行包装、request/主审及必要证据保留，核验源码先保管精确版本再退役，不留无恢复入口的CPU来源。Git仅本地，用户已有结果表修改保持未提交；局部收尾不重置大清理周期。
+CPU与源身份按[sync](../reports/documentation/20261113/h_ablation_retry_s6/sync.json)核对11项，正式接管来源/小回执按[deployment_sync](../reports/documentation/20261113/h_ablation_retry_s6/deployment_sync.json)核对16项，具名SFTP与Windows大小/SHA一致；root docs只在Windows更新，正文/标签/预测/Memory/权重不回传。准备原始区间及子账单独保留，1380秒已在接管时一次进入原辅助账，CPU7秒不另加；预算不扩大。
+
+本地提交`038a646dd5bdc30b4c842006c93095f9ae7668a9`保管实际各版核验源码及未上传ZIP；从Git原始blob逐份核大小/SHA与执行版本一致后，已按[Windows回执](../reports/documentation/20261113/h_ablation_retry_s6/cleanup.json)删除本次8份无用核验/来源副本、模板及免审后无用ZIP，共156282字节；Linux按[回执](../reports/documentation/20261113/h_ablation_retry_s6/cleanup_linux.json)删除同7份（没有ZIP）共56188字节，活动包装/主审/授权及原绑定来源前后不变。CPU01/02各自源码和最终预算核验可从该commit对应路径精确恢复，原同步清单保留清理前事实，不追改。运行入口、正式request、所有通过/失败和费用原件继续保留；未删除模型或其他研究线资产，没有启动网页会话。Git仅本地，用户已有结果表修改保持未提交；局部收尾不重置大清理周期。
 
 ## 2026-11-13 晚间运行进度证据
 
