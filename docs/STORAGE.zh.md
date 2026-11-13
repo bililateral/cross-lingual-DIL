@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-13 中文H消融原队列恢复
+
+用户明确恢复中文消融，既有监管/原workspace/原账继续使用。[恢复前核对](../reports/documentation/20261113/h_ablation_resume/preflight.json)、[原resume入口回执](../reports/documentation/20261113/h_ablation_resume/resume.json)、[三条首更新观察](../reports/documentation/20261113/h_ablation_resume/observation.json)在Linux同名独立证据目录保管，共3份61974字节，经具名SFTP回传后逐份核大小/SHA。它们不替代原正式门、batch、暂停及continuation原件，不另造活动状态；当前唯一进度维护交接对应小节。实际入口只解除原pause_dispatch并写原last_request，没有新控制器或科研来源变更。
+
+50份冻结科研来源及3份活动控制源码、小资格/授权/输入元数据已现检SHA；原Full27份权重现检属主及大小，未重算大权重哈希/载模。原7成功回执前后保持，21份原消融端点、Full27和其他资产继续保护，新三任务在原training目录产物留Linux。未读取效果、正文、标签、Memory或确认数据。原辅助桶暂停费用继续累计，未扩预算、手改活动账或清零；纯观察准备的终端命令没有保存为测试脚本，不新增CPU/GPU资格。无临时脚本、外审包或模型搬运，本轮本地提交不推送；不重置大清理周期。
+
 ## 2026-11-13 确定性Full结果回传与审查保管
 
 三条确定性Full的[结果与主审分析](../reports/documentation/20261112/vendorlink_deterministic/result/report.zh.md)、原始完成/判定/费用、27格13指标、原P/M配对统计和数值历史摘要等30项498431字节已具名SFTP回传，逐项大小/SHA与[接收清单](../reports/documentation/20261112/vendorlink_deterministic/result/receive.json)一致。该清单13376字节、SHA256 `ecc5a8ee333cc76b2a44d301ae710fd9ce1e7466a04adf344a0b8f5f24477b8d`也核对。报告和所引小证据镜像留Linux本根result，原campaign/gate/来源/结果/账本不覆盖。统计和日志数值汇总在既有py310完成，不加载模型、预测数组或标签；Windows只作身份/保存字段对应核对、编辑和文件管理。

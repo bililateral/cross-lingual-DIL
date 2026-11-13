@@ -12,7 +12,7 @@
 
 判读区分此前固定参数诊断中的模式附加目标、正式出生分支产生目标/梯度，以及dev能力的实际变化；新候选效果已知，不再写为待验证。对旧Full的局部改善没有达到相对ER/SEQ的O/F、初学和新域联合要求；SEQ明显遗忘不足也未改变。若以后继续，先明确可区分的机制问题及有实际场景理由、共同作用于对手的应用压力条件；不自动换β、记忆规模或种子，不追改本轮P/M负结果。
 
-RMS、P及M正式端点继续保留供有明确权限的必要核对，旧G4/CE/评分头失败和全部费用不追改。确认集保持关闭，已见开发结果不能变回独立验证。中文暂停和旧Evolution/ABC结案不动；当前状态仅维护交接对应项，本地提交不推送。
+RMS、P及M正式端点继续保留供有明确权限的必要核对，旧G4/CE/评分头失败和全部费用不追改。确认集保持关闭，已见开发结果不能变回独立验证。中文消融按11月13日独立恢复决定接续，旧Evolution/ABC结案不动；当前状态仅维护交接对应项，本地提交不推送。
 
 ## Evolution：已结束路线与保留边界
 
@@ -28,11 +28,11 @@ RMS、P及M正式端点继续保留供有明确权限的必要核对，旧G4/CE/
 
 原季度路线仍结束，不续原C/D、不重训已删权重、不改门搜索顺序/种子/池规模。原[科学方案](../reports/documentation/20261107/evolution_pilot/proposal.zh.md)、[固定数据](../reports/documentation/20261107/evolution_pilot/data_preparation/report.zh.md)、[双路补充](../reports/documentation/20261107/evolution_pilot/execution/scope.zh.md)、[原实现主审](../reports/documentation/20261107/evolution_pilot/implementation/review/primary_disposition.zh.md)与[GPU证据](../reports/documentation/20261107/evolution_pilot/gpu_single/report.zh.md)是已发生事实的来源。A/B未揭示共同明显遗忘，127开发诊断同样没有；原VendorLink有效负结果、ABC前置门停止且无新候选训练权重、全部费用保持。已完成删除的对象和Git恢复界限见[存储记录](STORAGE.zh.md)，不可恢复的模型及127原始分数不冒称仍可复用。
 
-主张仍为同观察账号文本检索，不扩为真实跨账号同控。全局未来文本参与离线清洗、观察日非创建日、启发式语言和近重复近似边界保持，H演示改写行不得作效果/选参依据。中文H消融等候用户明确恢复，本轮不干预。按已有要求维护唯一交接、计划与决定记录，本地提交，不将旧批推送许可扩至新材料。
+主张仍为同观察账号文本检索，不扩为真实跨账号同控。全局未来文本参与离线清洗、观察日非创建日、启发式语言和近重复近似边界保持，H演示改写行不得作效果/选参依据。中文H消融按其独立恢复决定执行，不由本Evolution结案改变。按已有要求维护唯一交接、计划与决定记录，本地提交，不将旧批推送许可扩至新材料。
 
 ## 其他研究线的既有后续安排
 
-H历史两系数[本轮结果](../reports/seller_alias_continual/20261107/history_result/report.zh.md)的网页审查及[7项独立处置](../reports/seller_alias_continual/20261107/history_result/review/primary_disposition.zh.md)已闭合，本范围不追加候选、重训、标签读取或重采样。原执行与结果状态只见交接；保留新H27和原H27及完整原件。用户已选定历史开发版H作消融母体，并确认按[已审方案](../reports/documentation/20261106/h_history_ablation/review/primary_disposition.zh.md)实施；[实现及主审处置](../reports/documentation/20261107/h_ablation_prepare/review/primary_disposition.zh.md)现为下一阶段入口。用户随后明确“开始正式训练”，以[本次正式许可](../reports/documentation/20261107/h_ablation_start/authorization.json)及源绑定正式门执行唯一63条队列；随后用户确认暂停派发并明确核对后直接部署；[已核验暂停交接](../reports/documentation/20261107/h_ablation_pause/review/primary_disposition.zh.md)按当前交接的实际状态执行，在跑任务完成、空闲不续领，新后处理同样等待。仅用户明确恢复后续接原清单，完整成功后才自动进入既定新确认生成/评分/分析，缺项或运行失败不进入下游。待完整结果后按原范围回传、独立分析和具体包结果外审，再按实际用途处理权重；不追加GPU资格、候选或失败重试。英文ABC若前置条件未成立，按原约定停止；后续数据/目标/候选变更另行明确，不自动寻找遗忘更明显的子集。
+H历史两系数[本轮结果](../reports/seller_alias_continual/20261107/history_result/report.zh.md)的网页审查及[7项独立处置](../reports/seller_alias_continual/20261107/history_result/review/primary_disposition.zh.md)已闭合，本范围不追加候选、重训、标签读取或重采样。原执行与结果状态只见交接；保留新H27和原H27及完整原件。用户已选定历史开发版H作消融母体，并确认按[已审方案](../reports/documentation/20261106/h_history_ablation/review/primary_disposition.zh.md)实施；[实现及主审处置](../reports/documentation/20261107/h_ablation_prepare/review/primary_disposition.zh.md)现为下一阶段入口。用户随后明确“开始正式训练”，以[本次正式许可](../reports/documentation/20261107/h_ablation_start/authorization.json)及源绑定正式门执行唯一63条队列；随后用户确认暂停派发并明确核对后直接部署；[已核验暂停交接](../reports/documentation/20261107/h_ablation_pause/review/primary_disposition.zh.md)记录当时在跑任务完成、空闲不续领及新后处理等待的暂停行为。用户11月13日已[明确恢复](RESEARCH_DISCUSSION.zh.md#2026-11-13明确恢复中文h主实验消融)，沿已审resume入口续接原清单，完整成功后才自动进入既定新确认生成/评分/分析，缺项或运行失败不进入下游。待完整结果后按原范围回传、独立分析和具体包结果外审，再按实际用途处理权重；不追加GPU资格、候选或失败重试。英文ABC若前置条件未成立，按原约定停止；后续数据/目标/候选变更另行明确，不自动寻找遗忘更明显的子集。
 
 L²R／ER+GCR的[结果分析与审查处置](../reports/seller_alias_continual/20261101/comparison_result/review/primary_disposition.zh.txt)已完成，[本批符合条件的权重清理](../reports/seller_alias_continual/20261101/comparison_result/cleanup_receipt.json)已实际执行；本范围无剩余科研动作。保留完整指标/分数/日志/实际来源、逐文件清单、旧失败与费用；H−S额外抗遗忘仍未确认，不为翻转原结论追加训练、调参、标签解析或重采样。H/S54基线、供H_pos_history使用的原H27及预训练模型继续保留；已删除的新对照权重不能由SHA恢复，若需新实验另按范围确认。
 
