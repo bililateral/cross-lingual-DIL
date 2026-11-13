@@ -2,9 +2,11 @@
 
 ## 2026-11-13 完整H单一β探针保管
 
-本次独立目录[scope与实施](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md)对应Linux同名`workspace/scripts`及未来唯一campaign；与旧确定性Full和中文活动来源隔离。源文件、手写CPU核验及cpu01/02失败、cpu03通过原件留本地Git，失败费用继承；已上传来源大小/SHA核验后才在Linux执行。真实数据、预训练、未来模型/Memory/预测和标签按原Linux边界保管，不因全量Git交付纳入仓库。用户已有结果表修改保持未提交。
+本次独立目录[scope与实施](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md)对应Linux同名`workspace/scripts`、唯一wait及条件满足后才创建的campaign；与旧确定性Full和中文活动来源隔离。[正式门与来源](../reports/documentation/20261113/vendorlink_beta_quarter/final_sources.json)绑定14生产文件和独立一次性入口，生产版本Git 2b6bc763；cpu01/02失败、cpu03/04通过及cpu05终态补证均保留，累计CPU32秒，早期源码Git bd4cd8c1/37d3c98b/2b6bc763及最终核验Git 0728b409可精确恢复。等待进程已部署，当前身份/预算/中文进度只见交接唯一项及具名Linux观测。真实数据、预训练、未来模型/Memory/预测和标签按原Linux边界保管，不因全量Git交付纳入仓库。用户已有结果表修改保持未提交。
 
-本次具体审查包48份载荷及清单，204057字节，SHA256 `07f68544bb6ad3b85cf5fff72a127fb104ac3eedf348eeffac46ea8f343d5c53`，精确恢复入口`37d3c98b:reports/documentation/20261113/vendorlink_beta_quarter/review/input.zip`；原请求、完整背景、实际源码/核验和已开放结果均在范围内，未包含私有载荷或凭据。网页审查回收和最终处置完成后，按实际用途退役本轮一次性测试、无用包及副本，保留必要原文/回执和精确源码恢复；正式等待入口须在真实首更后按合同自删，不提前删除。局部收尾不重置11月6日大清理与11月21日到期，新增成果仅本地提交。
+本次具体审查包48份载荷及清单，204057字节，SHA256 `07f68544bb6ad3b85cf5fff72a127fb104ac3eedf348eeffac46ea8f343d5c53`，精确恢复入口`37d3c98b:reports/documentation/20261113/vendorlink_beta_quarter/review/input.zip`；原请求、完整背景、实际源码/核验和已开放结果均在范围内，未包含私有载荷或凭据。[完整外审](../reports/documentation/20261113/vendorlink_beta_quarter/review/external_report.zh.md)经Playwright实际Library下载回收36049字节、SHA256 `1b93962d41fb62d950430f08bb5bd5170c9279782083d827cef1ae5e195a94d0`，连同[独立处置及回收身份](../reports/documentation/20261113/vendorlink_beta_quarter/review/recovery.json)、原提交/模型选择/完成页保留；原包两处缺陷及必要修复证据不省略。两专用网页已关闭，未再上传最终修复源码。
+
+完成Git字节恢复核对后，Windows的两份一次性CPU核验脚本、根部重复once_wait及无用输入ZIP共4份，14份具名浏览器临时副本已按[本地回执](../reports/documentation/20261113/vendorlink_beta_quarter/cleanup.json)删除；Linux仅删除本次qualification/verify.py一份，见[Linux回执](../reports/documentation/20261113/vendorlink_beta_quarter/cleanup_linux.json)。没有删除模型、失败原件、正式依赖或活动等待入口。测试恢复入口为`0728b409:tests/verify_vendorlink_beta_quarter.py`及该提交同名qualification路径；活动`workspace/scripts/once_wait.py`保留，只有真实首个优化器更新后由已审运行器退役，不能因其他同名副本清理而误报缺依赖。根docs只在Windows维护，相关正式门/源码/原文/小回执具名SFTP核对同步，新增成果仅本地提交。局部收尾不重置11月6日大清理与11月21日到期。
 
 ## 2026-11-13 VendorLink下一步方向外审保管
 
