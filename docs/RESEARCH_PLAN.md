@@ -8,9 +8,9 @@
 
 [原FIT12合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)与用户明确的[六条M补充](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)及[完整结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md)共同界定这轮有限开发比较。原P的STOP_LEARNING及5pp/3.5pp裁决保持；后续4pp和明确M许可不追认P通过。既定训练、评分和无真值应用范围已完成，不重启控制器，不因有剩余88h预算自动新增任务或开放confirm。
 
-依据已完成的[随机模式诊断与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/report.zh.md)，用户已确认“仅出生评分MSE用确定性学生”的[三条Full合同](../reports/documentation/20261112/vendorlink_deterministic/scope.zh.md)，并明确本轮免外审、必要核验后直接训练。当前学习和历史监督随机模式、完整H、多记录评分、系数/六群Memory及原三个seed保持；新独立42h，复用旧SEQ/ER/V及Full对照。沿[正式门](../reports/documentation/20261112/vendorlink_deterministic/gate.json)绑定的唯一campaign继续三条，不重复已闭合的[增量核验及主审](../reports/documentation/20261112/vendorlink_deterministic/implementation.zh.md)、九端点诊断或全历史资格。三条训练完整后串行评分、完整评分后统一开放比较，随后结束，无自动confirm或新增应用批次；故障与资源等待按当前合同处理，不重建队列。
+依据已完成的[随机模式诊断与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/report.zh.md)形成的[三条Full合同](../reports/documentation/20261112/vendorlink_deterministic/scope.zh.md)已经执行至整批完整。[结果主审](../reports/documentation/20261112/vendorlink_deterministic/result/report.zh.md)保留对旧Full的局部改善、对ER/SEQ仍无联合优势及初学/新域保护失败；用户批准的具体结果外审经[独立处置](../reports/documentation/20261112/vendorlink_deterministic/result/review/primary_disposition.zh.md)闭合。按当前范围保管正式端点及完整证据，无剩余已授权科研执行；不重启唯一campaign或重复已闭合资格，confirm、新应用输出和任何新候选均不自动启动。
 
-判读仍区分模式附加目标已证实、记忆绝对评分保持成功、原dev能力未增加，以及新候选效果未知。即便改善原Full，也要相对ER/SEQ检查O/F、初学和新域保护；SEQ明显遗忘不足不能由Full修改消除。候选失败不自动换β、记忆规模或种子；应用压力条件的任何变化须有实际场景理由并共同作用于对手，不能追改本轮P/M负结果。
+判读区分此前固定参数诊断中的模式附加目标、正式出生分支产生目标/梯度，以及dev能力的实际变化；新候选效果已知，不再写为待验证。对旧Full的局部改善没有达到相对ER/SEQ的O/F、初学和新域联合要求；SEQ明显遗忘不足也未改变。若以后继续，先明确可区分的机制问题及有实际场景理由、共同作用于对手的应用压力条件；不自动换β、记忆规模或种子，不追改本轮P/M负结果。
 
 RMS、P及M正式端点继续保留供有明确权限的必要核对，旧G4/CE/评分头失败和全部费用不追改。确认集保持关闭，已见开发结果不能变回独立验证。中文暂停和旧Evolution/ABC结案不动；当前状态仅维护交接对应项，本地提交不推送。
 

@@ -1,5 +1,21 @@
 # 科研文件存储与恢复
 
+## 2026-11-13 确定性Full结果回传与审查保管
+
+三条确定性Full的[结果与主审分析](../reports/documentation/20261112/vendorlink_deterministic/result/report.zh.md)、原始完成/判定/费用、27格13指标、原P/M配对统计和数值历史摘要等30项498431字节已具名SFTP回传，逐项大小/SHA与[接收清单](../reports/documentation/20261112/vendorlink_deterministic/result/receive.json)一致。该清单13376字节、SHA256 `ecc5a8ee333cc76b2a44d301ae710fd9ce1e7466a04adf344a0b8f5f24477b8d`也核对。报告和所引小证据镜像留Linux本根result，原campaign/gate/来源/结果/账本不覆盖。统计和日志数值汇总在既有py310完成，不加载模型、预测数组或标签；Windows只作身份/保存字段对应核对、编辑和文件管理。
+
+12份新紧凑端点3918621201字节保留Linux，原P/M/RMS及预训练不删；三份latest由原控制器按成功验收后退役许可处理。正文、身份/标签载荷、Memory、逐查询分数、模型和confirm未回传。原正式94389秒及本轮辅助收尾后94422秒分别见原账与[result/budget](../reports/documentation/20261112/vendorlink_deterministic/result/budget.json)，旧P/M及诊断不清零、不混加。一次长终端输入在执行前因工具长度限制被拒绝，改为两个有界命令；一次清单SHA人工抄录多一字符触发本地拒绝，核对服务器分段原值后再传，未重算科研任务或放过身份不符。
+
+Linux临时观察副本`result/observe.py`（7755字节、SHA `9d12c2e40109553a2c28009583e2c14c3eb7a78d27db03d3f5e40134b32835f5`）在观察保存后已核对最终路径/属主/普通文件/单硬链接并删除，见[收尾及中文暂停元数据](../reports/documentation/20261112/vendorlink_deterministic/result/closure.json)。Windows普通工具`scripts/research_observe.py`及Git `975a540a`同字节源码保留，没有删除科研来源或模型。中文暂停和原账保持实际现场身份，动态数值只维护交接。
+
+用户批准的具体结果包为55载荷＋MANIFEST、206417字节、SHA `bb0ef9887e3d9d762e56ca0a6413236569708d7de934de627776e8969cc24f55`；逐成员大小/SHA已核对，输入原件及55来源的精确恢复点为Git `4abb20e1`。包只通过本地Playwright向[该次网页审查](https://chatgpt.com/c/6af672b0-6a30-83ea-b538-ab61cccf7784)单次提交，不向Linux额外复制ZIP，许可、模型选择器及请求记录见[submission](../reports/documentation/20261112/vendorlink_deterministic/result/review/submission.json)。完整[外审原文](../reports/documentation/20261112/vendorlink_deterministic/result/review/external_report.zh.md)由网页下载原样保存，29965字节、SHA `39b73bc83207f9a8f12259fedfb22d4f94b9903d86b5bb3d6197df036d05043f`；[独立主审](../reports/documentation/20261112/vendorlink_deterministic/result/review/primary_disposition.zh.md)关闭三项非阻断说明，无必要源码修复或重算，原科学失败保持。
+
+[回收与清理记录](../reports/documentation/20261112/vendorlink_deterministic/result/review/recovery.json)保留完整原文、完成页、模型选择和提交页身份。回收与主审后Playwright标签清单仅剩原about:blank，专用审查页已不在打开清单；未关闭其他任务页。Windows实际读Git `4abb20e1`的ZIP blob核对206417字节/SHA后，删除该无用输入ZIP及本任务8份浏览器临时/下载副本，合计9份257303字节；未删除正式审查原文、主审、清单、科研来源或模型，没有为清理另造Linux ZIP副本。恢复输入不授予新外发或新实验。
+
+最终报告、42项661696字节结果/审查/来源证据在Windows和Linux逐份大小/SHA一致，[最终同步](../reports/documentation/20261112/vendorlink_deterministic/result/sync.json)自身8842字节、SHA `a3190a9f4294458d55511a6dd372b8feab9fa47abec10f701e5a44d44bf7282b`亦经SFTP读回核对。送审时`budget.json`原字节保留；审后保存字段核对及最终保管保守另计30秒辅助，最终training92329/GPU675/auxiliary1448秒，共94452秒=26小时14分12秒，未超40h/1h/1h分桶。正式campaign账本核对未变，根docs不向Linux镜像。
+
+本轮新增成果本地提交不推送，根docs只维护Windows；局部收尾不重置11月6日大清理及11月21日到期。
+
 ## 2026-11-12 确定性出生评分Full部署与核验收尾
 
 21:34:13新增[只读进度快照](../reports/documentation/20261112/vendorlink_deterministic/progress_20261112_213413.json)，7382字节、SHA256 `fada3e234ca2df3b1c0cac02400b96cc7876a87d19fd56727e397f8d15c18601`，SFTP回传并核对大小/SHA。仅运行身份、训练计数/完成验收标志、GPU、账本及阶段文件是否存在；另只读两份已完成dispatch_receipt的seconds及stage端点文件mtime估计工期，不读取模型或新效果。快照kernel_identity中worker无start_ticks/boot_id预存基准，boot_matches=false不能解释为身份不符；其五项进程身份均匹配，控制器内核基准也匹配，未据缺失字段干预作业。当前交接原位更新，计划/设计入口接续逻辑仍适用，无新测试、临时脚本或载荷。本次新增记录本地提交，上一轮全部提交已推送的事实不扩大为本次新推送许可。

@@ -6,15 +6,15 @@
 
 ### VendorLink账号监督共同评价
 
-- **目标与有效范围**：完整H先学得接近VendorLink，再检验稳定少忘旧域、旧域最终更强和新域保护。用户11月12日确认确定性出生评分候选，并明确“直接免审吧，做完必要的测试后直接开始训练”，见[决定](RESEARCH_DISCUSSION.zh.md#2026-11-12批准确定性出生评分full候选并免审后开训)及[本轮合同](../reports/documentation/20261112/vendorlink_deterministic/scope.zh.md)。只新增Full seed51/52/53、ABC/40epoch、同RMS/FIT12；仅出生MSE学生无dropout，原当前/历史监督随机模式及系数/六群Memory保持。新独立42h=40训练/1GPU/1辅助、最多两路，无人为显存硬帽；不自动confirm、参数搜索或新增应用输出。
-- **已完成结果及卡点**：原六条M及后处理完整、0训练/评分失败，执行EXPLORATORY_M_COMPLETE、科学STOP_NO_H_ADVANTAGE；[结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md)中SEQ/ER/Full旧域O为86.3475/86.6435/85.6785%，F为1.1331/1.0672/1.4660pp。Full对SEQ/ER不利而对V_SET有外部优势，后者不能归因历史机制；原P的5pp/3.5pp失败与后续4pp决定分别保留。SEQ遗忘空间不足是新Full无法改变的独立限制。
-- **实现与正式运行**：[九端点诊断与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/report.zh.md)已完整结束；新候选[必要核验及主审](../reports/documentation/20261112/vendorlink_deterministic/implementation.zh.md)闭合，CPU四项一次通过、真实BERT单路核验通过，分别计辅助5/GPU10秒。11月12日12:00:46[单次启动](../reports/documentation/20261112/vendorlink_deterministic/launch.json)；[21:34:13现场](../reports/documentation/20261112/vendorlink_deterministic/progress_20261112_213413.json)核实原控制器2969588及活动seed53 worker3091680属主/创建时刻/完整命令/cwd匹配，gate身份不变。seed51/52均23640/23640更新，最后更新分别21:01:54/21:02:43，completion及包装验收成功、worker已释放；当前2完成/1运行/0待派。seed53已自动接槽，3814/23640更新，AlphaBay第19轮（epoch=18），0失败/0退槽/无预算停止。GPU瞬时27%、3372/32607MiB；单路是三任务最后一条的正常排程，非失败降槽。M评分/分析未开始，新效果未读；首域无历史回放，不据seed53当前计数判断保持效果。
-- **下一步与费用**：由同一控制器完成seed53，三条训练完整后串行GPU评分、完整评分后一次CPU分析并结束，无confirm/应用接续。21:34:13已结training64994/GPU10/auxiliary68秒，共65072秒（18小时4分32秒）；当前训练生命周期暂估1933.406秒（32分13秒）尚未结，监管活动仍累计，完整承诺估计46800.998秒与该暂估重叠、不重复相加。新42h=40/1/1及每条训练13h硬帽保持。前两条实际dispatch_receipt为32472.139/32520.419秒，各约9小时；前两域约1小时20分/1小时6分、Agora约6小时35分（仅按端点文件时间，不载模），不能按首域更新比例线性估计全程。seed53约21:02接槽，当前单路，后两域速度尚未实测；暂按前两条全程耗时并留单路吞吐变化余量，预计11月13日05:00—06:30训练结束，另留约30—60分钟串行评分/分析，预计05:30—07:30整批收尾。本批总工期现估17.5—19.5小时，观测时已过9小时33分，剩余约8—10小时；后两域实测或资源变化再更新，估计不是预算上限或效果承诺。
-- **来源与保管**：新工作根为`reports/documentation/20261112/vendorlink_deterministic`，实际入口为Linux同根`workspace/scripts/step35_vendorlink_account_control.py`；[正式门](../reports/documentation/20261112/vendorlink_deterministic/gate.json)和[13来源](../reports/documentation/20261112/vendorlink_deterministic/final_sources.json)绑定Git `c902ada1`及通过回执。原P/M/诊断来源、结果及费用冻结，原权重保留；三条从预训练冷启动，原P/M含收尾62h47m54s及诊断261s各自保管。一次性核验脚本已精确Git恢复核对后两端退役，日志/费用保留；[同步](../reports/documentation/20261112/vendorlink_deterministic/sync.json)仅小证据，真实数据/Memory/权重留Linux。根docs留Windows；Git交付按下方本轮最新推送授权执行。
+- **目标与有效范围**：完整H须学得充分、可重复少忘旧域、旧域最终更好且保护新域。11月12日批准的[确定性出生评分三条合同](../reports/documentation/20261112/vendorlink_deterministic/scope.zh.md)及原RMS/FIT12、ABC40轮、seed51/52/53、α/β和六群Memory保持；原SEQ/ER/V/Full复用，42h独立分桶，无confirm或自动候选。11月13日用户要求同步结果仔细分析，并批准本次55份材料的具体结果外审包，见[决定](RESEARCH_DISCUSSION.zh.md#2026-11-13同步确定性full结果并批准具体结果包外审)。训练前免审与新结果外审分别处理。
+- **实际完成**：11月13日04:37:38三条训练完整、04:48:42评分完整、04:48:43整批结束，总工期16小时47分58秒，剩余执行0。[09:53核对](../reports/documentation/20261112/vendorlink_deterministic/result/check.json)确认3/3训练、3/3评分和分析成功；每条23640更新/15480确定性历史消费，共70920/46440，27评分格/351新指标完整。原控制器退出、匹配进程0，无失败/退休/预算停止；13活动来源与正式门、原P/M绑定一致。没有重新载模、评分、标签读取或重采样。
+- **结果及卡点**：[完整分析](../reports/documentation/20261112/vendorlink_deterministic/result/report.zh.md)及[13指标/逐seed全表](../reports/documentation/20261112/vendorlink_deterministic/result/tables.zh.md)：新Full Q/O/F为86.7375%/86.1603%/0.5773pp，Agora89.4908%。对旧Full O+0.4818pp、F减少0.8888pp、Agora+0.2210pp，均2/3seed正；对ER/SEQ的O仍低0.4832/0.1872pp，Agora低1.8540/1.2648pp且3/3seed不利。Q变弱参与了F下降，不能把小F当有效抗遗忘。Dream增量2.6185pp未达4pp，相对SEQ初学低1.4862pp越过1pp保护；SEQ自身F仍仅1.1331pp。实际科学裁决STOP_NO_H_ADVANTAGE：保持、初学、新学和明显遗忘条件失败，外部竞争力通过。旧P/M及诊断结论与费用不追改。
+- **审查与后续**：用户批准的206417字节包经本地Playwright单次提交，[完整结果外审](../reports/documentation/20261112/vendorlink_deterministic/result/review/external_report.zh.md)已回收并经[逐项主审](../reports/documentation/20261112/vendorlink_deterministic/result/review/primary_disposition.zh.md)结案。未发现有效性阻断或必要重算；三项非阻断澄清已补：分支目标/梯度不等于保持收益，首步零值限定出生分支，指标异向及外审可核载荷范围明确。原科学裁决不变，不设新Full为已验证默认，不自动confirm、调β、扩Memory或新搜索；中文暂停保持。新研究须另有明确问题与范围。
+- **费用与保管**：[正式账](../reports/documentation/20261112/vendorlink_deterministic/result/formal_budget.json)training92329/GPU675/aux1385秒，共26小时13分09秒；[送审时结果账](../reports/documentation/20261112/vendorlink_deterministic/result/budget.json)94422秒保留，审后核对/保管保守另计30秒，最终[收尾账及同步](../reports/documentation/20261112/vendorlink_deterministic/result/sync.json)94452秒=26小时14分12秒，各桶未超40h/1h/1h。12份新紧凑端点3918621201字节及原端点保留Linux，3份latest按原验收规则退役；正文/身份/标签/Memory/预测不回传。30项498431字节小证据已SFTP核对；生产入口与Gate仍在本轮workspace，科研来源Git c902ada1，送审输入精确恢复Git 4abb20e1。根docs留Windows，本轮新增成果本地提交不推送。
 
 ### 历史权重版H主实验消融
 
-保持暂停，等待用户明确恢复。[11月12日12:02:24只读核对](../reports/documentation/20261112/vendorlink_deterministic/launch_observation.json)仍为PAUSED_IDLE、7完成/0活动/56待派、无退休；暂停marker/continuation存在，监管1412412属主/命令/cwd/start_ticks匹配且无子进程。原已结训练84533.078403秒、辅助1563.688573秒、确认0不变。范围见[正式许可](../reports/documentation/20261107/h_ablation_start/authorization.json)、[暂停补充](../reports/documentation/20261107/h_ablation_pause/scope.zh.md)。不能因VendorLink运行恢复或删除marker；恢复须承接原队列及账本。
+保持暂停，等待用户明确恢复。[11月13日10:17:43只读核对](../reports/documentation/20261112/vendorlink_deterministic/result/closure.json)仍PAUSED_IDLE、7完成/0活动/56待派、无退休；暂停marker/continuation存在，监管1412412属主/命令/cwd/start_ticks匹配且无子进程。实际账training84533.078403秒、auxiliary11351.418399秒、confirmation0；辅助已较旧快照增加，不能沿用1563秒作为当前值。范围见[正式许可](../reports/documentation/20261107/h_ablation_start/authorization.json)、[暂停补充](../reports/documentation/20261107/h_ablation_pause/scope.zh.md)。不删除marker、不恢复派发；以后明确恢复须承接原队列与实际剩余账。
 
 ### 已结案研究线
 
@@ -32,7 +32,7 @@
 
 ### 文件保管与本轮交付
 
-[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。11月12日用户已[批准纪律必要修订及全部本地提交推送](RESEARCH_DISCUSSION.zh.md#2026-11-12批准纪律歧义修订及全部本地提交推送)，本次交付包括当前科研分支此前未推送成果和本轮修订，替代这些提交原本地交付限定，不扩大到未来新提交或其他分支。纪律第2/4/5/6/8/9/10节及AGENTS对应入口已澄清；工作流、设计入口和计划按职责检查，无需复制条款。运行来源、原始证据及清理恢复入口分别保管，未改Linux活动作业；推送成功以实际远端ref核对为准。
+[存储记录](STORAGE.zh.md)维护保管和清理事实，大清理上次11月6日、下次11月21日，局部收尾不重置。11月12日[纪律修订及整批本地提交推送](RESEARCH_DISCUSSION.zh.md#2026-11-12批准纪律歧义修订及全部本地提交推送)保留其已发生交付范围，不扩大到后续新成果。11月13日确定性Full结果、外审和保管按本轮范围作本地提交、不推送；原始来源、正式结果及清理恢复入口分别保留，根docs只在Windows维护。
 
 ## 近期执行与审查历史
 
@@ -520,7 +520,7 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 
 当前执行状态只看顶部表格；本节是证据导航。按本轮实际变化确定最小核验，未变且适用的证据可复用，不因换Agent递归重读或重跑全部历史。
 
-本次接手以顶部唯一对应项及[VendorLink执行安排](RESEARCH_PLAN.md#vendorlink账号监督fit12共同协议后续)为准：当前推进已批准的确定性出生评分Full三条候选，原P/M及九端点诊断已完成，来源、主审处置和实际入口由[设计入口](CURRENT_EXPERIMENT_DESIGN.md)定位。Evolution和旧ABC按各自停止结论保持结束。沿用已批准合同、充分核验和唯一活动控制器，只读核对真实状态，不重做资格、旧诊断或训练。新数据、候选、预算、判据、失败重试和外发包仍按其具体范围；中文消融暂停决定保持。
+本次接手以顶部唯一对应项及[VendorLink执行安排](RESEARCH_PLAN.md#vendorlink账号监督fit12共同协议后续)为准：确定性出生评分Full三条、整批分析及本轮结果外审/处置已经结案；原P/M及九端点诊断保持结案。来源、主审处置和实际入口由[设计入口](CURRENT_EXPERIMENT_DESIGN.md)定位。Evolution和旧ABC按各自停止结论保持结束，不重做资格、旧诊断或训练，不重建已结束控制器。新数据、候选、预算、判据、失败重试和外发包仍按其具体范围；中文消融暂停决定保持。
 
 接手首先核对本地分支/工作区、当前文档与来源回执。涉及活动作业或资源时，按第7节只读核对精确Linux目录，不凭旧PID/摘要判断状态；纯文档接手更新不冒充新的服务器观测。旧的Windows资格例外已经完成，后续科研执行默认Linux既有py310。身份语义、未冻结分域、PGP计数勘误、原始结果优先及避免重复核验的具体边界均见上方计划；不要把已改写展示表中的H行当实测证据。
 
