@@ -49,6 +49,8 @@ def dependency_observation(g):
             or update.get('updated_sources') != expected_sources):
         raise ValueError('Chinese whole-campaign completion identity differs')
     if not (state/'completion.json').exists():
+        if not live:
+            raise RuntimeError('Chinese supervisor exited before its final closure receipt; no automatic beta launch')
         return dict(ready=False, status='WAITING_CHINESE_SUPERVISOR_CLOSURE')
     if read(state/'completion.json').get('status') != 'CONTROLLED_CAMPAIGN_COMPLETE':
         raise ValueError('Chinese supervisor closure differs')

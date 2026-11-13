@@ -137,6 +137,9 @@ class Checks(unittest.TestCase):
         write(root/'completion.json', dict(status='COMPLETE_PENDING_RESULT_REVIEW_MODELS_RETAINED',
             new_trajectories=63, full_reused=9, sources=[], controller_update=dict(request=dep['request']['path'],updated_sources=[])))
         self.assertFalse(waiter.dependency_observation(g)['ready'])
+        with patch.object(waiter, 'kernel_identity', side_effect=psutil.NoSuchProcess(dep['controller']['pid'])):
+            with self.assertRaisesRegex(RuntimeError, 'final closure receipt'):
+                waiter.dependency_observation(g)
         write(state/'completion.json', {'status':'CONTROLLED_CAMPAIGN_COMPLETE'})
         with patch.object(waiter.psutil, 'process_iter', return_value=[]):
             self.assertTrue(waiter.dependency_observation(g)['ready'])
@@ -192,8 +195,19 @@ class Checks(unittest.TestCase):
             def snapshot(self): return {'processes':{},'free':9*2**30}
         obs = resource_observation(g,self.root,True,[ident],TightNV(),limits=BETA_LIMITS)
         self.assertFalse(obs['ready']); self.assertEqual(obs['unreflected_commitments'],5*2**30)
+        read_text = Path.read_text
+        def vanished(path, *args, **kwargs):
+            if str(path) == f'/proc/{ident["pid"]}/stat':
+                raise FileNotFoundError(str(path))
+            return read_text(path, *args, **kwargs)
+        with patch.object(Path, 'read_text', vanished):
+            with self.assertRaises(psutil.NoSuchProcess): kernel_identity(ident['pid'])
+            exited = resource_observation(g,self.root,True,[ident],TightNV(),limits=BETA_LIMITS)
+        self.assertEqual(exited['unreflected_commitments'],0)
+        self.assertTrue(exited['commitments'][0]['exited'])
         EVIDENCE['three_slots'] = dict(cpu_affinities=completed,reserved_seconds=140400,
-                                      start_ticks_used_despite_created_time_difference=True, pending_gpu_deducted=True)
+                                      start_ticks_used_despite_created_time_difference=True, pending_gpu_deducted=True,
+                                      kernel_exit_race_handled=True)
 
 
 if __name__ == '__main__':

@@ -19,7 +19,12 @@ from step30_evolution_policy import CAPS, DOMAINS, LIMITS, decision, select_a, t
 
 
 def kernel_identity(pid):
-    fields = Path(f'/proc/{pid}/stat').read_text().rsplit(') ', 1)[1].split()
+    try:
+        fields = Path(f'/proc/{pid}/stat').read_text().rsplit(') ', 1)[1].split()
+    except FileNotFoundError as error:
+        # A process may exit between psutil's lookup and the kernel read.
+        # Preserve the caller's existing exited-process handling.
+        raise psutil.NoSuchProcess(pid) from error
     return dict(start_ticks=int(fields[19]), boot_id=Path('/proc/sys/kernel/random/boot_id').read_text().strip())
 
 
