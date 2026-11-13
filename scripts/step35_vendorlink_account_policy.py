@@ -7,6 +7,8 @@ from step29_vendorlink_methods import Settings
 
 PROTOCOL = 'vendorlink-account-fit12-mechanism-20261111'
 DETERMINISTIC_PROTOCOL = 'vendorlink-fit12-deterministic-history-20261112'
+BETA_PROTOCOL = 'vendorlink-fit12-beta-quarter-20261113'
+BETA = .191859540449699
 DOMAINS = ('AlphaBay', 'Dream', 'Agora')
 SEEDS = (51, 52, 53)
 CAPS = dict(training=80*3600, gpu=4*3600, auxiliary=4*3600)
@@ -18,6 +20,7 @@ LIMITS = dict(workers=2, free_gpu_bytes=5*2**30, process_gpu_bytes=None,
 CELLS = ((0, 1), (1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3))
 DETERMINISTIC_CAPS = dict(training=40*3600, gpu=3600, auxiliary=3600)
 DETERMINISTIC_LIMITS = dict(LIMITS, disk_bytes=12*2**30)
+BETA_LIMITS = dict(DETERMINISTIC_LIMITS, workers=3)
 
 
 @dataclass(frozen=True)
@@ -100,6 +103,59 @@ def deterministic_comparison(baseline, candidate):
     return dict(status='DETERMINISTIC_HISTORY_EXPERIMENT_COMPLETE', original_M=original, candidate_M=current,
                 comparisons=pairs, confirmation=False, application=False, automatic_followup=False,
                 interpretation='Old-Full differences are descriptive; original effect/quality/forgetting gates remain separate')
+
+
+def beta_tasks(selection):
+    result = deterministic_tasks(selection)
+    for task in result:
+        task['id'] = task['id'].replace('H_full_det_', 'H_full_beta_quarter_')
+        task['settings']['beta'] = BETA
+    return result
+
+
+def beta_comparison(baseline, reference, candidate):
+    """Predeclared joint response, separate from the unchanged original gates."""
+    if set(reference) != {'H_full'} or set(candidate) != {'H_full'}:
+        raise ValueError('Exactly the fixed Full reference and candidate required')
+    original = deterministic_comparison(baseline, candidate)
+    # Validate the reference through the same finite, complete seed contract.
+    decide({**baseline, **reference}, True)
+    rows, ref = candidate['H_full'], reference['H_full']
+    def mean(values): return statistics.mean(values)
+    def values(source, key): return [r[key] for r in source]
+    def delta(other, key): return [a[key]-b[key] for a, b in zip(rows, other, strict=True)]
+    def lower(other, key, average, minimum):
+        d = delta(other, key)
+        return mean(d) >= average and min(d) >= minimum
+    def gain(key):
+        v = values(rows, key)
+        return mean(v) >= .04 and min(v) >= 0
+    dream = (gain('GB') and all(lower(baseline[m], 'R22', -.01, -.03) for m in ('H_SEQ', 'H_ER'))
+             and sum(v > 0 for v in delta(ref, 'R22')) >= 2)
+    old = (mean(delta(ref, 'O')) > 0 and sum(v > 0 for v in delta(ref, 'O')) >= 2
+           and min(delta(ref, 'O')) >= -.01
+           and all(mean(delta(ref, k)) >= 0 for k in ('R31', 'R32')))
+    agora = (mean(delta(ref, 'R33')) >= 0 and sum(v >= 0 for v in delta(ref, 'R33')) >= 2
+             and gain('GC') and all(lower(baseline[m], 'R33', -.02, -.05)
+                                   for m in ('H_SEQ', 'H_ER', 'V_CLS', 'V_SET')))
+    checks = original['candidate_M']['checks']
+    response = dict(dream_restore=dream, old_final_improve=old, agora_protect=agora,
+                    original_initial_protection=checks['initial_protection'],
+                    original_new_protection=checks['new_protection'],
+                    original_external_protection=checks['external'])
+    # R11 and R12 precede the intervention. Report any exact numeric discrepancy;
+    # it requires source/path investigation, never post-hoc attribution to beta.
+    unchanged = {k: delta(ref, k) for k in ('R11', 'R12')}
+    integrity = all(v == 0 for d in unchanged.values() for v in d)
+    pairs = [dict(seed=r['seed'], **{k: r[k]-b[k] for k in
+             ('Q', 'O', 'F', 'R11', 'R12', 'R22', 'R31', 'R32', 'R33', 'GB', 'GC')})
+             for r, b in zip(rows, ref, strict=True)]
+    return dict(status='BETA_QUARTER_EXPERIMENT_COMPLETE', response_checks=response,
+                joint_response=all(response.values()), first_domain_differences=unchanged,
+                interpretation_requires_identity_review=not integrity,
+                reference_pairs=pairs, original_gates=original,
+                confirmation=False, application=False, automatic_followup=False,
+                interpretation='Development strategy total effect; no requirement to beat reference F; no automatic confirmation or beta search')
 
 
 def select(development, baseline):

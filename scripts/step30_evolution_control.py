@@ -18,6 +18,11 @@ from step30_evolution_io import (Budget, Ledger, PYTHON, access, dataset, direct
 from step30_evolution_policy import CAPS, DOMAINS, LIMITS, decision, select_a, tasks
 
 
+def kernel_identity(pid):
+    fields = Path(f'/proc/{pid}/stat').read_text().rsplit(') ', 1)[1].split()
+    return dict(start_ticks=int(fields[19]), boot_id=Path('/proc/sys/kernel/random/boot_id').read_text().strip())
+
+
 def resource_observation(allowed: dict, root: Path, gpu: bool, owned=(), nv=None, *, limits=None) -> dict:
     import shutil
     limits = LIMITS if limits is None else limits
@@ -48,7 +53,9 @@ def resource_observation(allowed: dict, root: Path, gpu: bool, owned=(), nv=None
             for row in [*allowed['other_gpu_commitments'], *owned]:
                 try:
                     process = psutil.Process(row['pid'])
-                    if process.create_time() != row['created'] or process.username() != row['owner']:
+                    same = (kernel_identity(row['pid']) == {k: row[k] for k in ('start_ticks', 'boot_id')}
+                            if 'start_ticks' in row else process.create_time() == row['created'])
+                    if not same or process.username() != row['owner']:
                         return dict(observation, ready=False, hold='Declared GPU commitment identity changed')
                     if row not in owned and (process.cwd() != row['cwd'] or process.cmdline() != row['command']):
                         return dict(observation, ready=False, hold='Declared GPU commitment command/cwd changed')
@@ -154,8 +161,8 @@ class Runner:
     def command(self, job: dict, slot: int, deadline: float):
         cores = psutil.Process().cpu_affinity()
         if len(cores) < 2*self.limits['workers']:
-            raise RuntimeError('Four allowed CPU cores required for two slots')
-        chosen = cores[-4:][slot*2:slot*2+2]
+            raise RuntimeError('Two allowed CPU cores per approved slot required')
+        chosen = cores[-2*self.limits['workers']:][slot*2:slot*2+2]
         return ['taskset', '-c', ','.join(map(str, chosen)), PYTHON, '-B', '-u', str(self.worker_entry),
                 '--gate', str(self.gate_path), '--action', job['action'], '--target', str(job['target']),
                 '--deadline', str(deadline), *job['extra']]
@@ -292,7 +299,8 @@ class Runner:
                                     stdout=output, stderr=subprocess.STDOUT, start_new_session=True, umask=0o077)
                             p = psutil.Process(process.pid)
                             identity = dict(pid=p.pid, owner=p.username(), created=p.create_time(), command=argv,
-                                            cwd=p.cwd(), reserved_bytes=admission_limits['free_gpu_bytes'])
+                                            cwd=p.cwd(), reserved_bytes=admission_limits['free_gpu_bytes'],
+                                            **kernel_identity(p.pid))
                             # taskset execs in place, so the command after exec omits its own wrapper.
                             identity['command'] = argv[3:]
                             active[slot] = dict(process=process, job=job, identity=identity, started=started,

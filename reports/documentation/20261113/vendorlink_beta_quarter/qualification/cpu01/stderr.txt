@@ -1,0 +1,20 @@
+test_beta_actual_gradient_and_execute (__main__.Checks) ... ok
+test_chinese_completion_is_not_idle_or_pause (__main__.Checks) ... ok
+test_original_results_and_response_boundaries (__main__.Checks) ... ok
+test_three_real_cpu_slots_and_resource_reservations (__main__.Checks) ... ERROR
+test_wait_joint_trigger_and_unique_attempt (__main__.Checks) ... ok
+
+======================================================================
+ERROR: test_three_real_cpu_slots_and_resource_reservations (__main__.Checks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261113/vendorlink_beta_quarter/qualification/verify.py", line 182, in test_three_real_cpu_slots_and_resource_reservations
+    runner.run_many(tiny,3,lambda job: completed.append(json.loads((job['target']/'cores.json').read_text())))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261113/vendorlink_beta_quarter/workspace/scripts/step30_evolution_control.py", line 374, in run_many
+    raise RuntimeError('Incomplete phase; healthy slots drained, downstream closed')
+RuntimeError: Incomplete phase; healthy slots drained, downstream closed
+
+----------------------------------------------------------------------
+Ran 5 tests in 5.189s
+
+FAILED (errors=1)
