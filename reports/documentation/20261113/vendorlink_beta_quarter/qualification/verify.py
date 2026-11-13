@@ -134,6 +134,9 @@ class Checks(unittest.TestCase):
         root, state = Path(dep['campaign']), Path(dep['state'])
         (root/'pause_dispatch').touch()
         self.assertFalse(waiter.dependency_observation(g)['ready'])
+        with patch.object(waiter, 'kernel_identity', side_effect=psutil.NoSuchProcess(dep['controller']['pid'])):
+            with self.assertRaisesRegex(RuntimeError, 'before complete closure'):
+                waiter.dependency_observation(g)
         write(root/'completion.json', dict(status='COMPLETE_PENDING_RESULT_REVIEW_MODELS_RETAINED',
             new_trajectories=63, full_reused=9, sources=[], controller_update=dict(request=dep['request']['path'],updated_sources=[])))
         self.assertFalse(waiter.dependency_observation(g)['ready'])
@@ -143,9 +146,12 @@ class Checks(unittest.TestCase):
         write(state/'completion.json', {'status':'CONTROLLED_CAMPAIGN_COMPLETE'})
         with patch.object(waiter.psutil, 'process_iter', return_value=[]):
             self.assertTrue(waiter.dependency_observation(g)['ready'])
+            with patch.object(waiter, 'kernel_identity', side_effect=psutil.NoSuchProcess(dep['controller']['pid'])):
+                self.assertTrue(waiter.dependency_observation(g)['ready'])
         write(root/'failure.json', {'status':'STOP_NO_RETRY'})
         with self.assertRaises(RuntimeError): waiter.dependency_observation(g)
-        EVIDENCE['dependency'] = dict(pause_not_completion=True, supervisor_closure_required=True, failure_blocks=True)
+        EVIDENCE['dependency'] = dict(pause_not_completion=True, supervisor_closure_required=True, failure_blocks=True,
+            normal_exit_after_both_receipts_allowed=True, exit_before_either_closure_rejected=True)
 
     def test_wait_joint_trigger_and_unique_attempt(self):
         root = self.root/'new'; root.mkdir()
