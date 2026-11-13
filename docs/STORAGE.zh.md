@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-13 中文单次重试恢复保管
+
+[本次独立目录](../reports/documentation/20261113/h_ablation_retry_s6/scope.zh.md)保管单条重试授权、限定免审、CPU01/02/03、独立主审、正式request及实际接管证据；运行包装在同根workspace/scripts/retry_once.py，调用原已审freeze/drain和原controller/dispatch，不覆盖活动50科研来源。原失败目录在实际排空后才整体原样归档，后续资产路径和实际发生状态见运行回执，不提前声称已移动或开训。Full27、原成功端点及现有worker均保护。
+
+CPU与源身份按[sync](../reports/documentation/20261113/h_ablation_retry_s6/sync.json)核对11项，正式接管来源/小回执按[deployment_sync](../reports/documentation/20261113/h_ablation_retry_s6/deployment_sync.json)核对16项，具名SFTP与Windows大小/SHA一致；root docs只在Windows更新，正文/标签/预测/Memory/权重不回传。准备原始区间及子账单独保留，1380秒已在接管时一次进入原辅助账，CPU7秒不另加；预算不扩大。100094字节具体包获本次免审后未上传，属于后续常规收尾对象；当前运行包装、request/主审及必要证据保留，核验源码先保管精确版本再退役，不留无恢复入口的CPU来源。Git仅本地，用户已有结果表修改保持未提交；局部收尾不重置大清理周期。
+
 ## 2026-11-13 晚间运行进度证据
 
 本轮只读核对中文消融及既有β等待进程，Linux保存[具名观测](../reports/documentation/20261113/h_ablation_resume/progress_20261113_193435.json)，通过SFTP回传同名Windows路径，22397字节、SHA256 `23ad45a514c4d8f57d240070908dc528739d1e5b16b5bb9e2e38c4b71865fec6`逐项一致。内容限定实际进程身份、更新计数、成功/失败调度回执、OOM技术诊断及资源/费用元数据；未读取或回传科学效果、标签、正文、Memory或权重。原始旧观测保留，当前状态仅原位更新交接；未写活动账本、改运行源码或操作已有进程。SSH/SFTP均已退出，没有生成临时脚本、下载副本或压缩包，没有删除模型。用户结果表已有修改继续保留、不纳入本次提交；本轮仅本地Git，不沿用旧推送许可。局部记录更新不重置大清理周期。
