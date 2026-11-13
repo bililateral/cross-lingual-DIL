@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-13 完整H单一β探针保管
+
+本次独立目录[scope与实施](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md)对应Linux同名`workspace/scripts`及未来唯一campaign；与旧确定性Full和中文活动来源隔离。源文件、手写CPU核验及cpu01/02失败、cpu03通过原件留本地Git，失败费用继承；已上传来源大小/SHA核验后才在Linux执行。真实数据、预训练、未来模型/Memory/预测和标签按原Linux边界保管，不因全量Git交付纳入仓库。用户已有结果表修改保持未提交。
+
+本次具体审查包48份载荷及清单，204057字节，SHA256 `07f68544bb6ad3b85cf5fff72a127fb104ac3eedf348eeffac46ea8f343d5c53`，精确恢复入口`37d3c98b:reports/documentation/20261113/vendorlink_beta_quarter/review/input.zip`；原请求、完整背景、实际源码/核验和已开放结果均在范围内，未包含私有载荷或凭据。网页审查回收和最终处置完成后，按实际用途退役本轮一次性测试、无用包及副本，保留必要原文/回执和精确源码恢复；正式等待入口须在真实首更后按合同自删，不提前删除。局部收尾不重置11月6日大清理与11月21日到期，新增成果仅本地提交。
+
 ## 2026-11-13 VendorLink下一步方向外审保管
 
 用户明确要求送审下一步想法及完整背景。本次[输入清单](../reports/documentation/20261113/vendorlink_next_review/manifest.json)含65份安全载荷，13份生产源码来自Git c902ada1并按正式来源逐份核对；输入ZIP为288163字节、SHA256 `cc5c7c5230b511e23a9223b9126958e12c84d214a630c46b051eef7983e928ef`，精确恢复入口`2026e5ab:reports/documentation/20261113/vendorlink_next_review/input.zip`。原请求、背景和待审建议保留送审字节；本轮外发许可来自当前具体指令，不沿用旧结果包许可。
