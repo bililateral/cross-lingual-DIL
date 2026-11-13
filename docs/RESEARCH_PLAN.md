@@ -10,7 +10,7 @@
 
 依据已完成的[随机模式诊断与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/report.zh.md)形成的[三条Full合同](../reports/documentation/20261112/vendorlink_deterministic/scope.zh.md)已经执行至整批完整。[结果主审](../reports/documentation/20261112/vendorlink_deterministic/result/report.zh.md)保留对旧Full的局部改善、对ER/SEQ仍无联合优势及初学/新域保护失败；用户批准的具体结果外审经[独立处置](../reports/documentation/20261112/vendorlink_deterministic/result/review/primary_disposition.zh.md)闭合。完整结果证据继续保管，端点按用户随后明确的清理决定处理，无剩余已授权科研执行；不重启唯一campaign或重复已闭合资格，confirm、新应用输出和任何新候选均不自动启动。
 
-判读区分此前固定参数诊断中的模式附加目标、正式出生分支产生目标/梯度，以及dev能力的实际变化；新候选效果已知，不再写为待验证。对旧Full的局部改善没有达到相对ER/SEQ的O/F、初学和新域联合要求；SEQ明显遗忘不足也未改变。若以后继续，先明确可区分的机制问题及有实际场景理由、共同作用于对手的应用压力条件；不自动换β、记忆规模或种子，不追改本轮P/M负结果。
+后续优先级按用户要求的[完整背景方向外审及独立处置](../reports/documentation/20261113/vendorlink_next_review/primary_disposition.zh.md)修正：当前推荐将有效的外部开发竞争力和内部联合失败定稿收尾，不将统一跨市场池或12/15条开发队列作为默认下一步。现FIT12可以有效测量CL，只是没有支持原强抗遗忘目标；新应用协议须有独立需求，不能为找下降而扩池。若用户仍需要会改变科学决策的机制答案，才另定同协议唯一非零β的三条冷启动，或更窄的A→B诊断；β、数值响应/停止、两阶段入口与预算均未批准，不自动实施。相容的已保存对照可复用；完整ABC是包含后续教师变化的策略总效应，A→B不能代替Agora及总目标。只靠近ER不证明出生保持价值，恢复Q/O时F可能上升，不能只选小F；任何结果都不追改原P/M门或自动打开confirm。新建议不要求重开已充分完成的CPU/GPU资格，也不改变中文独立消融。
 
 用户明确选中的P24、M24和确定性Full12端点，以及早期GPU核验18份完整状态，已按[逐文件回执](../reports/documentation/20261113/vendorlink_weight_cleanup/receipt.json)删除；后续不能再假定可加载这些端点，SHA不能恢复权重，重训仍需新范围。原ABC36及RMS6不在本次选中范围，继续保管；目前无已批准的后续加载任务。旧G4/CE/评分头失败、完整结果和全部费用不追改。确认集保持关闭，已见开发结果不能变回独立验证。中文消融按11月13日独立恢复决定接续，旧Evolution/ABC结案不动；当前状态仅维护交接对应项，本地提交不推送。
 

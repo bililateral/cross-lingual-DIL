@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-13 VendorLink下一步方向外审保管
+
+用户明确要求送审下一步想法及完整背景。本次[输入清单](../reports/documentation/20261113/vendorlink_next_review/manifest.json)含65份安全载荷，13份生产源码来自Git c902ada1并按正式来源逐份核对；输入ZIP为288163字节、SHA256 `cc5c7c5230b511e23a9223b9126958e12c84d214a630c46b051eef7983e928ef`，精确恢复入口`2026e5ab:reports/documentation/20261113/vendorlink_next_review/input.zip`。原请求、背景和待审建议保留送审字节；本轮外发许可来自当前具体指令，不沿用旧结果包许可。
+
+[外审完整原文](../reports/documentation/20261113/vendorlink_next_review/external_report.zh.md)经Playwright从网页提供的Library文件直接下载，49047字节，SHA256 `70865f4296d9613e9095b24d5cd48b089eec884b3f1ed67dc2dc490e0d109826`；与[独立主审](../reports/documentation/20261113/vendorlink_next_review/primary_disposition.zh.md)、模型选择/提交/完成页及提交身份一并保管Windows和本地Git。本次未连接Linux，无科研计算或两端同步声明，根docs仅Windows维护；未改其他实验权重、原始结果或预算。原文回收、主审和Git恢复核对后，本轮无用输入包及具名浏览器副本按常规收尾退役，精确路径/字节见[recovery](../reports/documentation/20261113/vendorlink_next_review/recovery.json)。专用会话/下载页已关闭；外审建议没有转换成新实验权限。局部收尾不重置11月6日大清理与11月21日到期。
+
 ## 2026-11-13 VendorLink指定权重及早期GPU状态清理
 
 按用户先选中P/M/新Full60份、再明确追加早期18份GPU状态的[具体指令](RESEARCH_DISCUSSION.zh.md#2026-11-13明确删除vendorlink部分权重及早期gpu核验状态)，Linux于11:09:35完成逐文件删除。精确路径、大小、SHA、属主/inode、实际删除时间及前后核对保留在[原始回执](../reports/documentation/20261113/vendorlink_weight_cleanup/receipt.json)，同字节保管于Linux同名目录；312139字节、SHA256 `ac296ac950905dd80fe2d5395a2dc0e75e4b1ab7cb23050d12a8e4398427b642`已具名SFTP回传并在Windows核对。

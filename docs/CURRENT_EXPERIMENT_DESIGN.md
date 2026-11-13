@@ -4,6 +4,8 @@ H/S评价补充（2026-11-02）：用户选择[方案A](../reports/seller_alias_
 
 ## 当前合同入口
 
+VendorLink后续方向审查（2026-11-13，**方案判断，非新执行合同**）：用户明确要求送审主执行者建议并提供完整背景，见[请求与阅读地图](../reports/documentation/20261113/vendorlink_next_review/request.zh.md)、[原送审想法](../reports/documentation/20261113/vendorlink_next_review/proposal_as_submitted.zh.md)及[外审原文/独立处置](../reports/documentation/20261113/vendorlink_next_review/primary_disposition.zh.md)。默认扩池和12/15条队列建议已撤回；同协议β或A→B仅是未授权的条件性选择。旧合同、判据和结果保持，后续安排见计划，唯一状态见交接。
+
 VendorLink确定性出生评分候选（2026-11-12）：用户明确实施并免本轮外审、必要测试后直接训练，按[新合同](../reports/documentation/20261112/vendorlink_deterministic/scope.zh.md)限定三条Full、固定seed51/52/53和原RMS/FIT12/ABC40轮、新42h预算。只改出生MSE学生随机模式，旧P/M对照复用，原明显遗忘不足/负结果及confirm关闭保持；[实现核验与主审](../reports/documentation/20261112/vendorlink_deterministic/implementation.zh.md)说明实际作用，[正式门](../reports/documentation/20261112/vendorlink_deterministic/gate.json)绑定隔离workspace的13来源及新三任务入口，运行状态只见交接。
 
 本轮[完整结果与主审](../reports/documentation/20261112/vendorlink_deterministic/result/report.zh.md)及[全部13指标](../reports/documentation/20261112/vendorlink_deterministic/result/detail.json)按原门解释局部改善与联合目标失败；新结果外审按[具体包许可](../reports/documentation/20261112/vendorlink_deterministic/result/review/submission.json)执行，[完整原文与独立处置](../reports/documentation/20261112/vendorlink_deterministic/result/review/primary_disposition.zh.md)明确数值、机制和证据范围，与训练前方案/实现免审区分。原合同、正式门、来源与结果不追改；用户后续选中的P/M/新Full60端点及早期GPU18状态已按[保管回执](../reports/documentation/20261113/vendorlink_weight_cleanup/receipt.json)删除，合同中的端点复用为已发生行为，不再授予未来加载或重训。当前处置状态只见交接。
