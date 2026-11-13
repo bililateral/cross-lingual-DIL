@@ -177,9 +177,14 @@ class Checks(unittest.TestCase):
         completed, own_counts = [], []
         def admit(g, root, gpu, owned, nv, limits):
             own_counts.append(len(owned)); return {'ready':True}
-        tiny = [dict(j,seconds=15) for j in jobs]
+        # Keep the production 15-second shutdown margin; the CPU fixture needs
+        # a positive running window even though its work takes <1 second.
+        tiny = [dict(j,seconds=60) for j in jobs]
         with patch('step28_formal_queue.GpuMemory', NV), patch('step30_evolution_control.resource_observation', side_effect=admit):
-            runner.run_many(tiny,3,lambda job: completed.append(json.loads((job['target']/'cores.json').read_text())))
+            try:
+                runner.run_many(tiny,3,lambda job: completed.append(json.loads((job['target']/'cores.json').read_text())))
+            finally:
+                EVIDENCE['slot_dispatch'] = json.loads((self.root/'dispatch.json').read_text())
         self.assertEqual(len(completed),3); self.assertEqual(len(set(sum(completed,[]))),6)
         self.assertEqual(max(own_counts),2)
         ident = dict(pid=psutil.Process().pid,owner=psutil.Process().username(),created=-100.,reserved_bytes=5*2**30,**kernel_identity(psutil.Process().pid))
