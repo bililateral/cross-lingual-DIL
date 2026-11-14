@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-14 中文辅助硬帽取消及三中断恢复保管
+
+[独立恢复目录](../reports/documentation/20261114/h_ablation_budget_resume/scope.zh.md)保留用户具体指令、运行补充、本地处置、两份实际入口、正式request/launch、现场资源/预算及三条首更新；原已审dispatch和50冻结科学来源不改，根docs仅Windows维护。按用户要求未新增测试、短测、外审包或一次性核验脚本，未创建网页会话。两运行入口仍供当前监管调用，不属于无用文件，继续保护。
+
+原预算停机[具名观测](../reports/documentation/20261113/h_ablation_retry_s6/progress_20261114_budget_stop.json)29047字节，SHA256 `a8ec7689945eef58cea9781efc63f9f3328594df5636f3346d947210f096e6d5`；11月14日04:02最终failure/budget/dispatch/execution_time/cost_records原字节保留于Linux新恢复根previous_segment，不将新状态追改入旧回执。三条BCA_s4中断目录整体移入原campaign/attempts/各任务/attempt0，32文件1305723909字节，原模型/日志/访问/费用均保留且大小/SHA一致；只回传[路径与身份回执](../reports/documentation/20261114/h_ablation_budget_resume/state/attempt_resolution.json)，没有回传模型、正文、身份、标签、Memory或预测。21成功及Full27未移动或删除。
+
+β旧wait含失败原件原样保管在wait_before_budget_resume，更早wait_before_chinese_retry_s6继续保留；新gate_after_budget_resume.json另存，只迁移真实依赖与承接费用，不覆盖原门/launch。新唯一wait和once_wait仍活动，不能提前清理。实际首更/身份及新门等9项由[final_sync](../reports/documentation/20261114/h_ablation_budget_resume/final_sync.json)具名SFTP回传并逐份核大小/SHA；5项部署文件按sync清单远端核对。辅助历史和本次665秒保守准备费留在原累计账，非CPU活动，不新增测试子账。没有遗留临时副本或压缩包，没有删除权重；本地提交不推送，用户已有结果表修改保持。局部收尾不重置11月6日大清理和11月21日到期。
+
 ## 2026-11-13 中文单次重试恢复保管
 
 [本次独立目录](../reports/documentation/20261113/h_ablation_retry_s6/scope.zh.md)保管单条重试授权、限定免审、CPU01/02/03、独立主审、正式request及实际接管证据；运行包装在同根workspace/scripts/retry_once.py，调用原已审freeze/drain和原controller/dispatch，不覆盖活动50科研来源。原失败目录在实际排空后才整体原样归档，后续资产路径和实际发生状态见运行回执，不提前声称已移动或开训。Full27、原成功端点及现有worker均保护。

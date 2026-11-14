@@ -4,7 +4,7 @@
 
 接手和日常同步按[工作流](RESEARCH_WORKFLOW.zh.md)使用一次性只读观察及具名SFTP核验；普通更新数变化不重复修改合同入口/计划。状态跃迁时核对受影响可变入口，保持活动冻结来源、历史原件和原判据。
 
-中文消融单任务技术失败后，用户已[明确允许ABC_s6_ER重试一次及恢复原槽交接](RESEARCH_DISCUSSION.zh.md#2026-11-13单次重试中文er并恢复原槽交接)。沿[本次补充](../reports/documentation/20261113/h_ablation_retry_s6/scope.zh.md)，先受控排空原worker，再保留失败现场/费用，恢复该槽并续接原固定队列；新失败仍退休、不自动再试。β唯一等待只迁移真实监管身份及承接费用，完整性未满足就不进入确认、分析或β训练，不能以队列排空代替完整成功。原预算不扩，辅助余额紧张仍按硬帽处理；实际当前状态只见交接及原始观测。
+中文消融沿[11月14日明确补充](../reports/documentation/20261114/h_ablation_budget_resume/scope.zh.md)执行：辅助桶取消硬上限、保留全部费用；训练378h/确认12h及原资源/科学条件保持，旧394h不再作为辅助停止线。只重跑三条BCA_s4预算中断，保留21成功及Full引用，恢复三槽原固定队列；新失败仍退休、不自动再试。11月13日ABC_s6_ER单次恢复是已发生历史，不继续列为待执行。原63新增及Full完整有效后才原生成、盲评分和分析；不足仍禁止下游。β唯一等待按本次真实中文监管和新依赖门承接，科学完整性与进程释放条件不变，不能以空槽/不完整停止放行；β自身独立42h不改。实际状态和观测仅维护交接。
 
 ## VendorLink账号监督：FIT12共同协议后续
 
@@ -12,7 +12,7 @@
 
 依据已完成的[随机模式诊断与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/report.zh.md)形成的[三条Full合同](../reports/documentation/20261112/vendorlink_deterministic/scope.zh.md)已经执行至整批完整。[结果主审](../reports/documentation/20261112/vendorlink_deterministic/result/report.zh.md)保留对旧Full的局部改善、对ER/SEQ仍无联合优势及初学/新域保护失败；用户批准的具体结果外审经[独立处置](../reports/documentation/20261112/vendorlink_deterministic/result/review/primary_disposition.zh.md)闭合。完整结果证据继续保管，端点按用户随后明确的清理决定处理，该已结案批次无剩余科研执行；不重启其唯一campaign或重复已闭合资格，confirm、新应用输出和任何新候选均不自动启动。
 
-用户在[完整背景方向外审及独立处置](../reports/documentation/20261113/vendorlink_next_review/primary_disposition.zh.md)后明确选择继续改善完整H，已确认[同协议单一β探针](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md)：β=.191859540449699、seed51/52/53、完整ABC每域40轮、最多3-worker、独立42h。[增量审查与必要修复](../reports/documentation/20261113/vendorlink_beta_quarter/review/primary_disposition.zh.md)已闭合，沿[绑定的正式门](../reports/documentation/20261113/vendorlink_beta_quarter/gate.json)及唯一等待控制器，继续等待中文H消融整批结束、监管闭合和进程释放，再通过实时资源准入自动执行；不重开已存在等待器或campaign。三条完整训练后串行盲评分、一次分析；按预定Dream恢复、两个旧域最终改善与Agora保护联合判断，原强门单列。任何结果均结束该有限探针，不追加β/seed/epoch或自动confirm。
+用户在[完整背景方向外审及独立处置](../reports/documentation/20261113/vendorlink_next_review/primary_disposition.zh.md)后明确选择继续改善完整H，已确认[同协议单一β探针](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md)：β=.191859540449699、seed51/52/53、完整ABC每域40轮、最多3-worker、独立42h。[增量审查与必要修复](../reports/documentation/20261113/vendorlink_beta_quarter/review/primary_disposition.zh.md)已闭合，沿原绑定来源及[当前依赖门](../reports/documentation/20261113/vendorlink_beta_quarter/gate_after_budget_resume.json)的唯一等待控制器，继续等待中文H消融整批结束、监管闭合和进程释放，再通过实时资源准入自动执行；不重开已存在等待器或campaign。三条完整训练后串行盲评分、一次分析；按预定Dream恢复、两个旧域最终改善与Agora保护联合判断，原强门单列。任何结果均结束该有限探针，不追加β/seed/epoch或自动confirm。
 
 不恢复统一跨市场池或12/15条开发队列；当前FIT12有效但未支持原强抗遗忘目标。复用相容保存对照，完整ABC包含后续教师变化，只靠近ER不证明出生保持价值；恢复Q/O时F可以上升，不能只选小F。原P/M结果和费用不改，不重开充分资格，不改变中文独立合同或挪用预算。具体等待/运行状态只维护交接对应项。
 
