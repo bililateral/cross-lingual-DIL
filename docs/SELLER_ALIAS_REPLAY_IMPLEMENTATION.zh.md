@@ -40,7 +40,7 @@
 
 ## 外审处置、部署与失败经过
 
-已阅读全文并独立复核[外审处置](../reports/seller_alias_continual/20260912/replay_implementation/review.json)、[原回复](../reports/seller_alias_continual/20260912/replay_implementation/review_reply.json)及[证据包](../reports/seller_alias_continual/20260912/replay_implementation/external_evidence.zip)。实际回复model_slug为gpt-6-pro。12份生产来源与提交时一致、8旧冻结来源一致，16份保存矩阵及外审历史AP摘要/资格记录均吻合；20个独立测试名称与源码及日志一致，不重复计数单独运行的Torch用例。本地没有重跑这些不变测试，也未解析正式监督。
+已阅读全文并独立复核[外审处置](../reports/seller_alias_continual/20260912/replay_implementation/review.json)、[原回复](../reports/seller_alias_continual/20260912/replay_implementation/review_reply.json)及当时的证据包（后续重复副本清理已退役；现查上述保留原文及[文件身份清单](../reports/seller_alias_continual/20260912/replay_implementation/review_files.json)，包可从Git `39988ad3^:reports/seller_alias_continual/20260912/replay_implementation/external_evidence.zip`恢复，24824字节）。实际回复model_slug为gpt-6-pro。12份生产来源与提交时一致、8旧冻结来源一致，16份保存矩阵及外审历史AP摘要/资格记录均吻合；20个独立测试名称与源码及日志一致，不重复计数单独运行的Torch用例。本地没有重跑这些不变测试，也未解析正式监督。
 
 R1已确认且非阻断：Budget只覆盖作业子目录run/，末次取样还早于最终manifest和模型核验回执。用临时9字节run载荷、3字节外围日志及11字节上限实际复现了“run检查通过但全目录12字节”的范围差，临时夹具已自动清理。采用最小报告修正，不改训练/评价代码：完成后逐文件统计整个作业目录最终逻辑字节，分别列出run、外围日志和收尾回执；使用started.txt、finished.txt、resource_usage.log及exit_status.txt报告完整历时/退出状态；保留大状态共存时观测，必要时加外围与收尾字节给出保守上界，不能把最终大小当瞬时峰值。实际资源回执须等运行完成，当前不声称已测量。
 
