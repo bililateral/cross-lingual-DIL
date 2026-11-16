@@ -1,6 +1,12 @@
 # 科研文件存储与恢复
 
-## 2026-11-16 中文消融公式展示保管
+## 2026-11-16 中文消融局部排名公式展示修订
+
+按[最新修订要求](RESEARCH_DISCUSSION.zh.md#2026-11-16公式展示改为围绕原h_full的局部改善)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为24211字节、SHA256 d694fe5b0be97c78f42780f7395248d7f0ce160aa2dfb5d48c0eefb14935cf5f；27份保存逐query指标逐份核对大小/SHA，原指标均值恢复后才作局部升位。当前[计算入口](../scripts/ablation_formula_display.py)15532字节、SHA256 e8088686710c886fef03da82936c77bd63fb889a31de11d494e077d84216faf5，Linux同字节替换原非活动formula_display.py并在执行前核对。新数值SFTP回传身份一致，原预测矩阵、pairs、owners、标签、模型均未读取；临时JSON原子写出路径已替换，无遗留临时文件或新包。
+
+当前同名公式文件是可变展示产物；前一独立分布版本的准确源码/数值从Git 8fcdaf21恢复，以下首次保管段仅描述其当时状态，不再作为当前文件身份。原正式summary/结果/审查/费用不改，本轮只计算声明的检索侧示例，原概率与分类输出保持；没有改动运行作业或删除科研资产。代码是当前表格的必要重算入口，继续保留。既有用户文档编辑不纳入提交，不推送，不重置大清理周期。
+
+## 2026-11-16 中文消融公式展示首次版本保管（历史）
 
 按[明确的公式展示范围](RESEARCH_DISCUSSION.zh.md#2026-11-16中文消融map增加2个百分点的公式展示)，Linux py310从已开放的原summary计算一组评分假设的指标期望，保存[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)，12872字节、SHA256 ac43d25546975c145358e26bbb8986a7e50e56117b512c156fde66af572231f1；SFTP回传后身份一致。该文件在原冻结result目录之外，不覆盖实测summary/指标/审查/费用；不涉及标签、模型或预测载荷。
 
