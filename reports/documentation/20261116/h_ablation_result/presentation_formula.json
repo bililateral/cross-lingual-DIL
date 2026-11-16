@@ -1,6 +1,6 @@
 {
   "created_at": "2026-11-16T21:02:56.136205+08:00",
-  "purpose": "Formula example: prior local final-query reranking plus all-eight acquisition-endpoint shift; not experimental results",
+  "purpose": "Formula examples with common acquisition shifts, Full final reranking and KD user-specified O/F anchors; not experimental measurements",
   "source": {
     "path": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/confirmation/summary.json",
     "bytes": 3973607,
@@ -502,7 +502,7 @@
     "reconstruction": "Modify only patterns whose positive ranks are uniquely identified by all ten saved per-query metrics",
     "classification": "Retain original pair scores, stage-cal mapping, probability outputs, threshold, confusion counts, losses and pair curves unchanged",
     "output_separation": "Retrieval-only local reranking is a separate illustrative output. It is not ranking the same unchanged probability array, nor a learned deployable improvement",
-    "temporal": "All eight illustrative R11 and R22 MAP endpoints increase by 0.02. Final endpoints retain the prior display, including Full retrieval reranking. This is endpoint arithmetic, not reconstructed early-stage scores or other early-stage metrics.",
+    "temporal": "Common R11/R22 +0.02 acquisition scenario retained; current KD example additionally raises only final position-2 mean MAP by 0.02. Full keeps its prior final-query reranking.",
     "scope": "A deterministic formula scenario, no ideal-reference mixture or independent score distribution. Original experimental verdict unchanged"
   },
   "cell_changes": [
@@ -678,7 +678,8 @@
     "label_reading": false,
     "score_matrix_reading": false,
     "resampling": false,
-    "acquisition_shift_all_eight_identities": true
+    "acquisition_shift_all_eight_identities": true,
+    "kd_O_F_anchors_and_final_MAP_consistent": true
   },
   "supersedes": {
     "git": "8fcdaf21",
@@ -902,7 +903,8 @@
       "O": 0.0,
       "Z": 0.0,
       "final_mean": 0.0
-    }
+    },
+    "status": "Historical intermediate scenario; current KD final endpoint shift is recorded in kd_final_reranking"
   },
   "formula_map_components": {
     "Full": {
@@ -925,12 +927,12 @@
     },
     "KD": {
       "A_acq": 0.5280323682033579,
-      "O": 0.5086925165750686,
-      "F": 0.019339851628289217,
+      "O": 0.5186925165750687,
+      "F": 0.009339851628289217,
       "N": 0.5243647399542752,
       "Z": 0.5273412250484725,
       "F_first": 0.020944139454330157,
-      "final_mean": 0.51490875273287
+      "final_mean": 0.5215754193995367
     },
     "SEQ": {
       "A_acq": 0.5283409192312276,
@@ -978,5 +980,2555 @@
       "final_mean": 0.5060500364279539
     }
   },
-  "updated_at": "2026-11-16T21:59:00.605596+08:00"
+  "updated_at": "2026-11-16T22:36:11.048965+08:00",
+  "formula_final_values": {
+    "KD": {
+      "average_precision": 0.3689879297343562,
+      "trapezoidal_pr_auc": 0.3557025513439702,
+      "roc_auc": 0.8026812409476516,
+      "recall_at_fpr_1pct": 0.22449074074074074,
+      "brier": 0.04176955268059347,
+      "log_loss": 0.16409548793131462,
+      "precision": null,
+      "recall": 0.13967592592592593,
+      "f1": 0.2213332325664942,
+      "specificity": 0.9960686943927167,
+      "balanced_accuracy": 0.5678723101593213,
+      "mcc": null,
+      "map": 0.5215754193995367,
+      "mrr": 0.5724018068349445,
+      "recall_at_1": 0.32771164021164023,
+      "recall_at_3": 0.543535052910053,
+      "recall_at_5": 0.6491732804232805,
+      "recall_at_10": 0.7780257936507935,
+      "ndcg_at_1": 0.4419642857142857,
+      "ndcg_at_3": 0.4929463222216228,
+      "ndcg_at_5": 0.5410265586478431,
+      "ndcg_at_10": 0.5870764734136265
+    }
+  },
+  "kd_final_reranking": {
+    "purpose": "User-approved O/F anchors as a formula example, not measured KD improvement",
+    "prior_display_sha256": "3441547c5dbe9e06ea1f71bdbca4ac3de751660ebc52467de56bca8561d98079",
+    "source_bindings": {
+      "ABC_s4_KD": {
+        "path": "metrics_ABC_s4_KD_3_2_raw.npy",
+        "bytes": 89728,
+        "sha256": "35102b28a76cfe4672dc6ba76b159be2fbc29c9436392f986d45de21e39bcec9"
+      },
+      "ABC_s5_KD": {
+        "path": "metrics_ABC_s5_KD_3_2_raw.npy",
+        "bytes": 89728,
+        "sha256": "992aed4c92b912cb91e8cc3006e6f9fa11fc05c330928356cd5c340ca0002297"
+      },
+      "ABC_s6_KD": {
+        "path": "metrics_ABC_s6_KD_3_2_raw.npy",
+        "bytes": 89728,
+        "sha256": "23787a2513571851f8aa31c65e748ff2aca77d9c7ee4a1cbb7f61e7611078601"
+      },
+      "BCA_s4_KD": {
+        "path": "metrics_BCA_s4_KD_3_2_raw.npy",
+        "bytes": 89728,
+        "sha256": "2879e3f73b4b935cc77605aecd4b26763ffd13981c6d8cc58c1ec9af40e79613"
+      },
+      "BCA_s5_KD": {
+        "path": "metrics_BCA_s5_KD_3_2_raw.npy",
+        "bytes": 89728,
+        "sha256": "b5b2a450d0509ea1f3189b41ac24a672f84c615ccf4f19081b3293b95b74945b"
+      },
+      "BCA_s6_KD": {
+        "path": "metrics_BCA_s6_KD_3_2_raw.npy",
+        "bytes": 89728,
+        "sha256": "9d20d2f8f4ec86f58c02573aece13fa8942941ad36fd9fb172e499dcd6120462"
+      },
+      "CAB_s4_KD": {
+        "path": "metrics_CAB_s4_KD_3_2_raw.npy",
+        "bytes": 89728,
+        "sha256": "1ca37be9d3f8f707d524513dd9a996ee3cd986846ff00c67b9679a3bcddedc7d"
+      },
+      "CAB_s5_KD": {
+        "path": "metrics_CAB_s5_KD_3_2_raw.npy",
+        "bytes": 89728,
+        "sha256": "46d53fc679530b2ef98f5167bc963f1256f61764c0c1026d384c3c7a5901568b"
+      },
+      "CAB_s6_KD": {
+        "path": "metrics_CAB_s6_KD_3_2_raw.npy",
+        "bytes": 89728,
+        "sha256": "8f9becee4594d4431ae56d28fc16f0a30498974f3b67776a3330b7c6bae32ed3"
+      }
+    },
+    "previous_components": {
+      "A_acq": 0.5280323682033579,
+      "O": 0.5086925165750686,
+      "F": 0.019339851628289217,
+      "N": 0.5243647399542752,
+      "Z": 0.5273412250484725,
+      "F_first": 0.020944139454330157,
+      "final_mean": 0.51490875273287
+    },
+    "components": {
+      "A_acq": 0.5280323682033579,
+      "O": 0.5186925165750687,
+      "F": 0.009339851628289217,
+      "N": 0.5243647399542752,
+      "Z": 0.5273412250484725,
+      "F_first": 0.020944139454330157,
+      "final_mean": 0.5215754193995367
+    },
+    "selected_queries": [
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 18,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 18,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 8,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 6,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 6,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 6,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 0,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 0,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 0,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 37,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 58,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 19,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 14,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 10,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 10,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 2,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 2,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 2,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 79,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 66,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 35,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 29,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 17,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 29,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 48,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 5,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 3,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 84,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 73,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 65,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 35,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 31,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 35,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 95,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 31,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 48,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 85,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 79,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 79,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 47,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 32,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 47,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 96,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 42,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 75,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 86,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 86,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 86,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 50,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 47,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 51,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 108,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 96,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 93,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 117,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 88,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 88,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 51,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 51,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 63,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 120,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 107,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 120,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 125,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 115,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 125,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 61,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 61,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 80,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 121,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 114,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 121,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 126,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 125,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 126,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 63,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 83,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 90,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 134,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 120,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 125,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 144,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 127,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 129,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 80,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 99,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 95,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 145,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 125,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 154,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 145,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 175,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 168,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 83,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 106,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 99,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 166,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 134,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 166,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 175,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 218,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 175,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 95,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 140,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 128,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 171,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 154,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 171,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 219,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 240,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 196,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 136,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 184,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 136,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 188,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 163,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 186,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 226,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 275,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 224,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 145,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 188,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 197,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 192,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 166,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 188,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 250,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 276,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 226,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 186,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 225,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 202,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 194,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 171,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 192,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 265,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 309,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 251,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 207,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 230,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 230,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 197,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 176,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 194,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 267,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 329,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 275,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 213,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 242,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 242,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 210,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 186,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 195,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 275,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 332,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 276,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 215,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 254,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 249,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 217,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 188,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 197,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 276,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 363,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 286,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 228,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 262,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 250,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 220,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 210,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 213,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 309,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 372,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 296,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 229,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 265,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 296,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 222,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 260,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 243,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 333,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 382,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 329,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 262,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 284,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 302,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 241,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 261,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 261,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 349,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 383,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 332,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 265,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 302,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 323,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 260,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 262,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 262,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 363,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 384,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 333,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 276,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 327,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 327,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 283,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 278,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 265,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 373,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 389,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 363,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 281,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 341,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 339,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 297,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 283,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 285,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 376,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 390,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 370,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 309,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 360,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 341,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 304,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 333,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 304,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 381,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 455,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 382,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 339,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 362,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 362,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 310,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 357,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 307,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 384,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 458,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 384,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 341,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 373,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 373,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 330,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 369,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 357,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 388,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 493,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 390,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 348,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 380,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 395,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 369,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 381,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 408,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 389,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 509,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 397,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 349,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 421,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 436,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 381,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 384,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 418,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 390,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 520,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 406,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 360,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 435,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 453,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 393,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 393,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 421,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 403,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 536,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 440,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 361,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 436,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 460,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 408,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 418,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 451,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 406,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 544,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 444,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 396,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 442,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 461,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 412,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 423,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 452,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 440,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 551,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 448,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 447,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 453,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 490,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 414,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 431,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 457,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 444,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 583,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 455,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 453,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 461,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 525,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 418,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 446,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 462,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 493,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 607,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 488,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 461,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 490,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 573,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 428,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 452,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 463,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 512,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 624,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 529,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 490,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 494,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 580,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 449,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 462,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 468,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 540,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 650,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 551,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 500,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 504,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 604,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 461,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 468,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 496,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 551,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 656,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 594,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 507,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 525,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 613,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 463,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 493,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 502,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 594,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 671,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 599,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 509,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 580,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 635,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 468,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 506,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 506,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 611,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 726,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 611,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 514,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 636,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 636,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 502,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 543,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 513,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 624,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 738,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 624,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 525,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 656,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 649,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 518,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 564,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 556,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 635,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 743,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 635,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 573,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 673,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 660,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 543,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 593,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 564,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 656,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 781,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 647,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 619,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 689,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 667,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 555,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 595,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 565,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 660,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 782,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 650,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 636,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 693,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 669,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 564,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s5_KD",
+        "query_index": 605,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s6_KD",
+        "query_index": 568,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 671,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s5_KD",
+        "query_index": 790,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s6_KD",
+        "query_index": 660,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s4_KD",
+        "query_index": 665,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s5_KD",
+        "query_index": 726,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "BCA_s6_KD",
+        "query_index": 673,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "CAB_s4_KD",
+        "query_index": 565,
+        "rank_before": 2,
+        "rank_after": 1
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 0,
+        "rank_before": 5,
+        "rank_after": 4
+      },
+      {
+        "cell": "ABC_s4_KD",
+        "query_index": 6,
+        "rank_before": 5,
+        "rank_after": 4
+      }
+    ],
+    "moves": {
+      "single_two_to_one": 403,
+      "single_five_to_four": 2
+    },
+    "affected_position": 2,
+    "affected_queries": 10080,
+    "all_final_queries": 30240,
+    "position2_metric_deltas": {
+      "map": 0.02,
+      "mrr": 0.02,
+      "recall_at_1": 0.03998015873015873,
+      "recall_at_3": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "ndcg_at_1": 0.03998015873015873,
+      "ndcg_at_3": 0.01475548703479208,
+      "ndcg_at_5": 0.01476418222345058,
+      "ndcg_at_10": 0.01476418222345058
+    },
+    "endpoint_rule": "Keep R31/R33 fixed; increase mean R32 by 0.02 after the existing R11/R22 shifts",
+    "pair_outputs": "Original pair scores, calibration, threshold and all first 12 final metrics unchanged",
+    "output_separation": "Retrieval ranks are a separate illustrative output, not ranking unchanged pair probabilities",
+    "identity_checks": true
+  }
 }

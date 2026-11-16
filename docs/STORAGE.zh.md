@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-16 KD指定O/F的局部排名公式记录
+
+按[最新决定](RESEARCH_DISCUSSION.zh.md#2026-11-16按指定kd旧域最终和遗忘值重建一致公式示例)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为87590字节、SHA256 f793a50943e3ce093234b23040dbef1c3cdc69d3e33b9d93f97f80f4aaeb6c7b。Linux同名展示产物经SFTP回传Windows，大小/SHA一致。前版33027字节/SHA3441547c5dbe9e06ea1f71bdbca4ac3de751660ebc52467de56bca8561d98079由Git defdda5f可精确恢复，本版也记录此前身份。
+
+此次仅新增9份原已开放KD第二到达位置逐query指标的身份绑定和405个局部相邻交换记录；原输入数组留Linux，Windows仅回传必要JSON，不同步标签、预测或模型。原saved_final_values/saved_map_components、Full示例、原科学结果和前一基线公式JSON均保持。八配置取得平移的中间记录保留并标为历史中间态，当前KD最终分项以kd_final_reranking及formula_map_components为准。只执行Linux py310一次性内联计算，没有生成脚本文件；原formula_display.py仍不存在，JSON原子临时路径已替换并核实无遗留。本轮仅本地提交，不推送，不重置大清理周期。
+
 ## 2026-11-16 第一节基线取得端点公式记录
 
 新增[baseline_acquisition_formula.json](../reports/documentation/20261116/h_ablation_result/baseline_acquisition_formula.json)，25848字节、SHA256 2adf9a7142afa6b98c6273cef3cc10a29052d2c7d32c004af1f0d02d9c72499b。Linux位于 `/home/yongpeng/cross-lingual/reports/documentation/20261116/h_ablation_result/baseline_acquisition_formula.json`，经SFTP回传Windows后大小/SHA一致；保存9列原展示输入、22行前后值（19行实际变化）、公式参数、聚合端点与精度核对，不含标签/预测/模型。
