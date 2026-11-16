@@ -1,5 +1,20 @@
 # 科研文件存储与恢复
 
+## 2026-11-16 中文消融新增训练权重定向删除
+
+按[本次明确决定](RESEARCH_DISCUSSION.zh.md#2026-11-16核对后删除本次中文消融新增权重)，先核对中文整批完成及评分/分析验收、无活动中文进程或目标权重打开句柄、β不加载本批中文模型，再删除用户范围内的190份权重。16:11:42实际完成，合计247830452432字节，约230.81GiB，无备份。删除前每份实际SHA均与原成功完成或预算中断归档记录一致，见[逐文件路径/大小/SHA及保管基线](../reports/documentation/20261116/h_ablation_weight_cleanup/preflight.json)；实际逐路径删除、零残留及保留核对见[删除回执](../reports/documentation/20261116/h_ablation_weight_cleanup/receipt.json)。两份回执均已SFTP回传并核对大小/SHA。
+
+| 对象 | 实际处置 |
+|---|---|
+| 63条新增训练的189份阶段端点 | 已删除，246526076664字节；Linux本批formal/training/对应任务/run/models/stage1、2、3.pt |
+| 旧预算中断BCA_s4_ER的1份阶段端点 | 已删除，1304370776字节；同一formal/attempts/BCA_s4_ER/attempt0/run/models/stage1.pt；原失败/归档/费用保留 |
+| Windows对应formal目录 | 实际不存在，没有本地权重或删除动作 |
+| 原复用Full27、预训练模型及其他研究线模型 | 保留，不属于本次产生资产；Full27删除前后大小/属主/模式/mtime/inode一致 |
+| 结果、盲分数、指标、Memory、日志、源/配置、访问及费用 | 6706份非权重文件保持；6540份内容SHA一致，166份Memory或生成隔离载荷仅核对元数据，未打开正文/pairs/owners或Memory内容 |
+| 活动β三训练及14生产来源 | 原进程身份匹配、RUNNING，14来源大小/SHA不变，未停止或改源 |
+
+Linux范围为/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal；删除后其中模型权重0份，目录和非权重原件保留。完成回执中历史MODELS_RETAINED字段不追改，当前保管事实以清理回执为准。已删模型不能靠Git/SHA恢复，不能再列为可载模复用输入；结果解释/审查仍沿保存指标和盲分数完成。维护核对墙钟另在回执注明，未重算指标、载模或改已闭合实验账。本次没有临时核验脚本/上传包，不触发其他资产清理；大清理上次11月6日/下次11月21日保持。当前成果仅本地提交，不推送，不纳入用户结果表和其他正在形成的结果分析文件。
+
 ## 2026-11-16 中文消融后处理恢复保管
 
 用户要求同步完整消融结果；现场先保管了训练完成、生成资源回执失败及β依赖退出的[14份原始元数据](../reports/documentation/20261116/h_ablation_result/raw_manifest.json)，121367字节，具名SFTP回传并逐份核对大小/SHA。63成功训练和同一120群继续保留；未回传正文、账号映射、pairs/owners、Memory、预测数组或模型。原生成退出1及10.468339秒失败费保持，不改写为进程成功。
