@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-16 中文消融公式展示保管
+
+按[明确的公式展示范围](RESEARCH_DISCUSSION.zh.md#2026-11-16中文消融map增加2个百分点的公式展示)，Linux py310从已开放的原summary计算一组评分假设的指标期望，保存[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)，12872字节、SHA256 ac43d25546975c145358e26bbb8986a7e50e56117b512c156fde66af572231f1；SFTP回传后身份一致。该文件在原冻结result目录之外，不覆盖实测summary/指标/审查/费用；不涉及标签、模型或预测载荷。
+
+必要计算源码[ablation_formula_display.py](../scripts/ablation_formula_display.py)8690字节、SHA256 f627371910d218bb51b79f6d190de149d87dce639ded69e2b069c99bf1aab7aa，同字节部署于Linux本轮h_ablation_result/formula_display.py并在执行前核对；它是展示数值的重算来源，随公式记录保留，不是新增资格测试或监听。没有额外临时文件/包、模型删除或正式作业改动，不重置大清理周期。仅新增目标文档的公式展示部分，既有用户编辑不纳入本次Git提交，本轮不推送。
+
 ## 2026-11-16 中文消融完整结果与分析交付
 
 [原始结果清单](../reports/documentation/20261116/h_ablation_result/result/source_manifest.json)绑定1319文件、26607489字节，全部具名SFTP回传至本轮result并核对大小/SHA，包括原summary、1296匿名群指标、完整性/访问/资源与成本回执。未回传正文、账号映射、pairs/owners载荷、预测矩阵、Memory或权重；已开放的汇总不增加封存材料权限。原summary SHA256为f187d1e29351e7321ab5ab534bff38eb2704adf0156b6c491b4251372dbfa30b，保留原primary_pass=false，独立分析与图表另存，不覆盖正式结果。
