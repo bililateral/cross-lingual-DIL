@@ -1,0 +1,140 @@
+{
+  "observed_at": "2026-11-16T10:43:18.757217+08:00",
+  "identities": {
+    "controller": {
+      "pid": 4167213,
+      "owner": "yongpeng",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "-u",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261116/h_ablation_result/recovery/workspace/scripts/resume.py",
+        "--request",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261116/h_ablation_result/recovery/request.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace",
+      "start_ticks": 222636945,
+      "boot_id": "c1ccd67e-4533-42ce-9ad5-04c9e2ed1b3e",
+      "rss_bytes": 628375552,
+      "elapsed_monotonic_seconds": 2645.3193115796894
+    },
+    "score": {
+      "pid": 4167240,
+      "owner": "yongpeng",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261116/h_ablation_result/recovery/workspace/scripts/evaluate.py",
+        "--recovery-request",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261116/h_ablation_result/recovery/request.json",
+        "confirmation",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_start/formal_gate.json",
+        "--deadline",
+        "2269456.392370526",
+        "--batch",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/training/batch.json",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace/formal/confirmation"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261107/h_ablation_prepare/workspace",
+      "start_ticks": 222637639,
+      "boot_id": "c1ccd67e-4533-42ce-9ad5-04c9e2ed1b3e",
+      "rss_bytes": 2390081536,
+      "elapsed_monotonic_seconds": 2638.3795146010816
+    },
+    "beta_wait": {
+      "pid": 4167214,
+      "owner": "yongpeng",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "-u",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261113/vendorlink_beta_quarter/workspace/scripts/once_wait.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261113/vendorlink_beta_quarter/gate_after_postprocess_resume.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261113/vendorlink_beta_quarter/workspace",
+      "start_ticks": 222636960,
+      "boot_id": "c1ccd67e-4533-42ce-9ad5-04c9e2ed1b3e",
+      "rss_bytes": 547319808,
+      "elapsed_monotonic_seconds": 2645.1696935519576
+    }
+  },
+  "training_success": 63,
+  "training_pending": 0,
+  "training_active": 0,
+  "reused_full": 9,
+  "blind_complete_trajectories": 10,
+  "blind_total_trajectories": 72,
+  "blind_group_forwards": 2400,
+  "blind_total_group_forwards": 17280,
+  "score_array_count": 183,
+  "failure": false,
+  "all_blind_complete": false,
+  "confirmation_result": false,
+  "analysis_result": false,
+  "campaign_complete": false,
+  "used_seconds": {
+    "auxiliary": 23030.546144002816,
+    "confirmation": 0,
+    "training": 736914.5371611663
+  },
+  "caps": {
+    "auxiliary": null,
+    "confirmation": 43200,
+    "training": 1360800
+  },
+  "evaluation_access": {
+    "events": [
+      {
+        "keys": [
+          "new_generated_owners_and_pairs"
+        ],
+        "role": "ablation_generation",
+        "time": 1794791469.2680745
+      },
+      {
+        "keys": [
+          "new_public_text",
+          "216_inference_states"
+        ],
+        "role": "ablation_blind_inference",
+        "time": 1794794365.644348
+      }
+    ]
+  },
+  "gpu_processes": "4167240, 2534 MiB",
+  "beta_status": {
+    "status": "WAITING_CHINESE_COMPLETION",
+    "observed_epoch": 1794796996.7929337,
+    "identity": {
+      "pid": 4167214,
+      "owner": "yongpeng",
+      "command": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "-u",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261113/vendorlink_beta_quarter/workspace/scripts/once_wait.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261113/vendorlink_beta_quarter/gate_after_postprocess_resume.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261113/vendorlink_beta_quarter/workspace",
+      "start_ticks": 222636960,
+      "boot_id": "c1ccd67e-4533-42ce-9ad5-04c9e2ed1b3e"
+    },
+    "dependency": {
+      "ready": false,
+      "status": "WAITING_CHINESE_COMPLETION",
+      "controller": 4167213
+    },
+    "resources": null,
+    "active_seconds": 1.3841312336735427,
+    "auxiliary_used_seconds": 375,
+    "sleep_charged": false,
+    "automatic_retry": false
+  },
+  "beta_campaign_exists": false,
+  "beta_failure": false,
+  "user_request": "Stop conversational waiting and report progress; do not stop authorized server jobs",
+  "scientific_effects_read": false
+}

@@ -8,6 +8,8 @@
 
 旧根failure、budget、cost_records、execution_time按原字节保存在Linux新恢复state/previous_segment；旧βwait整体保存在原root/wait_before_postprocess_resume，新依赖门另存为gate_after_postprocess_resume.json。原冻结门、失败回执和旧两次等待归档不变。启动/依赖/训练费用等[8份具名元数据](../reports/documentation/20261116/h_ablation_result/startup_sync.json)56468字节已SFTP回传、逐份大小/SHA一致；训练费用盘点只用独立dispatch和cost账，不读逐训练私有状态。确认评分使用Linux既有py310及原正式端点，结果完整前不读取效果或提前开标签；根docs在Windows维护。当前进度只见交接唯一研究线项，不把本记录当动态账本。
 
+10:43:18的[结束本轮等待时观测](../reports/documentation/20261116/h_ablation_result/recovery/progress_20261116_104318.json)5041字节已具名SFTP回传、大小/SHA一致；内容限运行/访问角色/费用元数据，没有效果载荷。用户询问清理时已明确说明189新增阶段端点及复用Full27仍是当前评分依赖，未执行删除或移动。
+
 本次新增成果仅本地保管，11月14日已完成推送许可不扩大到本批；用户已有结果表编辑保持未提交。本轮没有删除权重，没有外发新结果包。局部恢复不重置上次11月6日、下次11月21日大清理周期。
 
 ## 2026-11-14 全项目科研记录与同步核对
