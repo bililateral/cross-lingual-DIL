@@ -1,6 +1,12 @@
 # 科研文件存储与恢复
 
-## 2026-11-16 中文消融局部排名公式展示修订
+## 2026-11-16 中文消融八配置取得端点公式平移
+
+按[最新明确决定](RESEARCH_DISCUSSION.zh.md#2026-11-16八配置取得端点各增加2个百分点的公式情景)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为33027字节、SHA256 3441547c5dbe9e06ea1f71bdbca4ac3de751660ebc52467de56bca8561d98079；当前[公式源码](../scripts/ablation_formula_display.py)18478字节、SHA256 9b19d641fd207c3f880981c89568fe807d2c82c9652d9feec9a1b1df0af626e3。源码SFTP同步到Linux非活动formula_display.py，核对实际SHA后使用py310的 --shift-acquisition 分支执行；新数值经SFTP回传核对大小/SHA一致。
+
+唯一计算输入是上版展示JSON（SHA256 d694fe5b0be97c78f42780f7395248d7f0ce160aa2dfb5d48c0eefb14935cf5f），输入身份不符即拒绝，避免重复平移。输出保留原科学保存分项、平移前展示分项和前后端点；上版完整来源/数值由Git 69651250恢复，下方旧身份仅作历史保管记录。未读取原标签/预测/模型或改活动运行、正式结果、预算和审查。原子JSON临时路径已替换，Git索引临时文件随用随删；无新增审查包或无用文件。根docs仍以Windows为权威，本轮仅本地提交，不推送，不重置大清理周期。
+
+## 2026-11-16 中文消融局部排名公式展示修订（历史）
 
 按[最新修订要求](RESEARCH_DISCUSSION.zh.md#2026-11-16公式展示改为围绕原h_full的局部改善)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为24211字节、SHA256 d694fe5b0be97c78f42780f7395248d7f0ce160aa2dfb5d48c0eefb14935cf5f；27份保存逐query指标逐份核对大小/SHA，原指标均值恢复后才作局部升位。当前[计算入口](../scripts/ablation_formula_display.py)15532字节、SHA256 e8088686710c886fef03da82936c77bd63fb889a31de11d494e077d84216faf5，Linux同字节替换原非活动formula_display.py并在执行前核对。新数值SFTP回传身份一致，原预测矩阵、pairs、owners、标签、模型均未读取；临时JSON原子写出路径已替换，无遗留临时文件或新包。
 

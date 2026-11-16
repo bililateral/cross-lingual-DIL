@@ -147,5 +147,55 @@ def main():
     print(json.dumps(dict(path=str(OUTPUT),bytes=OUTPUT.stat().st_size,sha256=digest(OUTPUT),
         parameters=result['parameters'],values=values,components=example),ensure_ascii=False))
 
+def shift_acquisition():
+    """Apply the approved scalar-endpoint example to all eight configurations."""
+    prior_sha = 'd694fe5b0be97c78f42780f7395248d7f0ce160aa2dfb5d48c0eefb14935cf5f'
+    assert digest(OUTPUT) == prior_sha, 'Expected the unshifted local-reranking display'
+    result = json.loads(OUTPUT.read_text())
+    before = {arm:dict(result['full_formula_map_components'] if arm=='Full'
+                       else result['saved_map_components'][arm]) for arm in result['arms']}
+    shifted, endpoints = {}, {}
+    for arm, old in before.items():
+        r22 = 2*old['N']-old['Z']
+        r11 = 2*old['A_acq']-r22
+        r31 = r11-old['F_first']
+        r32 = 2*old['O']-r31
+        r33 = old['Z']
+        new11, new22 = r11+.02, r22+.02
+        new = dict(old, A_acq=(new11+new22)/2,
+                   F=(new11+new22)/2-old['O'], N=(new22+r33)/2,
+                   F_first=new11-r31)
+        for key, delta in dict(A_acq=.02,F=.02,N=.01,F_first=.02,O=0.,Z=0.,final_mean=0.).items():
+            assert abs(new[key]-old[key]-delta)<1e-12, (arm,key)
+        assert abs((r31+r32+r33)/3-new['final_mean'])<1e-12
+        assert all(0<=v<=1 for v in (new11,new22,r31,r32,r33))
+        shifted[arm] = new
+        endpoints[arm] = dict(before=dict(R11=r11,R22=r22,R31=r31,R32=r32,R33=r33),
+                              after=dict(R11=new11,R22=new22,R31=r31,R32=r32,R33=r33))
+    result['acquisition_shift'] = dict(
+        purpose='Hypothetical scalar MAP endpoints, not measured improvement or a claim that ablations have no effect',
+        prior_display_sha256=prior_sha,prior_components=before,endpoints=endpoints,
+        delta_R11=.02,delta_R22=.02,
+        deltas=dict(A_acq=.02,F=.02,N=.01,F_first=.02,O=0.,Z=0.,final_mean=0.))
+    result['formula_map_components'] = shifted
+    result['full_formula_map_components'] = shifted['Full']
+    result['assumptions']['temporal'] = (
+        'All eight illustrative R11 and R22 MAP endpoints increase by 0.02. '
+        'Final endpoints retain the prior display, including Full retrieval reranking. '
+        'This is endpoint arithmetic, not reconstructed early-stage scores or other early-stage metrics.')
+    result['checks']['acquisition_shift_all_eight_identities'] = True
+    result['updated_at'] = datetime.now(timezone(timedelta(hours=8))).isoformat()
+    result['purpose'] = 'Formula example: prior local final-query reranking plus all-eight acquisition-endpoint shift; not experimental results'
+    temporary = OUTPUT.with_suffix('.json.tmp')
+    temporary.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+    temporary.replace(OUTPUT)
+    print(json.dumps(dict(path=str(OUTPUT),bytes=OUTPUT.stat().st_size,sha256=digest(OUTPUT),
+                          components=shifted),ensure_ascii=False))
+
 if __name__=='__main__':
-    main()
+    import sys
+    if sys.argv[1:] == ['--shift-acquisition']:
+        shift_acquisition()
+    else:
+        assert not sys.argv[1:], 'Unsupported arguments'
+        main()
