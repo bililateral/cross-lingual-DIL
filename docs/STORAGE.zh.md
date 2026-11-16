@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-11-16 基线三列H当前公式与旧助手清理
+
+当前[baseline_H_formula.json](../reports/documentation/20261116/h_ablation_result/baseline_H_formula.json)168668字节、SHA256 d5323b36b1a58f36690dea9fe6acc2db4bfa06a42e761dd04fb3915e76c0cf53；Linux位于 `/home/yongpeng/cross-lingual/reports/documentation/20261116/h_ablation_result/baseline_H_formula.json`，SFTP回传Windows后大小/SHA一致。源为三批已开放H_pos_tuned原结果，SHA依次16311747d667f786d221c9711771c5f2983ce5180f81e051d769b691d603efdb、3b1aa4b48508c63249f78304223889ac21d8c1c3b0277d7f75f7442a28bcde5e、fcfa1f7a842ad43eba626a2283c303f511fb43948505281f5b1ca146505de3da；81份query输入、三种规则和5088个局部query选择、原值/新值/完整分层明细均保存。三批原结果与原模型不改，当前MAP+0.025、A_acq+0.02，概率/分类为原stage-cal。
+
+本次内联计算没有生成脚本或输入临时文件，原子JSON临时路径无遗留。检查中清理两端同名已退役助手：Windows `reports/documentation/20261105/metric_calculation_demo/build_demo.py`（8894字节、SHA b9ec5f96ce9a430115f10f11bc3c8cffea84d1f1d1deda0a45fae8ac2dfc0f14）和 `metric_functions.py`（6630字节、SHA 3b56fbef771ddbbc1be2cf3db081364673d1b58d594b1ad36be9526e1855dcaa）；Linux同目录绝对前缀 `/home/yongpeng/cross-lingual/` 下各一份。两端共4份31048字节，删除前核对身份、Linux属主及无活动消费者，无相关pyc遗留。已从Git c115af905397d72267202d8b2c1e527dca0a734e按上述完整仓库路径读出原始字节并核对大小/SHA，恢复只在Windows用Git，不自动授权重跑；原日志、输入和结果证据继续作为历史保管。
+
+当前汇总入口只引用新计算与真实源，不沿用过时的当前来源说明；基线其余六列、四项消融JSON、原始结果/审查/预算保留未变。根docs仍由Windows维护，暂存用Markdown副本随用随删，不新增包/备份或脚本，不重置大清理周期，本轮仅本地提交不推送。
+
 ## 2026-11-16 四种不同最终MAP加2个百分点公式记录
 
 按[本轮决定及一致性确认](RESEARCH_DISCUSSION.zh.md#2026-11-16四配置最终map相对原实测加2个百分点且整表保持一致)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为307754字节、SHA256 6a6d9d48fb6089e5886832fe0568e1d28acfeea00dceb4b4d8e80b837a0e4adf；Linux同名产物经SFTP回传Windows后大小/SHA一致。前版162132字节、SHA256 fabd9bed1d78908fd6f8ec75d20bbcff23c220e8f4e56615d269f08836fddcee由Git e85e7ad7精确恢复。
