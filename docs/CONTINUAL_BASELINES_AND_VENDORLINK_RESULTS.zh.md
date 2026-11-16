@@ -121,7 +121,7 @@
 
 H_full 列为围绕原保存排名的局部检索重排公式示例，其余配置沿已保存结果，不额外放 H_full 原值列。原账号对评分、stage-cal 概率输出和分类阈值均保留，只在检索输出侧作少量相邻升位。这两个输出在示例中分开：它不声称同一份未改概率直接排序就会产生新 MAP，也不是新训练或实测改进。[完整实测结果及审查](../reports/documentation/20261116/h_ablation_result/result/report.zh.md)与原验收保持。
 
-| 指标／评价范围 | H_full（公式示例） | ER | KD | SEQ | NoRegroup | MeanPool | StandardRank | AccountPool |
+| 指标／评价范围 | H_full（公式示例） | w/o score retention (ER) | w/o historical supervision (KD) | w/o history (SEQ) | w/o regrouping | w/ mean pooling | w/ standard ranking loss | w/ account-level pooling |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | **最终三域：22 项指标** | — | — | — | — | — | — | — | — |
 | AP ↑ | **0.369405601** | 0.346946950 | 0.368987930 | 0.341098921 | 0.338052664 | 0.360510481 | 0.367396348 | 0.353915884 |
