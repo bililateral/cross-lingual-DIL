@@ -104,7 +104,7 @@ def main():
             by[arm] = {metric: {'defined_groups': sum(c['defined_groups'][i] for c in cells), 'total_group_evaluations': len(cells)*40,
                               'defined_cells': sum(c['mean'][i] is not None for c in cells), 'total_cells': len(cells)} for i, metric in enumerate(columns) if metric in ('precision', 'mcc')}
         details['na_coverage'][role] = by
-    main = '# 中文H消融：完整保存指标表\n\n单位：能力为%，差值/遗忘为百分点；Brier和log-loss用原单位。N/A原样传播。所有区间均沿用原5000次条件配对结果，没有新重采样。\n\n'
+    main = '# 中文H消融：完整保存指标表\n\n单位：能力为%，差值/遗忘为百分点；Brier和log-loss用原单位。N/A原样传播。所有区间均沿用原5000次条件配对结果，没有新重采样。\n\nBrier/log-loss低值更优，F=O−A_acq、F_first=R31−R11；其余高值更优指标按取得减最终。该方向沿原保存计算，不因表注补充改数值。\n\n'
     for role in roles:
         main += f'## {role}：八配置全22指标\n\n'
         for metric_i, metric in enumerate(columns):

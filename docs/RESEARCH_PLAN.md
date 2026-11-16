@@ -4,7 +4,7 @@
 
 接手和日常同步按[工作流](RESEARCH_WORKFLOW.zh.md)使用一次性只读观察及具名SFTP核验；普通更新数变化不重复修改合同入口/计划。状态跃迁时核对受影响可变入口，保持活动冻结来源、历史原件和原判据。
 
-中文消融已沿[11月16日获准后处理](../reports/documentation/20261116/h_ablation_result/recovery/authorization.json)完成原整批；[完整结果、组件分析](../reports/documentation/20261116/h_ablation_result/result/report.zh.md)和全指标已回传核对。接下来完成已获具体包许可的结果外审及独立处置，保留Full−ER强O/F证据和A_acq点保护微负导致的原联合false，不以“首域波动”改门，不追加实验。新增及中断权重已[定向清理](../reports/documentation/20261116/h_ablation_weight_cleanup/receipt.json)，Full27及保存分数/指标保留；不再把重新载模作为既有后续步骤。原生成失败和全部费用保持，结果收尾另记辅助，训练378h/确认12h及辅助无硬帽补充不变。动态进度仅见交接。
+中文消融已沿[11月16日获准后处理](../reports/documentation/20261116/h_ablation_result/recovery/authorization.json)完成原整批；[完整结果、组件分析](../reports/documentation/20261116/h_ablation_result/result/report.zh.md)和全指标已回传核对。[结果外审与独立处置](../reports/documentation/20261116/h_ablation_result/result/review/primary_disposition.zh.md)已闭合，本中文批次无剩余科研执行；保留Full−ER强O/F证据和A_acq点保护微负导致的原联合false，不以“首域波动”改门，不追加实验。新增及中断权重已[定向清理](../reports/documentation/20261116/h_ablation_weight_cleanup/receipt.json)，Full27及保存分数/指标保留；不再把重新载模作为既有后续步骤。原生成失败和全部费用保持，结果收尾另记辅助，训练378h/确认12h及辅助无硬帽补充不变。动态进度仅见交接。
 
 ## VendorLink账号监督：FIT12共同协议后续
 
@@ -16,7 +16,7 @@
 
 不恢复统一跨市场池或12/15条开发队列；当前FIT12有效但未支持原强抗遗忘目标。复用相容保存对照，完整ABC包含后续教师变化，只靠近ER不证明出生保持价值；恢复Q/O时F可以上升，不能只选小F。原P/M结果和费用不改，不重开充分资格，不改变中文独立合同或挪用预算。具体等待/运行状态只维护交接对应项。
 
-用户明确选中的P24、M24和确定性Full12端点，以及早期GPU核验18份完整状态，已按[逐文件回执](../reports/documentation/20261113/vendorlink_weight_cleanup/receipt.json)删除；后续不能再假定可加载这些端点，SHA不能恢复权重，重训仍需新范围。原ABC36及RMS6不在本次选中范围，继续保管；目前无已批准的后续加载任务。旧G4/CE/评分头失败、完整结果和全部费用不追改。确认集保持关闭，已见开发结果不能变回独立验证。中文消融已完成执行并进入结果审查，旧Evolution/ABC结案不动；当前状态仅维护交接对应项；11月14日用户已明确本轮全部本地提交推送，历史冻结原件不追改。
+用户明确选中的P24、M24和确定性Full12端点，以及早期GPU核验18份完整状态，已按[逐文件回执](../reports/documentation/20261113/vendorlink_weight_cleanup/receipt.json)删除；后续不能再假定可加载这些端点，SHA不能恢复权重，重训仍需新范围。原ABC36及RMS6不在本次选中范围，继续保管；目前无已批准的后续加载任务。旧G4/CE/评分头失败、完整结果和全部费用不追改。确认集保持关闭，已见开发结果不能变回独立验证。中文消融执行、分析及结果审查已结案，旧Evolution/ABC结案不动；当前状态仅维护交接对应项；11月14日用户已明确本轮全部本地提交推送，历史冻结原件不追改。
 
 ## Evolution：已结束路线与保留边界
 
@@ -36,7 +36,7 @@
 
 ## 其他研究线的既有后续安排
 
-H历史两系数[完整结果](../reports/seller_alias_continual/20261107/history_result/report.zh.md)及[7项结果处置](../reports/seller_alias_continual/20261107/history_result/review/primary_disposition.zh.md)已闭合，原H27及新Full27继续保留，不追加HPO。trial3母体随后按[已审消融方案](../reports/documentation/20261106/h_history_ablation/review/primary_disposition.zh.md)、[实现处置](../reports/documentation/20261107/h_ablation_prepare/review/primary_disposition.zh.md)与正式门完成唯一63条新增及同一新确认；暂停、恢复、预算中断和11月16日资源修复均为已发生历史，入口及原件见设计/讨论记录。完整结果已回传并形成组件分析，本研究线下一步仅为当前具体结果审查及处置，见本页顶部；不再列筹备/训练/等待结果为后续任务。已删新增端点不再载模复用，保存证据与原Full27保持。英文ABC前置门早已按原约定正常停止，不恢复旧监听；后续数据/目标/候选变更另行明确，不自动寻找遗忘更明显的子集。
+H历史两系数[完整结果](../reports/seller_alias_continual/20261107/history_result/report.zh.md)及[7项结果处置](../reports/seller_alias_continual/20261107/history_result/review/primary_disposition.zh.md)已闭合，原H27及新Full27继续保留，不追加HPO。trial3母体随后按[已审消融方案](../reports/documentation/20261106/h_history_ablation/review/primary_disposition.zh.md)、[实现处置](../reports/documentation/20261107/h_ablation_prepare/review/primary_disposition.zh.md)与正式门完成唯一63条新增及同一新确认；暂停、恢复、预算中断和11月16日资源修复均为已发生历史，入口及原件见设计/讨论记录。完整结果、组件分析及结果审查已结案，本研究线无剩余科研动作，见本页顶部；不再列筹备/训练/等待结果为后续任务。已删新增端点不再载模复用，保存证据与原Full27保持。英文ABC前置门早已按原约定正常停止，不恢复旧监听；后续数据/目标/候选变更另行明确，不自动寻找遗忘更明显的子集。
 
 L²R／ER+GCR的[结果分析与审查处置](../reports/seller_alias_continual/20261101/comparison_result/review/primary_disposition.zh.txt)已完成，[本批符合条件的权重清理](../reports/seller_alias_continual/20261101/comparison_result/cleanup_receipt.json)已实际执行；本范围无剩余科研动作。保留完整指标/分数/日志/实际来源、逐文件清单、旧失败与费用；H−S额外抗遗忘仍未确认，不为翻转原结论追加训练、调参、标签解析或重采样。H/S54基线、供H_pos_history使用的原H27及预训练模型继续保留；已删除的新对照权重不能由SHA恢复，若需新实验另按范围确认。
 

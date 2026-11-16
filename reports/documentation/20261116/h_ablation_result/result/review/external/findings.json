@@ -1,0 +1,386 @@
+{
+  "review_id": "H_ABLATION_RESULT_REVIEW_20261116",
+  "date": "2026-11-16",
+  "timezone": "Asia/Shanghai",
+  "input_zip_sha256": "6e67606d50257739b432e2479513c518a0e16af805b7e228c073e90323e40b9d",
+  "disposition": "ACCEPT_SAVED_RESULTS_WITH_NONBLOCKING_REPORTING_CLARIFICATIONS",
+  "original_primary_pass": false,
+  "scientific_validity_blockers": 0,
+  "material_result_errors": 0,
+  "required_new_scientific_operations": 0,
+  "severity_definitions": {
+    "INFORMATIONAL": "成立结论或证据限定；无科研纠错要求",
+    "LOW_REPORTING": "非阻断文案/统计口径精确化；不改变数值、原判据、预算或运行"
+  },
+  "counts": {
+    "INFORMATIONAL": 12,
+    "LOW_REPORTING": 6
+  },
+  "findings": [
+    {
+      "id": "HRES-01",
+      "title": "输入及保存值核对通过",
+      "severity": "INFORMATIONAL",
+      "classification": "VERIFIED_CONSISTENCY",
+      "evidence": [
+        "manifest.json",
+        "result/summary.json",
+        "group_metrics/*.json",
+        "checks/input_payload_verification.json",
+        "checks/saved_metrics_verification.json"
+      ],
+      "conclusion": "1397载荷全量大小/SHA匹配；1296份群指标的28512项均值及33264项轨迹公式独立一致，三角色、分层、交互和显示表未见数值矛盾。",
+      "minimum_necessary_action": "保留结果与原始保存值。区间只读保存结果，不将保存值算术称作重新评价或重做bootstrap。",
+      "disposition": "ACCEPTED",
+      "report_section": "2",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-02",
+      "title": "原联合门未过是真实有效负结果",
+      "severity": "INFORMATIONAL",
+      "classification": "VALID_NEGATIVE_PRIMARY",
+      "evidence": [
+        "contract/proposal.zh.md §6—7",
+        "source/scripts/step28_h_ablation_evaluate.py:summarize",
+        "result/summary.json:primary_checks,primary_pass"
+      ],
+      "conclusion": "O/F两方向通过，A_acq点差−0.0414124691pp使原五项all为false；N/Z点保护通过。",
+      "minimum_necessary_action": "继续报告primary_pass=false，不按近零/跨零/首域相同重判，不将联合未过写成全部无效。",
+      "disposition": "ACCEPTED_KEEP_FALSE",
+      "report_section": "3.3、5.1",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-03",
+      "title": "R11相同与R22异向解释成立",
+      "severity": "INFORMATIONAL",
+      "classification": "VERIFIED_DECOMPOSITION",
+      "evidence": [
+        "source/scripts/step28_h_ablation.py:Method.objective/update",
+        "source/scripts/step28_history_optuna.py:Objective",
+        "group_metrics/metrics_*_{Full,ER}_1_1_*.json",
+        "result/analysis_details.json:full_er_acquisition_pairs"
+      ],
+      "conclusion": "27组R11完整群JSON内容相同；首阶段无历史项。R22平均−0.0828pp，4正5负，A_acq为其一半。不能由此证明模型权重相等、β过大或只是正常噪声。",
+      "minimum_necessary_action": "将一致限定于提供的保存评价；保留局部R22代价与因果未识别边界。",
+      "disposition": "ACCEPTED",
+      "report_section": "5.2",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-04",
+      "title": "九配对平均改善不等于逐旧域全改善",
+      "severity": "LOW_REPORTING",
+      "classification": "LOCAL_NEGATIVE_QUALIFICATION",
+      "evidence": [
+        "result/summary.json:per_cell.BCA_s4_{Full,ER}_raw_3_2",
+        "checks/saved_metrics_verification.json:full_er_old_domain_pair_signs,full_er_per_order_cells"
+      ],
+      "conclusion": "O九配对均正，但R32八正一负；BCA第二旧域C最终平均差−0.2019pp，其中seed4−1.2896pp。原文平均措辞未错，摘要应防逐域扩大。",
+      "minimum_necessary_action": "建议在九配对同向之后补上述一条局部反例；不新增逐域验收门。",
+      "disposition": "NON_BLOCKING_CLARIFICATION_INCLUDED",
+      "report_section": "5.4",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-05",
+      "title": "出生保持贡献大但为整条策略条件效应",
+      "severity": "INFORMATIONAL",
+      "classification": "CONDITIONAL_POSITIVE_COMPONENT",
+      "evidence": [
+        "result/summary.json:contrasts.Full-ER,KD-SEQ",
+        "source/scripts/step28_h_ablation.py:Spec,Method,Memory"
+      ],
+      "conclusion": "有/无历史监督两侧均有较大O/F改善，支持本批条件出生评分保持贡献；教师、优化器和轨迹随干预变化，不能作固定教师下局部梯度机制证明。",
+      "minimum_necessary_action": "保留条件贡献表述，KD明确仍使用历史样本；98.5%/1.5%仅恒等式分解。",
+      "disposition": "ACCEPTED",
+      "report_section": "5.3、6.2",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-06",
+      "title": "监督边际收益及交互不得夸大",
+      "severity": "LOW_REPORTING",
+      "classification": "EXPLORATORY_MIXED_COMPONENT",
+      "evidence": [
+        "result/summary.json:contrasts.ER-SEQ,Full-KD",
+        "result/summary.json:exploratory_interaction"
+      ],
+      "conclusion": "ER−SEQ的O/F有利但A/N/Z点差为负；Full−KD的O/F小，最终MAP+0.0699pp的CI跨零。交互O负F正是本尺度边际减弱，不是协同放大。",
+      "minimum_necessary_action": "建议将历史监督单独有益限定到旧域O/F，同时保留保护端点负点值和Full−KD最终MAP跨零；不换KD母体。",
+      "disposition": "NON_BLOCKING_CLARIFICATION_INCLUDED",
+      "report_section": "6.2",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-07",
+      "title": "重组支持整体学习及保持贡献",
+      "severity": "INFORMATIONAL",
+      "classification": "CONDITIONAL_POSITIVE_COMPONENT",
+      "evidence": [
+        "result/summary.json:contrasts.Full-NoRegroup",
+        "source/scripts/step28_h_ablation.py:Method.objective"
+      ],
+      "conclusion": "Full−NoRegroup同时改善取得、旧末态、新学与F；删除的是当前/历史两处A1，无法拆分各自作用。",
+      "minimum_necessary_action": "保留整体重组策略解释，不拆成独立两处因果贡献。",
+      "disposition": "ACCEPTED",
+      "report_section": "6.3",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-08",
+      "title": "混合池化改善能力但未证明更少遗忘",
+      "severity": "INFORMATIONAL",
+      "classification": "VALID_MIXED_COMPONENT",
+      "evidence": [
+        "result/summary.json:contrasts.Full-MeanPool",
+        "source/scripts/step28_h_ablation.py:mean_scores,Method.logits"
+      ],
+      "conclusion": "Full能力更高，F差+0.2031pp且区间跨零；实现为完整FP64 mean对照。",
+      "minimum_necessary_action": "保留异向F，不声称减轻遗忘、优于纯LogMeanExp或0.5系数最优。",
+      "disposition": "ACCEPTED",
+      "report_section": "6.4",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-09",
+      "title": "排序替换能力更高但F更高",
+      "severity": "INFORMATIONAL",
+      "classification": "VALID_MIXED_COMPONENT",
+      "evidence": [
+        "result/summary.json:contrasts.Full-StandardRank,ranking_query_subgroups",
+        "source/scripts/step28_h_ablation.py:Method.objective"
+      ],
+      "conclusion": "A/O/final更高，但F+0.3577pp且探索性区间为正；固定λ替换包含双正例梯度及尺度改变。单/双正例均正点差不识别唯一机制。",
+      "minimum_necessary_action": "保留F代价和训练/评价子组区别；单正例MAP=MRR不重复算证据，不追加子组bootstrap。",
+      "disposition": "ACCEPTED",
+      "report_section": "6.5",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-10",
+      "title": "AccountPool只识别完整结构策略差",
+      "severity": "INFORMATIONAL",
+      "classification": "CONDITIONAL_STRUCTURE_EFFECT",
+      "evidence": [
+        "contract/proposal.zh.md §3.3",
+        "source/scripts/step28_h_ablation.py:account_scores,Memory,Method",
+        "result/summary.json:contrasts.Full-AccountPool"
+      ],
+      "conclusion": "同时改变先平均/先匹配次序和自身教师表示；Full O/F及A/N/Z点值较好，但A区间跨零。",
+      "minimum_necessary_action": "不归因单个池化算子，不宣称等FLOPs或等实际Memory字节。",
+      "disposition": "ACCEPTED",
+      "report_section": "6.6",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-11",
+      "title": "正文宜补三角色辅助指标异向",
+      "severity": "LOW_REPORTING",
+      "classification": "ROLE_DEPENDENT_AUXILIARY_RESULTS",
+      "evidence": [
+        "result/summary.json:absolute.{Full,ER}.{raw,stage-cal,first-cal}.final_mean",
+        "result/tables.zh.md"
+      ],
+      "conclusion": "stage-cal主概率/F1有利，但raw的Brier/log-loss/F1较差；first-cal概率损失较好而F1/召回较低。完整表已有负项，非删数据。",
+      "minimum_necessary_action": "正文补一句角色依赖及原值小表；保留预定主角色，不将raw MAP优势扩大到全部概率/分类。",
+      "disposition": "NON_BLOCKING_CLARIFICATION_INCLUDED",
+      "report_section": "7.2",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-12",
+      "title": "N/A正确；独立表注应明确损失遗忘方向",
+      "severity": "LOW_REPORTING",
+      "classification": "TABLE_INTERPRETATION",
+      "evidence": [
+        "result/summary.json:forgetting_orientation,per_cell",
+        "result/tables.zh.md开头",
+        "source/scripts/step28_h_ablation_evaluate.py:field_values,summarize"
+      ],
+      "conclusion": "N/A传播与pooled分列正确；Full stage-cal为2064/2160群次、14/54格。表头只注明损失原单位，未单列F方向。",
+      "minimum_necessary_action": "表注补Brier/log-loss的F=O−A_acq、F_first=R31−R11，其余高值更优指标相反；不改数值。pooled人读简表可选。",
+      "disposition": "NON_BLOCKING_TABLE_NOTE_INCLUDED",
+      "report_section": "3.2、7.3",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-13",
+      "title": "统计推断限固定路径及合成机制",
+      "severity": "INFORMATIONAL",
+      "classification": "INFERENCE_BOUNDARY",
+      "evidence": [
+        "contract/proposal.zh.md §7",
+        "source/scripts/step28_h_ablation_evaluate.py:summarize",
+        "source/scripts/step28_continual_comparison_evaluate.py:interval",
+        "result/summary.json:bootstrap,limits"
+      ],
+      "conclusion": "5000次实际域分层共享群索引符合合同；区间不覆盖seed总体/HPO/市场。A/N/Z点保护不是统计非劣；次级和交互未家族校正。",
+      "minimum_necessary_action": "保留条件限定和探索性标签，不将三角色、九顺序seed配对或代数相关端点当独立重复。",
+      "disposition": "ACCEPTED",
+      "report_section": "8",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-14",
+      "title": "资源元数据恢复保留原科学确认",
+      "severity": "INFORMATIONAL",
+      "classification": "RECOVERY_SCOPE_ACCEPTED",
+      "evidence": [
+        "recovery/authorization.json",
+        "recovery/original_generation_console.txt",
+        "recovery/original_generation_receipt.json",
+        "recovery/source/*.py",
+        "result/evaluation_access.json",
+        "result/confirmation_receipt.json",
+        "result/analysis_receipt.json"
+      ],
+      "conclusion": "失败位于无穷deadline严格JSON写出；恢复三入口不训练不生成，只包裹资源快照与原确认分析。原退出1及10.468339s仍保留，CPU3s是既有元数据证据。",
+      "minimum_necessary_action": "接受原确认接续的记录/源码证据，不改写原失败，不称本审重新执行原生核验。",
+      "disposition": "ACCEPTED_WITH_EVIDENCE_BOUNDARY",
+      "report_section": "4",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-15",
+      "title": "成本应写清累计计费和显存统计层级",
+      "severity": "LOW_REPORTING",
+      "classification": "COST_PRESENTATION_SCOPE",
+      "evidence": [
+        "result/formal_budget.json",
+        "result/cost_records.json",
+        "result/execution_time.json",
+        "contract/budget_resume_scope.zh.md"
+      ],
+      "conclusion": "216.423641h含实际任务与保守准备包络。7.50—7.53GiB是配置内最高值范围，全部单任务范围7.46—7.53；不是已证数值错误。",
+      "minimum_necessary_action": "明确累计计费、失败继承、Full历史账；显存注明配置最大值层级及周期采样。时间写后处理约5h7m，未提供RSS/Memory如实标缺。",
+      "disposition": "NON_BLOCKING_PRECISION_INCLUDED",
+      "report_section": "9.1—9.2",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-16",
+      "title": "本体核验与清单绑定必须分层",
+      "severity": "LOW_REPORTING",
+      "classification": "AUDIT_EVIDENCE_SCOPE",
+      "evidence": [
+        "result/source_manifest.json",
+        "result/completion.json:controller_update",
+        "recovery/request.json:updated_sources",
+        "checks/source_binding_verification.json"
+      ],
+      "conclusion": "50科学源+3恢复入口本体已核；继承pause dispatcher本体未附。原回传1319项中本包1306本体核过，13仅绑定，不能称全端到端现场核验。",
+      "minimum_necessary_action": "审查报告/阅读范围明列未核本体与二手证据；不要求服务器、封存载荷或重做结果。该限制已在本报告落实。",
+      "disposition": "AUDIT_SCOPE_REQUIRED_AND_INCLUDED",
+      "report_section": "2.3、4.1、12",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-17",
+      "title": "历史负结果和英文外推边界保留",
+      "severity": "INFORMATIONAL",
+      "classification": "EXTERNAL_VALIDITY_BOUNDARY",
+      "evidence": [
+        "background/mother_result.zh.md",
+        "background/vendorlink_deterministic_result.zh.md",
+        "background/vendorlink_direction_primary.zh.md",
+        "background/vendorlink_beta_scope.zh.md",
+        "result/vendorlink_context.zh.md"
+      ],
+      "conclusion": "固定母体、旧H−S失败、合成机制与英文账号代理均不得混用；中文O/F不能解除英文学习/保持/新域联合卡点。",
+      "minimum_necessary_action": "保留旧负结果；β仅按包内时点背景引用，不判断实时进度或新增搜索。",
+      "disposition": "ACCEPTED",
+      "report_section": "10",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    },
+    {
+      "id": "HRES-18",
+      "title": "删除后的模型保管状态不回写历史终态",
+      "severity": "INFORMATIONAL",
+      "classification": "ASSET_STATE_BOUNDARY",
+      "evidence": [
+        "request.zh.md",
+        "result/report.zh.md §6",
+        "result/completion.json:status"
+      ],
+      "conclusion": "已删189新增端点及旧中断端点属于执行者后续保管记录，删除回执本体未附；MODELS_RETAINED为清理前冻结状态。",
+      "minimum_necessary_action": "不声称现场验证删除，不将已删端点视作可载模复用，不提出模型恢复或重训前提。",
+      "disposition": "ACCEPTED_AS_REPORTED_STATE",
+      "report_section": "9.3",
+      "blocks_result_acceptance": false,
+      "requires_scientific_code_change": false,
+      "requires_new_experiment": false,
+      "requires_resampling": false,
+      "do_not_expand": "不改原门，不追加方法/seed/数据/训练，不恢复模型，不访问服务器或封存材料。"
+    }
+  ]
+}
