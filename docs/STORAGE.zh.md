@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-16 第一节基线取得端点公式记录
+
+新增[baseline_acquisition_formula.json](../reports/documentation/20261116/h_ablation_result/baseline_acquisition_formula.json)，25848字节、SHA256 2adf9a7142afa6b98c6273cef3cc10a29052d2c7d32c004af1f0d02d9c72499b。Linux位于 `/home/yongpeng/cross-lingual/reports/documentation/20261116/h_ablation_result/baseline_acquisition_formula.json`，经SFTP回传Windows后大小/SHA一致；保存9列原展示输入、22行前后值（19行实际变化）、公式参数、聚合端点与精度核对，不含标签/预测/模型。
+
+本次用Linux既有py310一次性内联命令计算，没有生成Python脚本、输入临时文件或传输包。原显示值按Decimal精确平移；端点由已舍入汇总量代数还原，仅作公式示意，恒等式核对容差2e-9，不声称未舍入实测值。原Chinese展示JSON、原正式证据及预算均保持；前几轮公式脚本双端清理事实见下节。仅保留必要数值记录，不制造源码副本，不重置大清理周期；本轮本地提交，不推送。
+
 ## 2026-11-16 公式展示一次性脚本双端清理
 
 用户要求及时删除本次及前几轮计算脚本。实际核对三轮生成器沿同一路径覆盖，不存在三份独立脚本；旧版本已在Git保管，未新增备份或压缩包。本次删除Windows `scripts/ablation_formula_display.py`、Linux `/home/yongpeng/cross-lingual/reports/documentation/20261116/h_ablation_result/formula_display.py`，各18478字节，SHA256均为9b19d641fd207c3f880981c89568fe807d2c82c9652d9feec9a1b1df0af626e3，共2份36956字节。删除前已核对精确路径、大小、SHA和Linux属主，无活动进程使用该脚本；删除后两端路径不存在，Linux展示目录没有遗留.tmp，前几轮索引/传输临时文件亦无遗留。本段替代下方旧记录中“源码继续保留”的当前保管安排，不追改其当时执行事实。
