@@ -1,14 +1,28 @@
 # 科研文件存储与恢复
 
+## 2026-11-16 公式展示一次性脚本双端清理
+
+用户要求及时删除本次及前几轮计算脚本。实际核对三轮生成器沿同一路径覆盖，不存在三份独立脚本；旧版本已在Git保管，未新增备份或压缩包。本次删除Windows `scripts/ablation_formula_display.py`、Linux `/home/yongpeng/cross-lingual/reports/documentation/20261116/h_ablation_result/formula_display.py`，各18478字节，SHA256均为9b19d641fd207c3f880981c89568fe807d2c82c9652d9feec9a1b1df0af626e3，共2份36956字节。删除前已核对精确路径、大小、SHA和Linux属主，无活动进程使用该脚本；删除后两端路径不存在，Linux展示目录没有遗留.tmp，前几轮索引/传输临时文件亦无遗留。本段替代下方旧记录中“源码继续保留”的当前保管安排，不追改其当时执行事实。
+
+已从以下Git对象直接读出原始字节并核对恢复身份，恢复仅在Windows使用Git，不自动授权重跑：
+
+| 版本 | Git提交及仓库路径 | 字节 | SHA256 |
+|---|---|---:|---|
+| 首次独立分布示例 | `8fcdaf21:scripts/ablation_formula_display.py` | 8690 | f627371910d218bb51b79f6d190de149d87dce639ded69e2b069c99bf1aab7aa |
+| 围绕原排名的局部重排 | `69651250:scripts/ablation_formula_display.py` | 15532 | e8088686710c886fef03da82936c77bd63fb889a31de11d494e077d84216faf5 |
+| 八配置取得端点平移 | `34dabb2c95dbe8854feeb11c8b4c893d57639c12:scripts/ablation_formula_display.py` | 18478 | 9b19d641fd207c3f880981c89568fe807d2c82c9652d9feec9a1b1df0af626e3 |
+
+必要的[展示数值和来源](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)保留，33027字节、SHA256 3441547c5dbe9e06ea1f71bdbca4ac3de751660ebc52467de56bca8561d98079，双端核对未变。已将可变文档对已删源码的链接改为本恢复入口；正式结果、模型、原始证据及其他实验脚本未动。不重置大清理周期，仅本地提交，不推送，用户既有结果表编辑继续保留。
+
 ## 2026-11-16 中文消融八配置取得端点公式平移
 
-按[最新明确决定](RESEARCH_DISCUSSION.zh.md#2026-11-16八配置取得端点各增加2个百分点的公式情景)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为33027字节、SHA256 3441547c5dbe9e06ea1f71bdbca4ac3de751660ebc52467de56bca8561d98079；当前[公式源码](../scripts/ablation_formula_display.py)18478字节、SHA256 9b19d641fd207c3f880981c89568fe807d2c82c9652d9feec9a1b1df0af626e3。源码SFTP同步到Linux非活动formula_display.py，核对实际SHA后使用py310的 --shift-acquisition 分支执行；新数值经SFTP回传核对大小/SHA一致。
+按[最新明确决定](RESEARCH_DISCUSSION.zh.md#2026-11-16八配置取得端点各增加2个百分点的公式情景)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为33027字节、SHA256 3441547c5dbe9e06ea1f71bdbca4ac3de751660ebc52467de56bca8561d98079；当前[公式脚本恢复说明](#2026-11-16公式展示一次性脚本双端清理)18478字节、SHA256 9b19d641fd207c3f880981c89568fe807d2c82c9652d9feec9a1b1df0af626e3。源码SFTP同步到Linux非活动formula_display.py，核对实际SHA后使用py310的 --shift-acquisition 分支执行；新数值经SFTP回传核对大小/SHA一致。
 
 唯一计算输入是上版展示JSON（SHA256 d694fe5b0be97c78f42780f7395248d7f0ce160aa2dfb5d48c0eefb14935cf5f），输入身份不符即拒绝，避免重复平移。输出保留原科学保存分项、平移前展示分项和前后端点；上版完整来源/数值由Git 69651250恢复，下方旧身份仅作历史保管记录。未读取原标签/预测/模型或改活动运行、正式结果、预算和审查。原子JSON临时路径已替换，Git索引临时文件随用随删；无新增审查包或无用文件。根docs仍以Windows为权威，本轮仅本地提交，不推送，不重置大清理周期。
 
 ## 2026-11-16 中文消融局部排名公式展示修订（历史）
 
-按[最新修订要求](RESEARCH_DISCUSSION.zh.md#2026-11-16公式展示改为围绕原h_full的局部改善)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为24211字节、SHA256 d694fe5b0be97c78f42780f7395248d7f0ce160aa2dfb5d48c0eefb14935cf5f；27份保存逐query指标逐份核对大小/SHA，原指标均值恢复后才作局部升位。当前[计算入口](../scripts/ablation_formula_display.py)15532字节、SHA256 e8088686710c886fef03da82936c77bd63fb889a31de11d494e077d84216faf5，Linux同字节替换原非活动formula_display.py并在执行前核对。新数值SFTP回传身份一致，原预测矩阵、pairs、owners、标签、模型均未读取；临时JSON原子写出路径已替换，无遗留临时文件或新包。
+按[最新修订要求](RESEARCH_DISCUSSION.zh.md#2026-11-16公式展示改为围绕原h_full的局部改善)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为24211字节、SHA256 d694fe5b0be97c78f42780f7395248d7f0ce160aa2dfb5d48c0eefb14935cf5f；27份保存逐query指标逐份核对大小/SHA，原指标均值恢复后才作局部升位。当前[公式脚本恢复说明](#2026-11-16公式展示一次性脚本双端清理)15532字节、SHA256 e8088686710c886fef03da82936c77bd63fb889a31de11d494e077d84216faf5，Linux同字节替换原非活动formula_display.py并在执行前核对。新数值SFTP回传身份一致，原预测矩阵、pairs、owners、标签、模型均未读取；临时JSON原子写出路径已替换，无遗留临时文件或新包。
 
 当前同名公式文件是可变展示产物；前一独立分布版本的准确源码/数值从Git 8fcdaf21恢复，以下首次保管段仅描述其当时状态，不再作为当前文件身份。原正式summary/结果/审查/费用不改，本轮只计算声明的检索侧示例，原概率与分类输出保持；没有改动运行作业或删除科研资产。代码是当前表格的必要重算入口，继续保留。既有用户文档编辑不纳入提交，不推送，不重置大清理周期。
 
@@ -16,7 +30,7 @@
 
 按[明确的公式展示范围](RESEARCH_DISCUSSION.zh.md#2026-11-16中文消融map增加2个百分点的公式展示)，Linux py310从已开放的原summary计算一组评分假设的指标期望，保存[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)，12872字节、SHA256 ac43d25546975c145358e26bbb8986a7e50e56117b512c156fde66af572231f1；SFTP回传后身份一致。该文件在原冻结result目录之外，不覆盖实测summary/指标/审查/费用；不涉及标签、模型或预测载荷。
 
-必要计算源码[ablation_formula_display.py](../scripts/ablation_formula_display.py)8690字节、SHA256 f627371910d218bb51b79f6d190de149d87dce639ded69e2b069c99bf1aab7aa，同字节部署于Linux本轮h_ablation_result/formula_display.py并在执行前核对；它是展示数值的重算来源，随公式记录保留，不是新增资格测试或监听。没有额外临时文件/包、模型删除或正式作业改动，不重置大清理周期。仅新增目标文档的公式展示部分，既有用户编辑不纳入本次Git提交，本轮不推送。
+必要计算源码[公式脚本恢复说明](#2026-11-16公式展示一次性脚本双端清理)8690字节、SHA256 f627371910d218bb51b79f6d190de149d87dce639ded69e2b069c99bf1aab7aa，同字节部署于Linux本轮h_ablation_result/formula_display.py并在执行前核对；它是展示数值的重算来源，随公式记录保留，不是新增资格测试或监听。没有额外临时文件/包、模型删除或正式作业改动，不重置大清理周期。仅新增目标文档的公式展示部分，既有用户编辑不纳入本次Git提交，本轮不推送。
 
 ## 2026-11-16 中文消融完整结果与分析交付
 

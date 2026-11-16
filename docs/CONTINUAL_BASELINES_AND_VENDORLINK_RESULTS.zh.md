@@ -182,7 +182,7 @@ $$
 
 此为检索输出侧的局部重排公式例子，不构成已学得或可直接部署的H_full改进，也不改变原科学主门。若要求检索排名与分类概率始终由同一组标量分数直接决定，就需要另作真实分数层面的设定，不能把本示例宣称为该情形。
 
-来源与核对见[公式数值记录](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)和[实际计算入口](../scripts/ablation_formula_display.py)。本轮只在Linux py310使用已开放的汇总和逐query指标；未读取pairs、owners、正文、标签或评分矩阵，没有载模、训练或新重采样。前一独立指数分布版本仅从Git `8fcdaf21` 回溯，已由本例替代。
+来源与核对见[公式数值记录](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)和[公式脚本恢复说明](STORAGE.zh.md#2026-11-16公式展示一次性脚本双端清理)。本轮只在Linux py310使用已开放的汇总和逐query指标；未读取pairs、owners、正文、标签或评分矩阵，没有载模、训练或新重采样。前一独立指数分布版本仅从Git `8fcdaf21` 回溯，已由本例替代。
 
 ## 指标计算公式
 
