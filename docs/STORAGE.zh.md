@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-16 四种不同最终MAP加2个百分点公式记录
+
+按[本轮决定及一致性确认](RESEARCH_DISCUSSION.zh.md#2026-11-16四配置最终map相对原实测加2个百分点且整表保持一致)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为307754字节、SHA256 6a6d9d48fb6089e5886832fe0568e1d28acfeea00dceb4b4d8e80b837a0e4adf；Linux同名产物经SFTP回传Windows后大小/SHA一致。前版162132字节、SHA256 fabd9bed1d78908fd6f8ec75d20bbcff23c220e8f4e56615d269f08836fddcee由Git e85e7ad7精确恢复。
+
+final_metric_examples保存四种不同局部排名公式、108项原指标身份、5460个query的紧凑选择、完整精度最终指标/位置增量/端点分项及核对；formula_final_values和formula_map_components为当前一致展示值，A_acq与前轮逐字段相同。旧kd_final_reranking/old_domain_reranking仅作历史来源，已注明替代状态。原saved结果、Full及其他配置、第一节基线公式JSON和正式结果不变。Windows仅回传必要JSON，无原数组/标签/预测/模型。计算为Linux py310一次性内联命令，没有新脚本或输入临时文件；原formula_display.py仍不存在，JSON原子临时路径无遗留，暂存用Markdown副本随用随删。不新增备份/传输包，不重置大清理周期，仅本地提交不推送。
+
 ## 2026-11-16 三项消融旧域最终加2个百分点公式记录
 
 按[最新决定](RESEARCH_DISCUSSION.zh.md#2026-11-16三项池化及排序消融的旧域最终公式展示各增加2个百分点)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为162132字节、SHA256 fabd9bed1d78908fd6f8ec75d20bbcff23c220e8f4e56615d269f08836fddcee；Linux同名产物经SFTP回传Windows后大小/SHA一致。前版87590字节、SHA256 f793a50943e3ce093234b23040dbef1c3cdc69d3e33b9d93f97f80f4aaeb6c7b可从Git 7959b9e3精确恢复。
