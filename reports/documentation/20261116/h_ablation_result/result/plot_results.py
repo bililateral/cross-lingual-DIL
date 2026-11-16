@@ -32,8 +32,9 @@ def main():
         fig.canvas.draw()
         require_matplotlib_panel_alignment(fig, json_out=str(args.out/f'{name}.alignment.json'),
             tolerance_pt=1.5, gutter_tolerance_pt=1.5, require_panel_labels=multi, strict=True)
-        for ext in ('pdf', 'svg', 'png'):
-            fig.savefig(args.out/f'{name}.{ext}', dpi=300, facecolor='white')
+        fig.savefig(args.out/f'{name}.pdf', facecolor='white')
+        fig.savefig(args.out/f'{name}.svg', facecolor='white')
+        fig.savefig(args.out/f'{name}.png', dpi=300, facecolor='white')
         plt.close(fig)
 
     fig, ax = plt.subplots(figsize=(183/25.4, 90/25.4))

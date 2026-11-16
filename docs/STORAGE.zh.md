@@ -1,5 +1,14 @@
 # 科研文件存储与恢复
 
+## 2026-11-16 中文消融完整结果与分析交付
+
+[原始结果清单](../reports/documentation/20261116/h_ablation_result/result/source_manifest.json)绑定1319文件、26607489字节，全部具名SFTP回传至本轮result并核对大小/SHA，包括原summary、1296匿名群指标、完整性/访问/资源与成本回执。未回传正文、账号映射、pairs/owners载荷、预测矩阵、Memory或权重；已开放的汇总不增加封存材料权限。原summary SHA256为f187d1e29351e7321ab5ab534bff38eb2704adf0156b6c491b4251372dbfa30b，保留原primary_pass=false，独立分析与图表另存，不覆盖正式结果。
+
+Linux既有py310整理保存值和绘图，Windows仅编辑/文件身份/归档核对；[29份展示核验产物](../reports/documentation/20261116/h_ablation_result/result/presentation_manifest.json)已逐份核对。正式50科学来源与原门一致，原代码精确字节供审查；表格/图源、PDF/SVG/PNG、最小字号/碰撞/对齐审计及初次静态导出检查误报均保留。原正式费用冻结，结果收尾辅助另记；无重算模型分数或新增bootstrap。最新β观测只含身份、更新计数、资源、预算及来源，不含中途效果。
+
+用户具体批准的[结果审查输入](../reports/documentation/20261116/h_ablation_result/result/review/package.json)为8378171字节、1397载荷加清单，完整背景/原方案审查/实际来源/匿名指标和新解释均在内，已核每成员SHA，上传一次。排除清单、[许可](../reports/documentation/20261116/h_ablation_result/result/review/authorization.json)和[提交](../reports/documentation/20261116/h_ablation_result/result/review/submission.json)保管；没有把旧包许可扩成新包。原件、完整审查及独立处置按实际完成保存；无用传输副本与一次性CPU源码在精确恢复核对后收尾，必要证据不删除。模型清理事实见下节，原Full27保留，已删190端点不再列为可加载。根docs以Windows为权威，活动Linux源码不回写。本轮新增成果仅本地提交，用户结果表已有修改保持不动。
+
+
 ## 2026-11-16 中文消融新增训练权重定向删除
 
 按[本次明确决定](RESEARCH_DISCUSSION.zh.md#2026-11-16核对后删除本次中文消融新增权重)，先核对中文整批完成及评分/分析验收、无活动中文进程或目标权重打开句柄、β不加载本批中文模型，再删除用户范围内的190份权重。16:11:42实际完成，合计247830452432字节，约230.81GiB，无备份。删除前每份实际SHA均与原成功完成或预算中断归档记录一致，见[逐文件路径/大小/SHA及保管基线](../reports/documentation/20261116/h_ablation_weight_cleanup/preflight.json)；实际逐路径删除、零残留及保留核对见[删除回执](../reports/documentation/20261116/h_ablation_weight_cleanup/receipt.json)。两份回执均已SFTP回传并核对大小/SHA。
@@ -25,7 +34,7 @@ Linux范围为/home/yongpeng/cross-lingual/reports/documentation/20261107/h_abla
 
 10:43:18的[结束本轮等待时观测](../reports/documentation/20261116/h_ablation_result/recovery/progress_20261116_104318.json)5041字节已具名SFTP回传、大小/SHA一致；内容限运行/访问角色/费用元数据，没有效果载荷。用户询问清理时已明确说明189新增阶段端点及复用Full27仍是当前评分依赖，未执行删除或移动。
 
-11月16日15:06:14的阶段快照32690字节与15:09:41的[完成/自动交接快照](../reports/documentation/20261116/h_ablation_result/recovery/progress_20261116_150941.json)76122字节已具名SFTP回传并核对大小/SHA，原观测不覆盖。最终快照含中文完成/费用/原主门摘要和β真实首更/身份/14来源核对，不含标签、模型、Memory或预测数组；未回传完整summary载荷。Linux活动一次性入口once_wait.py已按原合同在首个真实更新后自删，原174字节源码及SHA、first_update/queue_continues回执仍留存，当前控制器继续；不把自删误判为监听丢失而重建。中文训练权重和Full端点继续保留待结果处置，本轮没有删除模型或修改活动来源。
+11月16日15:06:14的阶段快照32690字节与15:09:41的[完成/自动交接快照](../reports/documentation/20261116/h_ablation_result/recovery/progress_20261116_150941.json)76122字节已具名SFTP回传并核对大小/SHA，原观测不覆盖。最终快照含中文完成/费用/原主门摘要和β真实首更/身份/14来源核对，不含标签、模型、Memory或预测数组；未回传完整summary载荷。Linux活动一次性入口once_wait.py已按原合同在首个真实更新后自删，原174字节源码及SHA、first_update/queue_continues回执仍留存，当前控制器继续；不把自删误判为监听丢失而重建。该15:09快照时中文权重和Full端点仍保留，随后16:11的定向清理及本次完整结果回传见上节；旧快照不追改。
 
 本次新增成果仅本地保管，11月14日已完成推送许可不扩大到本批；用户已有结果表编辑保持未提交。本轮没有删除权重，没有外发新结果包。局部恢复不重置上次11月6日、下次11月21日大清理周期。
 

@@ -4,7 +4,7 @@
 
 接手和日常同步按[工作流](RESEARCH_WORKFLOW.zh.md)使用一次性只读观察及具名SFTP核验；普通更新数变化不重复修改合同入口/计划。状态跃迁时核对受影响可变入口，保持活动冻结来源、历史原件和原判据。
 
-中文消融沿[11月14日明确补充](../reports/documentation/20261114/h_ablation_budget_resume/scope.zh.md)取消辅助硬上限、保留全部费用，训练378h/确认12h及原科学/资源条件保持；三条BCA_s4预算中断的一次重跑属于已发生历史，不再列为待执行。11月16日按[已批准后处理恢复](../reports/documentation/20261116/h_ablation_result/recovery/authorization.json)保留63训练和同一120群，沿原确认/分析完成技术整批；下一步是核对保存全指标、配对区间和组件解释、回传结果并按具体包许可完成结果审查，本批新增及中断尝试权重已按用户后续决定完成[定向清理](../reports/documentation/20261116/h_ablation_weight_cleanup/receipt.json)，原Full27/预训练起点保留；结果分析使用已保存分数/指标，不重训、不再生成、不改原门。β按本次真实监管与依赖门满足中文整批/闭合/释放及资源条件后自动接续；进入原三seed完整训练→串行评分→分析，不因中文科学主门false取消已批准接续，不追加候选、confirm或自动失败重试。β独立42h不改；实际进度及观测只在交接对应项维护。
+中文消融已沿[11月16日获准后处理](../reports/documentation/20261116/h_ablation_result/recovery/authorization.json)完成原整批；[完整结果、组件分析](../reports/documentation/20261116/h_ablation_result/result/report.zh.md)和全指标已回传核对。接下来完成已获具体包许可的结果外审及独立处置，保留Full−ER强O/F证据和A_acq点保护微负导致的原联合false，不以“首域波动”改门，不追加实验。新增及中断权重已[定向清理](../reports/documentation/20261116/h_ablation_weight_cleanup/receipt.json)，Full27及保存分数/指标保留；不再把重新载模作为既有后续步骤。原生成失败和全部费用保持，结果收尾另记辅助，训练378h/确认12h及辅助无硬帽补充不变。动态进度仅见交接。
 
 ## VendorLink账号监督：FIT12共同协议后续
 
@@ -12,11 +12,11 @@
 
 依据已完成的[随机模式诊断与主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/diagnosis/report.zh.md)形成的[三条Full合同](../reports/documentation/20261112/vendorlink_deterministic/scope.zh.md)已经执行至整批完整。[结果主审](../reports/documentation/20261112/vendorlink_deterministic/result/report.zh.md)保留对旧Full的局部改善、对ER/SEQ仍无联合优势及初学/新域保护失败；用户批准的具体结果外审经[独立处置](../reports/documentation/20261112/vendorlink_deterministic/result/review/primary_disposition.zh.md)闭合。完整结果证据继续保管，端点按用户随后明确的清理决定处理，该已结案批次无剩余科研执行；不重启其唯一campaign或重复已闭合资格，confirm、新应用输出和任何新候选均不自动启动。
 
-用户在[完整背景方向外审及独立处置](../reports/documentation/20261113/vendorlink_next_review/primary_disposition.zh.md)后明确选择继续改善完整H，已确认[同协议单一β探针](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md)：β=.191859540449699、seed51/52/53、完整ABC每域40轮、最多3-worker、独立42h。[增量审查与必要修复](../reports/documentation/20261113/vendorlink_beta_quarter/review/primary_disposition.zh.md)已闭合，沿原绑定来源及[当前依赖门](../reports/documentation/20261113/vendorlink_beta_quarter/gate_after_budget_resume.json)的唯一等待控制器，继续等待中文H消融整批结束、监管闭合和进程释放，再通过实时资源准入自动执行；不重开已存在等待器或campaign。三条完整训练后串行盲评分、一次分析；按预定Dream恢复、两个旧域最终改善与Agora保护联合判断，原强门单列。任何结果均结束该有限探针，不追加β/seed/epoch或自动confirm。
+用户在[完整背景方向外审及独立处置](../reports/documentation/20261113/vendorlink_next_review/primary_disposition.zh.md)后明确选择继续改善完整H，已确认[同协议单一β探针](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md)：β=.191859540449699、seed51/52/53、完整ABC每域40轮、最多3-worker、独立42h。[增量审查与必要修复](../reports/documentation/20261113/vendorlink_beta_quarter/review/primary_disposition.zh.md)已闭合，沿原绑定来源及[当前依赖门](../reports/documentation/20261113/vendorlink_beta_quarter/gate_after_postprocess_resume.json)，中文技术整批闭合/释放后已由唯一控制器自动进入训练；继续原队列，不重开等待器或campaign。三条完整训练后串行盲评分、一次分析；按预定Dream恢复、两个旧域最终改善与Agora保护联合判断，原强门单列。任何结果均结束该有限探针，不追加β/seed/epoch或自动confirm。
 
 不恢复统一跨市场池或12/15条开发队列；当前FIT12有效但未支持原强抗遗忘目标。复用相容保存对照，完整ABC包含后续教师变化，只靠近ER不证明出生保持价值；恢复Q/O时F可以上升，不能只选小F。原P/M结果和费用不改，不重开充分资格，不改变中文独立合同或挪用预算。具体等待/运行状态只维护交接对应项。
 
-用户明确选中的P24、M24和确定性Full12端点，以及早期GPU核验18份完整状态，已按[逐文件回执](../reports/documentation/20261113/vendorlink_weight_cleanup/receipt.json)删除；后续不能再假定可加载这些端点，SHA不能恢复权重，重训仍需新范围。原ABC36及RMS6不在本次选中范围，继续保管；目前无已批准的后续加载任务。旧G4/CE/评分头失败、完整结果和全部费用不追改。确认集保持关闭，已见开发结果不能变回独立验证。中文消融按11月13日独立恢复决定接续，旧Evolution/ABC结案不动；当前状态仅维护交接对应项；11月14日用户已明确本轮全部本地提交推送，历史冻结原件不追改。
+用户明确选中的P24、M24和确定性Full12端点，以及早期GPU核验18份完整状态，已按[逐文件回执](../reports/documentation/20261113/vendorlink_weight_cleanup/receipt.json)删除；后续不能再假定可加载这些端点，SHA不能恢复权重，重训仍需新范围。原ABC36及RMS6不在本次选中范围，继续保管；目前无已批准的后续加载任务。旧G4/CE/评分头失败、完整结果和全部费用不追改。确认集保持关闭，已见开发结果不能变回独立验证。中文消融已完成执行并进入结果审查，旧Evolution/ABC结案不动；当前状态仅维护交接对应项；11月14日用户已明确本轮全部本地提交推送，历史冻结原件不追改。
 
 ## Evolution：已结束路线与保留边界
 
@@ -36,7 +36,7 @@
 
 ## 其他研究线的既有后续安排
 
-H历史两系数[本轮结果](../reports/seller_alias_continual/20261107/history_result/report.zh.md)的网页审查及[7项独立处置](../reports/seller_alias_continual/20261107/history_result/review/primary_disposition.zh.md)已闭合，本范围不追加候选、重训、标签读取或重采样。原执行与结果状态只见交接；保留新H27和原H27及完整原件。用户已选定历史开发版H作消融母体，并确认按[已审方案](../reports/documentation/20261106/h_history_ablation/review/primary_disposition.zh.md)实施；[实现及主审处置](../reports/documentation/20261107/h_ablation_prepare/review/primary_disposition.zh.md)现为下一阶段入口。用户随后明确“开始正式训练”，以[本次正式许可](../reports/documentation/20261107/h_ablation_start/authorization.json)及源绑定正式门执行唯一63条队列；随后用户确认暂停派发并明确核对后直接部署；[已核验暂停交接](../reports/documentation/20261107/h_ablation_pause/review/primary_disposition.zh.md)记录当时在跑任务完成、空闲不续领及新后处理等待的暂停行为。用户11月13日已[明确恢复](RESEARCH_DISCUSSION.zh.md#2026-11-13明确恢复中文h主实验消融)，沿已审resume入口续接原清单，完整成功后才自动进入既定新确认生成/评分/分析，缺项或运行失败不进入下游。11月16日按[已批准后处理恢复](../reports/documentation/20261116/h_ablation_result/recovery/authorization.json)保留63成功和同一120群，只修资源JSON接续原确认/分析；沿现有接续进程，不再生成或重训。待完整结果后按原范围回传、独立分析和具体包结果外审，本批新增权重保管以11月16日明确清理回执为准，原Full/预训练依赖继续保留；不追加GPU资格、候选或自动失败重试。英文ABC前置门已按原约定正常停止，不恢复旧监听；后续数据/目标/候选变更另行明确，不自动寻找遗忘更明显的子集。
+H历史两系数[完整结果](../reports/seller_alias_continual/20261107/history_result/report.zh.md)及[7项结果处置](../reports/seller_alias_continual/20261107/history_result/review/primary_disposition.zh.md)已闭合，原H27及新Full27继续保留，不追加HPO。trial3母体随后按[已审消融方案](../reports/documentation/20261106/h_history_ablation/review/primary_disposition.zh.md)、[实现处置](../reports/documentation/20261107/h_ablation_prepare/review/primary_disposition.zh.md)与正式门完成唯一63条新增及同一新确认；暂停、恢复、预算中断和11月16日资源修复均为已发生历史，入口及原件见设计/讨论记录。完整结果已回传并形成组件分析，本研究线下一步仅为当前具体结果审查及处置，见本页顶部；不再列筹备/训练/等待结果为后续任务。已删新增端点不再载模复用，保存证据与原Full27保持。英文ABC前置门早已按原约定正常停止，不恢复旧监听；后续数据/目标/候选变更另行明确，不自动寻找遗忘更明显的子集。
 
 L²R／ER+GCR的[结果分析与审查处置](../reports/seller_alias_continual/20261101/comparison_result/review/primary_disposition.zh.txt)已完成，[本批符合条件的权重清理](../reports/seller_alias_continual/20261101/comparison_result/cleanup_receipt.json)已实际执行；本范围无剩余科研动作。保留完整指标/分数/日志/实际来源、逐文件清单、旧失败与费用；H−S额外抗遗忘仍未确认，不为翻转原结论追加训练、调参、标签解析或重采样。H/S54基线、供H_pos_history使用的原H27及预训练模型继续保留；已删除的新对照权重不能由SHA恢复，若需新实验另按范围确认。
 
