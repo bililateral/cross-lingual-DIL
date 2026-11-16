@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-16 三项消融旧域最终加2个百分点公式记录
+
+按[最新决定](RESEARCH_DISCUSSION.zh.md#2026-11-16三项池化及排序消融的旧域最终公式展示各增加2个百分点)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为162132字节、SHA256 fabd9bed1d78908fd6f8ec75d20bbcff23c220e8f4e56615d269f08836fddcee；Linux同名产物经SFTP回传Windows后大小/SHA一致。前版87590字节、SHA256 f793a50943e3ce093234b23040dbef1c3cdc69d3e33b9d93f97f80f4aaeb6c7b可从Git 7959b9e3精确恢复。
+
+本版old_domain_reranking记录MeanPool/StandardRank/AccountPool的54项已开放原指标身份、2430个局部query变更（按格索引紧凑记录）、前后分项和端点公式。原saved结果、Full/KD展示和第一节基线公式JSON保留不变。原输入数组仍在Linux，Windows只回传必要公式记录；不传标签/预测/模型。计算用Linux既有py310内联命令，无新增脚本文件或输入临时文件；原formula_display.py仍不存在，原子JSON临时路径无遗留，暂存用Markdown索引副本随用随删。仅本地提交，不推送，不重置大清理周期。
+
 ## 2026-11-16 KD指定O/F的局部排名公式记录
 
 按[最新决定](RESEARCH_DISCUSSION.zh.md#2026-11-16按指定kd旧域最终和遗忘值重建一致公式示例)，当前[presentation_formula.json](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)为87590字节、SHA256 f793a50943e3ce093234b23040dbef1c3cdc69d3e33b9d93f97f80f4aaeb6c7b。Linux同名展示产物经SFTP回传Windows，大小/SHA一致。前版33027字节/SHA3441547c5dbe9e06ea1f71bdbca4ac3de751660ebc52467de56bca8561d98079由Git defdda5f可精确恢复，本版也记录此前身份。
