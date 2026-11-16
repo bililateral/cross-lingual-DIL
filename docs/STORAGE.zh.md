@@ -1,5 +1,15 @@
 # 科研文件存储与恢复
 
+## 2026-11-16 中文消融后处理恢复保管
+
+用户要求同步完整消融结果；现场先保管了训练完成、生成资源回执失败及β依赖退出的[14份原始元数据](../reports/documentation/20261116/h_ablation_result/raw_manifest.json)，121367字节，具名SFTP回传并逐份核对大小/SHA。63成功训练和同一120群继续保留；未回传正文、账号映射、pairs/owners、Memory、预测数组或模型。原生成退出1及10.468339秒失败费保持，不改写为进程成功。
+
+按[本次明确许可](../reports/documentation/20261116/h_ablation_result/recovery/authorization.json)，恢复目录保管授权、诊断、CPU01原始回执、本地处置、来源/部署清单、request及实际启动证据。原50科学来源及已审派发器保持；新三入口只修无限辅助deadline的JSON元数据并接续原确认/分析。Git `cfbc6054afa0fc8fdfe6456cc6afb51f468c4e10`保管实际修复和测试版本；CPU完整生命周期2.021449秒、计3秒，是1043秒保守准备费的子集，不能重复相加。活动入口不能清理，一次性核验源码待本次恢复验收和精确恢复核对后收尾。
+
+旧根failure、budget、cost_records、execution_time按原字节保存在Linux新恢复state/previous_segment；旧βwait整体保存在原root/wait_before_postprocess_resume，新依赖门另存为gate_after_postprocess_resume.json。原冻结门、失败回执和旧两次等待归档不变。启动/依赖/训练费用等[8份具名元数据](../reports/documentation/20261116/h_ablation_result/startup_sync.json)56468字节已SFTP回传、逐份大小/SHA一致；训练费用盘点只用独立dispatch和cost账，不读逐训练私有状态。确认评分使用Linux既有py310及原正式端点，结果完整前不读取效果或提前开标签；根docs在Windows维护。当前进度只见交接唯一研究线项，不把本记录当动态账本。
+
+本次新增成果仅本地保管，11月14日已完成推送许可不扩大到本批；用户已有结果表编辑保持未提交。本轮没有删除权重，没有外发新结果包。局部恢复不重置上次11月6日、下次11月21日大清理周期。
+
 ## 2026-11-14 全项目科研记录与同步核对
 
 用户明确要求全面核对科研文件同步进度、检查平时少看的位置、原位更新滞后记录，并提交所有本地commit；本次授权覆盖当前科研分支所有尚未推送提交及本次维护成果，替代此前本批“仅本地、不推送”的当前交付限制，不追改原合同、送审、运行原件中的历史push=false。用户既有结果表编辑继续保留未提交，未改其内容。
