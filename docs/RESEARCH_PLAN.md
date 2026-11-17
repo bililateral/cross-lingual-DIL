@@ -6,6 +6,8 @@
 
 中文消融已沿[11月16日获准后处理](../reports/documentation/20261116/h_ablation_result/recovery/authorization.json)完成原整批；[完整结果、组件分析](../reports/documentation/20261116/h_ablation_result/result/report.zh.md)和全指标已回传核对。[结果外审与独立处置](../reports/documentation/20261116/h_ablation_result/result/review/primary_disposition.zh.md)已闭合，本中文批次无剩余科研执行；保留Full−ER强O/F证据和A_acq点保护微负导致的原联合false，不以“首域波动”改门，不追加实验。新增及中断权重已[定向清理](../reports/documentation/20261116/h_ablation_weight_cleanup/receipt.json)，Full27已按[11月17日后续授权](../reports/maintenance/20261117/trained_weights/report.zh.md)清理，保存分数/指标保留；不再把重新载模作为既有后续步骤。原生成失败和全部费用保持，结果收尾另记辅助，训练378h/确认12h及辅助无硬帽补充不变。动态进度仅见交接。
 
+当前无待恢复、待评分或待外审的正式实验，中文消融与单一β的已批准批次均已结案。本轮完成进度文档和交接说明；若用户继续改善完整H，应先基于最新β及中文消融的原始结果明确下一问题、候选／对照、所需数据与预算、判据及停止条件，再按具体决定推进。既有文献／数学与已开放保存结果可按原权限整理，不能把旧搜索预算、已删模型或本次交接当作新训练许可。下方旧调度与候选安排用于解释已经完成的历史，不是当前待执行清单。
+
 ## VendorLink账号监督：FIT12共同协议后续
 
 [原FIT12合同](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md)与用户明确的[六条M补充](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/scope.zh.md)及[完整结果主审](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md)共同界定这轮有限开发比较。原P的STOP_LEARNING及5pp/3.5pp裁决保持；后续4pp和明确M许可不追认P通过。既定训练、评分和无真值应用范围已完成，不重启控制器，不因有剩余88h预算自动新增任务或开放confirm。
@@ -14,9 +16,9 @@
 
 用户在[完整背景方向外审及独立处置](../reports/documentation/20261113/vendorlink_next_review/primary_disposition.zh.md)后明确选择继续改善完整H，已确认[同协议单一β探针](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md)：β=.191859540449699、seed51/52/53、完整ABC每域40轮、最多3-worker、独立42h。[增量审查与必要修复](../reports/documentation/20261113/vendorlink_beta_quarter/review/primary_disposition.zh.md)已闭合，沿原绑定来源及[当前依赖门](../reports/documentation/20261113/vendorlink_beta_quarter/gate_after_postprocess_resume.json)，中文技术整批闭合/释放后已由唯一控制器自动完成三条训练、串行盲评分和一次分析。[本批完整结果](../reports/documentation/20261113/vendorlink_beta_quarter/result/report.zh.md)保持Dream/Agora响应通过、AlphaBay最终退步导致联合false及原强门失败；技术执行剩余0，[结果外审和六项独立主审](../reports/documentation/20261113/vendorlink_beta_quarter/result/review/primary_disposition.zh.md)已闭合，无新增计算要求；原终账和完整负结果保留；本批12端点已按11月17日授权清理，不重开等待器或campaign。任何结果均结束该有限探针，不追加β/seed/epoch或自动confirm。
 
-不恢复统一跨市场池或12/15条开发队列；当前FIT12有效但未支持原强抗遗忘目标。复用相容保存对照，完整ABC包含后续教师变化，只靠近ER不证明出生保持价值；恢复Q/O时F可以上升，不能只选小F。原P/M结果和费用不改，不重开充分资格，不改变中文独立合同或挪用预算。具体等待/运行状态只维护交接对应项。
+不恢复统一跨市场池或12/15条开发队列；当前FIT12有效但未支持原强抗遗忘目标。复用相容保存对照，完整ABC包含后续教师变化，只靠近ER不证明出生保持价值；恢复Q/O时F可以上升，不能只选小F。原P/M结果和费用不改，不重开充分资格，不改变中文独立合同或挪用预算。完整结案状态及后续权限只维护交接对应项。
 
-用户明确选中的P24、M24和确定性Full12端点，以及早期GPU核验18份完整状态，已按[逐文件回执](../reports/documentation/20261113/vendorlink_weight_cleanup/receipt.json)删除；后续不能再假定可加载这些端点，SHA不能恢复权重，重训仍需新范围。原ABC36及RMS6随后已按11月17日授权删除；无已批准的后续加载任务。旧G4/CE/评分头失败、完整结果和全部费用不追改。确认集保持关闭，已见开发结果不能变回独立验证。中文消融执行、分析及结果审查已结案，旧Evolution/ABC结案不动；当前状态仅维护交接对应项；11月14日获准的那一批本地提交已完成推送；其后新增材料按各自当次许可保管，当前交付以交接为准，历史冻结原件不追改。
+用户明确选中的P24、M24和确定性Full12端点，以及早期GPU核验18份完整状态，已按[逐文件回执](../reports/documentation/20261113/vendorlink_weight_cleanup/receipt.json)删除；后续不能再假定可加载这些端点，SHA不能恢复权重，重训仍需新范围。原ABC36及RMS6随后已按11月17日授权删除；无已批准的后续加载任务。旧G4/CE/评分头失败、完整结果和全部费用不追改。确认集保持关闭，已见开发结果不能变回独立验证。中文消融执行、分析及结果审查已结案，旧Evolution/ABC结案不动；当前状态仅维护交接对应项；11月17日获准的34个提交已完整推送至b41e51c3；本轮后续文档维护单独本地提交，实际差异以交接和Git为准，历史冻结原件不追改。
 
 ## Evolution：已结束路线与保留边界
 

@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-17 完整Git交付与随后接手文档维护
+
+用户授权的全部现有成果已实际交付：此前33个本地提交，加本次用户汇总MD编辑及授权记录，共34个提交正常推送至既有科研分支。独立查询的实际远端ref与本地HEAD同为`b41e51c327e5f080eed87beb0dbb5d62057b5678`，当时工作区干净、领先／落后0／0，Git LFS无待交付对象；模型、凭据和封存数据未入Git。该事实替代下方历史批次的“待推送”“仅本地”和“用户MD未提交”作为当前交付判断。
+
+用户随后要求更新滞后的进度文档并提供完整接手提示词。本轮只维护交接、计划、设计入口、讨论与存储记录，原始结果、冻结合同、完成回执、审查及用户指标表不改，不新开计算或Linux观察。提示词在对话中提供，当前状态仍以交接为唯一入口，不另建平行进度文件。本轮文档成果单独本地提交，未借前批已完成的一次性许可自动推送；接手时应分别核对最新本地HEAD和上述已交付远端。根docs仍只在Windows维护，大清理周期保持11月6日／11月21日。
+
 ## 2026-11-17 Linux剩余训练权重清理后的当前保管
 
 按本轮明确授权完成[逐批依赖核查与清理](../reports/maintenance/20261117/trained_weights/report.zh.md)，13:35:35（UTC+8）删除196个路径、142份底层训练文件，共145675301229字节（135.6707 GiB）；其中旧H/S54份包含108个硬链接路径，未重复计算空间。对象还包括历史trial3 Full27、原VendorLink ABC36、RMS6、最新β12、旧BGE共享状态3，以及本轮明确撤销旧保留决定的排序2和FOREVER核验2。先前依赖均已结束，无已批准的未来载模任务；旧明确保留决定及原完成回执仍保留历史字节。
@@ -12,7 +18,7 @@
 
 [原件/来源清单](../reports/documentation/20261113/vendorlink_beta_quarter/result/source_manifest.json)绑定80份550908字节，具名SFTP回传后逐份大小/SHA一致；本地raw用唯一短文件名，清单保留远端原绝对路径及对应关系。包含14生产源、当前门、训练/评分/分析/访问和成本回执、当前及相容旧P/M/ref已开放聚合指标；不含正文、账号/身份、Memory、模型、预测/逐query、confirm/test/owners/private_custody载荷。
 
-[初次88份来源/结果双端核对](../reports/documentation/20261113/vendorlink_beta_quarter/result/sync.json)合计1273300字节，含80原件和8分析/报告；初次sync为28498字节、SHA256 44207c0c0f2b93f7a59a45a81e3d96d28963b90d7341fdd92de2baa8657b5b24，经SFTP回传一致，可从Git a7fc6a5c恢复；当前同页sync按审后报告及新增审查原件更新，原来源不改。Linux py310仅从保存指标核对端点/配对/判据并生成summary、detail和全表，没有运行正式analyze、重新评分或重采样；报告原位保管于[本批result](../reports/documentation/20261113/vendorlink_beta_quarter/result/report.zh.md)，原正式终账和裁决不覆盖。三训练/三评分完整、控制器退出及12新紧凑端点元数据见check和observation；新端点留Linux，没有本轮模型删除。结果外审包102载荷/379202字节（SHA256 ebc2d35d1dd196e6f29ea578ed5329f6e76549a42e747df35c59f045f542c05c）已逐成员核对；用户明确允许本包外审，已通过本地Playwright单次上传，[提交记录](../reports/documentation/20261113/vendorlink_beta_quarter/result/review/submission.json)绑定实际会话，现已全文回收并完成[六项独立主审](../reports/documentation/20261113/vendorlink_beta_quarter/result/review/primary_disposition.zh.md)，无结果有效性阻断或必要重算，科学失败裁决保持；不沿用历史包许可。无新的计算脚本、监听或临时传输包；内联核对的cells类型断言纠正和被拒长输入均记delivery_budget，不记作科研实验重试。根docs仅Windows，本地提交不推送，大清理周期仍11月6日/11月21日。
+[初次88份来源/结果双端核对](../reports/documentation/20261113/vendorlink_beta_quarter/result/sync.json)合计1273300字节，含80原件和8分析/报告；初次sync为28498字节、SHA256 44207c0c0f2b93f7a59a45a81e3d96d28963b90d7341fdd92de2baa8657b5b24，经SFTP回传一致，可从Git a7fc6a5c恢复；当前同页sync按审后报告及新增审查原件更新，原来源不改。Linux py310仅从保存指标核对端点/配对/判据并生成summary、detail和全表，没有运行正式analyze、重新评分或重采样；报告原位保管于[本批result](../reports/documentation/20261113/vendorlink_beta_quarter/result/report.zh.md)，原正式终账和裁决不覆盖。三训练/三评分完整、控制器退出及12新紧凑端点元数据见check和observation；结果交付时新端点仍在Linux；随后已按上方11月17日清理范围删除。结果外审包102载荷/379202字节（SHA256 ebc2d35d1dd196e6f29ea578ed5329f6e76549a42e747df35c59f045f542c05c）已逐成员核对；用户明确允许本包外审，已通过本地Playwright单次上传，[提交记录](../reports/documentation/20261113/vendorlink_beta_quarter/result/review/submission.json)绑定实际会话，现已全文回收并完成[六项独立主审](../reports/documentation/20261113/vendorlink_beta_quarter/result/review/primary_disposition.zh.md)，无结果有效性阻断或必要重算，科学失败裁决保持；不沿用历史包许可。无新的计算脚本、监听或临时传输包；内联核对的cells类型断言纠正和被拒长输入均记delivery_budget，不记作科研实验重试。根docs仅Windows；该结果批当时先本地保管，现已随34提交推送至b41e51c3，大清理周期仍11月6日/11月21日。
 
 [外审原文](../reports/documentation/20261113/vendorlink_beta_quarter/result/review/external_report.zh.md)33859字节、SHA256 c9698ab1540d48d22cc5d64e2fa7445021bb7f74b786cf781be2757907c4904e，自原会话Library直接下载，复制后同字节。必要修改仅357字段口径和阶段/指标解释；check/summary/detail/tables、原门和正式终账不改。原送审ZIP379202字节已核Git a7fc6a5c精确恢复后退役，清单/请求及102原载荷继续由该提交保管；完整外审原文、主审、完成页及[恢复/收尾记录](../reports/documentation/20261113/vendorlink_beta_quarter/result/review/recovery.json)保留。审后10份修订报告/审查文件共91179字节已SFTP镜像并核对大小/SHA；最终sync索引97份来源/结果/审查文件共1353373字节，索引本身32166字节、SHA256 602b2d616fa7c377f0b6a6c7a4e8bb1f2902f8a7e31a5eec1a5387166ea206f5双端一致。共清理6份无用ZIP/下载副本/浏览器临时文件494783字节，没有新计算脚本或Linux临时包；专用Library与聊天页均已关闭，不涉及模型删除，不重置大清理周期。
 
