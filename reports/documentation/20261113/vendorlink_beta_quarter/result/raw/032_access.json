@@ -1,0 +1,89 @@
+{
+  "role": "dev",
+  "sources": {
+    "AlphaBay:dev": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/data/AlphaBay_dev.json",
+      "bytes": 658254,
+      "sha256": "ee725475d064cb146b5a568e7c8b18741471d10675ef48a01c96529299b51ab7"
+    },
+    "AlphaBay:fit": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/data/AlphaBay_fit.json",
+      "bytes": 3581464,
+      "sha256": "34b2b568c562cd963a6607ca3b4f059a33a5d2cf52b4bffd463fa0a2e874f817"
+    },
+    "Dream:dev": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/data/Dream_dev.json",
+      "bytes": 249461,
+      "sha256": "9039617ee8d6e07024b139d0798df7bd7095869168cd28b6921436be60a26eb5"
+    },
+    "Dream:fit": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/data/Dream_fit.json",
+      "bytes": 1321579,
+      "sha256": "b4c0e7c552a1abb83e42537b7083e9b270dd63476a5d120ab392f06870b7cd6e"
+    },
+    "Agora:dev": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/data/Agora_dev.json",
+      "bytes": 749682,
+      "sha256": "f87e16288de46452935d126142d0a81a3b5f5335122bc9ec07aec1c9e2be9bd3"
+    },
+    "Agora:fit": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/data/Agora_fit.json",
+      "bytes": 3936369,
+      "sha256": "0e62aade678abdacb37d9e9782741add655c790e229e62da9edccf50e8e465e4"
+    }
+  },
+  "training_identity": {
+    "protocol": "vendorlink-fit12-beta-quarter-20261113",
+    "task": {
+      "id": "M_H_full_beta_quarter_s52",
+      "phase": "M",
+      "candidate": "H_CE_RMS",
+      "method": "H_full",
+      "seed": 52,
+      "epochs": 40,
+      "stages": 3,
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "settings": {
+        "method": "H_full",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 2.5e-05,
+        "head_lr": 0.0003,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "mean_last4_sum",
+        "head_schedule": "encoder",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.191859540449699,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "rms",
+        "diagnostics": false,
+        "deterministic_history": true
+      }
+    },
+    "manifest": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261109/vendorlink_account_protocol/execution/qualification/manifest.json",
+      "bytes": 5126,
+      "sha256": "bab95378ac57c754b58f0d63336e358f56965dbf93700d87965e27abc56f28ad"
+    },
+    "gate": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261113/vendorlink_beta_quarter/gate_after_postprocess_resume.json",
+      "bytes": 18230,
+      "sha256": "7cd1670eaecc47aff18d2c9353c6903b18c80c016aca11822319b498d9ef166c"
+    }
+  }
+}

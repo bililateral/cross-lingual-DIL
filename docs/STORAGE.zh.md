@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-17 β探针完整结果回传与保管
+
+[原件/来源清单](../reports/documentation/20261113/vendorlink_beta_quarter/result/source_manifest.json)绑定80份550908字节，具名SFTP回传后逐份大小/SHA一致；本地raw用唯一短文件名，清单保留远端原绝对路径及对应关系。包含14生产源、当前门、训练/评分/分析/访问和成本回执、当前及相容旧P/M/ref已开放聚合指标；不含正文、账号/身份、Memory、模型、预测/逐query、confirm/test/owners/private_custody载荷。
+
+[88份来源/结果双端核对](../reports/documentation/20261113/vendorlink_beta_quarter/result/sync.json)合计1273300字节，含80原件和8分析/报告；sync本身28498字节、SHA256 44207c0c0f2b93f7a59a45a81e3d96d28963b90d7341fdd92de2baa8657b5b24经SFTP回传一致。Linux py310仅从保存指标核对端点/配对/判据并生成summary、detail和全表，没有运行正式analyze、重新评分或重采样；报告原位保管于[本批result](../reports/documentation/20261113/vendorlink_beta_quarter/result/report.zh.md)，原正式终账和裁决不覆盖。三训练/三评分完整、控制器退出及12新紧凑端点元数据见check和observation；新端点留Linux，没有本轮模型删除。结果外审包102载荷/379202字节（SHA256 ebc2d35d1dd196e6f29ea578ed5329f6e76549a42e747df35c59f045f542c05c）已逐成员核对，尚待本包许可，不沿用历史包许可。无新的计算脚本、监听或临时传输包；内联核对的cells类型断言纠正和被拒长输入均记delivery_budget，不记作科研实验重试。根docs仅Windows，本地提交不推送，大清理周期仍11月6日/11月21日。
+
 ## 2026-11-17 当前展示文件与同步索引
 
 本次实际核对Windows文件、Linux同名产物及清理状态，当前适用关系如下；下方既往执行段中的“当前”按该段发生时点理解，不能覆盖本索引和交接最新项。原实测/冻结回执、历史计算和费用均未追改。
