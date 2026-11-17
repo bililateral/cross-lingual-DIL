@@ -4,6 +4,8 @@ H/S评价补充（2026-11-02）：用户选择[方案A](../reports/seller_alias_
 
 ## 当前合同入口
 
+模型可用性以[11月17日保管核查](STORAGE.zh.md#2026-11-17-linux剩余训练权重清理后的当前保管)为准：用途已结束的独立训练权重已按用户授权删除，完整结果与原始证据保留。下列合同中旧H/S、trial3 Full、原ABC、RMS及β端点的加载／复用均是已发生执行的依据，不表示这些参数现在仍在Linux，也不授权重训；当前作业与后续动作仍只看交接和计划。
+
 指标汇总的[公式展示](CONTINUAL_BASELINES_AND_VENDORLINK_RESULTS.zh.md)沿[基线H来源与计算](../reports/documentation/20261116/h_ablation_result/baseline_H_formula.json)及[中文消融来源与计算](../reports/documentation/20261116/h_ablation_result/presentation_formula.json)，与下列正式科研结果分工不同；不能用展示值替代原实测、原判据或已闭合外审。最新展示口径/保管与作业状态统一见交接，用户决定从讨论记录回溯。
 
 中文H八配置消融完整结果（2026-11-16）：[完整分析](../reports/documentation/20261116/h_ablation_result/result/report.zh.md)、[22指标三角色全表](../reports/documentation/20261116/h_ablation_result/result/tables.zh.md)、[来源/保存字段核对](../reports/documentation/20261116/h_ablation_result/result/check.json)沿原八配置及同一120群，一次开放后解释结果，不改原统计或判据。Full−ER的O/F主区间通过，A_acq点保护微负使联合false；A_acq含R11/R22，不能误写成首域单项。组件比较按原探索性层级与归因边界报告；[具体许可后的完整外审与18项处置](../reports/documentation/20261116/h_ablation_result/result/review/primary_disposition.zh.md)只精确化报告解释，无新增科研计算或判据变化；不授权新实验。结果处置与运行状态只见交接。
