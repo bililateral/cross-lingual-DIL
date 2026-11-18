@@ -26,55 +26,62 @@ def read_object(path):
 
 
 def identity(expected):
-    aliases = {'owner': 'username', 'created': 'create_time', 'command': 'cmdline'}
-    expected = {key: expected.get(key, expected.get(alias)) for key, alias in aliases.items()} | {
-        'pid': expected.get('pid'), 'cwd': expected.get('cwd')}
-    if any(v is None for v in expected.values()):
-        raise ValueError('Identity requires pid, owner, created, command and cwd')
+    wanted = dict(pid=expected['pid'], owner=expected.get('owner', expected.get('username')),
+                  command=expected.get('command', expected.get('cmdline')), cwd=expected['cwd'])
+    created = expected.get('created', expected.get('create_time'))
+    if created is not None:
+        wanted['created'] = created
+    if 'start_ticks' in expected or 'boot_id' in expected:
+        wanted.update(start_ticks=expected.get('start_ticks'), boot_id=expected.get('boot_id'))
+    if None in wanted.values() or ('created' not in wanted and 'start_ticks' not in wanted):
+        raise ValueError('Identity requires pid, owner, command, cwd and creation time or start_ticks/boot_id')
     try:
-        p = psutil.Process(expected['pid'])
+        p = psutil.Process(wanted['pid'])
         with p.oneshot():
             actual = dict(pid=p.pid, owner=p.username(), created=p.create_time(),
                           command=p.cmdline(), cwd=p.cwd())
-        return dict(exists=True, matches=actual == expected, expected=expected, actual=actual)
-    except psutil.NoSuchProcess:
-        return dict(exists=False, matches=False, expected=expected)
+            if 'start_ticks' in wanted:
+                fields = Path(f'/proc/{p.pid}/stat').read_text().rsplit(') ', 1)[1].split()
+                actual.update(start_ticks=int(fields[19]),
+                              boot_id=Path('/proc/sys/kernel/random/boot_id').read_text().strip())
+        matched = all(actual[k] == v for k, v in wanted.items())
+        result = dict(exists=True, matches=matched, expected=wanted)
+        if matched:
+            result['actual'] = actual
+        return result
+    except (psutil.NoSuchProcess, FileNotFoundError):
+        return dict(exists=False, matches=False, expected=wanted)
     except psutil.AccessDenied:
-        return dict(exists=True, matches=None, expected=expected, error='Access denied')
-
-
-def last_update(path):
-    # Only project the last complete line's counters; never export losses/ids.
-    with path.open('rb') as stream:
-        stream.seek(0, 2)
-        length = stream.tell()
-        stream.seek(max(0, length - 1024 * 1024))
-        lines = stream.read().splitlines()
-    for line in reversed(lines[-2:]):
-        try:
-            row = json.loads(line)
-            return {key: row[key] for key in ('stage', 'epoch', 'stage_update', 'updates', 'total_updates')
-                    if key in row}
-        except (ValueError, UnicodeDecodeError):
-            continue
-    raise ValueError(f'No complete update in bounded tail: {path}')
+        return dict(exists=True, matches=None, expected=wanted, error='Access denied')
 
 
 def argument(command, flag):
     return command[command.index(flag) + 1] if flag in command else None
 
 
-def observe(root):
+def observe(root, gate_path=None, identity_receipt=None):
     root = Path(root).resolve(strict=True)
-    launch, gate = read_object(root / 'launch.json'), read_object(root / 'gate.json')
+    if (gate_path is None) != (identity_receipt is None):
+        raise ValueError('Supply both the effective gate and its identity receipt')
+    gate_path = Path(gate_path or root / 'gate.json').resolve(strict=True)
+    receipt_path = Path(identity_receipt or root / 'launch.json').resolve(strict=True)
+    if not gate_path.is_relative_to(root):
+        raise ValueError('Gate must be inside the explicitly selected root')
+    launch = read_object(receipt_path)
+    binding = launch['gate']
+    if ('path' in binding or identity_receipt is not None) and binding.get('path') != str(gate_path):
+        raise ValueError('Identity receipt names a different gate')
+    raw_gate = gate_path.read_bytes()
+    if len(raw_gate) != binding['bytes'] or hashlib.sha256(raw_gate).hexdigest() != binding['sha256']:
+        raise ValueError('Gate size/SHA differs from identity receipt')
+    gate = json.loads(raw_gate)
     campaign = Path(gate['campaign']).resolve()
     if not campaign.is_relative_to(root):
         raise ValueError('Campaign must be inside the explicitly selected root')
-    controller = identity(launch)
-    binding = launch.get('gate', {})
-    gate_matches = (binding.get('bytes') == (root / 'gate.json').stat().st_size and
-                    binding.get('sha256') == hashlib.sha256((root / 'gate.json').read_bytes()).hexdigest())
-    dispatch = read_object(campaign / 'dispatch.json') if (campaign / 'dispatch.json').exists() else {}
+    controller = identity(launch.get('identity', launch))
+    dispatch_path = campaign / 'dispatch.json'
+    dispatch_present = dispatch_path.exists()
+    dispatch = read_object(dispatch_path) if dispatch_present else {}
     budget = read_object(campaign / 'budget.json') if (campaign / 'budget.json').exists() else {}
     active, running, commitments = [], {}, {}
     for slot, source in dispatch.get('active', {}).items():
@@ -98,13 +105,17 @@ def observe(root):
     for folder in sorted(campaign.glob('*/training/*')):
         if not folder.is_dir():
             continue
-        updates = folder / 'run/updates.jsonl'
+        workload = folder / 'run/workload.json'
+        count = read_object(workload)['current_updates'] if workload.exists() else None
+        if count is not None and (type(count) is not int or count < 0):
+            raise ValueError(f'Invalid workload update count: {workload}')
         receipt = folder / 'dispatch_receipt.json'
         saved = read_object(receipt) if receipt.exists() else {}
         training.append(dict(task=folder.name, phase=folder.parent.parent.name,
-                             counters=last_update(updates) if updates.exists() else None,
-                             updates_mtime_utc=datetime.fromtimestamp(updates.stat().st_mtime, timezone.utc).isoformat()
-                             if updates.exists() else None,
+                             counters=dict(updates=count, total_updates=count) if count is not None else None,
+                             counters_source='run/workload.json (epoch or completion)',
+                             updates_mtime_utc=datetime.fromtimestamp(workload.stat().st_mtime, timezone.utc).isoformat()
+                             if count is not None else None,
                              training_completion_record_exists=(folder / 'run/completion.json').exists(),
                              wrapper_validation_success=saved.get('success'),
                              worker_released=saved.get('released'),
@@ -112,11 +123,12 @@ def observe(root):
     settled = budget.get('used_seconds', {})
     return dict(observed_at=datetime.now(timezone.utc).isoformat(), root=str(root),
                 observer_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-                controller=controller, launch_gate_matches=gate_matches,
+                controller=controller, identity_receipt=str(receipt_path), gate_path=str(gate_path),
+                launch_gate_matches=True, dispatch_record_exists=dispatch_present,
                 dispatch={key: dispatch.get(key) for key in ('status', 'pending', 'retired', 'budget_stop')},
-                dispatch_failure_count=len(dispatch.get('failures', [])),
-                controller_error_present=bool(dispatch.get('controller_error')),
-                active=active, training=training,
+                dispatch_failure_count=len(dispatch['failures']) if 'failures' in dispatch else None,
+                controller_error_present=bool(dispatch['controller_error']) if 'controller_error' in dispatch else None,
+                active=active if 'active' in dispatch else None, training=training,
                 campaign_failure_record_exists=(campaign / 'failure.json').exists(),
                 campaign_completion_record_exists=(campaign / 'completion.json').exists(),
                 scientific_decisions={phase: dict(analysis_record_exists=(campaign / phase / 'analysis/result/results.json').exists(),
@@ -132,10 +144,12 @@ def observe(root):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', required=True, type=Path, help='Explicit execution root containing launch.json and gate.json')
+    parser.add_argument('--gate', type=Path, help='Effective gate selected by the handoff')
+    parser.add_argument('--identity-receipt', type=Path, help='Named launch or handover receipt binding that gate')
     args = parser.parse_args()
     if sys.platform != 'linux' or Path(sys.executable).resolve() != PYTHON.resolve():
         parser.error('Run only with the existing Linux py310 Python')
-    result = observe(args.root)
+    result = observe(args.root, args.gate, args.identity_receipt)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if result['controller']['matches'] is not None else 2
 

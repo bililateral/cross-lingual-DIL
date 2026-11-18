@@ -7,23 +7,26 @@
 1. 先核对分支、工作区和最新用户决定，读取交接`## 当前工作`至`## 近期执行与审查历史`之间的内容。按研究线小节定位；不要先全文读取讨论、存储或历史快照。
 2. 从设计入口找到当前方案及补充、实际入口和必要既有审查。冻结材料的旧“待批准”按其时点解释，不覆盖后续有出处的决定。
 3. 涉及运行时，用下面的一次性只读观察核对现场，再更新交接对应项。观测不重启、补位或控制作业，不开放未完整阶段效果。
-4. 启动、阶段结束、失败、授权改变或审查结案时核对受影响入口。普通更新数变化只更新必要观察和交接；设计入口不复制PID、门开关或网页生成状态，计划不复制进度。
+4. 作业或审查状态变化，更新交接对应研究线和原件链接。有新合同、待办、用户决定或保管变化时，再更新各自负责的入口。普通进度观测归作业回执和交接。
 
 ## Linux只读观察
 
-使用现有py310执行已同步且核对身份的`scripts/research_observe.py`，显式给出含`launch.json`和`gate.json`的执行根。例如：
+使用已核对身份的 `scripts/research_observe.py` 和 Linux 既有 py310。普通作业只传 `--root`，沿用根目录的 `launch.json` 和 `gate.json`。迁移过的作业同时传入交接具名的有效门和身份回执。下例使用 11 月 17 日 β 的历史路径说明字段对应关系。
 
 ```bash
+research_root=/home/yongpeng/cross-lingual/reports/documentation
 /home/yongpeng/miniconda3/envs/py310/bin/python -B \
   /path/to/verified/scripts/research_observe.py \
-  --root /home/yongpeng/cross-lingual/reports/documentation/20261110/vendorlink_redesign/implementation
+  --root "$research_root/20261113/vendorlink_beta_quarter" \
+  --gate "$research_root/20261113/vendorlink_beta_quarter/gate_after_postprocess_resume.json" \
+  --identity-receipt "$research_root/20261116/h_ablation_result/recovery/state/beta_handover.json"
 ```
 
-输出仅为stdout JSON，需要保管时重定向到本轮具名新证据文件，不覆盖旧回执。工具不导入科研实现，不载模、不读效果值/标签/正文/分数；只读取允许的启动、gate、dispatch、账本、更新计数和训练包装元数据。效果仅报告文件存在与否，`NOT_READ`不是通过或失败。进程同时核对PID、属主、创建时间、完整命令和cwd；`matches=false/null`须调查，不能仅凭进程存在判断仍是原作业。命令成功只表示观察完成，不表示训练健康或科学门通过。
+工具先核对回执绑定的门路径（具名模式）、大小和 SHA，再解析同一份已核字节并定位作业。进程身份兼容顶层启动回执和嵌套的 `identity`，逐项核对 PID、属主、完整命令、cwd 以及创建时间或 `start_ticks/boot_id`。若回执给出两种启动标识，两者都要吻合。遇到 `matches=false/null`，结合观测时点区分历史进程、已退出和读取受限。
 
-发生过依赖身份迁移或exec接续的作业，根launch.json可能只保存历史进程，先按交接找到当前迁移回执和gate再核对身份。本工具当前要求created型身份及固定launch/gate布局；只有start_ticks/boot_id或迁移绑定不兼容时，采用与实际字段对应的一次性只读核对，不为通过工具而改活动门、补建假launch或重启监听。进程身份不匹配先区分历史绑定与真实故障，不能仅凭旧PID不存在判定当前作业已停。
+训练进度只从 `run/workload.json` 的 `current_updates` 取得，按完整训练轮或完成时刷新。缺文件时 `counters=null`；工具不打开含样本与训练明细的 `updates.jsonl`。缺调度回执时 `dispatch_record_exists=false`，失败数、活动槽及控制器错误状态为 `null`。回执实际记录空失败列表时，失败数才为零。
 
-观察是依次读取的现场快照；任务切换时可能存在短暂不一致。JSON若正在写入而不可解析，工具拒绝给出成功快照；按具体缺项再观察，不据此重启作业。当前工具适配现有launch/gate/campaign目录形式；遇其他格式应明确报不支持，不能猜字段。
+输出为 stdout JSON。观测按顺序读取，任务切换时各项可能取自不同时刻。包装验收、完成文件存在和科学判定分别报告，`NOT_READ` 表示效果内容未读。按当轮权限保管新的具名快照；遇不可解析的元数据或其他作业布局，按实际入口核对。
 
 预算三项分开：`settled_seconds`是账本已结算；`active_lifecycle_estimate_seconds`是身份匹配的活动worker暂估；`active_full_commitment_estimate_seconds`由同机创建时间/生命周期deadline推算完整承诺。后两项互相重叠，不能相加；预约不是已耗。原始预约未单独持久化，因此承诺明确标为估计，不冒充权威准入账。监管尚未结账费用不估算，CPU子账不重复加。工具从不写账，也不以这些显示值代替原Ledger准入。
 
@@ -38,12 +41,16 @@
 
 ./scripts/research_files.ps1 -Action Verify -Root . -Manifest ./manifest.json
 
-# 远端目录须已存在且确属本轮；Push会写具名目标，不能指向活动冻结来源。
+# 新文件写入本次获准的既有隔离目录；方向必填。
 ./scripts/research_files.ps1 -Action Sync -Root . -Manifest ./manifest.json `
   -HostName yongpeng@10.201.109.111 -RemoteRoot /explicit/isolated/directory -Direction Push
 ```
 
-Sync使用系统OpenSSH/SFTP，认证由其终端提示完成，工具没有密码参数或凭据字段。Push前核对本地身份，上传后逐份get读回再比较大小/SHA；Pull须提供远端已取得的身份清单，全批校验后才安装本地文件，不覆盖同路径异内容。失败不出成功回执；Push失败可能已有部分文件到达远端，应先核对现场，不能声称自动回滚。工具不在远端建目录/删除，不递归传输；私有目录和常见模型/原始数组等载荷被排除，其他名称仍须人工核对权限。临时批处理及读回副本只在本次唯一临时目录，finally核对路径后清理。
+Push 先核本地清单，再用系统 SSH 调用 Linux 既有 py310 执行随工具提供的具名文件核对逻辑。目标和父目录由本轮明确指定。已有同内容直接跳过写入，已有异内容默认拒绝整批。只有本次获准更新的具名可变文件，才在调用中另给 `-ExpectedRemoteManifest <旧身份清单>`，列明对应路径和已核实的旧大小、SHA。旧身份不符或应存在的旧目标已缺失都会停止。冻结文件沿用原保管约定。
+
+有变化的内容先用 SFTP 传入目标同目录下本次私有暂存目录。发布前再次核对整批目标和暂存字节，再逐文件发布；新目标以独占方式创建。工具之间以父目录锁协调发布，其他写入工具须与本次具名替换错开。最终逐个 SFTP 读回并校验，成功回执中 `actions` 与清单逐项对应，为 `create`、`replace` 或 `skip`。中断可能留下已发布的部分文件或本次暂存，先核对现场；同内容可安全重试。
+
+Pull 以已取得的远端身份清单为准，全批核对后才安装本地文件，同名异内容会停止。认证由 OpenSSH 处理。一次 Push 的预检、上传、发布、读回使用独立客户端连接，口令认证可能分别提示。本地读回与远端暂存均按本次具名路径收尾。
 
 ## 外审收尾复用
 
@@ -63,4 +70,4 @@ ReviewRecord只生成具名原文/完成页及主审文件的身份，要求明�
 
 新辅助工具明确区分`read_object(path)`的已解析对象与文件绑定/路径；传输只接受显式`path/bytes/sha256`清单，缺字段、错类型、重复路径或SHA不符即拒绝。训练产物完成记录、包装验收结果与科学门分别显示，不用一个success替代三层结论。活动科学来源不为统一字段热改；将来确有接口变更时只补受影响的类型/错误传播/收尾核验，既有合同和有效证据继续适用。
 
-常规验证：Linux现有py310运行`tests/test_research_observe.py`，Windows运行`tests/research_files.tests.ps1`做文件机械检查。它们是保留的普通工具回归，不是一次性科研资格，也不自动授权任何模型、标签或GPU作业。
+常规验证在 Linux 既有 py310 运行 `tests/test_research_observe.py`，在 Windows 运行 `tests/research_files.tests.ps1` 做文件机械检查。具名 Linux 验证已获准时，可给后者传 `-SyncTestHost 用户@主机`，用随机临时目录内的虚构文本验证实际 OpenSSH/SFTP 入口并清理。
