@@ -2,7 +2,9 @@
 
 ## 2026-11-18 固定构群后的六槽风险写入
 
-沿用上轮六份定向成员布局；逐查询有向预测、两策略的槽位身份及逐次内容清单只在 Linux 保管。新增六份压缩清单存于本轮独立目录 vendorlink_fit_risk_memory/selection_private，文件名、大小和 SHA 见[冻结回执](../reports/documentation/20261118/vendorlink_fit_risk_memory/freeze.json)。Windows 通过具名 SFTP 回传合成核验、阶段计时、访问登记和[匿名汇总](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/summary.json)，九个结果文件与 [Linux 清单](../reports/documentation/20261118/vendorlink_fit_risk_memory/delivery.sha256)一致。没有新增训练权重。外发限另行确认的具体包。
+沿用上轮六份定向成员布局；逐查询有向预测、两策略的槽位身份及逐次内容清单只在 Linux 保管。新增六份压缩清单存于本轮独立目录 vendorlink_fit_risk_memory/selection_private，文件名、大小和 SHA 见[冻结回执](../reports/documentation/20261118/vendorlink_fit_risk_memory/freeze.json)。Windows 通过具名 SFTP 回传合成核验、阶段计时、访问登记和[匿名汇总](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/summary.json)，九个结果文件与 [Linux 清单](../reports/documentation/20261118/vendorlink_fit_risk_memory/delivery.sha256)一致。没有新增训练权重。已核准的 15 项匿名包只送审一次。
+
+已保留[完整外审原文](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/review/external_report.zh.md)、独立主审和定稿。七份结果与审查材料已逐项 SFTP 读回并核对 [Linux SHA](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/review/sync.sha256)。本地 Git f495c551 可精确恢复提交时的 ZIP 和报告。17 份包工作副本、网页临时文件及读回副本共 189,366 字节已收尾；两端保管及逐文件身份见[收尾记录](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/review/recovery.json)。定向收尾未改变全项目清理周期。
 
 ## 2026-11-18 VendorLink 当期 fit 构群
 

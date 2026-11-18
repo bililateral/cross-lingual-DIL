@@ -4,7 +4,7 @@
 
 ## VendorLink账号监督：FIT12共同协议后续
 
-先按用户对具体匿名包的决定，完成固定构群写入诊断的一次结果合审和独立处置。按本轮判据结束当期词面风险优先保留精确对的路线。后续若提出新的完整 H 假设，应说明它如何同时保护旧域末态、初学和新域学习，以及与这个仅测覆盖机会的诊断有什么关系。新候选、训练与确认仍需具体决定。[停止条件](../reports/documentation/20261118/vendorlink_fit_risk_memory/scope.zh.md) · [诊断结果](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/report.zh.md)
+本轮按判据结束“固定成员池、按当期 fit 词面风险写入精确对”的路线。下一项科学选择是是否提出可同时保护旧域最终表现、初学和新域学习的新机制假设。现有权限可解释已保存的结果；新增候选、数据用途、训练或独立确认由新方案和具体许可决定。[本轮停止条件](../reports/documentation/20261118/vendorlink_fit_risk_memory/scope.zh.md) · [已闭合的结果审查](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/review/primary_disposition.zh.md)
 
 ## 既往计划与决定（历史）
 
