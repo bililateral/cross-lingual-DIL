@@ -2,7 +2,7 @@
 
 ## 2026-11-18 ER 前五竞争账号诊断
 
-12 个开发矩阵在 Linux 的原 ER 评分目录各读取一次。具名 SFTP 只回传[六格匿名汇总](../reports/documentation/20261118/vendorlink_er_top5/result/summary.json)、[访问清单](../reports/documentation/20261118/vendorlink_er_top5/result/access.jsonl)、手写核验与计算计时。Windows 与 Linux 使用同相对目录，两端已核对源码、范围及五份回传材料的 SHA。正式分数及账号对应保管在 Linux。外审仅使用[逐成员清单](../reports/documentation/20261118/vendorlink_er_top5/result/review/manifest.json)中的一包获准材料。
+12 个开发矩阵在 Linux 的原 ER 评分目录各读取一次。具名 SFTP 只回传[六格匿名汇总](../reports/documentation/20261118/vendorlink_er_top5/result/summary.json)、[访问清单](../reports/documentation/20261118/vendorlink_er_top5/result/access.jsonl)、手写核验与计算计时。Windows 与 Linux 使用同相对目录，两端已核对源码、范围及五份回传材料的 SHA。正式分数及账号对应保管在 Linux。外审仅使用[逐成员清单](../reports/documentation/20261118/vendorlink_er_top5/result/review/manifest.json)中的一包获准材料。定稿报告、完整外审和主审记录已在 Linux 回存并具名读回校验。送审 ZIP、浏览器和核对副本的退役范围见[收尾回执](../reports/documentation/20261118/vendorlink_er_top5/result/review/recovery.json)，已送审字节可从本地 Git 75076122 恢复。
 
 ## 2026-11-18 FIT12 旧域分数漂移诊断
 
