@@ -29,7 +29,7 @@ PREVIOUS = ROOT.parents[2]/'20261113/vendorlink_beta_quarter'
 PREVIOUS_GATE = PREVIOUS/'gate_after_postprocess_resume.json'
 PRIOR_HASH = '7cd1670eaecc47aff18d2c9353c6903b18c80c016aca11822319b498d9ef166c'
 PUBLIC_BETA = '0fcc9250927d09607b790700904f222e8ba42e301852415e0ff05b8f34ed9d49'
-NAMES = ['step35_market_'+s for s in ('adapters','worker','queue')]
+NAMES = ['step35_market_'+s for s in ('accounting','adapters','worker','queue')]
 NAMES += ['step35_vendorlink_account_'+s for s in ('control','evaluate','io','methods','policy','run')]
 NAMES += ['step29_vendorlink_'+s for s in ('data','methods','run')]
 NAMES += ['step30_evolution_'+s for s in ('control','io','policy')] + ['step28_formal_queue']
@@ -56,7 +56,8 @@ def process_info(pid):
 
 def live(row):
     try:
-        return all(process_info(row['pid'])[k] == row[k] for k in ('owner','cwd','command','start_ticks','boot_id'))
+        actual=process_info(row['pid'])
+        return all(actual[k] == row[k] for k in ('owner','cwd','command','start_ticks','boot_id'))
     except (psutil.NoSuchProcess, psutil.AccessDenied, FileNotFoundError):
         return False
 
@@ -199,10 +200,13 @@ def prepare(revision):
     tasks=market_tasks()
     write(ROOT/'tasks.json',tasks)
     write(ROOT/'final_sources.json', dict(git=revision, sources=science, deployment=str(WS)))
-    cpu_sec=7+sum(x['charged_seconds'] for x in cpu)
-    aux=cpu_sec+sum(x['monitor_seconds'] for x in cpu+gpu)+sum(
-        read(p)['charged_seconds'] for p in sorted(EVIDENCE.glob('operation_*.json')))
-    bindings=[record(EVIDENCE/(r['label']+'.json')) for r in cpu+gpu]
+    repaired=sorted(EVIDENCE.glob('repair[0-9][0-9].json'))
+    if not repaired or not read(repaired[-1])['passed'] or read(repaired[-1])['production_sources']!=science:
+        raise ValueError('Missing focused qualification for the final production files')
+    cpu_sec=7+sum(x['charged_seconds'] for x in cpu)+sum(read(p)['charged_seconds'] for p in repaired)
+    prior_events=sorted(EVIDENCE.glob('operation_*.json'))
+    aux=cpu_sec+sum(x['monitor_seconds'] for x in cpu+gpu)+sum(read(p)['charged_seconds'] for p in prior_events)
+    bindings=[record(EVIDENCE/(r['label']+'.json')) for r in cpu+gpu]+[record(p) for p in repaired]
     limits=dict(LIMITS,workers=3,vendor_reserve_bytes=29*GIB,free_gpu_bytes=reserved*GIB)
     write(GATE,dict(protocol=PROTOCOL,training_authorized=True,review_closed=True,source_git=revision,
           workspace=str(WS),campaign=str(CAMPAIGN),experiment_root=str(ROOT),caps=CAPS,limits=limits,
@@ -212,7 +216,8 @@ def prepare(revision):
           review_decision=record(ROOT/'review/decision.json'),qualification=bindings+[record(ROOT/'oom_qualification.json')],
           manifest=prev['manifest'],model_binding=prev['model_binding'],other_gpu_commitments=[],
           allow_observed_foreign_gpu_processes=True,cpu_test_seconds=cpu_sec,
-          prior_seconds=dict(training=0,auxiliary=aux+5,gpu=sum(x['charged_seconds'] for x in gpu)),
+          prior_operation_ids=[p.name for p in prior_events],operations_entry=record(Path(__file__)),
+          prior_seconds=dict(training=0,auxiliary=aux,gpu=sum(x['charged_seconds'] for x in gpu)),
           historical=dict(original_H_ER=dict(binding=prev['prior_M']['results'],method='H_ER'),
                           original_beta_Full=dict(binding=oldbeta,method='H_full')),
           prepared=now(),confirmation_open=False))
@@ -223,7 +228,7 @@ def launch():
     g=read(GATE)
     if CAMPAIGN.exists() or (ROOT/'launch.json').exists():
         raise ValueError('Existing formal campaign or launch receipt')
-    for item in [g['authorization'],g['scope'],g['review'],g['review_decision'],g['source_list'],g['tasks'],
+    for item in [g['authorization'],g['scope'],g['review'],g['review_decision'],g['source_list'],g['tasks'],g['operations_entry'],
                  *g['sources'],*g['qualification']]:
         verify(item)
     # This exclusive claim prevents concurrent launchers creating two controllers.
@@ -252,7 +257,9 @@ def observe():
         if not target.is_relative_to(CAMPAIGN):
             raise ValueError('Wrong campaign worker target')
         w=target/'run/workload.json'
-        active.append(dict(slot=slot,identity=row,identity_matches=valid,
+        uptime=float(Path('/proc/uptime').read_text().split()[0])
+        elapsed=max(0,uptime-row['start_ticks']/os.sysconf('SC_CLK_TCK')) if valid else None
+        active.append(dict(slot=slot,identity=row,identity_matches=valid,open_lifecycle_seconds=elapsed,
                            task=cmd[cmd.index('--task')+1] if '--task' in cmd else None,
                            action=cmd[cmd.index('--action')+1],workload=read(w) if w.exists() else {}))
     budget=CAMPAIGN/'budget.json'
@@ -270,28 +277,69 @@ def observe():
         print((ROOT/'controller.log').read_text(errors='replace')[-3000:])
 
 
+def qualify_repairs():
+    history=sorted(EVIDENCE.glob('repair[0-9][0-9].json'))
+    if GATE.exists() or any(read(p)['passed'] for p in history):
+        raise ValueError('No repeated focused qualification')
+    remaining=1800-7-sum(r['charged_seconds'] for r in receipts('cpu'))-sum(read(p)['charged_seconds'] for p in history)
+    if remaining<5:
+        raise TimeoutError('CPU qualification allowance exhausted')
+    label=f'repair{len(history)+1:02d}'
+    target=EVIDENCE/label
+    target.mkdir(exist_ok=False)
+    core=psutil.Process().cpu_affinity()[0]
+    started=time.monotonic()
+    try:
+        result=subprocess.run(['taskset','-c',str(core),PYTHON,'-B',str(ROOT/'review/check_repairs.py'),str(target)],
+             cwd=WS,env=dict(os.environ,CUDA_VISIBLE_DEVICES='',OMP_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS='1'),
+             stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=remaining-2)
+        code,log=result.returncode,result.stdout.decode(errors='replace')[-3000:]
+    except subprocess.TimeoutExpired:
+        code,log=-1,'Single-core timeout'
+    seconds=time.monotonic()-started
+    detail=read(target/'result.json') if (target/'result.json').exists() else {}
+    passed=code==0 and detail.get('passed') is True
+    write(EVIDENCE/(label+'.json'),dict(label=label,passed=passed,charged_seconds=math.ceil(seconds),
+          elapsed_seconds=seconds,finished=now(),cpu_core=core,exit_code=code,output=log,detail=detail,
+          production_sources=sources(),operations_source=record(Path(__file__)),check_source=record(ROOT/'review/check_repairs.py')))
+    print(label,passed,seconds,log)
+    if not passed:
+        raise RuntimeError('Focused qualification failed')
+
+
+def settle_closed():
+    if (CAMPAIGN/'budget.json').exists() and (ROOT/'launch.json').exists() and not live(read(ROOT/'launch.json')['controller']):
+        from step35_market_accounting import MarketLedger
+        MarketLedger.settle_closed(CAMPAIGN)
+
+
 if __name__=='__main__':
     p=argparse.ArgumentParser()
     p.add_argument('op',choices=('preflight','cpu','gpu','prepare','launch','observe','account'))
     p.add_argument('--revision','--git',dest='revision')
+    p.add_argument('source_revision',nargs='?')
     args=p.parse_args()
     if sys.platform!='linux' or Path(sys.executable).resolve()!=Path(PYTHON).resolve():
         raise RuntimeError('Use the existing Linux py310')
     EVIDENCE.mkdir(exist_ok=True)
     t=time.monotonic()
-    if args.op in ('cpu','gpu'):
+    if args.op=='cpu' and any(r['passed'] for r in receipts('cpu')) and (ROOT/'review/check_repairs.py').is_file():
+        qualify_repairs()
+    elif args.op in ('cpu','gpu'):
         qualify('cpu' if args.op=='cpu' else 'cuda')
-    elif args.op=='prepare':
-        prepare(args.revision)
-    elif args.op=='launch':
-        launch()
-    elif args.op=='observe':
-        observe()
     else:
-        out=dict(observed=now(),resources=resources(),campaign_exists=CAMPAIGN.exists(),gate_exists=GATE.exists(),
-                 model_source=previous()['model_binding']['directory'])
-        write(ROOT/'preflight.json',out)
-        print(out)
-    if args.op in ('preflight','account','prepare','observe','launch'):
-        write(EVIDENCE/f'operation_{time.time_ns()}.json',dict(operation=args.op,
-              charged_seconds=math.ceil(time.monotonic()-t),ended=now()))
+        from step35_market_accounting import billed_operation
+        with billed_operation(ROOT,args.op,settle_closed):
+            if args.op=='prepare':
+                prepare(args.revision or args.source_revision)
+            elif args.op=='launch':
+                launch()
+            elif args.op=='observe':
+                observe()
+            elif args.op=='account' and (CAMPAIGN/'budget.json').exists():
+                print(read(CAMPAIGN/'budget.json')['used_seconds'])
+            else:
+                out=dict(observed=now(),resources=resources(),campaign_exists=CAMPAIGN.exists(),gate_exists=GATE.exists(),
+                         model_source=previous()['model_binding']['directory'])
+                write(ROOT/'preflight.json',out)
+                print(out)

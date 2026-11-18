@@ -94,9 +94,14 @@ def paired_report(results, historical):
                             [(key,-1 if key=='F' else 1) for key in full[0] if key!='seed']}
             for k,a,b in (('FA','R11','R31'),('FB','R22','R32')):
                 paired[name][k] = summary([(r[a]-r[b])-(f[a]-f[b]) for r,f in zip(rows,full)])
+    prehistory={m:{key:delta(results[m],key) for key in ('R01','R11','R12')} for m in ('H_SEQ','H_ER')}
+    integrity=all(d==0 for cells in prehistory.values() for values in cells.values() for d in values)
+    scientific=joint and scenario and internal and extern
     return dict(full_er=joint, full_er_checks=guards, new_learning=gain_protection, pressure=pressure,
                 meaningful_scenario=scenario, full_seq=internal, external=extern,
-                full_application=joint and scenario and internal and extern, original_fit12=ref,
+                scientific_gates_joint=scientific,full_application=scientific if integrity else None,
+                prehistory_integrity=integrity,interpretation_requires_identity_review=not integrity,
+                prehistory_H_macro_f1_differences=prehistory,original_fit12=ref,
                 summaries=summaries, full_minus_comparator=paired,
                 difference_convention='F, FA and FB are comparator minus Full; abilities are Full minus comparator')
 
@@ -197,8 +202,6 @@ def worker(gate, action, target, name, deadline):
                 paired_metrics[method+':'+cell][metric] = dict(values=differences,mean=statistics.mean(differences),
                     sd=statistics.stdev(differences),range=[min(differences),max(differences)])
     write(target/'result/metric_pairs.json',dict(seeds=list(SEEDS),full_minus_comparator=paired_metrics))
-    decision['prehistory_H_macro_f1_differences']={m:{c:paired_metrics[m+':'+c]['macro_F1']['values']
-        for c in ('R01','R11','R12')} for m in ('H_SEQ','H_ER')}
     write(target/'result/decision.json', decision)
 
 

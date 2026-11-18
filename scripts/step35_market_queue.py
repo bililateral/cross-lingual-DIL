@@ -3,6 +3,7 @@ import argparse
 import os
 from pathlib import Path
 import sys
+import time
 
 import psutil
 
@@ -164,6 +165,20 @@ class MarketRunner(Runner):
         super().__init__(*args, **kwargs)
         self.source_bindings = source_bindings
 
+    def settle_handoff(self,success=True):
+        if hasattr(self,'handoff_since'):
+            self.ledger.sync_external(force=True)
+            self.ledger.charge('auxiliary','controller_setup_or_handoff',time.monotonic()-self.handoff_since,success)
+            self.handoff_since=time.monotonic()
+
+    def run_many(self,*args,**kwargs):
+        self.settle_handoff()
+        try:
+            return super().run_many(*args,**kwargs)
+        finally:
+            if hasattr(self,'handoff_since'):
+                self.handoff_since=time.monotonic()
+
     def command(self, job, slot, deadline):
         for binding in self.source_bindings:
             verify(binding)
@@ -213,6 +228,7 @@ def run_training(runner, tasks, completed):
 
 
 def campaign(gate):
+    started=time.monotonic()
     gate = Path(gate).resolve()
     g = read(gate)
     if (sys.platform != 'linux' or Path(sys.executable).resolve() != Path(PYTHON).resolve() or
@@ -237,11 +253,13 @@ def campaign(gate):
     if tasks != market_tasks():
         raise ValueError('Wrong four-arm task freeze')
     root.mkdir(exist_ok=False)
-    ledger = Ledger(root, g['prior_seconds'], g['cpu_test_seconds'], caps=CAPS, cpu_test_cap=1800)
+    from step35_market_accounting import MarketLedger
+    ledger = MarketLedger(root, g['prior_seconds'], g['cpu_test_seconds'], g['prior_operation_ids'], caps=CAPS)
     gate_binding = record(gate)
     runner = MarketRunner(g, gate, root, ledger, worker_entry=worker, limits=g['limits'], caps=CAPS,
                           source_bindings=[gate_binding, g['tasks'], g['manifest'], *g['sources']],
                           halt_dispatch_on_failure=True, continue_after_oom=True)
+    runner.handoff_since=started
     by_id = {t['id']: t for t in tasks}
 
     def completed(job):
@@ -252,8 +270,7 @@ def campaign(gate):
 
     try:
         batch = run_training(runner, tasks, completed)
-        with ledger.active('paired_training_handoff'):
-            validate_streams(batch['winners'])
+        validate_streams(batch['winners'])
         scores = [dict(action='score', task_id=t['id'], target=root/'scoring'/t['id'], bucket='gpu',
                        seconds=1200, gpu_family='V' if t['method']=='VendorLink_SEQ' else 'H',
                        reserved_bytes=g['limits']['vendor_reserve_bytes' if t['method']=='VendorLink_SEQ' else 'free_gpu_bytes'])
@@ -264,12 +281,13 @@ def campaign(gate):
                 raise ValueError('Incorrect dev score identity')
             validate_scores(result)
         runner.run_many(scores, 1, completed_score)
-        with ledger.active('blind_score_handoff'):
-            write(root/'scoring_complete.json', dict(tasks=tasks,
-                  completions=[record(j['target']/'result/completion.json') for j in scores]))
+        write(root/'scoring_complete.json', dict(tasks=tasks,
+              completions=[record(j['target']/'result/completion.json') for j in scores]))
         analysis = dict(action='analyze', target=root/'analysis', bucket='auxiliary', seconds=600)
         def analyzed(job):
-            if not isinstance(read(job['target']/'result/decision.json')['full_application'],bool):
+            decision=read(job['target']/'result/decision.json')
+            if (not isinstance(decision['scientific_gates_joint'],bool) or
+                    (decision['full_application'] is None)!=decision['interpretation_requires_identity_review']):
                 raise ValueError('Missing complete development decision')
         runner.run_many([analysis], 1, analyzed)
         write(root/'completion.json', dict(status='COMPLETE', dev_opening='whole_batch_once',
@@ -277,6 +295,8 @@ def campaign(gate):
     except BaseException as exc:
         write(root/'failure.json', dict(error=repr(exc), automatic_restart=False))
         raise
+    finally:
+        runner.settle_handoff(not (root/'failure.json').exists())
 
 
 def main():

@@ -97,7 +97,7 @@ def decision_check():
         return [dict(seed=s,**summarize(cells)) for s in SEEDS]
     trials=dict(H_full=rows(.79,.71),H_ER=rows(.73),H_SEQ=rows(.70),V_CLS=rows(.75),V_SET=rows(.75))
     result=paired_report(trials,{})
-    require(result['full_application'] and result['new_learning']['H_ER/Dream']['net']<-.02,
+    require(result['scientific_gates_joint'] and result['new_learning']['H_ER/Dream']['net']<-.02,
             'A higher pre-learning score with protected acquisition should pass')
     trials['H_full']=rows(.79,.79)
     require(not paired_report(trials,{})['full_er'],'Relative alternative must not waive absolute learning')

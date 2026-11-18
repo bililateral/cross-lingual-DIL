@@ -157,7 +157,7 @@ class Budget:
 
 
 class Ledger:
-    def __init__(self, root: Path, prior: dict, cpu_tests: int, *, caps: dict = CAPS, cpu_test_cap=1200):
+    def __init__(self, root: Path, prior: dict, cpu_tests: int, *, caps: dict = CAPS, cpu_test_cap=1200, tail_seconds=30):
         self.caps = dict(caps)
         if set(prior) != set(self.caps) or any(not math.isfinite(v) or v < 0 or v >= self.caps[k] for k, v in prior.items()):
             raise ValueError('Complete nonnegative prior costs required')
@@ -165,7 +165,7 @@ class Ledger:
             raise ValueError('CPU tests are a subset of the auxiliary cumulative budget')
         self.root, self.used, self.events = root, dict(prior), []
         self.cpu_tests = cpu_tests
-        self.used['auxiliary'] += 30  # Explicit conservative final save/cleanup fee.
+        self.used['auxiliary'] += tail_seconds
         self.save()
 
     def save(self):

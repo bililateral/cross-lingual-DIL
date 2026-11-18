@@ -372,7 +372,10 @@ class Runner:
                     parent_active += time.monotonic()-tick
                 auxiliary_reserved = sum(x['job']['seconds'] for x in active.values()
                                          if x['job']['bucket'] == 'auxiliary') if self.halt_dispatch_on_failure else 0
-                if self.ledger.used['auxiliary']+math.ceil(parent_active)+auxiliary_reserved+60 >= self.caps['auxiliary']:
+                if hasattr(self.ledger,'sync_external'):
+                    self.ledger.sync_external()
+                if (self.ledger.used['auxiliary']+math.ceil(parent_active)+auxiliary_reserved+60+
+                        getattr(self.ledger,'operation_margin',0) >= self.caps['auxiliary']):
                     if self.halt_dispatch_on_failure:
                         # Shared controller budget: drain-by-waiting can keep
                         # spending beyond the hard cap. Own children must stop
