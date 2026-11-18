@@ -2,7 +2,9 @@
 
 ## 2026-11-18 VendorLink FIT12 市场适配器四组正式训练
 
-本批 Linux 正式根为 `/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution`。生产 Git `4c1ccc55` 的 17 份来源位于该根的 `workspace/scripts`，原控制器已创建唯一 `campaign`。Linux 保存原始任务日志、失败及费用、实际生成的端点、六群和教师，市场正文、账号及逐查询分数沿既有保管规则。Windows 具名回传并核对了正式门、来源清单、12 条任务、启动与首轮现场观测，并保管合成通过及失败回执、获准外审包、完整外审原文和主审。11 月 17 日旧训练权重的删除记录继续有效。根 docs 以 Windows 为准。[正式门](../reports/documentation/20261118/vendorlink_market_training/execution/formal_gate.json) · [来源](../reports/documentation/20261118/vendorlink_market_training/execution/final_sources.json) · [启动](../reports/documentation/20261118/vendorlink_market_training/execution/launch.json) · [现场观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json) · [审查](../reports/documentation/20261118/vendorlink_market_training/execution/review/primary_disposition.zh.md)
+本批 Linux 正式根为 `/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution`。生产 Git `4c1ccc55` 的 17 份来源位于该根的 `workspace/scripts`，原控制器已创建唯一 `campaign`。Linux 保存原始任务日志、失败及费用、实际生成的端点、六群和教师，市场正文、账号及逐查询分数沿既有保管规则。Windows 具名回传并核对了正式门、来源清单、12 条任务、启动与具名现场观测，并保管合成通过及失败回执、获准外审包、完整外审原文和主审。11 月 17 日旧训练权重的删除记录继续有效。根 docs 以 Windows 为准。[正式门](../reports/documentation/20261118/vendorlink_market_training/execution/formal_gate.json) · [来源](../reports/documentation/20261118/vendorlink_market_training/execution/final_sources.json) · [启动](../reports/documentation/20261118/vendorlink_market_training/execution/launch.json) · [现场观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json) · [审查](../reports/documentation/20261118/vendorlink_market_training/execution/review/primary_disposition.zh.md)
+
+11 月 18 日已将接手时积压的 19 个提交及本轮 4 个提交正常推至既有科研分支。启动证据提交为 `8324eeaf033f57c781a1fc66205a3fa181e941fc`。推送后独立查询远端同名 ref 与该提交完全一致，领先／落后 0/0、工作区干净，Git LFS 状态和 dry-run 均无待交付对象。本条交付回执及 23:07:26 的同队列进度随该分支后继记录提交，正式训练来源仍由原门绑定。
 
 ## 2026-11-18 市场适配器的合成核验
 
