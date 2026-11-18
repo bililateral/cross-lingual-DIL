@@ -2,11 +2,11 @@
 
 ## 当前工作
 
-截至 2026 年 11 月 18 日 20:35（北京时间），完整 H 的市场路由及六群容量合成核验、不同共享头的端点补验和一次结果外审均已结束。七条意见已独立处置，专用网页已关闭。中文 H 消融、VendorLink 单一 β 及此前五项零训练诊断均已结案。当前没有待接续的正式训练、评分或本轮外审。[科研计划](RESEARCH_PLAN.md) · [合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)
+2026 年 11 月 18 日，VendorLink 下轮四组开发比较已形成供用户决定开训的方案。完整 H 的市场路由及六群容量合成核验、不同共享头的端点补验和一次结果外审均已结束。七条意见已独立处置，专用网页已关闭。中文 H 消融、VendorLink 单一 β 及此前五项零训练诊断均已结案。最近一次 GPU 资源观察为当日 20:35，不代表新批次已经派发。[科研计划](RESEARCH_PLAN.md) · [合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)
 
 ### VendorLink账号监督共同评价
 
-- **完整 H 的 Q2 与 FIT12 已按市场路由。** 只扰动 Agora 适配器时旧两市场的全部向量和分数逐元素一致。两份第三阶段端点只改共享头，恢复后旧域表示相同，三个市场的候选分差都能变。双适配器及合成六群文件 861,243 字节。用户已要求原版 VendorLink_SEQ 与适配器 H_SEQ、H_ER、H_full 一起列入下轮开发比较。当前为排程讨论，训练尚未启动。上一项词面选群路线按门结束，AlphaBay 出域净增 0.017 对、Dream 净增 0.157 对。[四组排程建议](RESEARCH_PLAN.md#vendorlink账号监督fit12共同协议后续) · [适配器实测](../reports/documentation/20261118/vendorlink_market_adapters/report.zh.md) · [端点补验及七项主审](../reports/documentation/20261118/vendorlink_market_adapters/review/primary_disposition.zh.md) · [选群定稿](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/report.zh.md) · [选群主审](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/review/primary_disposition.zh.md)
+- **四组 VendorLink 开发比较的正式方案已列出，待用户决定开训。** 已定原版 VendorLink_SEQ 与市场适配器 H_SEQ、H_ER、H_full，各用 seed 51/52/53。V 单跑，H 先两路、资源够再补三路。提案列出 120 累计任务小时和 Full 对同结构 ER 的少忘、逐旧域末态及新域学习联合判据。已有合成证据覆盖 Q2/FIT12 两侧选路、不同共享头端点及双适配器与六群文件 861,243 字节。适配器的训练与真实开发效果待核实。上一项词面选群路线按门结束，AlphaBay 出域净增 0.017 对、Dream 净增 0.157 对。[四组提案](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md) · [适配器实测](../reports/documentation/20261118/vendorlink_market_adapters/report.zh.md) · [端点补验及七项主审](../reports/documentation/20261118/vendorlink_market_adapters/review/primary_disposition.zh.md) · [选群定稿](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/report.zh.md) · [选群主审](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/review/primary_disposition.zh.md)
 - **最近的正式训练是单一 β 探针。** 降低 β 后 Dream 初学改善，AlphaBay 最终退步，旧域分别不退步的联合条件仍为 false。11 月 17 日 10:19 的回执确认训练、盲评分和分析完整、控制器退出，dev 已整批开放，confirm 仍封存。追加训练或开放 confirm 需要新的具体决定。[合同](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md) · [完成观测](../reports/documentation/20261113/vendorlink_beta_quarter/result/observation.json) · [结果与适用范围](../reports/documentation/20261113/vendorlink_beta_quarter/result/report.zh.md)
 - 追溯运行时，11 月 17 日 00:11 的作业已用[迁移身份及门绑定](../reports/documentation/20261116/h_ablation_result/recovery/state/beta_handover.json)，根启动文件当时已属历史。该时点的进程和 worker 核对见[原始现场观测](../reports/documentation/20261117/handoff_sync/beta_observation.json)。
 

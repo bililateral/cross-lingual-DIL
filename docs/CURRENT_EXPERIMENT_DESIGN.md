@@ -4,6 +4,8 @@ H/S评价补充（2026-11-02，已结案）：用户选择[方案A](../reports/s
 
 ## 当前合同入口
 
+[VendorLink FIT12 四组正式训练方案（待开训决定）](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md)记录用户已确定的四组、三个 seed、V 单跑及 H 两路起步再补三路，列出拟定分桶预算、工期、Full 对 ER 联合判据和独立的 SEQ／VendorLink 比较。本轮尚无正式训练门。
+
 [完整 H 市场适配器合成核验](../reports/documentation/20261118/vendorlink_market_adapters/scope.zh.md)接到原 Q2/FIT12 评分和端点恢复，核对两侧按市场选路、单一记录匹配头以及两套增量与原六槽状态的实际序列化字节数。[市场适配器](../scripts/step35_market_adapters.py)供本轮合成评分使用。
 
 [固定构群后的 fit 风险写入诊断](../reports/documentation/20261118/vendorlink_fit_risk_memory/scope.zh.md)复用上轮定向成员池及原六槽淘汰轨迹。每种写入策略供 Full、ER 共用。六折词面混淆的有向预测与写入清单由[选群入口](../reports/documentation/20261118/vendorlink_fit_risk_memory/risk_memory.py)冻结，随后由[评价入口](../reports/documentation/20261118/vendorlink_fit_risk_memory/evaluate_risk.py)在既有 ER 开发事件上核对猜中及实际同群留存。

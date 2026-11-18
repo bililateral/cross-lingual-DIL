@@ -1,5 +1,9 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-18 确定四组开发比较及并发，先审阅训练方案
+
+用户要求“可以，就按四组、seed 51/52/53 来。VendorLink 单跑，H 先开两路，资源够再补到三路。先把正式训练方案、累计预算、预计工期和评价判据列清楚，尤其说清楚怎么判断 Full 比 ER 少忘、旧域最终更好，同时新域也学得好。我看完再决定开训。”四组及并发已定，执行者提出的预算、具体保护条件和开训范围供用户审阅。[四组训练方案](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md)
+
 ## 2026-11-18 市场适配器比较纳入 VendorLink_SEQ
 
 用户要求“vendor-link_SEQ也得加上，想想按几worker来实验”。原版 VendorLink_SEQ 列为拟训练的第四组，与市场适配器 H_SEQ、H_ER、H_full 按同一组开发 seed 比较。用户本轮要求考虑并发，尚未下达开训指令。[拟议排程与资源依据](RESEARCH_PLAN.md#vendorlink账号监督fit12共同协议后续)
