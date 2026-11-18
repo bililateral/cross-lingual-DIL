@@ -1,5 +1,9 @@
 # 科研文件存储与恢复
 
+## 2026-11-18 固定构群后的六槽风险写入
+
+沿用上轮六份定向成员布局；逐查询有向预测、两策略的槽位身份及逐次内容清单只在 Linux 保管。新增六份压缩清单存于本轮独立目录 vendorlink_fit_risk_memory/selection_private，文件名、大小和 SHA 见[冻结回执](../reports/documentation/20261118/vendorlink_fit_risk_memory/freeze.json)。Windows 通过具名 SFTP 回传合成核验、阶段计时、访问登记和[匿名汇总](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/summary.json)，九个结果文件与 [Linux 清单](../reports/documentation/20261118/vendorlink_fit_risk_memory/delivery.sha256)一致。没有新增训练权重。外发限另行确认的具体包。
+
 ## 2026-11-18 VendorLink 当期 fit 构群
 
 两个 fit、六份原群索引及 12 个 ER 矩阵沿原位置保管。每市场×seed 一份压缩私有清单，记录候选模板、三包共用的账号置换和相应两时点的六槽，及两条 fit 访问登记，仅保存在 Linux 独立目录 vendorlink_fit_regroup/selection_private。六份清单的大小、SHA、原索引及各臂峰值见[冻结回执](../reports/documentation/20261118/vendorlink_fit_regroup/freeze.json)。Windows 通过具名 SFTP 仅回传合成核验、冻结、计时、矩阵访问摘要及[匿名结果](../reports/documentation/20261118/vendorlink_fit_regroup/result/summary.json)，八个交付文件与 [Linux SHA](../reports/documentation/20261118/vendorlink_fit_regroup/delivery.sha256)一致。具体[外审包清单](../reports/documentation/20261118/vendorlink_fit_regroup/result/review/manifest.json)含 12 项，经用户单独核准。本批未产生训练权重。

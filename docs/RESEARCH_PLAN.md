@@ -4,7 +4,7 @@
 
 ## VendorLink账号监督：FIT12共同协议后续
 
-已有结果可用于讨论新的机制假设。提案应说明它如何同时保护旧域末态、初学和新域学习，以及上一轮只测量同群机会还留下了什么问题。下一项待决定的是是否对这样的假设开展实验。继续训练、依据开发结果选择新候选或开放 confirm，各自需要适用的具体许可。[最近诊断的范围和停止条件](../reports/documentation/20261118/vendorlink_fit_regroup/scope.zh.md) · [主审界定的证据范围](../reports/documentation/20261118/vendorlink_fit_regroup/result/review/primary_disposition.zh.md)
+先按用户对具体匿名包的决定，完成固定构群写入诊断的一次结果合审和独立处置。按本轮判据结束当期词面风险优先保留精确对的路线。后续若提出新的完整 H 假设，应说明它如何同时保护旧域末态、初学和新域学习，以及与这个仅测覆盖机会的诊断有什么关系。新候选、训练与确认仍需具体决定。[停止条件](../reports/documentation/20261118/vendorlink_fit_risk_memory/scope.zh.md) · [诊断结果](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/report.zh.md)
 
 ## 既往计划与决定（历史）
 
