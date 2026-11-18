@@ -1,5 +1,9 @@
 # 科研文件存储与恢复
 
+## 2026-11-18 VendorLink 当期 fit 构群
+
+两个 fit、六份原群索引及 12 个 ER 矩阵沿原位置保管。每市场×seed 一份压缩私有清单，记录候选模板、三包共用的账号置换和相应两时点的六槽，及两条 fit 访问登记，仅保存在 Linux 独立目录 vendorlink_fit_regroup/selection_private。六份清单的大小、SHA、原索引及各臂峰值见[冻结回执](../reports/documentation/20261118/vendorlink_fit_regroup/freeze.json)。Windows 通过具名 SFTP 仅回传合成核验、冻结、计时、矩阵访问摘要及[匿名结果](../reports/documentation/20261118/vendorlink_fit_regroup/result/summary.json)，八个交付文件与 [Linux SHA](../reports/documentation/20261118/vendorlink_fit_regroup/delivery.sha256)一致。具体[外审包清单](../reports/documentation/20261118/vendorlink_fit_regroup/result/review/manifest.json)含 12 项，经用户单独核准。本批未产生训练权重。
+
 ## 2026-11-18 六群覆盖诊断
 
 两市场 fit、原六份群索引和 12 个 ER 矩阵留 Linux 原位置。选群的账号序、群及视图／记录目录和逐槽清单只留 Linux 本轮独立目录的 selection_private。两份压缩名册冻结后的 SHA 与大小见[冻结回执](../reports/documentation/20261118/vendorlink_six_group_coverage/freeze.json)。Windows 具名 SFTP 回传六格出域、三格留存的[匿名汇总](../reports/documentation/20261118/vendorlink_six_group_coverage/result/summary.json)、冻结回执、访问摘要、合成核验、选群日志及计时，并核对 Linux SHA。[获准送审原件](../reports/documentation/20261118/vendorlink_six_group_coverage/result/review/manifest.json)可从本地 Git 7c8fa2a4 精确恢复。定稿报告、完整外审和独立主审均已回存 Linux，并经 SFTP 读回逐份匹配。14 份已退役包／浏览器／传输副本的具体路径和大小见[收尾记录](../reports/documentation/20261118/vendorlink_six_group_coverage/result/review/recovery.json)。本次无 Linux 科研资产删除，原权重清理及大清理周期保持。

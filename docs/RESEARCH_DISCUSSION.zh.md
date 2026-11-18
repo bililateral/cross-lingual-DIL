@@ -1,5 +1,11 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-18 只改变候选构群的配对诊断
+
+用户确认“可以，按这个方案先做构群诊断，不训练。允许用 AlphaBay 和 Dream 当期的 fit 文本及原群索引，每个 seed 做 1000 次配对，六群和 1 MiB 预算照旧，Full 和 ER 共用清单。全部冻结后再用 ER 的 12 个开发矩阵评价。按市场和 seed 告诉我，原来漏掉的 47 对和 7 对里，比重新随机编群多找回几对、出域时带走几对，AlphaBay 进入 Agora 前还保住几对。沿用一次结果合审，具体包再确认外发。”[冻结的科学范围](../reports/documentation/20261118/vendorlink_fit_regroup/scope.zh.md)记录配对、比较对象和讨论条件。
+
+用户随后明确“允许这个结果包外审”，限[29,332 字节、12 成员的具体 ZIP](../reports/documentation/20261118/vendorlink_fit_regroup/result/review/manifest.json)通过本地 Playwright MCP 向网页 GPT-6 Pro 提交一次。
+
 ## 2026-11-18 六群覆盖诊断与一次结果合审
 
 用户确认：“可以，按这个方案先做六群覆盖诊断，不训练。允许用 AlphaBay 和 Dream 的 fit 文本及原记忆群索引选群，清单冻结后再用 ER 的 12 个开发矩阵评价。做完 1000 次配对抽样，按市场和 seed 告诉我比随机多覆盖了几对，以及 AlphaBay 到进入 Agora 前还保住了几对。”[本次范围](../reports/documentation/20261118/vendorlink_six_group_coverage/scope.zh.md)固定同一候选群和六槽／1 MiB、每 seed 配对 1,000 次，Full 与 ER 共用每种策略的群清单。用户另明确“一次结果合审，先完成诊断”。新的外发包单独核准。

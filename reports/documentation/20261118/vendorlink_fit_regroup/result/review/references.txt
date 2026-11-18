@@ -1,0 +1,294 @@
+Excerpts of previously bound production or diagnostic sources. No project data.
+Source original_run.tmp, SHA-256 487b9c473cd30820df9c6a7f3315f7d2dc30e1e28c41d1b30109439ddb23ec4d
+def groups_for(accounts, seed, domain, epoch):
+    ids = [a['account_uid'] for a in accounts]
+    if ids != sorted(set(ids)) or len(ids) < 4:
+        raise ValueError('Sorted unique fit accounts required')
+    records = {}
+    for a in accounts:
+        items = sorted((Ad(**r) for r in a['records']), key=lambda r: r.uid)
+        if len(items) != 12 or len({r.uid for r in items}) != 12:
+            raise ValueError('Twelve distinct fit records required')
+        random.Random(seed_for(seed, domain, epoch, 'records', a['account_uid'])).shuffle(items)
+        records[a['account_uid']] = items
+    result = []
+    for packet in range(3):
+        shuffled = ids.copy()
+        random.Random(seed_for(seed, domain, epoch, 'accounts', packet)).shuffle(shuffled)
+        for index, chunk in enumerate(group_chunks(shuffled, 8)):
+            views = []
+            for account in chunk:
+                for v in range(2):
+                    ads = tuple(records[account][4*packet+2*v:4*packet+2*v+2])
+                    uid = hashlib.sha256(json.dumps([r.uid for r in ads]).encode()).hexdigest()
+                    views.append(View(uid, ads, account))
+            key = [seed, domain, epoch, packet, index, [[r.uid for r in v.records] for v in views]]
+            uid = hashlib.sha256(json.dumps(key, ensure_ascii=False, separators=(',', ':')).encode()).hexdigest()
+            g = Group(uid, domain, 'fit', tuple(views))
+            g.validate(training=True)
+            result.append(g)
+    all_ids = [r.uid for g in result for v in g.views for r in v.records]
+    if len(all_ids) != 12*len(accounts) or len(set(all_ids)) != len(all_ids):
+        raise ValueError('Every current advertisement must appear once per epoch')
+    return result
+Source step29_vendorlink_data.py, SHA-256 e0d2a10b9d6731967411f701e58ac2cc610d0ed7c9798640f485823954f16668
+def group_chunks(values: list, identities_per_group: int) -> list[list]:
+    chunks = [values[i:i+identities_per_group] for i in range(0, len(values), identities_per_group)]
+    if chunks and len(chunks[-1]) < 4:
+        if len(chunks) == 1:
+            return []
+        chunks[-2].extend(chunks.pop())
+    return chunks
+Source step29_vendorlink_methods.py, SHA-256 b6b5ce15248719080005f5f29c928544b0f48b59c463a62d1289b1dac613b116
+    def table(self, z):
+        i, j = torch.triu_indices(len(z), len(z), 1, device=z.device)
+        return torch.cat([self.head(torch.cat(((z[i[k:k+512]]-z[j[k:k+512]]).abs(),
+            z[i[k:k+512]]*z[j[k:k+512]]), 1)).flatten() for k in range(0, len(i), 512)])
+Source step29_vendorlink_methods.py, SHA-256 b6b5ce15248719080005f5f29c928544b0f48b59c463a62d1289b1dac613b116
+    def teacher(self, group, check=lambda: None):
+        self.eval()
+        return self.table(self.records(group, check)).float().cpu().clone()
+Source step29_vendorlink_methods.py, SHA-256 b6b5ce15248719080005f5f29c928544b0f48b59c463a62d1289b1dac613b116
+class Memory:
+    def __init__(self, seed, settings):
+        self.rng = random.Random(seed)
+        self.settings = settings
+        self.seen, self.entries = 0, []
+
+    def retain(self, groups, stage, model, check=lambda: None, *, record_teacher=lambda group: None):
+        if stage not in (1, 2):
+            raise ValueError("Only completed nonfinal stages produce history")
+        # Select first, then encode new survivors only; existing teachers never refresh.
+        selected = list(self.entries)
+        for group in sorted(groups, key=lambda g: g.uid):
+            self.seen += 1
+            slot = len(selected) if len(selected) < self.settings.memory_groups else self.rng.randrange(self.seen)
+            if slot < self.settings.memory_groups:
+                row = {"group": asdict(group), "origin": stage, "teacher": None}
+                if slot == len(selected):
+                    selected.append(row)
+                else:
+                    selected[slot] = row
+        for row in selected:
+            if row["teacher"] is None:
+                group = Group.from_dict(row["group"])
+                row["teacher"] = model.teacher(group, check)
+                record_teacher(group)
+        self.entries = selected
+        if len(self.bytes()) > self.settings.memory_bytes:
+            raise ValueError("Retained text, teachers and sampler state exceed the memory budget")
+
+    def state(self):
+        return {"seen": self.seen, "entries": self.entries, "rng": self.rng.getstate()}
+
+    def restore(self, state):
+        self.seen, self.entries = state["seen"], state["entries"]
+        self.rng.setstate(state["rng"])
+
+    def bytes(self):
+        buffer = io.BytesIO()
+        torch.save(self.state(), buffer)
+        return buffer.getvalue()
+
+    def draw(self, draw_seed):
+        row = random.Random(draw_seed).choice(self.entries)
+        return Group.from_dict(row["group"]), row["teacher"]
+Source diagnose.py, SHA-256 fdf8f1ced64e519861098134638b814e8ce33829b5e2b3ddf56cbf1fe6abb8e5
+def read_endpoint(item, size):
+    path, record, anchors = item
+    data = path.read_bytes()
+    require(len(data) == record["bytes"] and digest(data) == record["sha256"], "Matrix identity mismatch")
+    scores = np.load(io.BytesIO(data), allow_pickle=False)
+    require(scores.shape == (size, size) and scores.dtype.kind == "f" and np.isfinite(scores).all(),
+            "Invalid score matrix")
+    scores = scores.astype(np.float64, copy=False)
+    truth = np.arange(size)
+    order = np.argsort(-scores, axis=1, kind="stable")
+    ranks = (order == truth[:, None]).argmax(axis=1) + 1
+    winners = order[:, 0]
+    hits = (winners == truth)
+    predicted = np.bincount(winners, minlength=size)
+    metrics = {"Top1": float(hits.mean()), "MAP": float((1.0 / ranks).mean()),
+               "macro_F1": float((2.0 * hits / (1 + predicted)).mean())}
+    require(set(metrics) == set(anchors) and all(abs(v - anchors[k]) <= 1e-12 for k, v in metrics.items()),
+            "Saved endpoint metric or stable ordering mismatch")
+    return scores, ranks
+Source challengers.py, SHA-256 e69ae966d9d038fc3b0a69d683b58d1da5ff2c07b3db07d9ea6bb57435d6a23f
+def inspect_er():
+    pins = json.loads(pinned(PREVIOUS / "bindings.json", BINDINGS))
+    expected_rows = [r for r in pins["trajectories"] if r["family"] == "ER"]
+    require(len(expected_rows) == 3 and {r["seed"] for r in expected_rows} == set(SEEDS), "ER binding")
+    selected = {}
+    for row in expected_rows:
+        seed = row["seed"]
+        receipt = receipt_path(PROJECT, "ER", seed)
+        require(receipt.resolve() == receipt and receipt.stat().st_size == row["bytes"], "Receipt location/size")
+        data = json.loads(pinned(receipt, row["sha256"]))
+        require(data["task"]["id"] == f"M_H_ER_s{seed}" and data["task"]["seed"] == seed
+                and data["task"]["method"] == "H_ER" and data["role"] == "dev"
+                and data["reference_role"] == "fit" and data["reference_records"] == 12
+                and data["status"] == "BLIND_SCORES_COMPLETE"
+                and data["training_identity"]["manifest"]["sha256"] == pins["manifest_sha256"]
+                and all(data["sources"][k]["sha256"] == v for k, v in pins["roles"].items()), "Scoring identity")
+        for _, _, start, end in MARKETS:
+            for cell in (start, end):
+                record = data["files"][f"H_ER:{cell}"]
+                path = receipt.parent / f"H_ER_{cell}.npy"
+                require(cell in data["cells"] and str(path) == record["path"] and path.resolve() == path
+                        and path.is_file() and path.stat().st_size == record["bytes"], "Missing or unexpected matrix")
+                selected[seed, cell] = (path, record, row["metrics"][cell])
+    require(len(selected) == 12, "Incomplete preflight")
+    return selected
+Source select_groups.py (ab38a96a324e4ea6d79d65404a59a03239d1e2c7b5b1d52f5346692b0ae9b69b), make_pool / fit_weights / random_slots / size / six-index check:
+def make_pool(accounts, seed, stage, groups_for):
+    market = DOMAINS[stage - 1]
+    ids = [a["account_uid"] for a in accounts]
+    require(ids == sorted(set(ids)), "Fit account ordering")
+    id_to_index = {v: i for i, v in enumerate(ids)}
+    groups = groups_for(accounts, seed, market, 0)
+    require(len(groups) % 3 == 0, "Incomplete record packets")
+    per_packet = len(groups) // 3
+    views = [[None] * 6 for _ in ids]
+    pool, catalog = [], {}
+    for i, g in enumerate(groups):
+        packet = i // per_packet
+        members, view_records = [], []
+        for k in range(0, len(g.views), 2):
+            v0, v1 = g.views[k:k+2]
+            require(v0.identity == v1.identity and len(v0.records) == len(v1.records) == 2,
+                    "Original paired fit views required")
+            account = id_to_index[v0.identity]
+            members.append(account)
+            for offset, v in enumerate((v0, v1)):
+                require(views[account][2*packet+offset] is None, "Repeated fit view")
+                views[account][2*packet+offset] = v.records
+                view_records.append([v.uid, [r.uid for r in v.records]])
+        require(len(set(members)) == len(members) and g.uid not in catalog, "Repeated group/account")
+        n_records = 4 * len(members)
+        teacher = torch.zeros(n_records*(n_records-1)//2, dtype=torch.float32)
+        slot = Slot(g.uid, stage, packet, tuple(members),
+                    dict(group=asdict(g), origin=stage, teacher=teacher))
+        pool.append(slot)
+        catalog[g.uid] = dict(stage=stage, packet=packet, members=members, views=view_records)
+    for account in views:
+        require(all(v is not None for v in account) and len({r.uid for v in account for r in v}) == 12,
+                "Six disjoint two-record fit views required")
+    return pool, views, catalog
+
+
+def cosine_field(references, queries):
+    vec = TfidfVectorizer(lowercase=True, ngram_range=(1, 1), norm="l2", smooth_idf=True,
+                          sublinear_tf=False, dtype=np.float64)
+    if not any(vec.build_analyzer()(s) for s in references):
+        return np.zeros((len(queries), len(references)))
+    ref = vec.fit_transform(references)
+    return (vec.transform(queries) @ ref.T).toarray()
+
+
+def nominate(scores):
+    require(scores.ndim == 2 and scores.shape[0] == scores.shape[1] and np.isfinite(scores).all(),
+            "Invalid fit similarity")
+    edges = []
+    for i, row in enumerate(scores):
+        order = np.argsort(-row, kind="stable")
+        chosen = [int(j) for j in order if j != i and row[j] > 0][:5]
+        edges.extend((i, j) for j in chosen)
+    return edges
+
+
+def fit_weights(views):
+    counts = Counter()
+    for fold in range(6):
+        total = np.zeros((len(views), len(views)))
+        for field in ("title", "description"):
+            refs = [" ".join(getattr(r, field) for k, pair in enumerate(account) if k != fold
+                             for r in pair) for account in views]
+            queries = [" ".join(getattr(r, field) for r in account[fold]) for account in views]
+            total += .5 * cosine_field(refs, queries)
+        counts.update(nominate(total))
+    return counts
+
+
+def random_slots(old, ordered, rng, seen):
+    result = list(old)
+    for group in ordered:
+        seen += 1
+        slot = len(result) if len(result) < 6 else rng.randrange(seen)
+        if slot < 6:
+            if slot == len(result):
+                result.append(group)
+            else:
+                result[slot] = group
+    require(len(result) == 6, "Reservoir not full")
+    return result, seen
+
+def memory_size(slots, seen, rng_state, Memory):
+    memory = Memory(0, SimpleNamespace(memory_groups=6, memory_bytes=CAP))
+    memory.seen, memory.entries = seen, [g.row for g in slots]
+    memory.rng.setstate(rng_state)
+    return len(memory.bytes())
+
+
+def index_receipt(seed, stage, groups, pool, seen, size):
+    path = MECHANISM / f"campaign/M/training/M_H_ER_s{seed}/run/memory_stage{stage}.json"
+    require(path.resolve() == path, "Memory index path mismatch")
+    data = path.read_bytes()
+    index = json.loads(data)
+    require(index["groups"] == [dict(uid=g.uid, origin=g.stage) for g in groups]
+            and index["seen"] == seen and index["candidates"] == len(pool),
+            "Original random slots/order/origins/candidate count mismatch")
+    require(index["bytes"] == size, "Original serialized byte count mismatch")
+    return dict(seed=seed, stage=stage, sha256=sha(data), origins=[g.stage for g in groups],
+                seen=seen, candidates=len(pool), bytes=size)
+
+
+Source evaluate.py (d717b8f75438b434042abb8399b7447a1531efb353eaee25be7c98b0b7e1ed58), events:
+def events(start, end):
+    _, first_ranks = start
+    scores, end_ranks = end
+    winners = scores.argmax(axis=1)
+    require(np.array_equal(winners == np.arange(len(winners)), end_ranks == 1), "Final tie order")
+    lost = np.flatnonzero((first_ranks == 1) & (end_ranks != 1))
+    return [(int(q), int(winners[q])) for q in lost]
+
+Scorer step35_vendorlink_account_evaluate.py (44b9a6543c9805654e2293bacc4d7034f89045a4492c06e1ad00207bcafb0053), load_role and score:
+def load_role(binding, domain, role, expected):
+    rows = json.loads(pinned(binding).read_text())
+    ids = [r['account_uid'] for r in rows]
+    size = {'fit': 12, 'gallery': 4, 'dev': 2, 'confirm': 2}[role]
+    if ids != sorted(set(ids)) or len(ids) != expected or any(len(r['records']) != size for r in rows):
+        raise ValueError('Frozen role size/order changed')
+    views = [View(f"{domain}:{role}:{r['account_uid']}",
+                  tuple(Ad(**a) for a in r['records'])) for r in rows]
+    return ids, views
+
+    cells = ((1, 1),) if task['phase'] == 'D' else CELLS
+    domains = task_domains(task)
+    sources = {d+':'+r: manifest['files'][d+':'+r] for d in domains for r in (role, 'fit')}
+    write(root/'access.json', dict(role=role, sources=sources, training_identity=completion['identity']))
+    inputs, exports = {}, {}
+    for domain in domains:
+        n = manifest['counts'][domain]['eligible_accounts']
+        qids, query = load_role(sources[domain+':'+role], domain, role, n)
+        gids, gallery = load_role(sources[domain+':fit'], domain, 'fit', n)
+        if qids != gids:
+            raise ValueError('Query/gallery registered classes differ')
+        if ({r.uid for v in query for r in v.records} & {r.uid for v in gallery for r in v.records}
+                or {v.uid for v in query} & {v.uid for v in gallery}):
+            raise ValueError('Query/gallery text or view overlap')
+        inputs[domain] = (query, gallery, gids)
+    for stage in sorted({t for t, j in cells}):
+        endpoint = completion['endpoints'][str(stage)]
+        model, heads = restore(binding, task, pinned(endpoint), completion['identity'], stage)
+        for t, j in [c for c in cells if c[0] == stage]:
+            check()
+            domain = domains[j-1]
+            query, gallery, classes = inputs[domain]
+            q, g = encode(model, query, check), encode(model, gallery, check)
+            values = rectangular(model, q, g, check)
+            name = 'V_SET' if task['method'] == 'VendorLink_SEQ' else task['method']
+            cell = f'R{t}{j}'
+            path = root/f'{name}_{cell}.npy'
+            np.save(path, values)
+            exports[name+':'+cell] = record(path)
+            if task['settings'].get('diagnostics'):

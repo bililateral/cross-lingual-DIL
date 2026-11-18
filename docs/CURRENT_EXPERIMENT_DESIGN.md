@@ -4,6 +4,8 @@ H/S评价补充（2026-11-02，已结案）：用户选择[方案A](../reports/s
 
 ## 当前合同入口
 
+[当期 fit 构群诊断](../reports/documentation/20261118/vendorlink_fit_regroup/scope.zh.md)只改变完整候选群的账号成员。每个市场的三份记录包共用一个位置置换，比较原群、重新随机编群、按当期文本把易混账号配进同群。三者共用原 Algorithm R 六槽轨迹，Full 与 ER 在各臂共用一份清单。按市场、seed 对原候选池漏掉的事件、原可达补集和全部事件分别核对候选池、出域及跨市场留存。[构群与冻结](../reports/documentation/20261118/vendorlink_fit_regroup/regroup.py)和[冻结后评价](../reports/documentation/20261118/vendorlink_fit_regroup/evaluate_regroup.py)使用 Linux 既有 py310。
+
 [六群覆盖诊断](../reports/documentation/20261118/vendorlink_six_group_coverage/scope.zh.md)限定两个当期市场的 fit 和原群索引，通过原随机六槽与三随机三定向的配对，检验后来占据第一名的账号和正确账号能否在同一存活群中。每 seed 的 1,000 次配对均先冻结，再用固定的 ER 开发矩阵评价，另查 AlphaBay 进入 Agora 前的留存。[选群入口](../reports/documentation/20261118/vendorlink_six_group_coverage/select_groups.py)、[评价入口](../reports/documentation/20261118/vendorlink_six_group_coverage/evaluate.py)和[完整结果](../reports/documentation/20261118/vendorlink_six_group_coverage/result/report.zh.md)均对应本次无训练诊断。
 
 [ER 起点前五竞争账号范围](../reports/documentation/20261118/vendorlink_er_top5/scope.zh.md)限定为两个旧市场、seed 51/52/53 的 12 个既有开发矩阵。其[计算入口](../reports/documentation/20261118/vendorlink_er_top5/challengers.py)复用已审的原矩阵校验和排序，新增终点第一名与起点五个错误账号的交集，并与等概率无放回五选比较。[六格结果及解释](../reports/documentation/20261118/vendorlink_er_top5/result/report.zh.md)供用户决定记忆选群方向。
