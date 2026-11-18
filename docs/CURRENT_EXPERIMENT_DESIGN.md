@@ -4,7 +4,9 @@ H/S评价补充（2026-11-02，已结案）：用户选择[方案A](../reports/s
 
 ## 当前合同入口
 
-以下定位已完成实验的有效合同与证据，不是待启动队列。最新β及中文消融的结果审查均已闭合，无剩余技术执行；没有新候选、重训或confirm许可。旧“等待”“待部署”“正式关闭”按各自形成时点理解，已发生的接续与停止以结果回执及交接当前项为准。
+11 月 18 日的 [FIT12 全候选分数漂移诊断](../reports/documentation/20261118/vendorlink_score_drift/scope.zh.md)使用两个旧域、三种方法和三个固定 seed 的既有开发预测。[用户补充决定](../reports/documentation/20261118/vendorlink_score_drift/review/decision.json)将方案、实现和结果合并审查。[实际入口](../reports/documentation/20261118/vendorlink_score_drift/diagnose.py)和[原评分回执绑定](../reports/documentation/20261118/vendorlink_score_drift/bindings.json)界定一次 45 矩阵读取与匿名汇总，独立辅助作业上限为 1800 秒。
+
+以下定位已完成实验的有效合同与证据。最新 β 训练批次及中文消融的结果审查均已闭合，没有新候选、重训或 confirm 许可。历史等待与停止按发生时点及对应回执理解。
 
 模型可用性以[11月17日保管核查](STORAGE.zh.md#2026-11-17-linux剩余训练权重清理后的当前保管)为准：用途已结束的独立训练权重已按用户授权删除，完整结果与原始证据保留。下列合同中旧H/S、trial3 Full、原ABC、RMS及β端点的加载／复用均是已发生执行的依据，不表示这些参数现在仍在Linux，也不授权重训；当前作业与后续动作仍只看交接和计划。
 
