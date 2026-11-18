@@ -1,5 +1,9 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-18 只做 ER 前五竞争账号诊断，看完结果再决定选群
+
+用户明确决定：“可以，先不训练。允许用 ER 的 12 个既有开发矩阵做这次诊断，按市场和 seed 看最后抢到第一的账号有多少原本就在最接近的五个错误账号里，跟随机选五个比较。看完结果再决定要不要改记忆选群。”[实际范围](../reports/documentation/20261118/vendorlink_er_top5/scope.zh.md)限 AlphaBay R11→R31、Dream R22→R32。用户随后明确“允许本次结果包外审”，仅覆盖[12,704 字节的五文件 ZIP](../reports/documentation/20261118/vendorlink_er_top5/result/review/manifest.json)一次提交网页 GPT-6 Pro。
+
 ## 2026-11-18 确认 FIT12 全候选分数漂移诊断并选定结果合审
 
 用户在关于历史相对分差的段落上批注“那么继续研究吧”。在收到具体计算和访问说明后，以“可以”确认 [45 个旧域 dev 矩阵的只读诊断](../reports/documentation/20261118/vendorlink_score_drift/scope.zh.md)，限定原行列对应、单 CPU worker、最多两核、累计 30 分钟辅助作业、一次匿名整批开放。输入缺失或身份不符时停止。此次决定不包含新训练或 confirm。

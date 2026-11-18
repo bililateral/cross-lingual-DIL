@@ -1,5 +1,9 @@
 # 科研文件存储与恢复
 
+## 2026-11-18 ER 前五竞争账号诊断
+
+12 个开发矩阵在 Linux 的原 ER 评分目录各读取一次。具名 SFTP 只回传[六格匿名汇总](../reports/documentation/20261118/vendorlink_er_top5/result/summary.json)、[访问清单](../reports/documentation/20261118/vendorlink_er_top5/result/access.jsonl)、手写核验与计算计时。Windows 与 Linux 使用同相对目录，两端已核对源码、范围及五份回传材料的 SHA。正式分数及账号对应保管在 Linux。外审仅使用[逐成员清单](../reports/documentation/20261118/vendorlink_er_top5/result/review/manifest.json)中的一包获准材料。
+
 ## 2026-11-18 FIT12 旧域分数漂移诊断
 
 45 个获准的正式矩阵在 Linux 原评分目录只读使用。九份完成回执和开发查询、参考角色的来源摘要从[具名绑定](../reports/documentation/20261118/vendorlink_score_drift/bindings.json)进入，真实数据未复制至 Windows。Linux 新独立目录为同仓相对路径 `reports/documentation/20261118/vendorlink_score_drift`。匿名汇总、45 个逻辑端点的访问记录、作业回执和完整表经具名 SFTP 回传，入口为[结果报告](../reports/documentation/20261118/vendorlink_score_drift/result/report.zh.md)。两端保管实际源码和执行证据，根 docs 以 Windows 为权威。已删训练权重、大清理周期与原模型回执沿 11 月 17 日记录。
