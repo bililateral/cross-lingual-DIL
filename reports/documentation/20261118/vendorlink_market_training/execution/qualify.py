@@ -146,6 +146,11 @@ def exercise(binding,device,folder,output,used):
         state=torch.get_rng_state().clone()
         cuda_state=torch.cuda.get_rng_state() if native else None
         new=orig_start(model,stage,seed,optimizer)
+        if native and stage==1:
+            def entering_optimizer(opt,args,kwargs):
+                require(used+counters['steps']<12,'Cumulative native optimizer allowance')
+                write(output/'step_intents.json',dict(count=counters['steps']+1))
+            new.register_step_pre_hook(entering_optimizer)
         require(torch.equal(state,torch.get_rng_state()) and
                 (not native or torch.equal(cuda_state,torch.cuda.get_rng_state())), 'Adapter initialization changed pairing RNG')
         if stage>1:
@@ -181,9 +186,6 @@ def exercise(binding,device,folder,output,used):
                 counters['longest_training_channels']=88
         return value
     def update(model,opt,current,history,teacher,seed,check):
-        if native:
-            require(used+counters['steps']<12,'Cumulative native GPU optimizer allowance')
-            write(output/'step_intents.json',dict(count=counters['steps']+1))
         value=orig_update(model,opt,current,history,teacher,seed,check)
         require(value['optimizer_updates']==1 and value['current_encoder_gradient_norm']>0,
                 'No actual current encoder/adapter optimization')

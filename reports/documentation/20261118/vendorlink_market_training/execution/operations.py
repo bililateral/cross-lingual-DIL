@@ -88,6 +88,17 @@ def qualify(device):
         raise ValueError('Synthetic CPU qualification must finish first')
     allowance = (1800-7 if device == 'cpu' else 3600) - sum(r['charged_seconds'] for r in old)
     old_steps = sum(r.get('optimizer_intents',0) for r in old)
+    # GPU01 used a pre-forward intent counter and stopped in its very first backward.
+    # A single signed correction counts actual optimizer entries; all six seconds remain.
+    if prefix=='gpu' and old:
+        correction=read(EVIDENCE/'gpu01_disposition.json')
+        original=old[0]
+        if (record(EVIDENCE/'gpu01.json')['sha256']!=correction['original_sha256']
+                or original['label']!='gpu01' or original['optimizer_intents']!=1 or original['passed']
+                or 'LookupError: <ContextVar' not in original['synthetic_error_tail']
+                or correction['actual_optimizer_entries']!=0):
+            raise ValueError('The GPU01 pre-optimizer failure correction does not apply')
+        old_steps-=1
     if allowance <= 5 or (prefix == 'gpu' and old_steps >= 12):
         raise ValueError('Qualification allowance exhausted')
     initial = resources()

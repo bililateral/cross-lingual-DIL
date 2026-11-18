@@ -1,6 +1,5 @@
 """Market routing and the bounded historical state for the full H FIT12 scorer."""
 from contextlib import contextmanager
-from contextvars import ContextVar
 from copy import deepcopy
 import io
 import json
@@ -32,6 +31,17 @@ class LowRank(nn.Module):
         return self.up(self.down(x))
 
 
+class MarketRoute:
+    """Owned by one model. CUDA checkpoint recomputation can run on another Python thread."""
+    def __init__(self):
+        self.market = None
+
+    def get(self):
+        if self.market is None:
+            raise RuntimeError('A market route is required for this model call')
+        return self.market
+
+
 class RoutedProjection(nn.Module):
     def __init__(self, base, route):
         super().__init__()
@@ -55,7 +65,7 @@ class MarketH(nn.Module):
             raise ValueError('Expected FIT12 BERT-base H')
         self.h = original
         self.stage = 0
-        self._active = ContextVar('fit12_market')
+        self._active = MarketRoute()
         self.projections = {}
         for i in LAYERS:
             attention = self.h.encoder.encoder.layer[i].attention.self
@@ -140,11 +150,14 @@ class MarketH(nn.Module):
         # A future market uses the last available encoder for its pre-learning reading.
         market_index = DOMAINS.index(market)
         route = DOMAINS[min(market_index, max(0, self.stage - 1))]
-        token = self._active.set(route)
+        # Each worker calls this model serially. Backward joins its autograd workers
+        # before leaving the scope, including recomputation performed off this thread.
+        previous = self._active.market
+        self._active.market = route
         try:
             yield
         finally:
-            self._active.reset(token)
+            self._active.market = previous
 
     def records(self, group, check):
         with self.routing(group.domain):
