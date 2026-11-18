@@ -223,6 +223,134 @@ class BenchmarkTest(unittest.TestCase):
                 b.check_dispatch(root, gate, "worker", end, 120)
         EVIDENCE["dispatch"] = dict(own_claim="accepted", foreign_pid="rejected", historical_gate="rejected")
 
+    def test_generation_rechecks_162_endpoint_files(self):
+        from types import SimpleNamespace
+        rows = b.plan()
+        partition = {"calibration": [dict(domain=d, group_uid=f"{d}-{i}") for d in "ABC" for i in range(12)]}
+        accounting = [dict(id=row["id"], bucket="training", success=True) for row in rows]
+        access = dict(train=1, valid=0, heldout=0, owners=0, worker_train_reads=1)
+        mapping = {"a": 1.0, "b": 0.0}
+        with tempfile.TemporaryDirectory() as directory:
+            campaign = Path(directory)
+            b.data.write_json(campaign/"training_complete.json", dict(status="ALL_TRAINING_COMPLETE_EVALUATION_CLOSED",
+                              sources=[], completed=accounting))
+            for row, receipt in zip(rows, accounting, strict=True):
+                job = campaign/row["id"]
+                root = job/"run"
+                root.mkdir(parents=True)
+                b.data.write_json(job/"dispatch_receipt.json", receipt)
+                is_forever = row["name"] == b.forever.NAME
+                status = (b.forever_run.COMPLETE if is_forever else b.comparison_run.COMPLETE
+                          if row["name"] in b.comparison.NEW_METHODS else b.TRAIN_CAL_COMPLETE)
+                points = {}
+                for stage in (1, 2, 3):
+                    path = root/f"model-{stage}.pt"
+                    path.write_bytes(f"{row['id']}-{stage}".encode())
+                    map_path = root/f"map-{stage}.json"
+                    ftol = 0. if b.gradient_stopping(row) else b.five.parent.calibration.OPTIONS["ftol"]
+                    b.data.write_json(map_path, {**mapping, "status":"PASS_CALIBRATION_FIT", "options":{"ftol":ftol}})
+                    points[str(stage)] = dict(stage=stage, adam_step=288*stage, counts={"current":288*stage},
+                        model=b.data.record(path, root), full_restore_verified=True, inference_restore_verified=True,
+                        maps=dict(stage=mapping, first=mapping), calibration_ids=[f"{row['order'][stage-1]}-{i}" for i in range(12)])
+                    points[str(stage)]["calibration" if is_forever else "mapping"] = b.data.record(map_path, root)
+                b.data.write_json(root/"completion.json", dict(spec=row["native"], source_files=[], points=points,
+                    updates=864, status=status, partition=partition, access=access,
+                    counts=dict(current=864, fixture=0, replay=0)))
+            budget = SimpleNamespace(check=lambda: None)
+            with patch.object(ev.shared, "generate") as generate:
+                ev.run("generation", campaign, campaign/"generation", {"sources":[]}, budget)
+                self.assertEqual(generate.call_count, 1)
+                generate.reset_mock()
+                for index in (0, len(rows)-1):
+                    path = campaign/rows[index]["id"]/"run"/"model-3.pt"
+                    original = path.read_bytes()
+                    path.unlink()
+                    with self.assertRaises(FileNotFoundError):
+                        ev.run("generation", campaign, campaign/"generation", {"sources":[]}, budget)
+                    path.write_bytes(b"x"*len(original))
+                    with self.assertRaisesRegex(ValueError, "File differs"):
+                        ev.run("generation", campaign, campaign/"generation", {"sources":[]}, budget)
+                    path.write_bytes(original)
+                generate.assert_not_called()
+            self.assertFalse((campaign/"evaluation_access.json").exists())
+        EVIDENCE["before_generation"] = dict(handwritten_endpoints=162, intact="passed",
+                missing_H="blocked", changed_H="blocked", missing_FOREVER="blocked", changed_FOREVER="blocked",
+                official_groups_generated=0, official_pairs_opened=0)
+
+    def test_interrupted_worker_validation_keeps_receipt_and_fee(self):
+        with tempfile.TemporaryDirectory() as directory:
+            campaign = Path(directory)/"campaign"
+            limits = dict(rss_bytes=4*2**30, disk_bytes=2**30, free_reserve_bytes=1)
+            scope = dict(campaign=str(campaign), workspace=directory, limits=limits, workers=2,
+                         prior_used_seconds={"training":7., "control":0.}, budget_seconds={"training":240., "control":60.})
+            tasks = [dict(id=name, seconds=100., gpu=False) for name in ("interrupted_fixture", "peer_fixture")]
+            def command(row, job, deadline):
+                delay = ".08" if row["id"] == "interrupted_fixture" else "20"
+                return [sys.executable, "-B", "-c", f"import time; time.sleep({delay})"]
+            def validate(row, job):
+                raise KeyboardInterrupt("synthetic interruption during endpoint verification")
+            core = min(os.sched_getaffinity(0))
+            # Two real children share the one CPU allowed to this synthetic probe.
+            with (patch.object(b.queue, "GpuMemory") as monitor,
+                  patch.object(b.queue.psutil.Process, "cpu_affinity", return_value=[core, core])):
+                monitor.return_value.snapshot.return_value = {"free": 2**30, "processes": {}}
+                with self.assertRaises(KeyboardInterrupt):
+                    b.queue.dispatch(scope, tasks, command, validate, poll_seconds=.02)
+            receipt, peer = [b.data.read_json(campaign/t["id"]/"dispatch_receipt.json") for t in tasks]
+            failure = b.data.read_json(campaign/"failure.json")
+            self.assertEqual(failure["completed"], [receipt, peer])
+            self.assertEqual(failure["active"], {})
+            self.assertFalse(receipt["success"])
+            self.assertIn("KeyboardInterrupt", receipt["error"])
+            self.assertGreater(receipt["actual_seconds"], 0)
+            self.assertFalse(peer["success"])
+            self.assertGreater(peer["actual_seconds"], 0)
+            peer_pid = b.data.read_json(campaign/"peer_fixture"/"process.json")["pid"]
+            self.assertFalse(b.queue.psutil.pid_exists(peer_pid))
+            self.assertAlmostEqual(failure["used"]["training"], 7.+receipt["actual_seconds"]+peer["actual_seconds"])
+            self.assertFalse((campaign/"training_complete.json").exists())
+            EVIDENCE["interrupted_validation"] = dict(real_cpu_child=True, exit_status="interrupted",
+                    receipts_per_child=1, inherited_seconds=7., charged_seconds=receipt["actual_seconds"],
+                    peer_charged_seconds=peer["actual_seconds"], peer_drained=True, downstream_closed=True)
+
+    def test_gate_binds_authorized_sources_and_stop_reserve(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            scripts = root/"workspace"/"scripts"
+            scripts.mkdir(parents=True)
+            source = scripts/"handwritten.py"
+            source.write_text("# synthetic source identity\n")
+            analysis = root/"analysis.txt"
+            analysis.write_text("handwritten test fixture")
+            files = [b.queue.record(source)]
+            scope = dict(experiment=b.EXPERIMENT, runs=b.plan(), cohort=b.cohort(), actions=["training", *b.POST],
+                         sources=files, workers=1, worker_failure_policy="stop_batch", analysis_plan=b.queue.record(analysis),
+                         seconds_per_method={name:90 for name in b.NAMES}, post_seconds={name:90 for name in b.POST},
+                         prior_used_seconds={k:0 for k in ("control", "training", *b.POST)},
+                         budget_seconds={k:6000 for k in ("control", "training", *b.POST)},
+                         limits={k:1024 for k in ("rss_bytes", "disk_bytes", "small_bytes", "free_reserve_bytes",
+                                                  "free_gpu_bytes", "allocator_bytes", "process_gpu_bytes")})
+            def fixture_gate(authorization_sources):
+                auth = root/"synthetic-authorization.json"
+                b.data.write_json(auth, {**scope, "sources":authorization_sources, "authorize_execution":True})
+                path = root/"synthetic-gate.json"
+                b.data.write_json(path, {**scope, "approved":True, "review_closed":True, "workspace":str(scripts.parent),
+                                         "campaign":str(root/"campaign"), "authorization":b.queue.record(auth)})
+                return path
+            with patch.object(b, "SCRIPTS", scripts), patch.object(b, "source_paths", return_value=[source]):
+                self.assertEqual(b.read_gate(fixture_gate(files))["sources"], files)
+                with self.assertRaisesRegex(ValueError, "differ from the decision"):
+                    b.read_gate(fixture_gate([]))
+                for key, name in (("seconds_per_method", b.H), ("post_seconds", "generation")):
+                    scope[key][name] = 60
+                    with self.assertRaisesRegex(ValueError, "budget"):
+                        b.read_gate(fixture_gate(files))
+                    scope[key][name] = 90
+            self.assertFalse((root/"campaign").exists())
+        EVIDENCE["formal_gate_conditions"] = dict(exact_synthetic_source="accepted",
+                    different_authorized_source="blocked", training_at_stop_reserve="blocked",
+                    post_at_stop_reserve="blocked", formal_campaign_created=False)
+
     def test_table_and_single_logical_opening(self):
         cells = {"1_1": .8, "2_1": .7, "2_2": .6, "3_1": .5, "3_2": .4, "3_3": .9}
         values = ev.field_means(cells)
@@ -260,6 +388,9 @@ if __name__ == "__main__":
         b.five.parent.configure_numerics()
         cases = ("test_six_native_training_routes_and_real_update", "test_endpoint_with_only_current_calibration",
                  "test_blind_loader_all_six_native_endpoint_formats")
+    elif sys.argv[1:] == ["--review-fixes"] and not torch.cuda.is_available():
+        cases = ("test_generation_rechecks_162_endpoint_files", "test_interrupted_worker_validation_keeps_receipt_and_fee",
+                 "test_gate_binds_authorized_sources_and_stop_reserve")
     elif not sys.argv[1:] and not torch.cuda.is_available():
         cases = unittest.defaultTestLoader.getTestCaseNames(BenchmarkTest)
     else:

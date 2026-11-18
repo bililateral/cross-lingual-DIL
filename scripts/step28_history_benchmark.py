@@ -102,7 +102,7 @@ def read_gate(path):
             [queue.record(p) for p in source_paths()]):
         raise ValueError("Fresh campaign path or exact deployed sources differ")
     approved = data.read_json(queue.verify(allowed["authorization"]))
-    fields = ("experiment", "runs", "cohort", "actions", "limits", "workers", "seconds_per_method",
+    fields = ("experiment", "runs", "cohort", "actions", "sources", "limits", "workers", "seconds_per_method",
               "budget_seconds", "prior_used_seconds", "post_seconds", "worker_failure_policy", "analysis_plan")
     if approved.get("authorize_execution") is not True or any(approved[k] != allowed[k] for k in fields):
         raise ValueError("Execution scope or resource allocations differ from the decision")
@@ -112,8 +112,8 @@ def read_gate(path):
             set(allowed["seconds_per_method"]) != set(NAMES) or set(allowed["post_seconds"]) != set(POST) or
             set(allowed["budget_seconds"]) != {"training", "control", *POST} or
             set(allowed["prior_used_seconds"]) != set(allowed["budget_seconds"]) or
-            not all(positive(v) for k in ("seconds_per_method", "post_seconds", "budget_seconds")
-                    for v in allowed[k].values()) or
+            not all(positive(v) and v > 60 for k in ("seconds_per_method", "post_seconds")
+                    for v in allowed[k].values()) or not all(positive(v) for v in allowed["budget_seconds"].values()) or
             not all(type(v) in (int, float) and math.isfinite(v) and 0 <= v <= allowed["budget_seconds"][k]
                     for k, v in allowed["prior_used_seconds"].items())):
         raise ValueError("Incomplete independent task, controller or cumulative budget")
@@ -184,7 +184,7 @@ def validate_training(job, row, allowed, *, verify_models=True):
     return saved
 
 
-def completed(campaign, allowed):
+def completed(campaign, allowed, *, verify_models=True, check=lambda: None):
     saved = data.read_json(campaign/"training_complete.json")
     rows = plan()
     receipts = saved["completed"]
@@ -194,10 +194,11 @@ def completed(campaign, allowed):
         raise ValueError("All 54 successful training dispatch receipts are required")
     records = []
     for row in rows:
+        check()
         job = campaign/row["id"]
         if data.read_json(job/"dispatch_receipt.json") != next(r for r in receipts if r["id"] == row["id"]):
             raise ValueError("Dispatch receipt differs from batch")
-        rec = validate_training(job, row, allowed, verify_models=False)
+        rec = validate_training(job, row, allowed, verify_models=verify_models)
         if records and rec["partition"] != records[0]["record"]["partition"]:
             raise ValueError("Methods do not share the same training/calibration groups")
         records.append({**row, "root": job/"run", "record": rec})

@@ -2,6 +2,8 @@
 
 ## 2026-11-18 中文定稿 H 与五基线统一重新确认
 
+CPU 和 CUDA 核验完成后，用户明确答复“允许这个 CPU／GPU 合审包外审”。授权对象为 40,584 字节的合审包。已通过本地 Playwright MCP 向网页 GPT-6 Pro 提交一次并回收原文。此前 38,727 字节的单 CPU 包未提交。[具体包身份及提交记录](../reports/documentation/20261118/h_history_benchmark/review/submission.json) · [原文与独立处置](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md)
+
 11 月 19 日零时，用户确认“允许这一次限额短测并行”。当时 V 的 seed 51 已完成，seed 52 在跑，留足其 29 GiB 显存承诺后尚有 2.09 GiB。例外只限一次中文手写 CUDA 核验，整 PID 最多 1.5 GiB、最多 180 秒，独立记费。英语正式调度、三条 V 与后续九条 H 的安排沿原合同。
 
 用户选择“六方法统一做新确认：新版 H 加五个原定义基线，共 54 条轨迹，在同一套新 120 群上一次盲评，形成统一的前瞻性主表”。这里的 H 是八配置消融的 Full，沿用 Optuna trial3 的历史监督和出生评分保持两系数。用户要求本轮先完成正式训练脚本，再退役已被替代的旧训练入口、保留原记录并更新进度。CPU 核验后用户补充“你先做完CPU和必要的GPU核验后再一起外审”。该补充覆盖合成核验与合审次序，正式训练、确认群生成、开标签和统计通过条件另行确定。[方案](../reports/documentation/20261118/h_history_benchmark/scope.zh.md)

@@ -1,0 +1,45 @@
+{
+  "purpose": "中文 trial3 H 与五个原定义基线统一确认的方案、实现及 CPU/CUDA 合审",
+  "authorization": "允许这个 CPU／GPU 合审包外审",
+  "package": {
+    "path": "combined.zip",
+    "bytes": 40584,
+    "sha256": "0a79d2c369dd96c944c043fb062a55327241a5be0d64b12053f76b4b5dec5b30",
+    "files": [
+      "scope.zh.md",
+      "questions.zh.md",
+      "scripts/step28_history_benchmark.py",
+      "scripts/step28_history_benchmark_evaluate.py",
+      "tests/test_step28_history_benchmark.py",
+      "native_source_excerpts.txt",
+      "synthetic_cpu.json",
+      "source_manifest.json",
+      "synthetic_gpu.json",
+      "package_contents.json"
+    ]
+  },
+  "superseded_not_submitted": {
+    "bytes": 38727,
+    "sha256": "7013b5b39c017f051b1384de0dbcc3ecf1090df27bb29de7ec49625d36db5d4b"
+  },
+  "implementation_git": "c41f7ab8c53b58e67fa7287ced82eb9af2e1e970",
+  "transport": "本地 Playwright MCP",
+  "model_requested": "GPT-6 Pro",
+  "selector_observed": "GPT-6 [checked]; Pro, 5 of 5",
+  "visible_self_description": "GPT-6 Astra Pro",
+  "backend_identity": "未独立核验",
+  "conversation": "https://chatgpt.com/c/6afdcf46-4db4-83ea-a940-efcdb89db97a",
+  "submissions": 1,
+  "completion": {
+    "original_download_name": "chinese_six_method_combined_review.zh.md",
+    "saved_path": "external_report.zh.md",
+    "bytes": 33540,
+    "sha256": "576c68096fb6b0179ad7abbddc7c89cac032df941368d964fee1482e81eab34b",
+    "required_findings": ["HB-R01", "HB-R02"],
+    "local_disposition": "primary_disposition.zh.md",
+    "post_review_synthetic_receipt": "fix_cpu.json",
+    "dedicated_tab_closed": true,
+    "revised_sources_uploaded_to_reviewer": false
+  },
+  "request": "请以 GPT-6 Pro 对附件 combined.zip 做一次中文科研方案与实现合审。请先解包阅读 questions.zh.md、scope.zh.md、两份正式入口、原生实现节录、CPU 与 CUDA 回执，再核对其中具体问题。本次交付是固定 trial3 Full 加五个原定义基线的 54 条中文轨迹以及一批新 120 群的一次共同盲评入口。请重点追踪各方法实际更新、当前域数据权限、阶段端点、共同分区、盲分数与一次开 pairs 的先后关系、失败与费用、六方法 raw MAP 配对表。区分已经可定位的必修缺陷和应当留给开训前统计或资源合同的选择。如发现阻断，请给出源码函数、触发条件和最小修法。请说明手写 CPU/GPU 证据能支持到哪一步，给出一份可完整保存的中文审查报告。"
+}

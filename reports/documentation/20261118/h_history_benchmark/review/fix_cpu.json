@@ -1,0 +1,124 @@
+{
+  "purpose": "核验合审 HB-R01、HB-R02 及正式门的来源、收尾预留。全部输入为单核 Linux 临时手写夹具。",
+  "linux_workspace": "/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace",
+  "python": "/home/yongpeng/miniconda3/envs/py310/bin/python",
+  "before_manifest": "../source_sync.json",
+  "synchronization": "四个变动文件仅经 SFTP 同步至本批独立 workspace，并回读比对。其余 46 个文件使用原清单。",
+  "files": [
+    {
+      "path": "scripts/step28_history_benchmark.py",
+      "reviewed_bytes": 14155,
+      "reviewed_sha256": "752f78cb822896957de76cdaa800b5d1b345111ab12534bf01530bedae6c567e",
+      "final_bytes": 14294,
+      "final_sha256": "595f3c74fa78d4e4c3c0b0610c9e30874494e058dd7a2f9a45bc3fae435d22e3"
+    },
+    {
+      "path": "scripts/step28_history_benchmark_evaluate.py",
+      "reviewed_bytes": 11018,
+      "reviewed_sha256": "82c21291940d5884cef1eed0562d2d86a6bf852df8257108738c5bf7091e1398",
+      "final_bytes": 11239,
+      "final_sha256": "7b0d8f3980c9677d7c4fed6bbf3a1bd70313c97212eccbc528a4f24931e06f87"
+    },
+    {
+      "path": "scripts/step28_formal_queue.py",
+      "reviewed_bytes": 17132,
+      "reviewed_sha256": "f928e91f6f0cb82860e2b4bbb202fd1788cac56457dacdf61f91d4671b6803ef",
+      "final_bytes": 17400,
+      "final_sha256": "a4bd1867a5b6d1670bb6b15e27c53d838f804c067e5191ce430a9bb263630939"
+    },
+    {
+      "path": "tests/test_step28_history_benchmark.py",
+      "reviewed_bytes": 16893,
+      "reviewed_sha256": "9ccb88989bf37ad7dbba951672dd59553a8439fc0560a7e17d2701573893c09c",
+      "final_bytes": 26447,
+      "final_sha256": "cfa1fced254966bc56150fb1034f57a47ee296bc00c82e136d04ea011b786cff"
+    }
+  ],
+  "checks_in_order": [
+    {
+      "exit_code": 0,
+      "stdout_json": {
+        "cases": 2,
+        "cpu_affinity": [
+          0
+        ],
+        "evidence": {
+          "before_generation": {
+            "changed_FOREVER": "blocked",
+            "changed_H": "blocked",
+            "handwritten_endpoints": 162,
+            "intact": "passed",
+            "missing_FOREVER": "blocked",
+            "missing_H": "blocked",
+            "official_groups_generated": 0,
+            "official_pairs_opened": 0
+          },
+          "interrupted_validation": {
+            "charged_seconds": 0.10447344370186329,
+            "downstream_closed": true,
+            "exit_status": "interrupted",
+            "inherited_seconds": 7,
+            "real_cpu_child": true,
+            "receipts": 1
+          }
+        },
+        "formal_data_reads": 0,
+        "gpu_used": false,
+        "passed": true,
+        "pretrained_loads": 0,
+        "python": "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "seconds": 0.23655120003968477
+      },
+      "unittest_stderr": "test_generation_rechecks_162_endpoint_files (__main__.BenchmarkTest) ... ok\ntest_interrupted_worker_validation_keeps_receipt_and_fee (__main__.BenchmarkTest) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.236s\n\nOK\n"
+    },
+    {
+      "exit_code": 0,
+      "stdout_json": {
+        "cases": 3,
+        "cpu_affinity": [
+          0
+        ],
+        "evidence": {
+          "before_generation": {
+            "changed_FOREVER": "blocked",
+            "changed_H": "blocked",
+            "handwritten_endpoints": 162,
+            "intact": "passed",
+            "missing_FOREVER": "blocked",
+            "missing_H": "blocked",
+            "official_groups_generated": 0,
+            "official_pairs_opened": 0
+          },
+          "formal_gate_conditions": {
+            "different_authorized_source": "blocked",
+            "exact_synthetic_source": "accepted",
+            "formal_campaign_created": false,
+            "post_at_stop_reserve": "blocked",
+            "training_at_stop_reserve": "blocked"
+          },
+          "interrupted_validation": {
+            "charged_seconds": 0.13771958323195577,
+            "downstream_closed": true,
+            "exit_status": "interrupted",
+            "inherited_seconds": 7,
+            "peer_charged_seconds": 0.13433738378807902,
+            "peer_drained": true,
+            "real_cpu_child": true,
+            "receipts_per_child": 1
+          }
+        },
+        "formal_data_reads": 0,
+        "gpu_used": false,
+        "passed": true,
+        "pretrained_loads": 0,
+        "python": "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "seconds": 0.2722816541790962
+      },
+      "unittest_stderr": "test_generation_rechecks_162_endpoint_files (__main__.BenchmarkTest) ... ok\ntest_interrupted_worker_validation_keeps_receipt_and_fee (__main__.BenchmarkTest) ... ok\ntest_gate_binds_authorized_sources_and_stop_reserve (__main__.BenchmarkTest) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.272s\n\nOK\n"
+    }
+  ],
+  "billing": "各次 seconds 为该次 Python 定向核验计时。7 秒是手写继承账，两子进程费用位于该次核验内。",
+  "official_training_started": false,
+  "official_confirm_groups_generated": 0,
+  "official_pairs_opened": 0
+}

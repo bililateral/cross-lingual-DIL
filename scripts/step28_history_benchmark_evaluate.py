@@ -207,7 +207,9 @@ def run(action, campaign, job, allowed, budget):
     if action == "analysis":
         analyze(campaign, job, allowed, budget)
         return
-    records = bench.completed(campaign, allowed)
+    # Protect new group generation with a fresh on-disk hash of every endpoint.
+    # During blind inference each payload is verified again on actual restoration.
+    records = bench.completed(campaign, allowed, verify_models=action == "generation", check=budget.check)
     if action == "generation":
         shared.generate(campaign, job, records, budget, root_seed=bench.CONFIRM_SEED, namespace=bench.NAMESPACE,
                         sources=allowed["sources"], access_role="six_generation")

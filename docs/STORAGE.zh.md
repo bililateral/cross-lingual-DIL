@@ -2,6 +2,8 @@
 
 ## 2026-11-18 中文 trial3 H 六方法比较实现
 
+11 月 19 日合审收尾保留 40,584 字节送审 ZIP、33,540 字节外审 Markdown 原件、独立处置及两次定向 CPU 回执。送审版源码可从 Git `c41f7ab8` 恢复。中文独立 workspace 的最终版本由原 50 份清单和其后 4 份源码差异确定，差异记录列出逐文件新旧 SHA-256 与字节数。活跃英语队列仍按自身正式门绑定生产源码。[提交与回收记录](../reports/documentation/20261118/h_history_benchmark/review/submission.json) · [主审](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md) · [最终四份差异及核验](../reports/documentation/20261118/h_history_benchmark/review/fix_cpu.json)
+
 新源码及 CPU／CUDA 合成核验使用本项目独立的 `reports/documentation/20261118/h_history_benchmark/workspace`。SFTP 对具名源码和政策逐文件核对，未同步正式数据或模型。Windows 删除 4 个旧启动包装器及 1 个专用诊断重放入口，8 个仍由共享运行库或既有回归使用的模块退役旧命令行。上述 13 个路径在 Linux 项目根下均已不存在。本次保留历史部署、审查材料、通过及失败回执、原始分数和费用。原文件可由 Git `c73c5f6e` 的对应路径恢复。上一批 VendorLink 的远端交付最终到 `c73c5f6e`。[逐文件退役记录](../reports/documentation/20261118/h_history_benchmark/retirement.json) · [SFTP 清单](../reports/documentation/20261118/h_history_benchmark/source_sync.json) · [CPU 原件](../reports/documentation/20261118/h_history_benchmark/cpu.json) · [GPU 原件](../reports/documentation/20261118/h_history_benchmark/gpu.json)
 
 ## 2026-11-18 VendorLink FIT12 市场适配器四组正式训练

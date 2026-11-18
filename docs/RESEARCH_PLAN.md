@@ -4,7 +4,7 @@
 
 ## 中文 trial3 H 与五基线的共同确认
 
-用户选定在一批新 120 群上比较消融 Full 同配置 H、ER0.1、Logit0.1、L²R、ER+GCR、FOREVER。正式入口的 CPU 与 CUDA 合成核验均已完成。下一步按具体合审包的外发许可回收网页意见，再独立处置。真实训练的独立预算、并发和统计判据待开训前确定。先前的中文三批结果、八配置消融和本次前瞻表分别引用。[当前方案](../reports/documentation/20261118/h_history_benchmark/scope.zh.md)
+用户已选定在一批新 120 群上比较消融 Full 同配置 H、ER0.1、Logit0.1、L²R、ER+GCR、FOREVER。脚本、CPU／CUDA 合成核验及主审修复已完成。下一步是开训前固定五个配对比较的主要主张、O／F 实际幅度、A_acq／N／Z 保护与区间口径，再按各方法真实规模确定累计分桶、并发、失败政策、资源预留及本批授权。先前三批结果、八配置消融和这张拟作的前瞻表分别引用。[当前方案](../reports/documentation/20261118/h_history_benchmark/scope.zh.md) · [已处置意见和待定合同项](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md)
 
 ## VendorLink账号监督：FIT12共同协议后续
 

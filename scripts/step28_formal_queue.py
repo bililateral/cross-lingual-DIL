@@ -201,31 +201,39 @@ def dispatch(allowed: dict, rows: list[dict], command, validate, followups=(), p
         time.sleep(seconds)
         control_tick += time.monotonic()-begin
     def finish(slot, error=None):
-        item = active.pop(slot)
+        item = active[slot]
         process, row, job = item['process'], item['row'], item['job']
+        interrupted = None
         try:
             stop(process)
             if error is None:
                 if process.returncode != 0:
                     raise RuntimeError(f'Worker failed with exit {process.returncode}')
                 validate(row, job)
-        except Exception as exc:
+        except BaseException as exc:
             error = repr(exc)
+            if not isinstance(exc, Exception):
+                interrupted = exc
+            if process.poll() is None:
+                stop(process)
         finally:
             item['log'].close()
         elapsed = time.monotonic()-item['started']
         bucket = row.get('bucket', 'training')
-        used[bucket] = used.get(bucket, 0)+elapsed
         if elapsed > row['seconds']:
             error = error or 'Trajectory actual elapsed exceeds its allowance'
         receipt = dict(id=row['id'], slot=slot, bucket=bucket, actual_seconds=elapsed,
                        success=error is None, error=error)
+        write(job/'dispatch_receipt.json', receipt)
+        used[bucket] = used.get(bucket, 0)+elapsed
         result['completed'].append(receipt)
         result['active'].pop(str(slot), None)
-        write(job/'dispatch_receipt.json', receipt)
+        active.pop(slot)
         if error and slot not in result['retired_slots']:
             result['retired_slots'].append(slot)
         charge_control()
+        if interrupted is not None:
+            raise interrupted
         if used[bucket] > limits[bucket]:
             raise TimeoutError('Actual cumulative allowance exceeded; fees are not clipped')
         return error

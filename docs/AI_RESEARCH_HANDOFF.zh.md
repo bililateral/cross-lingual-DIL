@@ -2,7 +2,7 @@
 
 ## 当前工作
 
-截至 11 月 19 日 00:07:03，VendorLink FIT12 唯一正式队列已完成 VendorLink_SEQ 的 seed 51，seed 52 正在运行。中文六方法论文比较已完成 CPU 和必要 CUDA 合成核验，正式训练尚未启动。原八配置消融、单一 β、Evolution 和先前诊断均已结案。[本次现场观测与 CUDA 回执](../reports/documentation/20261118/h_history_benchmark/gpu.json) · [科研计划](RESEARCH_PLAN.md) · [合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)
+11 月 19 日 00:07:03 的现场观测显示，VendorLink FIT12 唯一正式队列已完成 VendorLink_SEQ 的 seed 51，seed 52 正在运行。同日，中文六方法论文比较的正式入口、CPU／CUDA 合成核验及独立主审均已完成，中文正式训练尚未启动。原八配置消融、单一 β、Evolution 和先前诊断均已结案。[现场观测与 CUDA 回执](../reports/documentation/20261118/h_history_benchmark/gpu.json) · [中文六方法主审](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md) · [科研计划](RESEARCH_PLAN.md) · [合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)
 
 ### VendorLink账号监督共同评价
 
@@ -12,7 +12,7 @@
 
 ### 历史权重版H主实验消融
 
-**中文六方法共同确认已完成正式入口与 CPU／CUDA 合成核验。** 新研究将使用消融 Full 同一套 trial3 配置，与独立的 ER0.1、Logit0.1、L²R、ER+GCR、FOREVER 比较。固定三个顺序、三个 seed，每方法九条，共 54 条。新 120 群待全批训练后统一盲评。Linux 单核六项及 CUDA 三项通过，单次 CUDA 生命周期 46.60 秒，整 PID 峰值 714 MiB。具体合审包已备妥。本轮尚未启动中文训练、生成新群或开标签。此前八配置消融维持结案。[方案与实际入口](../reports/documentation/20261118/h_history_benchmark/scope.zh.md) · [CPU 核验](../reports/documentation/20261118/h_history_benchmark/cpu.json) · [GPU 核验](../reports/documentation/20261118/h_history_benchmark/gpu.json) · [旧入口退役](../reports/documentation/20261118/h_history_benchmark/retirement.json)
+**中文六方法的脚本及合审已完成，正式训练待决定。** 本批拟比较消融 Full 同一套 trial3 配置与五个独立原定义基线，固定三个顺序、三个 seed、54 条轨迹，统一在新 120 群盲评。六项 CPU、三项 CUDA 合成核验通过。外审发现生成前漏验端点文件、控制器验收中断可漏账两项缺陷，已修复。最终三项单核用例覆盖 162 份手写端点、两路真实 CPU 子进程中断收尾和正式门边界。正式运行须另定统计判据和本批资源预算。目前未生成新群或开放标签，八配置消融原结论保持。送审基线为 Git `c41f7ab8`，最终部署源按 50 份原清单替换 4 份修复记录。[方案与两端核验](../reports/documentation/20261118/h_history_benchmark/scope.zh.md) · [外审及主审](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md) · [修复源码与核验](../reports/documentation/20261118/h_history_benchmark/review/fix_cpu.json) · [旧入口退役](../reports/documentation/20261118/h_history_benchmark/retirement.json)
 
 11 月 16 日，八配置消融完成。Full 相对 ER 的旧域末态和遗忘改善，平均取得能力的点值保护微负，原联合验收为 false。结果外审及 18 项主审处置已结案，本批后续只需按保存结果解释。[实测报告](../reports/documentation/20261116/h_ablation_result/result/report.zh.md) · [结果主审](../reports/documentation/20261116/h_ablation_result/result/review/primary_disposition.zh.md)
 
