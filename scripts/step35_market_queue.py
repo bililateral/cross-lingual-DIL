@@ -167,12 +167,13 @@ class MarketRunner(Runner):
     def command(self, job, slot, deadline):
         for binding in self.source_bindings:
             verify(binding)
-        cores = psutil.Process().cpu_affinity()[2*slot:2*slot+2]
-        if len(cores) != 2:
+        count = 1 if job['action'] == 'analyze' else 2
+        cores = psutil.Process().cpu_affinity()[2*slot:2*slot+count]
+        if len(cores) != count:
             raise RuntimeError('Two available cores required for the selected slot')
         return ['taskset', '-c', ','.join(map(str, cores)), PYTHON, '-B', '-u', str(self.worker_entry),
-                '--gate', str(self.gate_path), '--action', 'train', '--target', str(job['target']),
-                '--deadline', str(deadline), '--task', job['task_id']]
+                '--gate', str(self.gate_path), '--action', job['action'], '--target', str(job['target']),
+                '--deadline', str(deadline)] + (['--task', job['task_id']] if 'task_id' in job else [])
 
 
 def run_training(runner, tasks, completed):
@@ -219,6 +220,12 @@ def campaign(gate):
             or g['caps'] != CAPS or g['limits']['workers'] != 3):
         raise ValueError('An approved, reviewed four-arm Linux training gate is required')
     from step35_vendorlink_account_control import validate_training
+    from step35_vendorlink_account_evaluate import validate_scores
+    from step35_market_worker import market_tasks, validate_streams
+    if gate != Path(__file__).resolve().parents[2]/'formal_gate.json' or Path(g['campaign']) != gate.parent/'campaign':
+        raise ValueError('Use the reviewed isolated deployment')
+    for evidence in (g['authorization'], g['scope'], g['review'], *g['qualification']):
+        verify(evidence)
     sources = [verify(item) for item in g['sources']]
     worker = verify(g['worker_entry'])
     if (worker not in sources or Path(__file__).resolve() not in sources
@@ -227,8 +234,10 @@ def campaign(gate):
     root = Path(g['campaign']).resolve()
     data = read(verify(g['manifest']))
     tasks = read(verify(g['tasks']))
+    if tasks != market_tasks():
+        raise ValueError('Wrong four-arm task freeze')
     root.mkdir(exist_ok=False)
-    ledger = Ledger(root, g['prior_seconds'], g['cpu_test_seconds'], caps=CAPS)
+    ledger = Ledger(root, g['prior_seconds'], g['cpu_test_seconds'], caps=CAPS, cpu_test_cap=1800)
     gate_binding = record(gate)
     runner = MarketRunner(g, gate, root, ledger, worker_entry=worker, limits=g['limits'], caps=CAPS,
                           source_bindings=[gate_binding, g['tasks'], g['manifest'], *g['sources']],
@@ -241,7 +250,33 @@ def campaign(gate):
         identity = dict(protocol=PROTOCOL, task=task, manifest=g['manifest'], gate=gate_binding)
         validate_training(task, result, data, identity)
 
-    return run_training(runner, tasks, completed)
+    try:
+        batch = run_training(runner, tasks, completed)
+        with ledger.active('paired_training_handoff'):
+            validate_streams(batch['winners'])
+        scores = [dict(action='score', task_id=t['id'], target=root/'scoring'/t['id'], bucket='gpu',
+                       seconds=1200, gpu_family='V' if t['method']=='VendorLink_SEQ' else 'H',
+                       reserved_bytes=g['limits']['vendor_reserve_bytes' if t['method']=='VendorLink_SEQ' else 'free_gpu_bytes'])
+                  for t in tasks]
+        def completed_score(job):
+            result = read(job['target']/'result/completion.json')
+            if result['task'] != by_id[job['task_id']] or result['role'] != 'dev':
+                raise ValueError('Incorrect dev score identity')
+            validate_scores(result)
+        runner.run_many(scores, 1, completed_score)
+        with ledger.active('blind_score_handoff'):
+            write(root/'scoring_complete.json', dict(tasks=tasks,
+                  completions=[record(j['target']/'result/completion.json') for j in scores]))
+        analysis = dict(action='analyze', target=root/'analysis', bucket='auxiliary', seconds=600)
+        def analyzed(job):
+            if not isinstance(read(job['target']/'result/decision.json')['full_application'],bool):
+                raise ValueError('Missing complete development decision')
+        runner.run_many([analysis], 1, analyzed)
+        write(root/'completion.json', dict(status='COMPLETE', dev_opening='whole_batch_once',
+              confirm_open=False, decision=record(root/'analysis/result/decision.json')))
+    except BaseException as exc:
+        write(root/'failure.json', dict(error=repr(exc), automatic_restart=False))
+        raise
 
 
 def main():

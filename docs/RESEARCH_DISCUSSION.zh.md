@@ -1,5 +1,9 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-18 批准四组正式训练、启动观测后更新进度并推送全部提交
+
+用户审阅四组训练方案后明确要求“开始训练”，并要求实际观察到训练开始后及时更新全部相关项目进度记录，最后把所有本地提交推到远端。这一决定承接已经确定的并发、一次 OOM 重试和分桶预算。执行开训前定向核验与审查，整批 dev 和 confirm 延续合同的开放条件。[用户授权原文](../reports/documentation/20261118/vendorlink_market_training/execution/authorization.zh.md) · [四组合同](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md)
+
 ## 2026-11-18 四组训练允许人工恢复 OOM 槽并按配置和 seed 重试一次
 
 用户选择由原控制器核实旧进程退出、显存释放、并发资源和预算后重新开放槽位，明确“我就是要实现这样的效果，而且允许对OOM的实验配置、该 seed 重试一次，并保留第一次失败的记录和费用”。健康槽继续领取本阶段待派任务。该决定适用于本轮四组的训练调度，正式开训继续等用户决定。[恢复与一次重试条款](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md#已确认的-oom-恢复与一次重试)

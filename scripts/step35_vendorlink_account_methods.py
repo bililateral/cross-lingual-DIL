@@ -60,7 +60,7 @@ class AccountModel(Model):
         self.auxiliary_optimizer = torch.optim.AdamW(head.parameters(), lr=self.settings.auxiliary_lr,
             betas=(.9, .999), eps=1e-8, weight_decay=.01, amsgrad=False)
 
-    def backward_h(self, group, step_seed, teacher=None, history=False, check=lambda: None):
+    def backward_h(self, group, step_seed, teacher=None, history=False, check=lambda: None, *, frozen_history=False):
         torch.manual_seed(step_seed)
         z = self.records(group, check)  # Original normalized channels / sqrt(2).
         with torch.no_grad():
@@ -100,7 +100,11 @@ class AccountModel(Model):
                 (self.settings.gamma*ce).backward()
         if leaf.grad is None or not torch.isfinite(leaf.grad).all():
             raise ValueError('Missing/nonfinite encoder-chain gradient')
-        z.backward(leaf.grad)  # H + CE reach the same, single original encoder graph.
+        if frozen_history:
+            if not history or z.requires_grad:
+                raise ValueError('A retained market must have a completely frozen encoder route')
+        else:
+            z.backward(leaf.grad)  # H + CE reach the same current encoder graph.
         return logs
 
     def pair_backward(self, z, gradient, check):
@@ -112,7 +116,7 @@ class AccountModel(Model):
             self.head(torch.cat(((u-v).abs(), u*v), 1)).flatten().backward(gradient[k:k+512])
         return leaf
 
-    def backward_birth(self, group, teacher, check=lambda: None):
+    def backward_birth(self, group, teacher, check=lambda: None, *, frozen_history=False):
         if not self.settings.deterministic_history or teacher is None:
             raise ValueError('Deterministic Full and retained birth teacher required')
         # The context covers z.backward: checkpoint recomputation must see p=0.
@@ -129,7 +133,11 @@ class AccountModel(Model):
             leaf = self.pair_backward(z, gradient, check)
             if leaf.grad is None or not torch.isfinite(leaf.grad).all():
                 raise ValueError('Missing/nonfinite deterministic preservation gradient')
-            z.backward(leaf.grad)
+            if frozen_history:
+                if z.requires_grad:
+                    raise ValueError('Birth replay must not update an old market encoder')
+            else:
+                z.backward(leaf.grad)
             return dict(distillation=float(mse.detach()), weighted=float(loss.detach()),
                         record_gradient_norm=float(leaf.grad.detach().norm()), deterministic=True)
 

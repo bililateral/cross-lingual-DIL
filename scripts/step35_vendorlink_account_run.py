@@ -76,8 +76,12 @@ def atomic_tensor(path, value, check, replace=False):
 
 
 def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
-    if 'market_adapters' in task:
-        raise ValueError('The market-adapter implementation supports scoring only')
+    routed = 'market_adapters' in task
+    if routed:
+        from step35_market_adapters import FORMAT, MarketH, pack_history
+        if task['market_adapters'] != FORMAT or not task.get('stage_end_only'):
+            raise ValueError('Unknown market training or endpoint scheme')
+        model = MarketH(model)
     if job.exists() or model.settings != AccountSettings(**task['settings']) or task['stages'] not in (1, 3):
         raise ValueError('Fresh fixed task and actual configuration required')
     job.mkdir(parents=True)
@@ -92,10 +96,25 @@ def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
     if s.deterministic_history:
         workload['deterministic_history_groups'] = 0
     base = dict(identity=identity, task=task, model_binding=binding)
+    current_stream, replay_stream = hashlib.sha256(), hashlib.sha256()
+    history_sizes, survivors = {}, {}
+    shared = None
     def save_endpoint(stage):
+        nonlocal shared
         value = dict(**base, stage=stage, updates=updates,
                      head={k: v.detach().cpu() for k, v in model.head.state_dict().items()}, vendor_heads=heads)
-        if stage:
+        if stage and routed:
+            if stage == 1:
+                path = job/'shared_encoder.pt'
+                atomic_tensor(path, model.shared_encoder_state(), check)
+                shared = record(path)
+            path = job/f'market_state_{stage}.zip'
+            payload = pack_history(model, memory, identity)
+            with path.open('xb') as f:
+                f.write(payload)
+            value.update(shared_encoder=shared, market_state=record(path))
+            history_sizes[f'end_{stage}'] = len(payload)
+        elif stage:
             value['encoder'] = {k: v.detach().cpu() for k, v in model.encoder.state_dict().items()}
         path = job/f'stage{stage}.pt'
         atomic_tensor(path, value, check)
@@ -111,6 +130,10 @@ def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
                 model.start_vendor_stage(classes, seed_for(seed, domain, 'head'))
                 optimizer = make_optimizer(model)  # Previous head is only in CPU snapshots.
             else:
+                if routed:
+                    optimizer = model.start_training_market(stage, seed_for(seed, domain, 'market_adapter'), optimizer)
+                    if stage > 1:
+                        history_sizes[f'enter_{stage}'] = len(pack_history(model, memory, identity))
                 model.start_account_stage(classes, seed_for(seed, domain, 'auxiliary_head'))
                 if optimizer is None:
                     optimizer = make_optimizer(model)
@@ -144,6 +167,10 @@ def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
                     updates += 1
                     workload['current_updates'] += 1
                     workload['current_ads'] += count
+                    if routed:
+                        current_stream.update((batch.uid+'\n').encode())
+                        if history is not None:
+                            replay_stream.update((history.uid+'\n').encode())
                     if history is not None:
                         workload['history_groups'] += 1
                         workload['history_ads'] += sum(len(v.records) for v in history.views)
@@ -155,7 +182,12 @@ def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
                         f.write(json.dumps(dict(stage=stage, epoch=epoch, stage_update=update, updates=updates, total_updates=updates,
                             current_ids=current, history_group=None if history is None else history.uid,
                             rates=[g['lr'] for g in optimizer.param_groups], **logs), allow_nan=False)+'\n')
-                write(job/'workload.json', workload)
+                    if task.get('stage_end_only') and (update == 1 or update % 25 == 0):
+                        write(job/'workload.json', dict(workload, stage=stage, domain=domain, stage_update=update))
+                write(job/'workload.json', dict(workload, stage=stage, domain=domain, stage_update=update)
+                      if task.get('stage_end_only') else workload)
+                if task.get('stage_end_only'):
+                    continue
                 cursor = dict(stage=stage, next_epoch=epoch+1, updates=updates, workload=workload,
                               vendor_heads=heads)
                 check()
@@ -169,6 +201,8 @@ def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
                     workload['teacher_groups'] += 1
                     workload['teacher_ads'] += sum(len(v.records) for v in group.views)
                 memory.retain(memory_candidates, stage, model, check, record_teacher=teacher_done)
+                if routed:
+                    survivors[domain] = [r['group']['uid'] for r in memory.entries]
                 write(job/f'memory_stage{stage}.json', dict(bytes=len(memory.bytes()), seen=memory.seen,
                     candidates=len(memory_candidates), groups=[dict(uid=r['group']['uid'], origin=r['origin']) for r in memory.entries]))
             save_endpoint(stage)
@@ -183,6 +217,9 @@ def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
             del accounts, memory_candidates, batches, batch, history, teacher
         result = dict(status='TRAINING_COMPLETE_EVALUATION_CLOSED', **base, endpoints=endpoints,
                       updates=updates, workload=workload, diagnostics=diagnostics)
+        if routed:
+            result.update(history_bytes=history_sizes, current_stream=current_stream.hexdigest(),
+                          history_stream=replay_stream.hexdigest(), survivors=survivors)
         write(job/'workload.json', workload)
         write(job/'completion.json', result)
         return result

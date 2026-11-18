@@ -1,5 +1,9 @@
 # 科研文件存储与恢复
 
+## 2026-11-18 VendorLink FIT12 市场适配器四组正式训练
+
+本批在 Linux 项目下的 `reports/documentation/20261118/vendorlink_market_training/execution` 独立部署。正式活动源码位于其 `workspace/scripts`，正式训练、盲评分及一次分析使用同一 `campaign`。开放的来源身份、合成核验、派发元数据和累计费用可具名回传。市场正文、账号、逐查询矩阵、端点、教师及六群状态继续按原 Linux 保管规则保存。根 docs 继续以 Windows 为准。[执行与交付授权](../reports/documentation/20261118/vendorlink_market_training/execution/authorization.zh.md) · [当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)
+
 ## 2026-11-18 市场适配器的合成核验
 
 Linux 在独立目录 vendorlink_market_adapters 运行，保留接线代码和[具名回传的核验回执](../reports/documentation/20261118/vendorlink_market_adapters/receipt.json)、进程计时与标准输出。一次性合成角色、端点、矩阵和历史包随核验的临时目录退出清理。适配器包的实际文件字节、SHA 和还原行为见回执。原市场数据、Memory 和已删除端点的保管沿原记录。根 docs 在 Windows 维护。

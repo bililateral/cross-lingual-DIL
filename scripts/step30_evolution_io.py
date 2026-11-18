@@ -157,11 +157,11 @@ class Budget:
 
 
 class Ledger:
-    def __init__(self, root: Path, prior: dict, cpu_tests: int, *, caps: dict = CAPS):
+    def __init__(self, root: Path, prior: dict, cpu_tests: int, *, caps: dict = CAPS, cpu_test_cap=1200):
         self.caps = dict(caps)
         if set(prior) != set(self.caps) or any(not math.isfinite(v) or v < 0 or v >= self.caps[k] for k, v in prior.items()):
             raise ValueError('Complete nonnegative prior costs required')
-        if not 0 <= cpu_tests <= 1200 or prior['auxiliary'] < cpu_tests:
+        if not 0 <= cpu_tests <= cpu_test_cap or prior['auxiliary'] < cpu_tests:
             raise ValueError('CPU tests are a subset of the auxiliary cumulative budget')
         self.root, self.used, self.events = root, dict(prior), []
         self.cpu_tests = cpu_tests
