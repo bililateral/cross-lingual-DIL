@@ -4,7 +4,7 @@
 
 45 个获准的正式矩阵在 Linux 原评分目录只读使用。九份完成回执和开发查询、参考角色的来源摘要从[具名绑定](../reports/documentation/20261118/vendorlink_score_drift/bindings.json)进入，真实数据未复制至 Windows。Linux 新独立目录为同仓相对路径 `reports/documentation/20261118/vendorlink_score_drift`。匿名汇总、45 个逻辑端点的访问记录、作业回执和完整表经具名 SFTP 回传，入口为[结果报告](../reports/documentation/20261118/vendorlink_score_drift/result/report.zh.md)。两端保管实际源码和执行证据，根 docs 以 Windows 为权威。已删训练权重、大清理周期与原模型回执沿 11 月 17 日记录。
 
-准备包与获准外发的合审包范围不同。前者保留[未提交决定](../reports/documentation/20261118/vendorlink_score_drift/review/decision.json)，后者按[成员与摘要](../reports/documentation/20261118/vendorlink_score_drift/result/review/manifest.json)及[具体许可和提交记录](../reports/documentation/20261118/vendorlink_score_drift/result/review/submission.json)保管，均不含正式分数矩阵、逐查询结果、原始账号资料或密码。
+准备包未外发，实际送审包按[15 个成员与 SHA](../reports/documentation/20261118/vendorlink_score_drift/result/review/manifest.json)及[具体许可和提交记录](../reports/documentation/20261118/vendorlink_score_drift/result/review/submission.json)保管。主审后，[完整外审原文、主审及最终回存记录](../reports/documentation/20261118/vendorlink_score_drift/result/review/recovery.json)已具名保留。历史核验脚本两端退役，两份 ZIP 及浏览器临时副本定向清除。两包和核验源码可在 Windows Git 的 2a329372 精确恢复；正式入口、匿名统计、绑定、当时回执及原研究数据保留。Linux 正式输出目录为本轮独立目录下的 `analyze`，Windows 对应 `result`。[收尾账](../reports/documentation/20261118/vendorlink_score_drift/result/final_sync.json)共 96 秒辅助费用（含 90 秒短操作保守包络），沿本轮独立 1800 秒帽。
 
 ## 2026-11-17 完整Git交付与随后接手文档维护
 

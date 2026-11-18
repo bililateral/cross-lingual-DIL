@@ -6,7 +6,7 @@
 
 中文消融已沿[11月16日获准后处理](../reports/documentation/20261116/h_ablation_result/recovery/authorization.json)完成原整批；[完整结果、组件分析](../reports/documentation/20261116/h_ablation_result/result/report.zh.md)和全指标已回传核对。[结果外审与独立处置](../reports/documentation/20261116/h_ablation_result/result/review/primary_disposition.zh.md)已闭合，本中文批次无剩余科研执行；保留Full−ER强O/F证据和A_acq点保护微负导致的原联合false，不以“首域波动”改门，不追加实验。新增及中断权重已[定向清理](../reports/documentation/20261116/h_ablation_weight_cleanup/receipt.json)，Full27已按[11月17日后续授权](../reports/maintenance/20261117/trained_weights/report.zh.md)清理，保存分数/指标保留；不再把重新载模作为既有后续步骤。原生成失败和全部费用保持，结果收尾另记辅助，训练378h/确认12h及辅助无硬帽补充不变。动态进度仅见交接。
 
-中文消融与单一 β 训练批次均已结案。完整 H 的后续问题聚焦同查询的候选分差。用户已确认[用原 FIT12 开发分数作一次只读诊断](../reports/documentation/20261118/vendorlink_score_drift/scope.zh.md)，并选定[一次结果合审](../reports/documentation/20261118/vendorlink_score_drift/review/decision.json)。下一步按该批结果及独立主审判断是否值得另提受控实验。新训练、重训、确认和预算均须另立具体范围。以下旧调度安排用于解释历史批次。
+中文消融、单一 β 训练和[全候选分数漂移诊断](../reports/documentation/20261118/vendorlink_score_drift/result/report.zh.md)均已结案。按[合审后的独立判断](../reports/documentation/20261118/vendorlink_score_drift/result/review/primary_disposition.zh.md)，暂缓为“逐查询减均值、保持所有候选分差”分配三条轨迹。可直接使用已核定的观察结果撰写方法边界。新训练、重训、确认和预算均须另立具体范围。以下旧调度安排用于解释历史批次。
 
 ## VendorLink账号监督：FIT12共同协议后续
 

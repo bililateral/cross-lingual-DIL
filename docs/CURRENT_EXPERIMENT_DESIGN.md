@@ -4,7 +4,7 @@ H/S评价补充（2026-11-02，已结案）：用户选择[方案A](../reports/s
 
 ## 当前合同入口
 
-11 月 18 日的 [FIT12 全候选分数漂移诊断](../reports/documentation/20261118/vendorlink_score_drift/scope.zh.md)使用两个旧域、三种方法和三个固定 seed 的既有开发预测。[用户补充决定](../reports/documentation/20261118/vendorlink_score_drift/review/decision.json)将方案、实现和结果合并审查。[实际入口](../reports/documentation/20261118/vendorlink_score_drift/diagnose.py)和[原评分回执绑定](../reports/documentation/20261118/vendorlink_score_drift/bindings.json)界定一次 45 矩阵读取与匿名汇总，独立辅助作业上限为 1800 秒。
+11 月 18 日的 [FIT12 全候选分数漂移诊断](../reports/documentation/20261118/vendorlink_score_drift/scope.zh.md)使用两个旧域、三种方法和三个固定 seed 的既有开发预测。[用户补充决定](../reports/documentation/20261118/vendorlink_score_drift/review/decision.json)将方案、实现和结果合并审查。[实际入口](../reports/documentation/20261118/vendorlink_score_drift/diagnose.py)和[原评分回执绑定](../reports/documentation/20261118/vendorlink_score_drift/bindings.json)界定一次 45 矩阵读取与匿名汇总，独立辅助上限 1800 秒。[完整结果](../reports/documentation/20261118/vendorlink_score_drift/result/report.zh.md)及[合并审查与独立处置](../reports/documentation/20261118/vendorlink_score_drift/result/review/primary_disposition.zh.md)均已完成。
 
 以下定位已完成实验的有效合同与证据。最新 β 训练批次及中文消融的结果审查均已闭合，没有新候选、重训或 confirm 许可。历史等待与停止按发生时点及对应回执理解。
 
