@@ -4,7 +4,7 @@ H/S评价补充（2026-11-02，已结案）：用户选择[方案A](../reports/s
 
 ## 当前合同入口
 
-[四组正式训练方案](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md)与[获准执行及交付范围](../reports/documentation/20261118/vendorlink_market_training/execution/authorization.zh.md)共同约束本批。原版 VendorLink_SEQ、市场适配器 H_SEQ、H_ER、H_full 各三个 seed，V 单跑及 H 两路起步再按资源补三路。累计 120 h。Full 对 ER 的主判据同时保护遗忘、逐旧市场末态及新学习。OOM 后由[四组调度入口](../scripts/step35_market_queue.py)处理人工恢复及每条最多一次重试，首败和费用保留。实际派发及审查身份见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
+[四组正式训练方案](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md)、[用户开训授权](../reports/documentation/20261118/vendorlink_market_training/execution/authorization.zh.md)与[生效正式门](../reports/documentation/20261118/vendorlink_market_training/execution/formal_gate.json)约束同一批。生产来源 `4c1ccc55`，17 份部署源码。原版 VendorLink_SEQ、市场适配器 H_SEQ、H_ER、H_full 各三个 seed，V 串行，H 两路起步、资源够补三路。正式入口为部署内 `step35_market_queue.py`，唯一队列已经建立。Full 对 ER 的主判据同时保护遗忘、两个旧域末态及新域学习。实际入口依序用训练完整门、盲评分完整门及一次 dev 分析；共享前史异常时暂缓归因。局部 OOM 由原控制器处理具名恢复及最多一次重试。[最终来源](../reports/documentation/20261118/vendorlink_market_training/execution/final_sources.json) · [主审处置](../reports/documentation/20261118/vendorlink_market_training/execution/review/primary_disposition.zh.md) · [启动与当前阶段](AI_RESEARCH_HANDOFF.zh.md#当前工作)
 
 [完整 H 市场适配器合成核验](../reports/documentation/20261118/vendorlink_market_adapters/scope.zh.md)接到原 Q2/FIT12 评分和端点恢复，核对两侧按市场选路、单一记录匹配头以及两套增量与原六槽状态的实际序列化字节数。[市场适配器](../scripts/step35_market_adapters.py)供本轮合成评分使用。
 

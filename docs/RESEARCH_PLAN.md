@@ -1,14 +1,14 @@
 # 科研计划
 
-本页记录仍待决定的科研动作。各批执行及核实时间见[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)，科学问题、预算和实际入口见[合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)。
+本页记录活动批次的下一步与仍待决定的科研动作。执行及核实时间见[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)，科学问题、预算和实际入口见[合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)。
 
 ## VendorLink账号监督：FIT12共同协议后续
 
-用户已确定原版 VendorLink_SEQ、市场适配器 H_SEQ、H_ER、H_full 四组，各用 seed 51、52、53，固定 AlphaBay → Dream → Agora。三个 V 逐个单跑，九条 H 先开两路、资源够再补三路，共 12 条完整轨迹、36 个市场阶段。局部 CUDA OOM 后，健康 H 槽继续领任务，原控制器可按人工请求恢复退出槽，同配置及 seed 最多重试一次，失败费用保留。用户审阅后明确批准开训及远端交付。[执行授权](../reports/documentation/20261118/vendorlink_market_training/execution/authorization.zh.md) · [并发决定](RESEARCH_DISCUSSION.zh.md#2026-11-18-确定四组开发比较及并发先审阅训练方案) · [OOM 补充](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md#已确认的-oom-恢复与一次重试)
+已启动的正式队列依次完成三个独跑的原版 VendorLink_SEQ，再派发市场适配器 H_full、H_ER、H_SEQ 共九条轨迹。各组固定 seed 51、52、53。H 先开两路，前两槽确有更新且总资源够用时加第三路。每条走 AlphaBay → Dream → Agora，全批 12 条、36 个市场阶段。若有局部 OOM，健康 H 槽继续领活，按原控制器收到的具名请求等待资源和预算，同配置同 seed 仅重试一次。待整批齐全后执行串行盲评分，沿原队列一次开放 dev。[启动观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json) · [授权](../reports/documentation/20261118/vendorlink_market_training/execution/authorization.zh.md) · [操作条款](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md#已确认的-oom-恢复与一次重试)
 
 获准的主要比较要求 Full 相对同结构 ER 的少忘与旧域末态增益各至少 2 个百分点，并同时通过两旧域末态及新域取得、净学习和稳定性保护。遗忘压力、Full 对 H_SEQ 的保持和外部 VendorLink 两读取器分别判断。按训练 111 h、核验与评分 5 h、辅助 4 h 分桶。从首条正式训练到整批 dev，H 较早补足三路预计 24–40 h，全程两路预计 34–56 h。12 条轨迹齐全后串行评分，再一次开放整批 dev；confirm 保持封存。[冻结比较和顺序](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md) · [进度](AI_RESEARCH_HANDOFF.zh.md#当前工作)
 
-11 月 18 日 20:35:56（北京时间）只读观察到一张 RTX 5090，可用显存 31,844 MiB，计算进程表为空，可用内存约 242 GiB。原 FIT12 在 Linux 的 `reports/documentation/20261110/vendorlink_redesign/fit_reference/campaign/P/training/P_VendorLink_SEQ_s{51,52,53}/dispatch_receipt.json` 逐条记录整 PID 显存采样峰值 29,102,178,304、22,882,025,472、22,829,596,672 字节（27.10、21.31、21.26 GiB）。最大值加原 H 派发预留 5 GiB，超过本次所见整卡余量。原非适配器 H_SEQ、H_ER、H_full 采样峰值约 3.06–3.55 GiB。新适配器已有合成评分证据，其训练反向与回放峰值仍待限定核实。[原资源预留](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md) · [原 P 计时](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/budget.json) · [六条 H 训练资源](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md) · [三路 Full 实际工期和累计费用](../reports/documentation/20261113/vendorlink_beta_quarter/result/report.zh.md)
+11 月 18 日 20:35:56（北京时间）只读观察到一张 RTX 5090，可用显存 31,844 MiB，计算进程表为空，可用内存约 242 GiB。原 FIT12 在 Linux 的 `reports/documentation/20261110/vendorlink_redesign/fit_reference/campaign/P/training/P_VendorLink_SEQ_s{51,52,53}/dispatch_receipt.json` 逐条记录整 PID 显存采样峰值 29,102,178,304、22,882,025,472、22,829,596,672 字节（27.10、21.31、21.26 GiB）。最大值加原 H 派发预留 5 GiB，超过本次所见整卡余量。原非适配器 H_SEQ、H_ER、H_full 采样峰值约 3.06–3.55 GiB。11 月 18 日原生合成资格覆盖训练反向与六群回放，H 整 PID 采样峰值 3.51 GiB，正式门据此每 H 槽预留 5 GiB，V 槽预留 29 GiB。真实并发工期仍以现场为准。[资格](../reports/documentation/20261118/vendorlink_market_training/execution/qualification.zh.md) · [原资源预留](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md) · [原 P 计时](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/budget.json) · [六条 H 训练资源](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md) · [三路 Full 实际工期和累计费用](../reports/documentation/20261113/vendorlink_beta_quarter/result/report.zh.md)
 
 ## 既往计划与决定（历史）
 

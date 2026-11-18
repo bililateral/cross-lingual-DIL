@@ -1,0 +1,95 @@
+{
+  "observed": "2026-11-18T23:01:32+08:00",
+  "controller": {
+    "pid": 923881,
+    "owner": "yongpeng",
+    "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/workspace",
+    "command": [
+      "/home/yongpeng/miniconda3/envs/py310/bin/python",
+      "-B",
+      "-u",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/workspace/scripts/step35_market_queue.py",
+      "campaign",
+      "--gate",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/formal_gate.json"
+    ],
+    "start_ticks": 244607312,
+    "boot_id": "c1ccd67e-4533-42ce-9ad5-04c9e2ed1b3e"
+  },
+  "controller_identity_matches": true,
+  "active": [
+    {
+      "slot": "0",
+      "identity": {
+        "pid": 923888,
+        "owner": "yongpeng",
+        "created": 1795014057.47,
+        "command": [
+          "/home/yongpeng/miniconda3/envs/py310/bin/python",
+          "-B",
+          "-u",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/workspace/scripts/step35_market_worker.py",
+          "--gate",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/formal_gate.json",
+          "--action",
+          "train",
+          "--target",
+          "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/VendorLink_SEQ_s51/attempt-1",
+          "--deadline",
+          "2456874.476687882",
+          "--task",
+          "VendorLink_SEQ_s51"
+        ],
+        "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/workspace",
+        "reserved_bytes": 31138512896,
+        "start_ticks": 244607447,
+        "boot_id": "c1ccd67e-4533-42ce-9ad5-04c9e2ed1b3e",
+        "task_id": "VendorLink_SEQ_s51",
+        "attempt": 1
+      },
+      "identity_matches": true,
+      "open_lifecycle_seconds": 33.80999999959022,
+      "task": "VendorLink_SEQ_s51",
+      "action": "train",
+      "workload": {
+        "current_ads": 6552,
+        "current_updates": 205,
+        "history_ads": 0,
+        "history_groups": 0,
+        "teacher_ads": 0,
+        "teacher_groups": 0,
+        "stage": 1,
+        "domain": "AlphaBay",
+        "stage_update": 205
+      }
+    }
+  ],
+  "formal_trajectories": 12,
+  "successful_training": 0,
+  "failures": 0,
+  "training_complete": false,
+  "scores_complete": false,
+  "whole_batch_complete": false,
+  "failed": false,
+  "dispatch_status": "RUNNING",
+  "settled": {
+    "training": 0,
+    "auxiliary": 55,
+    "gpu": 35
+  },
+  "resources": {
+    "gpu_free_bytes": 9411428352,
+    "gpu_compute_pids": [
+      923888
+    ],
+    "cpu_cores": 48,
+    "ram_available_bytes": 258489421824,
+    "disk_free_bytes": 610207703040,
+    "experiment_bytes": 961197
+  },
+  "formal_gate": {
+    "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/formal_gate.json",
+    "bytes": 11860,
+    "sha256": "7607f7cf20834a5fa4f9a34ebda0d92543537d33b87c704abf91d812b0555b1f"
+  }
+}

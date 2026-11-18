@@ -2,12 +2,12 @@
 
 ## 当前工作
 
-2026 年 11 月 18 日，用户已批准 VendorLink FIT12 市场适配器四组正式训练及本地、远端交付。工程执行已转入新部署的开训前核验。中文 H 消融、VendorLink 单一 β、五项零训练诊断及上一项适配器合成评分审查均已结案。[科研计划](RESEARCH_PLAN.md) · [合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)
+2026 年 11 月 18 日，VendorLink FIT12 四组市场适配器开发训练正在唯一正式队列运行。北京时间 23:01:32 已见首条 VendorLink_SEQ 在 AlphaBay 的真实优化更新。中文 H 消融、原三市场 VendorLink、单一 β、Evolution、英文 ABC 及先前的零训练诊断均已结案。[正式现场观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json) · [科研计划](RESEARCH_PLAN.md) · [合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)
 
 ### VendorLink账号监督共同评价
 
-- **四组 VendorLink 开发比较已获准，正在完成开训前训练路径核验。** 原版 VendorLink_SEQ 与市场适配器 H_SEQ、H_ER、H_full 各用 seed 51/52/53。V 单跑，H 先两路、资源够再补三路。局部 OOM 后健康 H 槽继续领任务，由原控制器接收具名请求，允许原配置及 seed 最多重试一次，保留首败与费用。单批 120 累计任务小时。正式开训以新队列内优化更新及进程身份的现场记录为准。上项适配器评分与容量核验、词面选群诊断及各自外审均已闭合。[四组方案](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md) · [开训和交付决定](../reports/documentation/20261118/vendorlink_market_training/execution/authorization.zh.md) · [此前调度实测](../reports/documentation/20261118/vendorlink_market_training/oom_qualification.json) · [评分与容量](../reports/documentation/20261118/vendorlink_market_adapters/report.zh.md) · [选群定稿](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/report.zh.md)
-- **最近的正式训练是单一 β 探针。** 降低 β 后 Dream 初学改善，AlphaBay 最终退步，旧域分别不退步的联合条件仍为 false。11 月 17 日 10:19 的回执确认训练、盲评分和分析完整、控制器退出，dev 已整批开放，confirm 仍封存。追加训练或开放 confirm 需要新的具体决定。[合同](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md) · [完成观测](../reports/documentation/20261113/vendorlink_beta_quarter/result/observation.json) · [结果与适用范围](../reports/documentation/20261113/vendorlink_beta_quarter/result/report.zh.md)
+- **VendorLink FIT12 四组训练已启动。** 北京时间 23:00:57 启动；23:01:32 核实控制器 PID 923881、worker PID 923888 的属主、命令、工作目录、内核 start_ticks 和 boot_id。原版 VendorLink_SEQ / seed 51 / 第一次尝试在 AlphaBay 已完成 205 次更新、6,552 条 fit 文本暴露；当时 1 条在跑、11 条待派、0 条完成、0 条失败。GPU 计算进程只有该 worker。训练账在任务退出后结算，该条开放生命周期约 34 秒；已结算 GPU 核验 35 秒、辅助 55 秒。dev 尚未开放，confirm 封存。生产 Git `4c1ccc55`，Linux 项目根下 `reports/documentation/20261118/vendorlink_market_training/execution/campaign` 是唯一正式队列。接手读该目录的状态与回执。三条 V 单跑成功后，H_full、H_ER、H_SEQ 的九条任务先两路，满足约定再补第三路。局部 OOM 走原控制器的具名恢复，同配置同 seed 仅一次，首败与费用保留。预算为 111 h 训练、5 h 核验与评分、4 h 辅助。[正式门](../reports/documentation/20261118/vendorlink_market_training/execution/formal_gate.json) · [启动](../reports/documentation/20261118/vendorlink_market_training/execution/launch.json) · [现场观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json) · [完整判据和故障处置](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md) · [开训前主审](../reports/documentation/20261118/vendorlink_market_training/execution/review/primary_disposition.zh.md)
+- **上一批单一 β 探针已结案。** 降低 β 后 Dream 初学改善，AlphaBay 最终退步，旧域分别不退步的联合条件仍为 false。11 月 17 日 10:19 的回执确认训练、盲评分和分析完整、控制器退出，dev 已整批开放，confirm 仍封存。追加训练或开放 confirm 需要新的具体决定。[合同](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md) · [完成观测](../reports/documentation/20261113/vendorlink_beta_quarter/result/observation.json) · [结果与适用范围](../reports/documentation/20261113/vendorlink_beta_quarter/result/report.zh.md)
 - 追溯运行时，11 月 17 日 00:11 的作业已用[迁移身份及门绑定](../reports/documentation/20261116/h_ablation_result/recovery/state/beta_handover.json)，根启动文件当时已属历史。该时点的进程和 worker 核对见[原始现场观测](../reports/documentation/20261117/handoff_sync/beta_observation.json)。
 
 ### 历史权重版H主实验消融
@@ -526,7 +526,7 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 
 当前状态只看顶部按研究线组织的小节；本节是证据导航。按本轮实际变化确定最小核验，未变且适用的证据可复用，不因换Agent递归重读或重跑全部历史。
 
-本次接手以顶部唯一对应项及[后续边界](RESEARCH_PLAN.md#vendorlink账号监督fit12共同协议后续)为准：先读最新单一β完整结果及六项结果主审，再读中文H八配置完整结果及18项结果主审；确定性Full、原P/M及九端点诊断作为直接前序证据。中文原暂停已被后续明确恢复替代，63新增、Full复用、统一确认和结果审查均已完成；不得再按11月7日暂停状态交接。Evolution和旧ABC各自按停止结论保持结束，不重做资格、旧诊断或训练，不重建已结束控制器。模型已按11月17日授权清理，结果报告中的“模型保留”描述当时状态，实物以存储顶部和删除回执为准。
+接手四组开发训练从顶部唯一活动项的[正式门](../reports/documentation/20261118/vendorlink_market_training/execution/formal_gate.json)、[首轮现场观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json)和[运行计划](RESEARCH_PLAN.md#vendorlink账号监督fit12共同协议后续)进入，按实际进程及最新回执续接同一队列。前序依据按需读取单一 β 完整结果及六项主审、中文八配置消融结果及 18 项主审。中文原暂停已由完整执行及结案取代。Evolution 和旧 ABC 均按原停止结论关闭。历史模型以 11 月 17 日删除回执为准，本批新增端点按存储顶部保管。
 
 接手首先核对本地分支/工作区、当前文档与来源回执。涉及活动作业或资源时，按第7节只读核对精确Linux目录，不凭旧PID/摘要判断状态；纯文档接手更新不冒充新的服务器观测。旧的Windows资格例外已经完成，后续科研执行默认Linux既有py310。身份语义、各轮已固定分域与数据用途转换、PGP计数勘误、原始结果优先及避免重复核验的具体边界均见计划和对应合同；不要把已改写展示表中的H或消融行当实测证据。
 

@@ -2,7 +2,7 @@
 
 ## 2026-11-18 VendorLink FIT12 市场适配器四组正式训练
 
-本批在 Linux 项目下的 `reports/documentation/20261118/vendorlink_market_training/execution` 独立部署。正式活动源码位于其 `workspace/scripts`，正式训练、盲评分及一次分析使用同一 `campaign`。开放的来源身份、合成核验、派发元数据和累计费用可具名回传。市场正文、账号、逐查询矩阵、端点、教师及六群状态继续按原 Linux 保管规则保存。根 docs 继续以 Windows 为准。[执行与交付授权](../reports/documentation/20261118/vendorlink_market_training/execution/authorization.zh.md) · [当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)
+本批 Linux 正式根为 `/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution`。生产 Git `4c1ccc55` 的 17 份来源位于该根的 `workspace/scripts`，原控制器已创建唯一 `campaign`。Linux 保存原始任务日志、失败及费用、实际生成的端点、六群和教师，市场正文、账号及逐查询分数沿既有保管规则。Windows 具名回传并核对了正式门、来源清单、12 条任务、启动与首轮现场观测，并保管合成通过及失败回执、获准外审包、完整外审原文和主审。11 月 17 日旧训练权重的删除记录继续有效。根 docs 以 Windows 为准。[正式门](../reports/documentation/20261118/vendorlink_market_training/execution/formal_gate.json) · [来源](../reports/documentation/20261118/vendorlink_market_training/execution/final_sources.json) · [启动](../reports/documentation/20261118/vendorlink_market_training/execution/launch.json) · [现场观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json) · [审查](../reports/documentation/20261118/vendorlink_market_training/execution/review/primary_disposition.zh.md)
 
 ## 2026-11-18 市场适配器的合成核验
 
