@@ -1,5 +1,11 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-18 完整 H 市场路由与历史容量
+
+用户结束按词面混淆选群的路线，明确“先不训练”，授权用合成文本把市场适配器和共享关系头接入完整 H 的 Q2/FIT12 评分，检查单改 Agora 及单改共享头的作用，并实测两套适配器与六群、教师和采样状态在 1 MiB 下的总容量。用户决定看完结果再决定是否运行 Full 和 ER。[本轮范围](../reports/documentation/20261118/vendorlink_market_adapters/scope.zh.md)
+
+用户随后明确“允许这个包外审”，许可通过本地 Playwright MCP 给网页 GPT‑6 Pro 提交本次 28,202 字节的十文件包一次。[材料清单](../reports/documentation/20261118/vendorlink_market_adapters/review/manifest.json) · [提交记录](../reports/documentation/20261118/vendorlink_market_adapters/review/submission.json)
+
 ## 2026-11-18 固定构群后只改哪些群写进记忆
 
 用户确认“可以，按这个方案做诊断，不训练。只用 AlphaBay 和 Dream 当期 fit 和上轮六份冻结布局，只改哪些群写进记忆。六群和 1 MiB 不变，Full 和 ER 共用清单。每个 seed 做 1000 次配对，单核最多 30 分钟，不用 GPU。清单和预测的混淆对全部冻结后再读 ER 的 12 个开发矩阵。按市场和 seed 告诉我，原来漏掉的 47 对和 7 对里猜中几对，出域比同池随机多带走几对，AlphaBay 进入 Agora 前还保住几对。一次结果合审，具体包再确认外发。”[本次合同](../reports/documentation/20261118/vendorlink_fit_risk_memory/scope.zh.md)固定了六折有向预测、与同池随机写入的配对及停止条件。

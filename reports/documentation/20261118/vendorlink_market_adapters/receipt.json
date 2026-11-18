@@ -1,0 +1,232 @@
+{
+  "status": "PASS",
+  "validation_inputs": "handwritten_synthetic_only",
+  "training_updates": 0,
+  "official_model_files": {
+    "config.json": "8b73abed2d67075fd3ec0f840aa53d9cccdc9169c04a7da135c07e721910ed74",
+    "tokenizer_config.json": "0f6d13e6f4da6f9e24f22ada6bc3be571123d858d7c0c05a8a7cd55a9c23c2e8",
+    "vocab.txt": "eeaa9875b23b04b4c54ef759d03db9d1ba1554838f8fb26c5d96fa551df93d02",
+    "tokenizer.json": "5b3360be30cdf39081153cf9d30bfb0503c011462fc9f77f097127c83ef0f4d9",
+    "README.md": "cc8e037bc719c4776a0f78b146b315df062f8172343bbde9af25792683059080",
+    "model.safetensors": "1d8bdcee6021e2c25f0325e84889b61c2eb26b843eef5659c247af138d64f050"
+  },
+  "tokenizer_do_lower_case": true,
+  "settings": {
+    "method": "H_full",
+    "lambda_rank": 1.3051794547562026,
+    "lr_multiplier": 1.0,
+    "encoder_lr": 2.5e-05,
+    "head_lr": 0.0003,
+    "vendor_lr": 4e-05,
+    "weight_decay": 0.01,
+    "vendor_weight_decay": 0.0,
+    "microbatch": 8,
+    "vendor_batch": 32,
+    "channel_tokens": 256,
+    "vendor_tokens": 512,
+    "memory_groups": 6,
+    "memory_bytes": 1048576,
+    "pooling": "mean_last4_sum",
+    "head_schedule": "encoder",
+    "bce_weight": 1.0,
+    "hard_weight": 0.5,
+    "alpha": 0.07049361507739538,
+    "beta": 0.191859540449699,
+    "gamma": 1.0,
+    "auxiliary_lr": 0.0003,
+    "ce_scale_mode": "rms",
+    "diagnostics": false,
+    "deterministic_history": true
+  },
+  "query_shape": [
+    3,
+    2,
+    1536
+  ],
+  "fit_shape": [
+    3,
+    12,
+    1536
+  ],
+  "score_shape": [
+    3,
+    3
+  ],
+  "raw_score": "full H account relation logit",
+  "AlphaBay_matches_unadapted": {
+    "Q2": 0.0,
+    "FIT12": 0.0,
+    "scores": 0.0,
+    "within_query_score_gap": 0.0
+  },
+  "Dream_at_birth_matches_AlphaBay": {
+    "Q2": 0.0,
+    "FIT12": 0.0,
+    "scores": 0.0,
+    "within_query_score_gap": 0.0
+  },
+  "Dream_nonzero_vs_base": {
+    "Q2": 0.004679427947849035,
+    "FIT12": 0.005063549615442753,
+    "scores": 0.0001381412148475647,
+    "within_query_score_gap": 0.0001879185438156128
+  },
+  "Agora_at_birth_matches_Dream": {
+    "Q2": 0.0,
+    "FIT12": 0.0,
+    "scores": 0.0,
+    "within_query_score_gap": 0.0
+  },
+  "Agora_only": {
+    "AlphaBay": {
+      "Q2": 0.0,
+      "FIT12": 0.0,
+      "scores": 0.0,
+      "within_query_score_gap": 0.0
+    },
+    "Dream": {
+      "Q2": 0.0,
+      "FIT12": 0.0,
+      "scores": 0.0,
+      "within_query_score_gap": 0.0
+    },
+    "Agora": {
+      "Q2": 0.005003305152058601,
+      "FIT12": 0.005134658422321081,
+      "scores": 0.00010854750871658325,
+      "within_query_score_gap": 0.0001369267702102661
+    }
+  },
+  "head_weights_only": {
+    "AlphaBay": {
+      "Q2": 0.0,
+      "FIT12": 0.0,
+      "scores": 0.013026811182498932,
+      "within_query_score_gap": 0.004766136407852173
+    },
+    "Dream": {
+      "Q2": 0.0,
+      "FIT12": 0.0,
+      "scores": 0.012924671173095703,
+      "within_query_score_gap": 0.00497039407491684
+    },
+    "Agora": {
+      "Q2": 0.0,
+      "FIT12": 0.0,
+      "scores": 0.012924671173095703,
+      "within_query_score_gap": 0.00497039407491684
+    }
+  },
+  "independent_dense": {
+    "Dream": {
+      "Q2": 5.960464477539063e-08,
+      "FIT12": 1.1920928955078125e-07,
+      "scores": 0.0,
+      "within_query_score_gap": 0.0
+    },
+    "Agora": {
+      "Q2": 1.1920928955078125e-07,
+      "FIT12": 1.1920928955078125e-07,
+      "scores": 0.0,
+      "within_query_score_gap": 0.0
+    }
+  },
+  "restored_Agora": {
+    "Q2": 0.0,
+    "FIT12": 0.0,
+    "scores": 0.0,
+    "within_query_score_gap": 0.0
+  },
+  "full_score_export_max_errors": {
+    "R01": 0.0,
+    "R11": 0.0,
+    "R12": 0.0,
+    "R21": 0.0,
+    "R22": 0.0,
+    "R23": 0.0,
+    "R31": 0.0,
+    "R32": 0.0,
+    "R33": 0.0
+  },
+  "capacity": {
+    "parameters": {
+      "Dream": 98304,
+      "Agora": 98304
+    },
+    "dtype": "float32",
+    "payload_bytes": 786432,
+    "members": {
+      "route.json": 301,
+      "adapters.pt": 796035,
+      "memory.pt": 64597
+    },
+    "framing_bytes": 310,
+    "total_bytes": 861243,
+    "cap_bytes": 1048576,
+    "remaining_bytes": 187333,
+    "sha256": "4919d6bccf378d75d94048db5bd0c11957b94d4b5e009fb1df3364b3796db88e",
+    "groups": [
+      {
+        "origin": 1,
+        "records": 32,
+        "teacher_floats": 496
+      },
+      {
+        "origin": 1,
+        "records": 32,
+        "teacher_floats": 496
+      },
+      {
+        "origin": 2,
+        "records": 32,
+        "teacher_floats": 496
+      },
+      {
+        "origin": 2,
+        "records": 32,
+        "teacher_floats": 496
+      },
+      {
+        "origin": 1,
+        "records": 32,
+        "teacher_floats": 496
+      },
+      {
+        "origin": 2,
+        "records": 32,
+        "teacher_floats": 496
+      }
+    ],
+    "reservoir_seen": 12,
+    "rng_restored": true,
+    "draws_equal": 12,
+    "oversized_rejection": "Historical state exceeds the 1 MiB cap (1909819 bytes)",
+    "memory_bytes_unchanged": true
+  },
+  "sources": {
+    "step29_vendorlink_data.py": "e0d2a10b9d6731967411f701e58ac2cc610d0ed7c9798640f485823954f16668",
+    "step29_vendorlink_methods.py": "b6b5ce15248719080005f5f29c928544b0f48b59c463a62d1289b1dac613b116",
+    "step30_evolution_policy.py": "a6245ce9b7e349b99bc0278d43d80abe325151fb8478cf0eee38200dca3dd971",
+    "step30_evolution_io.py": "a0f08e5e5e8f4152fc291e39e9f68d0b693820d7ff0aa9ae81a66758410b4918",
+    "step35_vendorlink_account_policy.py": "e0819f8aba5a46eb00d3263b41dcf3951989d734b9e6e3006b91320995d32e46",
+    "step35_vendorlink_account_io.py": "302d0be21faa304621532e40e61d55794a51b1ec2cee9627f8645264df95ed35",
+    "step35_market_adapters.py": "2a75004aa51ca6947ce82804c5f0669fcf418874bcd956f7ae8bb970734c83a9",
+    "step29_vendorlink_run.py": "4509895e6c24f429ceb9d10d82ef03ddf5b21fe24f259e558067476439eebf5b",
+    "step35_vendorlink_account_methods.py": "bc4e5d57ecc6970287e3a7ab37931492895181e60bd717acc5ed6d7b838e168f",
+    "step35_vendorlink_account_run.py": "519f955dcef358c4510d1cefdf6786fe6df9b89f9ffb35ac067866af4f1d2c54",
+    "step35_vendorlink_account_evaluate.py": "48d6255c1fcdc5f566d04d23bf013059c03507df477a4c18a30f60bbb9b145c0"
+  },
+  "check_sha256": "c1e68137a41f95d445707a5448af17b09deaf17e906b7c1754d0ce19330347c8",
+  "gate_sha256": "7cd1670eaecc47aff18d2c9353c6903b18c80c016aca11822319b498d9ef166c",
+  "started": "2026-11-18T20:03:48+08:00",
+  "ended": "2026-11-18T20:04:42+08:00",
+  "wall_seconds": 54.60089544206858,
+  "cpu_seconds": 54.553875067999996,
+  "rss_peak_KiB": 2056836,
+  "affinity": [
+    4
+  ],
+  "python": "/home/yongpeng/miniconda3/envs/py310/bin/python",
+  "torch": "2.9.1+cu130",
+  "cuda_visible": ""
+}

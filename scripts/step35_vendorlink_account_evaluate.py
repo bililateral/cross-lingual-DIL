@@ -11,7 +11,7 @@ from step29_vendorlink_data import Ad, View, Group, seed_for
 from step29_vendorlink_methods import vendor_embeddings
 from step35_vendorlink_account_io import pinned, record, write
 from step35_vendorlink_account_policy import CELLS, DOMAINS, SEEDS, summarize, task_domains
-from step35_vendorlink_account_run import restore
+from step35_vendorlink_account_run import make_model, restore
 
 
 def load_role(binding, domain, role, expected):
@@ -26,13 +26,13 @@ def load_role(binding, domain, role, expected):
 
 
 @torch.no_grad()
-def encode(model, views, check=lambda: None):
+def encode(model, views, check=lambda: None, *, market='evaluation'):
     model.eval()
     lengths = {len(v.records) for v in views}
     if len(lengths) != 1:
         raise ValueError('Uniform record count per role required')
     if model.settings.method != 'VendorLink_SEQ':
-        z = model.records(Group('role', 'evaluation', 'dev', tuple(views)), check)
+        z = model.records(Group('role', market, 'dev', tuple(views)), check)
     else:
         texts = [r.title+' [SEP] '+r.description for v in views for r in v.records]
         parts = []
@@ -161,7 +161,14 @@ def validate_scores(completion):
         pinned(binding)
 
 
-def score(task, completion, manifest, binding, root, role, check):
+def score_market(model, market, query, fit, check):
+    """Encode both roles at the evaluated market and score all 2 x 12 record pairs."""
+    q = encode(model, query, check, market=market)
+    g = encode(model, fit, check, market=market)
+    return q, g, rectangular(model, q, g, check)
+
+
+def score(task, completion, manifest, binding, root, role, check, *, model_factory=make_model):
     if root.exists() or completion['status'] != 'TRAINING_COMPLETE_EVALUATION_CLOSED':
         raise ValueError('Complete training and fresh blind scoring required')
     if role not in ('dev', 'confirm'):
@@ -184,13 +191,13 @@ def score(task, completion, manifest, binding, root, role, check):
         inputs[domain] = (query, gallery, gids)
     for stage in sorted({t for t, j in cells}):
         endpoint = completion['endpoints'][str(stage)]
-        model, heads = restore(binding, task, pinned(endpoint), completion['identity'], stage)
+        model, heads = restore(binding, task, pinned(endpoint), completion['identity'], stage,
+                               factory=model_factory)
         for t, j in [c for c in cells if c[0] == stage]:
             check()
             domain = domains[j-1]
             query, gallery, classes = inputs[domain]
-            q, g = encode(model, query, check), encode(model, gallery, check)
-            values = rectangular(model, q, g, check)
+            q, g, values = score_market(model, domain, query, gallery, check)
             name = 'V_SET' if task['method'] == 'VendorLink_SEQ' else task['method']
             cell = f'R{t}{j}'
             path = root/f'{name}_{cell}.npy'

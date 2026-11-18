@@ -2,11 +2,11 @@
 
 ## 当前工作
 
-截至 2026 年 11 月 18 日 19:36（北京时间），中文 H 消融、VendorLink 单一 β 及随后五项零训练诊断均已结案。当前没有待接续的正式训练、评分或本轮结果外审。现有结果用于讨论有限历史记忆下的旧域保持与新域学习。[科研计划](RESEARCH_PLAN.md) · [合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)
+截至 2026 年 11 月 18 日 20:13（北京时间），完整 H 的市场路由和六群容量已在 Linux 完成合成核验，具名合审包已获准并单次[提交外审](../reports/documentation/20261118/vendorlink_market_adapters/review/submission.json)。中文 H 消融、VendorLink 单一 β 及此前五项零训练诊断均已结案。当前没有待接续的正式训练或评分。[科研计划](RESEARCH_PLAN.md) · [合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)
 
 ### VendorLink账号监督共同评价
 
-- **最新诊断只改变同一候选池中写进六槽的群。** AlphaBay 原漏的 47 对中，fit 猜中 5 对。与同池随机相比，出域平均净增合计 0.017 对，3/3 seed 正向；进入 Agora 前净增 0.015 对。预定出域增幅至少 1 对，本次具体写入路线结束。Dream 猜中 3/7 对，出域净增 0.157 对。19:16:25 计算结束，19:36 已回收唯一获准的外审原文并独立处置六条意见。两模型尚无这套清单的实际训练分数。[用户决定](RESEARCH_DISCUSSION.zh.md#2026-11-18-固定构群后只改哪些群写进记忆) · [定稿报告](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/report.zh.md) · [主审处置](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/review/primary_disposition.zh.md) · [上轮构群主审](../reports/documentation/20261118/vendorlink_fit_regroup/result/review/primary_disposition.zh.md)
+- **完整 H 的 Q2 与 FIT12 已按市场路由。** 只扰动 Agora 适配器时旧两市场的全部向量和分数逐元素一致；只改共同关系头时，三市场的候选分差都能变。双适配器及合成六群文件 861,243 字节。用户决定看完结果再决定是否训练 Full 和 ER。上一项词面选群路线按门结束，AlphaBay 出域净增 0.017 对、Dream 净增 0.157 对。[适配器实测](../reports/documentation/20261118/vendorlink_market_adapters/report.zh.md) · [选群定稿](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/report.zh.md) · [选群主审](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/review/primary_disposition.zh.md)
 - **最近的正式训练是单一 β 探针。** 降低 β 后 Dream 初学改善，AlphaBay 最终退步，旧域分别不退步的联合条件仍为 false。11 月 17 日 10:19 的回执确认训练、盲评分和分析完整、控制器退出，dev 已整批开放，confirm 仍封存。追加训练或开放 confirm 需要新的具体决定。[合同](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md) · [完成观测](../reports/documentation/20261113/vendorlink_beta_quarter/result/observation.json) · [结果与适用范围](../reports/documentation/20261113/vendorlink_beta_quarter/result/report.zh.md)
 - 追溯运行时，11 月 17 日 00:11 的作业已用[迁移身份及门绑定](../reports/documentation/20261116/h_ablation_result/recovery/state/beta_handover.json)，根启动文件当时已属历史。该时点的进程和 worker 核对见[原始现场观测](../reports/documentation/20261117/handoff_sync/beta_observation.json)。
 

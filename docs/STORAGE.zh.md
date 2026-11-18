@@ -1,5 +1,9 @@
 # 科研文件存储与恢复
 
+## 2026-11-18 市场适配器的合成核验
+
+Linux 在独立目录 vendorlink_market_adapters 运行，保留接线代码和[具名回传的核验回执](../reports/documentation/20261118/vendorlink_market_adapters/receipt.json)、进程计时与标准输出。一次性合成角色、端点、矩阵和历史包随核验的临时目录退出清理。适配器包的实际文件字节、SHA 和还原行为见回执。原市场数据、Memory 和已删除端点的保管沿原记录。根 docs 在 Windows 维护。
+
 ## 2026-11-18 固定构群后的六槽风险写入
 
 沿用上轮六份定向成员布局；逐查询有向预测、两策略的槽位身份及逐次内容清单只在 Linux 保管。新增六份压缩清单存于本轮独立目录 vendorlink_fit_risk_memory/selection_private，文件名、大小和 SHA 见[冻结回执](../reports/documentation/20261118/vendorlink_fit_risk_memory/freeze.json)。Windows 通过具名 SFTP 回传合成核验、阶段计时、访问登记和[匿名汇总](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/summary.json)，九个结果文件与 [Linux 清单](../reports/documentation/20261118/vendorlink_fit_risk_memory/delivery.sha256)一致。没有新增训练权重。已核准的 15 项匿名包只送审一次。

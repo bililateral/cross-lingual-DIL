@@ -4,7 +4,7 @@
 
 ## VendorLink账号监督：FIT12共同协议后续
 
-本轮按判据结束“固定成员池、按当期 fit 词面风险写入精确对”的路线。下一项科学选择是是否提出可同时保护旧域最终表现、初学和新域学习的新机制假设。现有权限可解释已保存的结果；新增候选、数据用途、训练或独立确认由新方案和具体许可决定。[本轮停止条件](../reports/documentation/20261118/vendorlink_fit_risk_memory/scope.zh.md) · [已闭合的结果审查](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/review/primary_disposition.zh.md)
+市场适配器与原共享关系头已通过合成路由及历史容量实测。用户将在读取本轮结果后决定是否比较同一市场架构、同一六群与相同资源下的 Full 和 ER。若决定训练，须另定训练入口、预算和评价合同，分别检验少忘、两个旧域末态、初学及新市场净学习。此前按词面混淆写入六槽的路线按原判据结束。[本轮合成证据](../reports/documentation/20261118/vendorlink_market_adapters/report.zh.md) · [六槽写入主审](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/review/primary_disposition.zh.md)
 
 ## 既往计划与决定（历史）
 

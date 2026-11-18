@@ -4,6 +4,8 @@ H/S评价补充（2026-11-02，已结案）：用户选择[方案A](../reports/s
 
 ## 当前合同入口
 
+[完整 H 市场适配器合成核验](../reports/documentation/20261118/vendorlink_market_adapters/scope.zh.md)接到原 Q2/FIT12 评分和端点恢复，核对两侧按市场选路、单一记录匹配头以及两套增量与原六槽状态的实际序列化字节数。[市场适配器](../scripts/step35_market_adapters.py)供本轮合成评分使用。
+
 [固定构群后的 fit 风险写入诊断](../reports/documentation/20261118/vendorlink_fit_risk_memory/scope.zh.md)复用上轮定向成员池及原六槽淘汰轨迹。每种写入策略供 Full、ER 共用。六折词面混淆的有向预测与写入清单由[选群入口](../reports/documentation/20261118/vendorlink_fit_risk_memory/risk_memory.py)冻结，随后由[评价入口](../reports/documentation/20261118/vendorlink_fit_risk_memory/evaluate_risk.py)在既有 ER 开发事件上核对猜中及实际同群留存。
 
 [当期 fit 构群诊断](../reports/documentation/20261118/vendorlink_fit_regroup/scope.zh.md)只改变完整候选群的账号成员。每个市场的三份记录包共用一个位置置换，比较原群、重新随机编群、按当期文本把易混账号配进同群。三者共用原 Algorithm R 六槽轨迹，每臂冻结一份供 Full 与 ER 共用的清单。本次训练次数为零，实际模型消费的证据边界见[定稿报告](../reports/documentation/20261118/vendorlink_fit_regroup/result/report.zh.md)。按市场、seed 对原候选池漏掉的事件、原可达补集和全部事件分别核对候选池、出域及跨市场留存。[构群与冻结](../reports/documentation/20261118/vendorlink_fit_regroup/regroup.py)和[冻结后评价](../reports/documentation/20261118/vendorlink_fit_regroup/evaluate_regroup.py)使用 Linux 既有 py310。

@@ -76,6 +76,8 @@ def atomic_tensor(path, value, check, replace=False):
 
 
 def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
+    if 'market_adapters' in task:
+        raise ValueError('The market-adapter implementation supports scoring only')
     if job.exists() or model.settings != AccountSettings(**task['settings']) or task['stages'] not in (1, 3):
         raise ValueError('Fresh fixed task and actual configuration required')
     job.mkdir(parents=True)
@@ -196,6 +198,9 @@ def restore(binding, task, endpoint, expected_identity, stage, factory=make_mode
             or value['stage'] != stage):
         raise ValueError('Actual endpoint/data/config identity differs')
     model = factory(binding, task)
+    if 'market_adapters' in task:
+        from step35_market_adapters import restore_scoring_endpoint
+        return restore_scoring_endpoint(model, value, expected_identity, stage), value['vendor_heads']
     if stage:
         model.encoder.load_state_dict(value['encoder'], strict=True)
     model.head.load_state_dict(value['head'], strict=True)
