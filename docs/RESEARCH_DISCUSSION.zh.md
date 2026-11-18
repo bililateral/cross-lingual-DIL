@@ -1,5 +1,11 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-18 六群覆盖诊断与一次结果合审
+
+用户确认：“可以，按这个方案先做六群覆盖诊断，不训练。允许用 AlphaBay 和 Dream 的 fit 文本及原记忆群索引选群，清单冻结后再用 ER 的 12 个开发矩阵评价。做完 1000 次配对抽样，按市场和 seed 告诉我比随机多覆盖了几对，以及 AlphaBay 到进入 Agora 前还保住了几对。”[本次范围](../reports/documentation/20261118/vendorlink_six_group_coverage/scope.zh.md)固定同一候选群和六槽／1 MiB、每 seed 配对 1,000 次，Full 与 ER 共用每种策略的群清单。用户另明确“一次结果合审，先完成诊断”。新的外发包单独核准。
+
+用户随后明确“允许这个结果包外审”，覆盖[25,088 字节、11 成员的具体包](../reports/documentation/20261118/vendorlink_six_group_coverage/result/review/manifest.json)通过本地 Playwright MCP 提交网页 GPT-6 Pro 一次。
+
 ## 2026-11-18 只做 ER 前五竞争账号诊断，看完结果再决定选群
 
 用户明确决定：“可以，先不训练。允许用 ER 的 12 个既有开发矩阵做这次诊断，按市场和 seed 看最后抢到第一的账号有多少原本就在最接近的五个错误账号里，跟随机选五个比较。看完结果再决定要不要改记忆选群。”[实际范围](../reports/documentation/20261118/vendorlink_er_top5/scope.zh.md)限 AlphaBay R11→R31、Dream R22→R32。用户随后明确“允许本次结果包外审”，仅覆盖[12,704 字节的五文件 ZIP](../reports/documentation/20261118/vendorlink_er_top5/result/review/manifest.json)一次提交网页 GPT-6 Pro。
