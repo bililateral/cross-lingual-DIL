@@ -4,7 +4,7 @@
 
 ## VendorLink账号监督：FIT12共同协议后续
 
-用户已确定原版 VendorLink_SEQ、市场适配器 H_SEQ、H_ER、H_full 四组，各用 seed 51、52、53，固定 AlphaBay → Dream → Agora。三个 V 逐个单跑，九条 H 先开两路、资源够再补三路，共 12 条完整轨迹、36 个市场阶段。用户要求先看正式方案再决定开训。[讨论决定](RESEARCH_DISCUSSION.zh.md#2026-11-18-确定四组开发比较及并发先审阅训练方案)
+用户已确定原版 VendorLink_SEQ、市场适配器 H_SEQ、H_ER、H_full 四组，各用 seed 51、52、53，固定 AlphaBay → Dream → Agora。三个 V 逐个单跑，九条 H 先开两路、资源够再补三路，共 12 条完整轨迹、36 个市场阶段。局部 CUDA OOM 后，健康 H 槽继续领任务，原控制器可按人工请求恢复退出槽，同配置及 seed 最多重试一次，失败费用保留。用户要求先看正式方案再决定开训。[并发决定](RESEARCH_DISCUSSION.zh.md#2026-11-18-确定四组开发比较及并发先审阅训练方案) · [OOM 补充](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md#已确认的-oom-恢复与一次重试)
 
 待审方案以 Full 对同结构 ER 的少忘及旧域末态各至少提高 2 个百分点为主要比较，逐市场保护 AlphaBay、Dream 末态和 Dream、Agora 新学习，另判 H_SEQ 遗忘压力、Full 对 H_SEQ 的保持和对原版 VendorLink 两读取器的结果。拟定累计预算 120 小时，从首条正式训练到整批开发结果预计 24–40 小时（H 较早补三路）或 34–56 小时（全程两路）。适配器训练反向与真实并发吞吐尚无实测。[四组正式训练方案及待审判据](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md) · [已有合成证据](../reports/documentation/20261118/vendorlink_market_adapters/report.zh.md)
 

@@ -1,0 +1,127 @@
+{
+  "status": "PASS",
+  "observed_utc": "2026-11-18T13:36:43.701714+00:00",
+  "seconds": 6.092555035836995,
+  "python": "/home/yongpeng/miniconda3/envs/py310/bin/python",
+  "inputs": "authored CPU subprocesses; structured OOM injection; synthetic NVML",
+  "model_updates": 0,
+  "formal_data_access": false,
+  "gpu_kernels": 0,
+  "cases": [
+    {
+      "case": "handoff",
+      "healthy_slot_next": [
+        "H_ER_s51",
+        "H_full_s52"
+      ],
+      "old_failure_pid": 907936,
+      "healthy_pids_during_rejoin": {
+        "2": 907941,
+        "1": 907944
+      },
+      "concurrent_pids": {
+        "2": 907941,
+        "1": 907944,
+        "0": 907948
+      },
+      "concurrent_tasks": {
+        "2": "H_SEQ_s51",
+        "1": "H_full_s52",
+        "0": "H_full_s51"
+      },
+      "restored_slot_next": "H_full_s53",
+      "duplicate_request_same_marker": true,
+      "rejected_lingering_gpu_pid": true,
+      "held_low_vram": true,
+      "winning_retries": {
+        "VendorLink_SEQ_s51": 2,
+        "H_full_s51": 2
+      },
+      "status": "COMPLETE",
+      "published_winners": 12,
+      "attempts": 14,
+      "actual_job_charged_seconds": 15,
+      "oom_attempt_fees": [
+        {
+          "operation": "VendorLink_SEQ_s51/attempt-1",
+          "success": false,
+          "charged_seconds": 1
+        },
+        {
+          "operation": "VendorLink_SEQ_s51/attempt-2",
+          "success": true,
+          "charged_seconds": 1
+        },
+        {
+          "operation": "H_full_s51/attempt-1",
+          "success": false,
+          "charged_seconds": 1
+        },
+        {
+          "operation": "H_full_s51/attempt-2",
+          "success": true,
+          "charged_seconds": 1
+        }
+      ],
+      "budget_stop": null
+    },
+    {
+      "case": "repeat",
+      "status": "INCOMPLETE",
+      "published_winners": 0,
+      "attempts": 2,
+      "actual_job_charged_seconds": 2,
+      "oom_attempt_fees": [
+        {
+          "operation": "VendorLink_SEQ_s51/attempt-1",
+          "success": false,
+          "charged_seconds": 1
+        },
+        {
+          "operation": "VendorLink_SEQ_s51/attempt-2",
+          "success": false,
+          "charged_seconds": 1
+        }
+      ],
+      "budget_stop": null
+    },
+    {
+      "case": "other",
+      "status": "INCOMPLETE",
+      "published_winners": 0,
+      "attempts": 1,
+      "actual_job_charged_seconds": 1,
+      "oom_attempt_fees": [
+        {
+          "operation": "VendorLink_SEQ_s51/attempt-1",
+          "success": false,
+          "charged_seconds": 1
+        }
+      ],
+      "budget_stop": "Worker failed; drain already running jobs without new dispatch"
+    },
+    {
+      "case": "budget",
+      "status": "INCOMPLETE",
+      "published_winners": 0,
+      "attempts": 1,
+      "actual_job_charged_seconds": 1,
+      "oom_attempt_fees": [
+        {
+          "operation": "VendorLink_SEQ_s51/attempt-1",
+          "success": false,
+          "charged_seconds": 1
+        }
+      ],
+      "budget_stop": "Cannot reserve full next operation within cumulative bucket"
+    }
+  ],
+  "source_sha256": {
+    "qualify_oom.py": "5c91b0833686e748751f1d742d41d92aa7b5b7e347829d00f164f37c1d8d18ce",
+    "scripts/step35_market_queue.py": "278f2139107733e1ce6c81dfa28e5a25103961e2e8b6641fe341c8f33256853d",
+    "scripts/step30_evolution_control.py": "eb5815e443ec4cbe55da5adf8184b0658069b40705e539621730a40827d53165",
+    "scripts/step30_evolution_io.py": "a0f08e5e5e8f4152fc291e39e9f68d0b693820d7ff0aa9ae81a66758410b4918",
+    "scripts/step30_evolution_policy.py": "a6245ce9b7e349b99bc0278d43d80abe325151fb8478cf0eee38200dca3dd971",
+    "scripts/step28_formal_queue.py": "f928e91f6f0cb82860e2b4bbb202fd1788cac56457dacdf61f91d4671b6803ef"
+  }
+}

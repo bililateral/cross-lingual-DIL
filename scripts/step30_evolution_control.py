@@ -172,7 +172,7 @@ class Runner:
                 '--gate', str(self.gate_path), '--action', job['action'], '--target', str(job['target']),
                 '--deadline', str(deadline), *job['extra']]
 
-    def run_many(self, jobs: list[dict], slots: int, completed):
+    def run_many(self, jobs: list[dict], slots: int, completed, *, recovery=None):
         """One parent owns dispatch and accounting; healthy slots keep taking work."""
         import shutil
         from step28_formal_queue import GpuMemory
@@ -186,6 +186,16 @@ class Runner:
         controller_error = None
         gpu = any(j['bucket'] in ('training', 'gpu') for j in jobs)
         nv = None
+
+        def work_left():
+            pending = next_job < len(jobs)
+            return active or (budget_stop is None and (
+                (pending and len(retired) < slots) or
+                (recovery is not None and recovery.waiting(pending))))
+
+        def dispatch_details():
+            return {} if recovery is None else recovery.dispatch_details()
+
         def finish(slot, error=None):
             item = active.pop(slot)
             p, job = item['process'], item['job']
@@ -200,6 +210,9 @@ class Runner:
             if p.poll() is None:
                 unreleased[slot] = dict(item['identity'], release_unconfirmed=True)
             elapsed = time.monotonic()-item['started']
+            if recovery is not None and (elapsed > job['seconds'] or
+                    (job['target']/'shared_failure.json').exists()):
+                reported_oom = False
             if p.returncode or elapsed > job['seconds']:
                 error = error or f'Worker exit {p.returncode} or lifecycle cap exceeded'
             if error is None:
@@ -210,11 +223,16 @@ class Runner:
             receipt = dict(success=error is None, error=error, seconds=elapsed, slot=slot,
                            failure_kind='CUDA_OOM' if reported_oom else ('OTHER' if error else None),
                            released=p.poll() is not None, peak_gpu_bytes=item['peak_gpu'], peak_rss_bytes=item['peak_rss'])
+            if recovery is not None:
+                receipt.update(task_id=job['task_id'], attempt=job['attempt'], process=item['identity'])
             write(job['target']/'dispatch_receipt.json', receipt)
-            self.ledger.charge(job['bucket'], job['target'].name, elapsed, error is None)
+            operation = job.get('operation', job['target'].name)
+            self.ledger.charge(job['bucket'], operation, elapsed, error is None)
+            if recovery is not None:
+                recovery.finished(slot, job, receipt)
             if error is not None:
                 retired.add(slot)
-                failures.append(dict(task=job['target'].name, slot=slot, error=error,
+                failures.append(dict(task=operation, slot=slot, error=error,
                                      kind='CUDA_OOM' if reported_oom else 'OTHER'))
         try:
             initialized = time.monotonic()
@@ -222,7 +240,7 @@ class Runner:
                 nv = GpuMemory() if gpu else None
             finally:
                 parent_active += time.monotonic()-initialized
-            while active or (next_job < len(jobs) and len(retired) < slots and budget_stop is None):
+            while work_left():
                 tick = time.monotonic()
                 try:
                     snapshot = nv.snapshot() if nv else None
@@ -255,10 +273,21 @@ class Runner:
                     if (failures and self.halt_dispatch_on_failure and
                             (not self.continue_after_oom or any(f.get('kind') != 'CUDA_OOM' for f in failures))):
                         budget_stop = 'Worker failed; drain already running jobs without new dispatch'
+                    if recovery is not None:
+                        recovery.observe_updates(active)
                     for slot in range(slots):
-                        if slot in active or slot in retired or next_job == len(jobs) or budget_stop:
+                        if slot in active or budget_stop:
                             continue
-                        job = dict(jobs[next_job])
+                        ordinary = jobs[next_job] if next_job < len(jobs) else None
+                        if recovery is None:
+                            if slot in retired or ordinary is None:
+                                continue
+                            selected = ordinary
+                        else:
+                            selected = recovery.select(slot, ordinary, retired, snapshot)
+                            if selected is None:
+                                continue
+                        job = dict(selected)
                         if (job.get('gpu_family') == 'V' and
                                 any(x['job'].get('gpu_family') == 'V' for x in active.values())):
                             continue  # New account protocol permits at most one V worker.
@@ -272,7 +301,8 @@ class Runner:
                                                      (120 if self.halt_dispatch_on_failure else 60))
                                 if job['seconds'] <= 15:
                                     raise TimeoutError('Insufficient remaining analysis lifecycle budget')
-                            self.ledger.reserve(job['bucket'], outstanding+job['seconds'])
+                            extra = recovery.initial_pair_seconds() if recovery is not None else 0
+                            self.ledger.reserve(job['bucket'], outstanding+job['seconds']+extra)
                             auxiliary_reserved = sum(x['job']['seconds'] for x in active.values() if x['job']['bucket'] == 'auxiliary')
                             self.ledger.reserve('auxiliary', auxiliary_reserved+math.ceil(parent_active)+60+
                                                 (job['seconds'] if job['bucket'] == 'auxiliary' else 0))
@@ -284,13 +314,18 @@ class Runner:
                         owned = [x['identity'] for x in active.values()]
                         admission_limits = dict(self.limits)
                         admission_limits['free_gpu_bytes'] = job.get('reserved_bytes', self.limits['free_gpu_bytes'])
-                        observation = resource_observation(self.allowed, self.root, gpu, owned, nv, limits=admission_limits)
+                        check_limits = (admission_limits if recovery is None else
+                                        recovery.admission_limits(admission_limits))
+                        observation = resource_observation(self.allowed, self.root, gpu, owned, nv, limits=check_limits)
                         write(job['target']/'admission.json', observation)
                         if not observation['ready']:
                             if not active and not self.wait_for_resources:
                                 raise RuntimeError('Resources unavailable; no automatic waiting authorized')
                             continue
-                        next_job += 1  # A launched/failed launch is consumed, never retried.
+                        if recovery is not None:
+                            recovery.admitted(slot, job, retired, observation)
+                        if selected is ordinary:
+                            next_job += 1
                         started = time.monotonic()
                         deadline = started+job['seconds']
                         process = None
@@ -306,6 +341,8 @@ class Runner:
                             identity = dict(pid=p.pid, owner=p.username(), created=p.create_time(), command=argv,
                                             cwd=p.cwd(), reserved_bytes=admission_limits['free_gpu_bytes'],
                                             **kernel_identity(p.pid))
+                            if recovery is not None:
+                                identity.update(task_id=job['task_id'], attempt=job['attempt'])
                             # taskset execs in place, so the command after exec omits its own wrapper.
                             identity['command'] = argv[3:]
                             active[slot] = dict(process=process, job=job, identity=identity, started=started,
@@ -320,14 +357,17 @@ class Runner:
                                 elapsed = time.monotonic()-started
                                 write(job['target']/'dispatch_receipt.json', dict(success=False, error=repr(exc),
                                       seconds=elapsed, slot=slot, released=True))
-                                self.ledger.charge(job['bucket'], job['target'].name, elapsed, False)
+                                self.ledger.charge(job['bucket'], job.get('operation', job['target'].name), elapsed, False)
                                 retired.add(slot)
                                 failures.append(dict(task=job['target'].name, slot=slot, error=repr(exc)))
                             if self.halt_dispatch_on_failure:
                                 budget_stop = 'Worker launch failed; no further dispatch'
+                    waiting_oom = recovery is not None and recovery.waiting(next_job < len(jobs))
                     write(self.root/'dispatch.json', dict(active={**unreleased, **{s: x['identity'] for s, x in active.items()}},
-                          retired=sorted(retired), failures=failures, pending=[j['target'].name for j in jobs[next_job:]],
-                          budget_stop=budget_stop, status='RUNNING' if active else 'WAITING_RESOURCES'))
+                          retired=sorted(retired), failures=failures,
+                          pending=[j.get('operation', j['target'].name) for j in jobs[next_job:]],
+                          budget_stop=budget_stop, status='RUNNING' if active else
+                          ('WAITING_OOM_RECOVERY' if waiting_oom else 'WAITING_RESOURCES'), **dispatch_details()))
                 finally:
                     parent_active += time.monotonic()-tick
                 auxiliary_reserved = sum(x['job']['seconds'] for x in active.values()
@@ -339,7 +379,7 @@ class Runner:
                         # within the already reserved cleanup margin instead.
                         raise TimeoutError('Auxiliary monitoring cleanup reserve reached')
                     budget_stop = 'Auxiliary monitoring budget exhausted'
-                if active or (next_job < len(jobs) and len(retired) < slots and budget_stop is None):
+                if work_left():
                     time.sleep(.2 if active else 30)
         except BaseException as exc:
             controller_error = repr(exc)
@@ -364,15 +404,16 @@ class Runner:
             finally:
                 parent_active += time.monotonic()-cleanup
                 try:
+                    incomplete = bool(failures) if recovery is None else not recovery.complete()
                     self.ledger.charge('auxiliary', 'dispatch_monitor', parent_active,
-                                       not failures and not budget_stop and not controller_error and not cleanup_errors)
+                                       not incomplete and not budget_stop and not controller_error and not cleanup_errors)
                 except BaseException as exc:
                     cleanup_errors.append(repr(exc))
-                self.failed |= bool(failures or budget_stop or controller_error or cleanup_errors or next_job != len(jobs))
+                self.failed |= bool(incomplete or budget_stop or controller_error or cleanup_errors or next_job != len(jobs))
                 write(self.root/'dispatch.json', dict(status='INCOMPLETE' if self.failed else 'COMPLETE',
                       active={**unreleased, **{s: x['identity'] for s, x in active.items()}}, retired=sorted(retired), failures=failures,
-                      pending=[j['target'].name for j in jobs[next_job:]], budget_stop=budget_stop,
-                      controller_error=controller_error, cleanup_errors=cleanup_errors))
+                      pending=[j.get('operation', j['target'].name) for j in jobs[next_job:]], budget_stop=budget_stop,
+                      controller_error=controller_error, cleanup_errors=cleanup_errors, **dispatch_details()))
                 if cleanup_errors and controller_error is None:
                     raise RuntimeError('Controller cleanup/accounting failure: '+repr(cleanup_errors))
         if self.failed:
