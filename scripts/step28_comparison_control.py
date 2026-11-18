@@ -1,7 +1,6 @@
 """One fixed 18-run queue and the already reviewed comparison evaluation entry."""
 from __future__ import annotations
 
-import argparse
 import json
 import os
 from pathlib import Path
@@ -442,8 +441,5 @@ def execute(gate_path):
         raise
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--gate', type=Path, required=True)
-    args = parser.parse_args()
-    execute(args.gate.resolve())
+if __name__ == "__main__":
+    raise SystemExit("Historical training entry retired. Use step28_history_benchmark.py with its own approved gate.")

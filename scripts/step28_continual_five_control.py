@@ -1,7 +1,6 @@
 """One owner of the fixed queue, three children and cumulative reservations."""
 from __future__ import annotations
 
-import argparse
 import os
 from pathlib import Path
 import signal
@@ -322,8 +321,4 @@ def execute(campaign: Path, gate_path: Path) -> dict:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--campaign", type=Path, required=True)
-    parser.add_argument("--gate", type=Path, required=True)
-    args = parser.parse_args()
-    execute(args.campaign, args.gate)
+    raise SystemExit("Historical training entry retired. Use step28_history_benchmark.py with its own approved gate.")

@@ -226,5 +226,5 @@ def main():
                        preflight=lambda: verify_reference(allowed), started=ENTRY_STARTED)
 
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    raise SystemExit("Historical training entry retired. Use step28_history_benchmark.py with its own approved gate.")

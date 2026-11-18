@@ -83,32 +83,33 @@ def full_gate(campaign: Path, allowed: dict) -> list[dict]:
     return records
 
 
-def generate(campaign: Path, job: Path, records: list, budget) -> None:
+def generate(campaign: Path, job: Path, records: list, budget, *, root_seed=CONFIRM_SEED,
+             namespace=NAMESPACE, sources=None, access_role='comparison_generation') -> None:
     old_policy, catalog = data.read_json(generator.POLICY), data.read_json(generator.CATALOG)
     generator.check_contract(old_policy, catalog)
-    if CONFIRM_SEED in (old_policy['root_seed'], prior.CONFIRM_SEED) or NAMESPACE in (*generator.SPLITS, prior.NAMESPACE):
+    if root_seed in (old_policy['root_seed'], prior.CONFIRM_SEED) or namespace in (*generator.SPLITS, prior.NAMESPACE):
         raise ValueError('Confirmation random stream/namespace reused')
-    policy = {**old_policy, 'root_seed': CONFIRM_SEED}
+    policy = {**old_policy, 'root_seed': root_seed}
     checker = validator.TextChecker(catalog)
     public_path, owner_path, pair_path = (job/name for name in ('groups.jsonl', 'owners.jsonl', 'pairs.jsonl'))
-    prior.access(campaign, 'comparison_generation', ('new_generated_owners_and_pairs',))
+    prior.access(campaign, access_role, ('new_generated_owners_and_pairs',))
     old_ids = {r['group_uid'] for item in records for role in item['record']['partition'].values() for r in role}
     groups, sellers, items_seen, controllers = set(), set(), set(), set()
     with public_path.open('x', encoding='utf-8') as public, owner_path.open('x', encoding='utf-8') as owners, pair_path.open('x', encoding='utf-8') as pairs:
         for domain in 'ABC':
             for index in range(40):
                 budget.check()
-                meta, items, identities = generator.make_group(policy, catalog, domain, NAMESPACE, index)
+                meta, items, identities = generator.make_group(policy, catalog, domain, namespace, index)
                 pair_rows = list(generator.pair_rows(identities))
                 checked = validator.check_group(items, identities, pair_rows, checker)
-                expected_group = generator.opaque_id(CONFIRM_SEED, domain, NAMESPACE, index, 'group')
-                expected_accounts = {generator.opaque_id(CONFIRM_SEED, domain, NAMESPACE, index, 'account', i) for i in range(28)}
-                expected_controllers = {generator.opaque_id(CONFIRM_SEED, domain, NAMESPACE, index, 'controller', i) for i in range(12)}
+                expected_group = generator.opaque_id(root_seed, domain, namespace, index, 'group')
+                expected_accounts = {generator.opaque_id(root_seed, domain, namespace, index, 'account', i) for i in range(28)}
+                expected_controllers = {generator.opaque_id(root_seed, domain, namespace, index, 'controller', i) for i in range(12)}
                 actual_controllers = {r['controller_uid'] for r in identities}
                 if (meta['group_uid'] != expected_group or expected_group in groups | old_ids
                         or checked['accounts'] != expected_accounts or actual_controllers != expected_controllers
                         or sellers & expected_accounts or controllers & actual_controllers
-                        or items_seen & checked['item_ids'] or meta['split'] != NAMESPACE):
+                        or items_seen & checked['item_ids'] or meta['split'] != namespace):
                     raise ValueError('New controller/account/group random namespaces overlap')
                 groups.add(expected_group)
                 sellers |= expected_accounts
@@ -121,8 +122,8 @@ def generate(campaign: Path, job: Path, records: list, budget) -> None:
         raise ValueError('Incomplete independent confirmation generation')
     files = {p.name: data.record(p, job) for p in (public_path, owner_path, pair_path)}
     owner_path.chmod(0)
-    data.write_json(job/'result.json', dict(status='GENERATED_VALIDATED_OWNERS_SEALED', root_seed=CONFIRM_SEED,
-        namespace=NAMESPACE, groups=120, files=files, sources=run.sources(),
+    data.write_json(job/'result.json', dict(status='GENERATED_VALIDATED_OWNERS_SEALED', root_seed=root_seed,
+        namespace=namespace, groups=120, files=files, sources=run.sources() if sources is None else sources,
         isolation='Pinned generator: new root and namespace enter all controller/account IDs and preference/style RNG; verified new actual IDs and old group exclusion. No old owners read or reconstructed.'))
 
 

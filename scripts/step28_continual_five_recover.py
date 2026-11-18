@@ -1,7 +1,6 @@
 """One authorized recovery of the fixed 45-run campaign; frozen learners unchanged."""
 from __future__ import annotations
 
-import argparse
 import copy
 import hashlib
 import json
@@ -352,17 +351,5 @@ def execute(gate_path, wait_seconds):
         raise
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=('wait', 'run', 'cpu'))
-    parser.add_argument('--gate', type=Path, required=True)
-    parser.add_argument('--self-delete', type=Path)
-    parser.add_argument('--wait-seconds', type=float, default=0.)
-    parser.add_argument('--job', type=Path)
-    args = parser.parse_args()
-    if args.action == 'wait':
-        wait_for_recovery(args.gate.resolve(), args.self_delete)
-    elif args.action == 'cpu':
-        qualify_cpu(args.gate.resolve(), args.job.resolve())
-    else:
-        execute(args.gate.resolve(), args.wait_seconds)
+if __name__ == "__main__":
+    raise SystemExit("Historical training entry retired. Use step28_history_benchmark.py with its own approved gate.")

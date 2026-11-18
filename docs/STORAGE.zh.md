@@ -1,5 +1,9 @@
 # 科研文件存储与恢复
 
+## 2026-11-18 中文 trial3 H 六方法比较实现
+
+新源码及 CPU／CUDA 合成核验使用本项目独立的 `reports/documentation/20261118/h_history_benchmark/workspace`。SFTP 对具名源码和政策逐文件核对，未同步正式数据或模型。Windows 删除 4 个旧启动包装器及 1 个专用诊断重放入口，8 个仍由共享运行库或既有回归使用的模块退役旧命令行。上述 13 个路径在 Linux 项目根下均已不存在。本次保留历史部署、审查材料、通过及失败回执、原始分数和费用。原文件可由 Git `c73c5f6e` 的对应路径恢复。上一批 VendorLink 的远端交付最终到 `c73c5f6e`。[逐文件退役记录](../reports/documentation/20261118/h_history_benchmark/retirement.json) · [SFTP 清单](../reports/documentation/20261118/h_history_benchmark/source_sync.json) · [CPU 原件](../reports/documentation/20261118/h_history_benchmark/cpu.json) · [GPU 原件](../reports/documentation/20261118/h_history_benchmark/gpu.json)
+
 ## 2026-11-18 VendorLink FIT12 市场适配器四组正式训练
 
 本批 Linux 正式根为 `/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution`。生产 Git `4c1ccc55` 的 17 份来源位于该根的 `workspace/scripts`，原控制器已创建唯一 `campaign`。Linux 保存原始任务日志、失败及费用、实际生成的端点、六群和教师，市场正文、账号及逐查询分数沿既有保管规则。Windows 具名回传并核对了正式门、来源清单、12 条任务、启动与具名现场观测，并保管合成通过及失败回执、获准外审包、完整外审原文和主审。11 月 17 日旧训练权重的删除记录继续有效。根 docs 以 Windows 为准。[正式门](../reports/documentation/20261118/vendorlink_market_training/execution/formal_gate.json) · [来源](../reports/documentation/20261118/vendorlink_market_training/execution/final_sources.json) · [启动](../reports/documentation/20261118/vendorlink_market_training/execution/launch.json) · [现场观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json) · [审查](../reports/documentation/20261118/vendorlink_market_training/execution/review/primary_disposition.zh.md)

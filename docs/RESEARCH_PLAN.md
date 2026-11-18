@@ -2,6 +2,10 @@
 
 本页记录活动批次的下一步与仍待决定的科研动作。执行及核实时间见[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)，科学问题、预算和实际入口见[合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)。
 
+## 中文 trial3 H 与五基线的共同确认
+
+用户选定在一批新 120 群上比较消融 Full 同配置 H、ER0.1、Logit0.1、L²R、ER+GCR、FOREVER。正式入口的 CPU 与 CUDA 合成核验均已完成。下一步按具体合审包的外发许可回收网页意见，再独立处置。真实训练的独立预算、并发和统计判据待开训前确定。先前的中文三批结果、八配置消融和本次前瞻表分别引用。[当前方案](../reports/documentation/20261118/h_history_benchmark/scope.zh.md)
+
 ## VendorLink账号监督：FIT12共同协议后续
 
 已启动的正式队列依次完成三个独跑的原版 VendorLink_SEQ，再派发市场适配器 H_full、H_ER、H_SEQ 共九条轨迹。各组固定 seed 51、52、53。H 先开两路，前两槽确有更新且总资源够用时加第三路。每条走 AlphaBay → Dream → Agora，全批 12 条、36 个市场阶段。若有局部 OOM，健康 H 槽继续领活，按原控制器收到的具名请求等待资源和预算，同配置同 seed 仅重试一次。待整批齐全后执行串行盲评分，沿原队列一次开放 dev。[启动观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json) · [授权](../reports/documentation/20261118/vendorlink_market_training/execution/authorization.zh.md) · [操作条款](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md#已确认的-oom-恢复与一次重试)

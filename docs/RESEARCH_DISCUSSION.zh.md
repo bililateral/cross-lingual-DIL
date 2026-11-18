@@ -1,5 +1,11 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-18 中文定稿 H 与五基线统一重新确认
+
+11 月 19 日零时，用户确认“允许这一次限额短测并行”。当时 V 的 seed 51 已完成，seed 52 在跑，留足其 29 GiB 显存承诺后尚有 2.09 GiB。例外只限一次中文手写 CUDA 核验，整 PID 最多 1.5 GiB、最多 180 秒，独立记费。英语正式调度、三条 V 与后续九条 H 的安排沿原合同。
+
+用户选择“六方法统一做新确认：新版 H 加五个原定义基线，共 54 条轨迹，在同一套新 120 群上一次盲评，形成统一的前瞻性主表”。这里的 H 是八配置消融的 Full，沿用 Optuna trial3 的历史监督和出生评分保持两系数。用户要求本轮先完成正式训练脚本，再退役已被替代的旧训练入口、保留原记录并更新进度。CPU 核验后用户补充“你先做完CPU和必要的GPU核验后再一起外审”。该补充覆盖合成核验与合审次序，正式训练、确认群生成、开标签和统计通过条件另行确定。[方案](../reports/documentation/20261118/h_history_benchmark/scope.zh.md)
+
 ## 2026-11-18 批准四组正式训练、启动观测后更新进度并推送全部提交
 
 用户审阅四组训练方案后明确要求“开始训练”，并要求实际观察到训练开始后及时更新全部相关项目进度记录，最后把所有本地提交推到远端。这一决定承接已经确定的并发、一次 OOM 重试和分桶预算。执行开训前定向核验与审查，整批 dev 和 confirm 延续合同的开放条件。[用户授权原文](../reports/documentation/20261118/vendorlink_market_training/execution/authorization.zh.md) · [四组合同](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md) 用户另就 76,794 字节的开训前包答复“允许这个包外审”；包经本地 Playwright MCP 提交网页 GPT‑6 Pro 一次，其两项必修意见已独立闭合。局部 OOM 的具名请求先等待旧进程与显存释放及可用资源；资源暂不足保留请求，已结算额度不足时停止派发。授权执行已由正式更新落地。[具体包许可](../reports/documentation/20261118/vendorlink_market_training/execution/review/submission.json) · [主审](../reports/documentation/20261118/vendorlink_market_training/execution/review/primary_disposition.zh.md) · [正式观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json)

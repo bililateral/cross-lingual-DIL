@@ -5,7 +5,6 @@ Only the explicitly authorized new attempt is dispatched here.
 """
 from __future__ import annotations
 
-import argparse
 import json
 import os
 from pathlib import Path
@@ -266,7 +265,5 @@ def execute(gate_path):
         raise
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--gate', type=Path, required=True)
-    execute(parser.parse_args().gate.resolve())
+if __name__ == "__main__":
+    raise SystemExit("Historical training entry retired. Use step28_history_benchmark.py with its own approved gate.")

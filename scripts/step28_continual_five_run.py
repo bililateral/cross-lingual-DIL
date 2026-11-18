@@ -1,7 +1,6 @@
 """One independent three-stage trajectory; blind endpoints and real restoration."""
 from __future__ import annotations
 
-import argparse
 import ast
 from contextlib import contextmanager
 import fcntl
@@ -10,7 +9,6 @@ import os
 from pathlib import Path
 import shutil
 import time
-import traceback
 
 import numpy as np
 import psutil
@@ -122,15 +120,19 @@ def save(path: Path, model, optimizer, meta: dict, budget: Budget) -> dict:
 
 
 def checkpoint(root, method, model, optimizer, memory, current, calibration, valid, c, stage, first_map, budget):
-    if (len(calibration) != 12 or len(valid) != 60 or any(g.labels is not None for g in valid)
+    if (len(calibration) != 12 or (valid is not None and
+            (len(valid) != 60 or any(g.labels is not None for g in valid)))
             or parent.adam_step(optimizer) != stage*288):
         raise ValueError("Endpoint/current-cal/blind-dev/Adam scope differs")
     optimizer.zero_grad(set_to_none=True)
     name = f"stage{stage}"
     rng, modes = diag.rng_state(), [v.training for v in model.modules()]
     with diag.neutral(model):
-        scores = {"calibration": method.score(model, calibration, c, budget.check),
-                  "raw": method.score(model, valid, c, budget.check)}
+        scored_groups = {"calibration": calibration}
+        if valid is not None:
+            scored_groups["raw"] = valid
+        scores = {role: method.score(model, groups, c, budget.check)
+                  for role, groups in scored_groups.items()}
         fit = parent.calibration.fit(scores["calibration"], np.asarray([g.labels for g in calibration], np.uint8),
                                      role="calibration", check=budget.check)
         if fit["status"] != "PASS_CALIBRATION_FIT":
@@ -154,7 +156,7 @@ def checkpoint(root, method, model, optimizer, memory, current, calibration, val
     if method.restore(full_path, full, model, optimizer) != meta:
         raise ValueError("Full restored metadata differs")
     with diag.neutral(model):
-        for role, groups in (("calibration", calibration), ("raw", valid)):
+        for role, groups in scored_groups.items():
             values = method.score(model, groups, c, budget.check)
             if not np.array_equal(scores[role], values):
                 raise ValueError("Full model/Adam restored prediction differs")
@@ -163,18 +165,19 @@ def checkpoint(root, method, model, optimizer, memory, current, calibration, val
     if method.restore(infer_path, inference, model, None) != meta:
         raise ValueError("Inference restored metadata differs")
     with diag.neutral(model):
-        for role, groups in (("calibration", calibration), ("raw", valid)):
+        for role, groups in scored_groups.items():
             values = method.score(model, groups, c, budget.check)
             if not np.array_equal(scores[role], values):
                 raise ValueError("Inference restored prediction differs")
             scores["inference-"+role] = values
-    for role, mapping in (("stage-cal", current_map), ("first-cal", first_map)):
-        scores[role] = parent.calibration.transform(scores["raw"], mapping)
-        parent.calibration.preserve_order(scores["raw"], scores[role])
+    if valid is not None:
+        for role, mapping in (("stage-cal", current_map), ("first-cal", first_map)):
+            scores[role] = parent.calibration.transform(scores["raw"], mapping)
+            parent.calibration.preserve_order(scores["raw"], scores[role])
     map_path = root/"maps"/(name+".json")
     data.write_json(map_path, fit)
     result = {**meta, "calibration_ids": [g.uid for g in calibration],
-              "development_ids": [g.uid for g in valid], "mapping": data.record(map_path, root),
+              "development_ids": [g.uid for g in valid or ()], "mapping": data.record(map_path, root),
               "full_restore_verified": True, "inference_restore_verified": True,
               "memory_summary": None if memory is None else memory.summary(),
               "full_state": {**full, "path": full_path.relative_to(root).as_posix()},
@@ -218,16 +221,20 @@ def train_stage(method, model, optimizer, current, memory, c, stage, root, budge
 
 def execute(job: Path, spec: m.Spec, deadline: float, gate_path: Path, *,
             implementation=m, source_files=None, budget_factory=Budget) -> dict:
-    import torch
-    torch.set_num_threads(1)
-    torch.set_num_interop_threads(1)
     gate = data.read_json(gate_path)
     expected_sources = sources() if source_files is None else source_files
     expected_runs = [s.identity() for s in implementation.specifications()]
     if (gate.get("status") != "APPROVED_IMPLEMENTATION_AND_RESOURCES" or gate["sources"] != expected_sources
             or gate["runs"] != expected_runs or spec.identity() not in expected_runs):
         raise ValueError("Exact implementation/qualification/run-list gate missing")
-    budget = budget_factory(job.parent, deadline)
+    return train_trajectory(job, spec, gate, implementation, budget_factory(job.parent, deadline))
+
+
+def train_trajectory(job, spec, gate, implementation, budget, *, train_inputs=None, completion_status=COMPLETE):
+    """Run the original optimizer, retention, calibration and checkpoint paths."""
+    import torch
+    torch.set_num_threads(1)
+    torch.set_num_interop_threads(1)
     budget.check()
     c, method = implementation.config(spec), implementation.Method(spec)
     parent.configure_numerics()
@@ -241,21 +248,24 @@ def execute(job: Path, spec: m.Spec, deadline: float, gate_path: Path, *,
         (root/sub).mkdir(parents=True)
     # Offline dispatch scope may index the full authorized archive. Neither this
     # object nor its future/evicted groups is supplied to train_stage/update.
-    public, metadata, checked = base.public.public_inputs(c)
-    _, partition = base.partition(public, metadata, c)
     access = dict(train=1, valid=0, heldout=0, owners=0, worker_train_reads=1)
     data.write_json(job/"access.json", access)
-    public["train"] = base.public.attach_labels(public["train"], c, "train")
-    groups, actual_partition = base.partition(public, metadata, c)
-    if actual_partition != partition:
-        raise ValueError("Labels changed public partition")
-    supply = parent.Supply(groups, partition)
-    valid = groups["development"]
+    if train_inputs is None:
+        public, metadata, checked = base.public.public_inputs(c)
+        _, partition = base.partition(public, metadata, c)
+        public["train"] = base.public.attach_labels(public["train"], c, "train")
+        groups, actual_partition = base.partition(public, metadata, c)
+        if actual_partition != partition:
+            raise ValueError("Labels changed public partition")
+        supply, valid = parent.Supply(groups, partition), groups["development"]
+        del public, groups, metadata
+    else:
+        supply, partition, checked = train_inputs(c)
+        valid = None
     manifest = dict(status="RUNNING", spec=spec.identity(), source_files=gate["sources"], public_inputs=checked,
                     partition=partition, pretrained_archive=archive, points={}, training={}, updates=0,
                     gradient_group_presentations=0, access=access)
     data.write_json(root/"startup.json", manifest)
-    del public, groups, metadata
     model, optimizer = method.fresh(c)
     manifest["initial"] = dict(model=core.state_digest(model.state_dict()), adam=core.state_digest(optimizer.state_dict()))
     memory, first_map = None, None
@@ -269,7 +279,7 @@ def execute(job: Path, spec: m.Spec, deadline: float, gate_path: Path, *,
         manifest["gradient_group_presentations"] += 288*(1+(stage > 1 and getattr(spec, "uses_history", spec.name != "SEQ_ref")))
         data.write_json(root/"progress.json", manifest)
         del current, calibration
-    manifest.update(status=COMPLETE, resources=budget.snapshot())
+    manifest.update(status=completion_status, resources=budget.snapshot())
     data.write_json(root/"completion.json", manifest)
     del model, optimizer, memory, supply
     gc.collect()
@@ -277,20 +287,5 @@ def execute(job: Path, spec: m.Spec, deadline: float, gate_path: Path, *,
     return manifest
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--job", type=Path, required=True)
-    parser.add_argument("--spec", type=Path, required=True)
-    parser.add_argument("--deadline", type=float, required=True)
-    parser.add_argument("--gate", type=Path, required=True)
-    args = parser.parse_args()
-    try:
-        execute(args.job, m.Spec.from_dict(data.read_json(args.spec)), args.deadline, args.gate)
-    except BaseException as error:
-        data.write_json(args.job/"failure.json", dict(error=repr(error), traceback=traceback.format_exc(),
-                                                    status="STOP_NO_RETRY", time=time.time()))
-        raise
-
-
 if __name__ == "__main__":
-    main()
+    raise SystemExit("Historical training entry retired. Use step28_history_benchmark.py with its own approved gate.")

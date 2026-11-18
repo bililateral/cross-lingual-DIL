@@ -1,0 +1,393 @@
+{
+  "environment": "Linux py310, one CPU, CUDA_VISIBLE_DEVICES empty",
+  "entry": "tests/test_step28_history_benchmark.py",
+  "workspace": "/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace",
+  "result": {
+    "cases": 6,
+    "cpu_affinity": [
+      0
+    ],
+    "evidence": {
+      "blind_gate": {
+        "complete_cells": 324,
+        "missing_cell": "rejected",
+        "missing_trajectory": "rejected_before_pairs",
+        "wrong_group_alignment": "rejected"
+      },
+      "dispatch": {
+        "foreign_pid": "rejected",
+        "historical_gate": "rejected",
+        "own_claim": "accepted"
+      },
+      "native_blind_restore": {
+        "ER0.1_ref": {
+          "blind_cells": 6,
+          "restored_endpoints": 3,
+          "scored_groups": 240
+        },
+        "ER_GCR_group_fixed": {
+          "blind_cells": 6,
+          "restored_endpoints": 3,
+          "scored_groups": 240
+        },
+        "FOREVER_group_fixed": {
+          "blind_cells": 6,
+          "restored_endpoints": 3,
+          "scored_groups": 240
+        },
+        "H_trial3": {
+          "blind_cells": 6,
+          "restored_endpoints": 3,
+          "scored_groups": 240
+        },
+        "L2R_text_fixed": {
+          "blind_cells": 6,
+          "restored_endpoints": 3,
+          "scored_groups": 240
+        },
+        "LOGIT0.1_ref": {
+          "blind_cells": 6,
+          "restored_endpoints": 3,
+          "scored_groups": 240
+        }
+      },
+      "paired_report": {
+        "contrasts": 5,
+        "hand_computed_delta": 0.01,
+        "matched_per_contrast": 9,
+        "second_pair_opening": "rejected"
+      },
+      "six_real_cpu_updates": {
+        "ER0.1_ref": {
+          "adam_step": 289,
+          "finite_scores": 378
+        },
+        "ER_GCR_group_fixed": {
+          "adam_step": 1,
+          "finite_scores": 378
+        },
+        "FOREVER_group_fixed": {
+          "adam_step": 1,
+          "finite_scores": 378
+        },
+        "H_trial3": {
+          "adam_step": 289,
+          "finite_scores": 378
+        },
+        "L2R_text_fixed": {
+          "adam_step": 1,
+          "finite_scores": 378
+        },
+        "LOGIT0.1_ref": {
+          "adam_step": 289,
+          "finite_scores": 378
+        }
+      },
+      "train_only_endpoint": {
+        "current_calibration_groups": 12,
+        "memory_bytes": 64352,
+        "old_dev_scores": 0,
+        "restored_full": true,
+        "restored_inference": true
+      }
+    },
+    "formal_data_reads": 0,
+    "gpu_used": false,
+    "passed": true,
+    "pretrained_loads": 0,
+    "python": "/home/yongpeng/miniconda3/envs/py310/bin/python",
+    "seconds": 6.54875274002552
+  },
+  "exit_code": 0,
+  "unittest_stderr": "test_blind_loader_all_six_native_endpoint_formats (__main__.BenchmarkTest) ... ok\ntest_endpoint_with_only_current_calibration (__main__.BenchmarkTest) ... ok\ntest_missing_receipt_and_misaligned_blind_cells (__main__.BenchmarkTest) ... ok\ntest_reservation_and_historical_gate_rejection (__main__.BenchmarkTest) ... ok\ntest_six_native_training_routes_and_real_update (__main__.BenchmarkTest) ... ok\ntest_table_and_single_logical_opening (__main__.BenchmarkTest) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 6.549s\n\nOK\n",
+  "earlier_incremental_checks": [
+    {
+      "exit_code": 0,
+      "stdout": {
+        "cases": 3,
+        "cpu_affinity": [
+          0
+        ],
+        "evidence": {
+          "blind_gate": {
+            "complete_cells": 324,
+            "missing_cell": "rejected",
+            "missing_trajectory": "rejected_before_pairs",
+            "wrong_group_alignment": "rejected"
+          },
+          "paired_report": {
+            "contrasts": 5,
+            "hand_computed_delta": 0.01,
+            "matched_per_contrast": 9,
+            "second_pair_opening": "rejected"
+          },
+          "six_real_cpu_updates": {
+            "ER0.1_ref": {
+              "adam_step": 289,
+              "finite_scores": 378
+            },
+            "ER_GCR_group_fixed": {
+              "adam_step": 1,
+              "finite_scores": 378
+            },
+            "FOREVER_group_fixed": {
+              "adam_step": 1,
+              "finite_scores": 378
+            },
+            "H_trial3": {
+              "adam_step": 289,
+              "finite_scores": 378
+            },
+            "L2R_text_fixed": {
+              "adam_step": 1,
+              "finite_scores": 378
+            },
+            "LOGIT0.1_ref": {
+              "adam_step": 289,
+              "finite_scores": 378
+            }
+          }
+        },
+        "formal_data_reads": 0,
+        "gpu_used": false,
+        "passed": true,
+        "pretrained_loads": 0,
+        "python": "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "seconds": 1.0295156841166317
+      },
+      "unittest_stderr": "test_missing_receipt_and_misaligned_blind_cells (__main__.BenchmarkTest) ... ok\ntest_six_native_training_routes_and_real_update (__main__.BenchmarkTest) ... ok\ntest_table_and_single_logical_opening (__main__.BenchmarkTest) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 1.028s\n\nOK\n"
+    },
+    {
+      "exit_code": 0,
+      "stdout": {
+        "cases": 4,
+        "cpu_affinity": [
+          0
+        ],
+        "evidence": {
+          "blind_gate": {
+            "complete_cells": 324,
+            "missing_cell": "rejected",
+            "missing_trajectory": "rejected_before_pairs",
+            "wrong_group_alignment": "rejected"
+          },
+          "paired_report": {
+            "contrasts": 5,
+            "hand_computed_delta": 0.01,
+            "matched_per_contrast": 9,
+            "second_pair_opening": "rejected"
+          },
+          "six_real_cpu_updates": {
+            "ER0.1_ref": {
+              "adam_step": 289,
+              "finite_scores": 378
+            },
+            "ER_GCR_group_fixed": {
+              "adam_step": 1,
+              "finite_scores": 378
+            },
+            "FOREVER_group_fixed": {
+              "adam_step": 1,
+              "finite_scores": 378
+            },
+            "H_trial3": {
+              "adam_step": 289,
+              "finite_scores": 378
+            },
+            "L2R_text_fixed": {
+              "adam_step": 1,
+              "finite_scores": 378
+            },
+            "LOGIT0.1_ref": {
+              "adam_step": 289,
+              "finite_scores": 378
+            }
+          },
+          "train_only_endpoint": {
+            "current_calibration_groups": 12,
+            "memory_bytes": 64346,
+            "old_dev_scores": 0,
+            "restored_full": true,
+            "restored_inference": true
+          }
+        },
+        "formal_data_reads": 0,
+        "gpu_used": false,
+        "passed": true,
+        "pretrained_loads": 0,
+        "python": "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "seconds": 1.5028588706627488
+      },
+      "unittest_stderr": "test_endpoint_with_only_current_calibration (__main__.BenchmarkTest) ... ok\ntest_missing_receipt_and_misaligned_blind_cells (__main__.BenchmarkTest) ... ok\ntest_six_native_training_routes_and_real_update (__main__.BenchmarkTest) ... ok\ntest_table_and_single_logical_opening (__main__.BenchmarkTest) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 1.501s\n\nOK\n"
+    },
+    {
+      "exit_code": 0,
+      "stdout": {
+        "cases": 5,
+        "cpu_affinity": [
+          0
+        ],
+        "evidence": {
+          "blind_gate": {
+            "complete_cells": 324,
+            "missing_cell": "rejected",
+            "missing_trajectory": "rejected_before_pairs",
+            "wrong_group_alignment": "rejected"
+          },
+          "dispatch": {
+            "foreign_pid": "rejected",
+            "historical_gate": "rejected",
+            "own_claim": "accepted"
+          },
+          "paired_report": {
+            "contrasts": 5,
+            "hand_computed_delta": 0.01,
+            "matched_per_contrast": 9,
+            "second_pair_opening": "rejected"
+          },
+          "six_real_cpu_updates": {
+            "ER0.1_ref": {
+              "adam_step": 289,
+              "finite_scores": 378
+            },
+            "ER_GCR_group_fixed": {
+              "adam_step": 1,
+              "finite_scores": 378
+            },
+            "FOREVER_group_fixed": {
+              "adam_step": 1,
+              "finite_scores": 378
+            },
+            "H_trial3": {
+              "adam_step": 289,
+              "finite_scores": 378
+            },
+            "L2R_text_fixed": {
+              "adam_step": 1,
+              "finite_scores": 378
+            },
+            "LOGIT0.1_ref": {
+              "adam_step": 289,
+              "finite_scores": 378
+            }
+          },
+          "train_only_endpoint": {
+            "current_calibration_groups": 12,
+            "memory_bytes": 64355,
+            "old_dev_scores": 0,
+            "restored_full": true,
+            "restored_inference": true
+          }
+        },
+        "formal_data_reads": 0,
+        "gpu_used": false,
+        "passed": true,
+        "pretrained_loads": 0,
+        "python": "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "seconds": 1.491899951826781
+      },
+      "unittest_stderr": "test_endpoint_with_only_current_calibration (__main__.BenchmarkTest) ... ok\ntest_missing_receipt_and_misaligned_blind_cells (__main__.BenchmarkTest) ... ok\ntest_reservation_and_historical_gate_rejection (__main__.BenchmarkTest) ... ok\ntest_six_native_training_routes_and_real_update (__main__.BenchmarkTest) ... ok\ntest_table_and_single_logical_opening (__main__.BenchmarkTest) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 1.490s\n\nOK\n"
+    },
+    {
+      "exit_code": 0,
+      "stdout": {
+        "cases": 6,
+        "cpu_affinity": [
+          0
+        ],
+        "evidence": {
+          "blind_gate": {
+            "complete_cells": 324,
+            "missing_cell": "rejected",
+            "missing_trajectory": "rejected_before_pairs",
+            "wrong_group_alignment": "rejected"
+          },
+          "dispatch": {
+            "foreign_pid": "rejected",
+            "historical_gate": "rejected",
+            "own_claim": "accepted"
+          },
+          "native_blind_restore": {
+            "ER0.1_ref": {
+              "blind_cells": 6,
+              "restored_endpoints": 3,
+              "scored_groups": 240
+            },
+            "ER_GCR_group_fixed": {
+              "blind_cells": 6,
+              "restored_endpoints": 3,
+              "scored_groups": 240
+            },
+            "FOREVER_group_fixed": {
+              "blind_cells": 6,
+              "restored_endpoints": 3,
+              "scored_groups": 240
+            },
+            "H_trial3": {
+              "blind_cells": 6,
+              "restored_endpoints": 3,
+              "scored_groups": 240
+            },
+            "L2R_text_fixed": {
+              "blind_cells": 6,
+              "restored_endpoints": 3,
+              "scored_groups": 240
+            },
+            "LOGIT0.1_ref": {
+              "blind_cells": 6,
+              "restored_endpoints": 3,
+              "scored_groups": 240
+            }
+          },
+          "paired_report": {
+            "contrasts": 5,
+            "hand_computed_delta": 0.01,
+            "matched_per_contrast": 9,
+            "second_pair_opening": "rejected"
+          },
+          "six_real_cpu_updates": {
+            "ER0.1_ref": {
+              "adam_step": 289,
+              "finite_scores": 378
+            },
+            "ER_GCR_group_fixed": {
+              "adam_step": 1,
+              "finite_scores": 378
+            },
+            "FOREVER_group_fixed": {
+              "adam_step": 1,
+              "finite_scores": 378
+            },
+            "H_trial3": {
+              "adam_step": 289,
+              "finite_scores": 378
+            },
+            "L2R_text_fixed": {
+              "adam_step": 1,
+              "finite_scores": 378
+            },
+            "LOGIT0.1_ref": {
+              "adam_step": 289,
+              "finite_scores": 378
+            }
+          },
+          "train_only_endpoint": {
+            "current_calibration_groups": 12,
+            "memory_bytes": 64364,
+            "old_dev_scores": 0,
+            "restored_full": true,
+            "restored_inference": true
+          }
+        },
+        "formal_data_reads": 0,
+        "gpu_used": false,
+        "passed": true,
+        "pretrained_loads": 0,
+        "python": "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "seconds": 6.431896106805652
+      },
+      "unittest_stderr": "test_blind_loader_all_six_native_endpoint_formats (__main__.BenchmarkTest) ... ok\ntest_endpoint_with_only_current_calibration (__main__.BenchmarkTest) ... ok\ntest_missing_receipt_and_misaligned_blind_cells (__main__.BenchmarkTest) ... ok\ntest_reservation_and_historical_gate_rejection (__main__.BenchmarkTest) ... ok\ntest_six_native_training_routes_and_real_update (__main__.BenchmarkTest) ... ok\ntest_table_and_single_logical_opening (__main__.BenchmarkTest) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 6.430s\n\nOK\n"
+    }
+  ],
+  "scope": "Only handmade CPU fixtures. Each 289 step counter starts from an explicitly synthetic Adam step 288. No pretrained weights or official corpus loaded. Native blind restore uses tiny handwritten checkpoints."
+}

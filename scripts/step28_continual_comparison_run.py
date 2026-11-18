@@ -1,7 +1,6 @@
 """Independent fixed-comparison trajectory. Requires its own approved runtime gate."""
 from __future__ import annotations
 
-import argparse
 import ast
 from collections import defaultdict
 import csv
@@ -11,7 +10,6 @@ import json
 from pathlib import Path
 import shutil
 import time
-import traceback
 
 import numpy as np
 import psutil
@@ -178,7 +176,7 @@ def checkpoint(root, method, model, optimizer, stage, calibration, c, first_map,
             save_array(root/'scores'/'stage1_diagnostic.npy', scores, root)
         fitted = m.parent.calibration.fit(scores, np.asarray([g.labels for g in calibration], np.uint8),
                                           role='calibration', check=budget.check,
-                                          stop_on_gradient=True)
+                                          stop_on_gradient=c.get('calibration_stop_on_gradient', True))
         if diagnostic_path is not None:
             data.write_json(root/'maps'/'stage1_diagnostic.json', fitted)
             print(json.dumps(dict(event='diagnostic_calibration', run_id=method.spec.run_id,
@@ -232,18 +230,23 @@ def checkpoint(root, method, model, optimizer, stage, calibration, c, first_map,
 
 
 def execute(job: Path, spec: m.Spec, deadline: float, gate_path: Path) -> dict:
-    import torch
     allowed = gate(gate_path, 'train')
     if spec.name not in m.NEW_METHODS or allowed.get('train_data') is not True or job.exists():
         raise ValueError('Only authorized new training in a fresh directory is allowed')
     job.mkdir(parents=True)
-    budget = Budget(job, deadline, allowed['limits'])
+    return train_trajectory(job, spec, allowed, Budget(job, deadline, allowed['limits']))
+
+
+def train_trajectory(job, spec, allowed, budget, *, calibration_stop_on_gradient=True):
+    """Execute the fixed L2R/GCR update and endpoint policy in a claimed job."""
+    import torch
     budget.check()
     torch.set_num_threads(1)
     torch.set_num_interop_threads(1)
     m.parent.configure_numerics()
     torch.cuda.set_per_process_memory_fraction(allowed['limits']['allocator_bytes']/torch.cuda.get_device_properties(0).total_memory)
     method, c = m.Method(spec), m.config(spec)
+    c['calibration_stop_on_gradient'] = calibration_stop_on_gradient
     if allowed.get('recovery') and spec.run_id == 'CAB_s6_L2R_text_fixed':
         c['diagnostic_calibration'] = True
     archive = m.core.model_files(m.base.model_config(c, 'split_rank'))
@@ -286,17 +289,5 @@ def execute(job: Path, spec: m.Spec, deadline: float, gate_path: Path) -> dict:
     return result
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--job', type=Path, required=True)
-    parser.add_argument('--spec', type=Path, required=True)
-    parser.add_argument('--gate', type=Path, required=True)
-    parser.add_argument('--deadline', type=float, required=True)
-    args = parser.parse_args()
-    try:
-        execute(args.job, m.Spec.from_dict(data.read_json(args.spec)), args.deadline, args.gate)
-    except BaseException as error:
-        if args.job.is_dir():
-            data.write_json(args.job/'failure.json', dict(error=repr(error), traceback=traceback.format_exc(),
-                                                        status='STOP_NO_RETRY'))
-        raise
+if __name__ == "__main__":
+    raise SystemExit("Historical training entry retired. Use step28_history_benchmark.py with its own approved gate.")

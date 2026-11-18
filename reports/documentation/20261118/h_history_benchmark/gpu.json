@@ -1,0 +1,74 @@
+{
+  "observation": {
+    "observed": "2026-11-19T00:06:16+08:00",
+    "controller_pid": 923881,
+    "controller_matches": true,
+    "english_status": "RUNNING",
+    "vendor_success": 1,
+    "workers": [
+      {
+        "slot": "0",
+        "pid": 933107,
+        "task": "VendorLink_SEQ_s52",
+        "reserve": 31138512896,
+        "identity_matches": true
+      }
+    ],
+    "gpu_free": 10319495168,
+    "gpu_pids": {
+      "933107": 23062380544
+    },
+    "unreflected_reservations": 8076132352,
+    "uncommitted_gpu_bytes": 2243362816,
+    "unknown_compute_pids": [],
+    "ram": 258481451008,
+    "disk": 608805867520,
+    "complete": false,
+    "gpu_count": 1
+  },
+  "after": {
+    "observed": "2026-11-19T00:07:03+08:00",
+    "controller_pid": 923881,
+    "controller_matches": true,
+    "english_status": "RUNNING",
+    "vendor_success": 1,
+    "workers": [
+      {
+        "slot": "0",
+        "pid": 933107,
+        "task": "VendorLink_SEQ_s52",
+        "reserve": 31138512896,
+        "identity_matches": true
+      }
+    ],
+    "gpu_free": 10319495168,
+    "gpu_pids": {
+      "933107": 23062380544
+    },
+    "unreflected_reservations": 8076132352,
+    "uncommitted_gpu_bytes": 2243362816,
+    "unknown_compute_pids": [],
+    "ram": 258541993984,
+    "disk": 608805019648,
+    "complete": false,
+    "gpu_count": 1
+  },
+  "code": 0,
+  "fault": null,
+  "elapsed": 46.601874083746225,
+  "whole_pid_peak_bytes": 748683264,
+  "allocator_cap": 536870912,
+  "whole_pid_cap": 1610612736,
+  "timeout_seconds": 180,
+  "log": [
+    "test_six_native_training_routes_and_real_update (__main__.BenchmarkTest) ... ok",
+    "test_endpoint_with_only_current_calibration (__main__.BenchmarkTest) ... ok",
+    "test_blind_loader_all_six_native_endpoint_formats (__main__.BenchmarkTest) ... ok",
+    "",
+    "----------------------------------------------------------------------",
+    "Ran 3 tests in 44.745s",
+    "",
+    "OK",
+    "{\"cases\": 3, \"cpu_affinity\": [47], \"evidence\": {\"device\": {\"allocated_peak\": 68814848, \"name\": \"NVIDIA GeForce RTX 5090\", \"reserved_peak\": 69206016}, \"native_blind_restore\": {\"ER0.1_ref\": {\"blind_cells\": 6, \"restored_endpoints\": 3, \"scored_groups\": 240}, \"ER_GCR_group_fixed\": {\"blind_cells\": 6, \"restored_endpoints\": 3, \"scored_groups\": 240}, \"FOREVER_group_fixed\": {\"blind_cells\": 6, \"restored_endpoints\": 3, \"scored_groups\": 240}, \"H_trial3\": {\"blind_cells\": 6, \"restored_endpoints\": 3, \"scored_groups\": 240}, \"L2R_text_fixed\": {\"blind_cells\": 6, \"restored_endpoints\": 3, \"scored_groups\": 240}, \"LOGIT0.1_ref\": {\"blind_cells\": 6, \"restored_endpoints\": 3, \"scored_groups\": 240}}, \"six_real_cuda_updates\": {\"ER0.1_ref\": {\"adam_step\": 289, \"finite_scores\": 378}, \"ER_GCR_group_fixed\": {\"adam_step\": 1, \"finite_scores\": 378}, \"FOREVER_group_fixed\": {\"adam_step\": 1, \"finite_scores\": 378}, \"H_trial3\": {\"adam_step\": 289, \"finite_scores\": 378}, \"L2R_text_fixed\": {\"adam_step\": 1, \"finite_scores\": 378}, \"LOGIT0.1_ref\": {\"adam_step\": 289, \"finite_scores\": 378}}, \"train_only_endpoint\": {\"current_calibration_groups\": 12, \"memory_bytes\": 64367, \"old_dev_scores\": 0, \"restored_full\": true, \"restored_inference\": true}}, \"formal_data_reads\": 0, \"gpu_used\": true, \"passed\": true, \"pretrained_loads\": 0, \"python\": \"/home/yongpeng/miniconda3/envs/py310/bin/python\", \"seconds\": 44.74507872061804}"
+  ]
+}

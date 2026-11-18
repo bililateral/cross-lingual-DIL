@@ -2,15 +2,17 @@
 
 ## 当前工作
 
-2026 年 11 月 18 日，VendorLink FIT12 四组市场适配器开发训练正在唯一正式队列运行。北京时间 23:07:26，首条 VendorLink_SEQ 已在 AlphaBay 完成 2,725 次优化更新。中文 H 消融、原三市场 VendorLink、单一 β、Evolution、英文 ABC 及先前的零训练诊断均已结案。[正式现场观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json) · [科研计划](RESEARCH_PLAN.md) · [合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)
+截至 11 月 19 日 00:07:03，VendorLink FIT12 唯一正式队列已完成 VendorLink_SEQ 的 seed 51，seed 52 正在运行。中文六方法论文比较已完成 CPU 和必要 CUDA 合成核验，正式训练尚未启动。原八配置消融、单一 β、Evolution 和先前诊断均已结案。[本次现场观测与 CUDA 回执](../reports/documentation/20261118/h_history_benchmark/gpu.json) · [科研计划](RESEARCH_PLAN.md) · [合同索引](CURRENT_EXPERIMENT_DESIGN.md#当前合同入口)
 
 ### VendorLink账号监督共同评价
 
-- **VendorLink FIT12 四组训练已启动。** 北京时间 23:00:57 启动；23:01:32 核实控制器 PID 923881、worker PID 923888 的属主、命令、工作目录、内核 start_ticks 和 boot_id。首轮观测已见 205 次优化更新；23:07:26 同一 worker 仍在原版 VendorLink_SEQ / seed 51 / 第一次尝试的 AlphaBay 阶段，累计 2,725 次更新、87,096 条 fit 文本暴露。此时 1 条在跑、11 条待派、0 条完成、0 条失败。GPU 计算进程只有该 worker。训练账在任务退出后结算，该条未结生命周期约 388 秒；已结算 GPU 核验 35 秒、辅助 56 秒。dev 尚未开放，confirm 封存。生产 Git `4c1ccc55`，Linux 项目根下 `reports/documentation/20261118/vendorlink_market_training/execution/campaign` 是唯一正式队列。接手读该目录的状态与回执。三条 V 单跑成功后，H_full、H_ER、H_SEQ 的九条任务先两路，满足约定再补第三路。局部 OOM 走原控制器的具名恢复，同配置同 seed 仅一次，首败与费用保留。预算为 111 h 训练、5 h 核验与评分、4 h 辅助。[正式门](../reports/documentation/20261118/vendorlink_market_training/execution/formal_gate.json) · [启动](../reports/documentation/20261118/vendorlink_market_training/execution/launch.json) · [现场观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json) · [完整判据和故障处置](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md) · [开训前主审](../reports/documentation/20261118/vendorlink_market_training/execution/review/primary_disposition.zh.md)
+- **VendorLink FIT12 四组训练已启动。** 11 月 19 日 00:07:03，V 的 seed 51 已完成，seed 52 正在运行。控制器 PID 923881 和 seed 52 的 PID 933107 均与具名回执的属主、命令、cwd 及内核身份吻合。[具名现场证据](../reports/documentation/20261118/h_history_benchmark/gpu.json) 此前于 11 月 18 日 23:00:57 启动；23:01:32 核实控制器 PID 923881、worker PID 923888 的属主、命令、工作目录、内核 start_ticks 和 boot_id。首轮观测已见 205 次优化更新；23:07:26 同一 worker 仍在原版 VendorLink_SEQ / seed 51 / 第一次尝试的 AlphaBay 阶段，累计 2,725 次更新、87,096 条 fit 文本暴露。此时 1 条在跑、11 条待派、0 条完成、0 条失败。GPU 计算进程只有该 worker。训练账在任务退出后结算，该条未结生命周期约 388 秒；已结算 GPU 核验 35 秒、辅助 56 秒。dev 尚未开放，confirm 封存。生产 Git `4c1ccc55`，Linux 项目根下 `reports/documentation/20261118/vendorlink_market_training/execution/campaign` 是唯一正式队列。接手读该目录的状态与回执。三条 V 单跑成功后，H_full、H_ER、H_SEQ 的九条任务先两路，满足约定再补第三路。局部 OOM 走原控制器的具名恢复，同配置同 seed 仅一次，首败与费用保留。预算为 111 h 训练、5 h 核验与评分、4 h 辅助。[正式门](../reports/documentation/20261118/vendorlink_market_training/execution/formal_gate.json) · [启动](../reports/documentation/20261118/vendorlink_market_training/execution/launch.json) · [现场观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json) · [完整判据和故障处置](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md) · [开训前主审](../reports/documentation/20261118/vendorlink_market_training/execution/review/primary_disposition.zh.md)
 - **上一批单一 β 探针已结案。** 降低 β 后 Dream 初学改善，AlphaBay 最终退步，旧域分别不退步的联合条件仍为 false。11 月 17 日 10:19 的回执确认训练、盲评分和分析完整、控制器退出，dev 已整批开放，confirm 仍封存。追加训练或开放 confirm 需要新的具体决定。[合同](../reports/documentation/20261113/vendorlink_beta_quarter/scope.zh.md) · [完成观测](../reports/documentation/20261113/vendorlink_beta_quarter/result/observation.json) · [结果与适用范围](../reports/documentation/20261113/vendorlink_beta_quarter/result/report.zh.md)
 - 追溯运行时，11 月 17 日 00:11 的作业已用[迁移身份及门绑定](../reports/documentation/20261116/h_ablation_result/recovery/state/beta_handover.json)，根启动文件当时已属历史。该时点的进程和 worker 核对见[原始现场观测](../reports/documentation/20261117/handoff_sync/beta_observation.json)。
 
 ### 历史权重版H主实验消融
+
+**中文六方法共同确认已完成正式入口与 CPU／CUDA 合成核验。** 新研究将使用消融 Full 同一套 trial3 配置，与独立的 ER0.1、Logit0.1、L²R、ER+GCR、FOREVER 比较。固定三个顺序、三个 seed，每方法九条，共 54 条。新 120 群待全批训练后统一盲评。Linux 单核六项及 CUDA 三项通过，单次 CUDA 生命周期 46.60 秒，整 PID 峰值 714 MiB。具体合审包已备妥。本轮尚未启动中文训练、生成新群或开标签。此前八配置消融维持结案。[方案与实际入口](../reports/documentation/20261118/h_history_benchmark/scope.zh.md) · [CPU 核验](../reports/documentation/20261118/h_history_benchmark/cpu.json) · [GPU 核验](../reports/documentation/20261118/h_history_benchmark/gpu.json) · [旧入口退役](../reports/documentation/20261118/h_history_benchmark/retirement.json)
 
 11 月 16 日，八配置消融完成。Full 相对 ER 的旧域末态和遗忘改善，平均取得能力的点值保护微负，原联合验收为 false。结果外审及 18 项主审处置已结案，本批后续只需按保存结果解释。[实测报告](../reports/documentation/20261116/h_ablation_result/result/report.zh.md) · [结果主审](../reports/documentation/20261116/h_ablation_result/result/review/primary_disposition.zh.md)
 
@@ -22,7 +24,7 @@ Evolution 以 [STOP_LEARNING](../reports/documentation/20261108/evolution_regist
 
 ### 文件保管与本轮交付
 
-11 月 17 日获准清理的训练权重已删除。复核优先使用保存的实测结果、日志和原回执。指标汇总中的中文 H 公式展示与实测报告分别引用。具体文件、公式来源和清理周期见[当前保管](STORAGE.zh.md#2026-11-17-linux剩余训练权重清理后的当前保管)及[展示来源](STORAGE.zh.md#2026-11-17-当前展示文件与同步索引)。最近一批获准推送在 11 月 17 日交付至 `b41e51c3`，此后的本地提交按当次许可交付。
+11 月 17 日获准清理的训练权重已删除。复核优先使用保存的实测结果、日志和原回执。指标汇总中的中文 H 公式展示与实测报告分别引用。具体文件、公式来源和清理周期见[当前保管](STORAGE.zh.md#2026-11-17-linux剩余训练权重清理后的当前保管)及[展示来源](STORAGE.zh.md#2026-11-17-当前展示文件与同步索引)。最近一批获准推送在 11 月 18 日交付至 `c73c5f6e`，其中包括英语队列启动与进度。中文新比较按本次提交范围保管。
 
 ## 近期执行与审查历史
 
