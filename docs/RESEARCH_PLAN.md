@@ -4,7 +4,11 @@
 
 ## VendorLink账号监督：FIT12共同协议后续
 
-市场适配器与原共享关系头已通过合成路由及历史容量实测。用户将在读取本轮结果后决定是否比较同一市场架构、同一六群与相同资源下的 Full 和 ER。若决定训练，须另定训练入口、预算和评价合同，分别检验少忘、两个旧域末态、初学及新市场净学习。此前按词面混淆写入六槽的路线按原判据结束。[本轮合成证据](../reports/documentation/20261118/vendorlink_market_adapters/report.zh.md) · [六槽写入主审](../reports/documentation/20261118/vendorlink_fit_risk_memory/result/review/primary_disposition.zh.md)
+下一轮开发比较纳入带市场适配器的 H_SEQ、H_ER、H_full，以及用户明确要求的原版 VendorLink_SEQ。拟沿用 AlphaBay → Dream → Agora 和开发 seed 51、52、53，四组各训三条，共 12 条完整轨迹、36 个市场阶段。三个 H 共用市场架构，ER 和 Full 共用六群及采样序列。VendorLink 沿原训练实现，同一端点提供 V_SET 与 V_CLS 两种读取。比较目标为旧域遗忘、两个旧域各自的最终 Macro-F1、初学与新市场净学习。正式训练仍待用户决定，训练入口、执行预算及评价合同待定。[合成评分与容量证据](../reports/documentation/20261118/vendorlink_market_adapters/report.zh.md) · [FIT12 共同评价口径](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/report.zh.md)
+
+并发建议为单卡最多三个训练 worker。先将三个 VendorLink seed 各用一个槽依次完成，同卡本项目此时不混派 H。再调度九条 H，先起两条，在核实适配器训练的整步显存、吞吐及可用余量后补至三条，不按 seed 设同步屏障。共享资源紧张时按实际余量派发。待整批训练完整后，GPU 评分按一个 worker 串行。此为排程建议，用户尚未确定并发或开训。
+
+11 月 18 日 20:35:56（北京时间）只读观察到一张 RTX 5090，可用显存 31,844 MiB，计算进程表为空，可用内存约 242 GiB。原 FIT12 在 Linux 的 `reports/documentation/20261110/vendorlink_redesign/fit_reference/campaign/P/training/P_VendorLink_SEQ_s{51,52,53}/dispatch_receipt.json` 逐条记录整 PID 显存采样峰值 29,102,178,304、22,882,025,472、22,829,596,672 字节（27.10、21.31、21.26 GiB）。最大值加原 H 派发预留 5 GiB，超过本次所见整卡余量。原非适配器 H_SEQ、H_ER、H_full 采样峰值约 3.06–3.55 GiB。新适配器已有合成评分证据，其训练反向与回放峰值仍待限定核实。[原资源预留](../reports/documentation/20261110/vendorlink_redesign/fit_reference/scope.zh.md) · [原 P 计时](../reports/documentation/20261110/vendorlink_redesign/fit_reference/result/budget.json) · [六条 H 训练资源](../reports/documentation/20261110/vendorlink_redesign/fit_reference/mechanism/result/report.zh.md) · [三路 Full 实际工期和累计费用](../reports/documentation/20261113/vendorlink_beta_quarter/result/report.zh.md)
 
 ## 既往计划与决定（历史）
 

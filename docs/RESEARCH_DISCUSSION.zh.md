@@ -1,5 +1,9 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-18 市场适配器比较纳入 VendorLink_SEQ
+
+用户要求“vendor-link_SEQ也得加上，想想按几worker来实验”。原版 VendorLink_SEQ 列为拟训练的第四组，与市场适配器 H_SEQ、H_ER、H_full 按同一组开发 seed 比较。用户本轮要求考虑并发，尚未下达开训指令。[拟议排程与资源依据](RESEARCH_PLAN.md#vendorlink账号监督fit12共同协议后续)
+
 ## 2026-11-18 完整 H 市场路由与历史容量
 
 用户结束按词面混淆选群的路线，明确“先不训练”，授权用合成文本把市场适配器和共享关系头接入完整 H 的 Q2/FIT12 评分，检查单改 Agora 及单改共享头的作用，并实测两套适配器与六群、教师和采样状态在 1 MiB 下的总容量。用户决定看完结果再决定是否运行 Full 和 ER。[本轮范围](../reports/documentation/20261118/vendorlink_market_adapters/scope.zh.md)
