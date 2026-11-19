@@ -1,5 +1,11 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-11-19 VendorLink FIT12 共享前馈层
+
+用户要求“英文 VendorLink 按刚才的方案先把共享前馈层接好，做必要的 CPU 核验。GPU 核验等后续中文这批释放资源后再做，做好外审，正式训练等我看完核验结果再定。”本次沿用真实训练和评分入口，用合成文本验证。新外审材料按具体包核准外发。[本轮范围](../reports/documentation/20261119/vendorlink_shared_ffn/scope.zh.md)
+
+CPU 实测完成后，用户针对 36,703 字节包答复“允许这个 CPU 包外审”。该包已按许可向网页 GPT‑6 Pro 提交一次。[包清单](../reports/documentation/20261119/vendorlink_shared_ffn/review/package_manifest.json) · [提交身份](../reports/documentation/20261119/vendorlink_shared_ffn/review/submission.json)
+
 ## 2026-11-18 中文定稿 H 与五基线统一重新确认
 
 11 月 19 日，用户要求“只要实验能完整运行有结果就行，具体的提升直接看结果”，将累计预算委托执行者拟定，指定沿 VendorLink 控制器处理故障并批准该调度增量外审。随后要求“等vendor-link试验运行结束后，满足正式开训的资源条件后就自动开始训练，确认开训后监听脚本自删”，并要求及时更新项目记录。对于监听增量包，用户答复“允许这个监听增量包外审”，对应 29,970 字节的单次外发；网页原件及主执行者逐项处置已归档。[条件启动授权](../reports/documentation/20261118/h_history_benchmark/start/authorization.zh.md) · [逐包授权与回收](../reports/documentation/20261118/h_history_benchmark/start/submission.json) · [外审与主审](../reports/documentation/20261118/h_history_benchmark/start/review.zh.md)

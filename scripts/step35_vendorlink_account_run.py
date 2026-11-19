@@ -78,10 +78,10 @@ def atomic_tensor(path, value, check, replace=False):
 def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
     routed = 'market_adapters' in task
     if routed:
-        from step35_market_adapters import FORMAT, MarketH, pack_history
-        if task['market_adapters'] != FORMAT or not task.get('stage_end_only'):
-            raise ValueError('Unknown market training or endpoint scheme')
-        model = MarketH(model)
+        from step35_market_adapters import SHARED_FFN_FORMAT, MarketH, pack_history
+        if not task.get('stage_end_only'):
+            raise ValueError('Market routing requires stage-end endpoints')
+        model = MarketH(model, adapter_format=task['market_adapters'])
     if job.exists() or model.settings != AccountSettings(**task['settings']) or task['stages'] not in (1, 3):
         raise ValueError('Fresh fixed task and actual configuration required')
     job.mkdir(parents=True)
@@ -108,6 +108,9 @@ def execute(model, load_fit, job, task, identity, binding, check=lambda: None):
                 path = job/'shared_encoder.pt'
                 atomic_tensor(path, model.shared_encoder_state(), check)
                 shared = record(path)
+            if stage >= 2 and model.adapter_format == SHARED_FFN_FORMAT:
+                # Only the scorer reads this endpoint. Training carries one live FFN.
+                value['shared_ffn'] = {k: p.detach().cpu() for k, p in model.shared_ffn_parameters().items()}
             path = job/f'market_state_{stage}.zip'
             payload = pack_history(model, memory, identity)
             with path.open('xb') as f:

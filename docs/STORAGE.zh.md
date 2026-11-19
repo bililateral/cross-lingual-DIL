@@ -1,5 +1,9 @@
 # 科研文件存储与恢复
 
+## 2026-11-19 VendorLink 共享前馈层合成核验
+
+Linux 在 `reports/documentation/20261119/vendorlink_shared_ffn/cpu01` 独立保管 17 份具名来源、合成核验程序与 CPU 原始回执。合成端点只在核验的临时目录内使用，正常退出时已回收。Windows 具名同步来源身份、准入、计时、控制台及聚合回执。外发 CPU 包保留清单和提交身份；本轮未产生正式模型。[来源](../reports/documentation/20261119/vendorlink_shared_ffn/cpu01/sources.json) · [CPU 原件](../reports/documentation/20261119/vendorlink_shared_ffn/cpu01/result.json) · [审查包身份](../reports/documentation/20261119/vendorlink_shared_ffn/review/package_manifest.json)
+
 ## 2026-11-18 中文 trial3 H 六方法比较实现
 
 11 月 19 日 17:09 中文正式开训。Linux 一次性副本在首笔原生更新留证后删除，原控制器继续派工。前序释放、首笔更新和自删三个原回执已具名同步到 Windows，19:08:32 核实三个活动 worker。[前序释放](../reports/documentation/20261118/h_history_benchmark/start/ready.json) · [首笔更新](../reports/documentation/20261118/h_history_benchmark/start/first_update.json) · [自删回执](../reports/documentation/20261118/h_history_benchmark/start/waiter_deleted.json) · [现场](../reports/documentation/20261118/h_history_benchmark/start/progress_20261119_190832.json)

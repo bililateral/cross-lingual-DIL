@@ -10,17 +10,19 @@ from step35_market_queue import H_ORDER, PROTOCOL, V_ORDER
 from step35_vendorlink_account_policy import BETA, DOMAINS, SEEDS, decide, settings
 
 
-def market_tasks():
-    from step35_market_adapters import FORMAT
+def market_tasks(*, shared_ffn=False):
+    from step35_market_adapters import FORMAT, SHARED_FFN_FORMAT
     result = []
-    for method, seed in V_ORDER+H_ORDER:
+    order = ([(method, seed) for method in ('H_SEQ', 'H_ER', 'H_full') for seed in SEEDS]
+             if shared_ffn else V_ORDER+H_ORDER)
+    for method, seed in order:
         vendor = method == 'VendorLink_SEQ'
         candidate = 'V1' if vendor else 'H_CE_RMS'
         hyper = settings(candidate, method)
         task = dict(id=f'{method}_s{seed}', method=method, seed=seed, epochs=40, stages=3,
                     phase='M', domains=list(DOMAINS), candidate=candidate, settings=hyper, stage_end_only=True)
         if not vendor:
-            task['market_adapters'] = FORMAT
+            task['market_adapters'] = SHARED_FFN_FORMAT if shared_ffn else FORMAT
             hyper.update(beta=BETA, deterministic_history=method == 'H_full')
         result.append(task)
     return result

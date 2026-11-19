@@ -10,7 +10,7 @@
 
 四组训练、开发评价、结果外审及主审已结案。撰写结果时分别引用同结构 ER、SEQ、外部两读取器和预指定的原无适配器 ER。Dream 同时报告取得、遗忘与末态。该批没有待接续训练或确认。[实测分析](../reports/documentation/20261118/vendorlink_market_training/result/report.zh.md) · [结果主审](../reports/documentation/20261118/vendorlink_market_training/result/review/primary_disposition.zh.md)
 
-11 月 19 日的后续建议尚待用户决定。若继续同一 FIT12，优先检验 Dream 学前起点相同、净学习却下降的问题。拟在 Dream、Agora 训练时额外开放最后一个 BERT 块的两层共享前馈线性变换，旧群的标签监督和出生评分约束也可更新这两层。建议先跑三个固定开发 seed 的 H_SEQ，分别核对新域学习与自然遗忘，再按事前约定的条件依次决定是否跑同结构 ER 和 Full。新实验的预算与开训尚待确定。原 12 条轨迹的权重已按用户要求清理，开发比较可引用保存值。[四组开发实测](../reports/documentation/20261118/vendorlink_market_training/result/report.zh.md) · [权重保管](../reports/maintenance/20261119/vendorlink_market_weights/receipt.json)
+11 月 19 日，用户准许先接入最后一个 BERT 块的共享前馈层。先用合成文本核对旧群反传、当前域学习路径、Q2/FIT12 两侧端点恢复与六群容量，并做增量外审。中文六方法整批释放资源后，再做单进程合成 GPU 核验。用户看完核验结果后决定是否开训。若批准正式开发，提案先检验三个固定 seed 的 H_SEQ 是否学好新域及产生自然遗忘，再按预定条件依次评估同结构 ER 和 Full。[本轮范围](../reports/documentation/20261119/vendorlink_shared_ffn/scope.zh.md) · [四组开发实测](../reports/documentation/20261118/vendorlink_market_training/result/report.zh.md)
 
 已结案的四组合同要求 Full 相对同结构 ER 的少忘与旧域末态增益各至少 2 个百分点，并同时通过两旧域末态及新域取得、净学习和稳定性保护。遗忘压力、Full 对 H_SEQ 的保持和外部 VendorLink 两读取器分别判断。按训练 111 h、核验与评分 5 h、辅助 4 h 分桶。confirm 保持封存。[冻结比较、顺序和开训排程](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md)
 

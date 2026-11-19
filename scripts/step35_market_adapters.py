@@ -14,6 +14,7 @@ from step35_vendorlink_account_policy import DOMAINS
 
 
 FORMAT = 'fit12-h-market-qv-r8-v1'
+SHARED_FFN_FORMAT = 'fit12-h-market-qv-r8-shared-last-ffn-v1'
 CAP = 1 << 20
 RANK = 8
 LAYERS = (8, 9, 10, 11)
@@ -57,13 +58,16 @@ class RoutedProjection(nn.Module):
 
 class MarketH(nn.Module):
     """One original H, its single relation head, and up to two distinct adapter banks."""
-    def __init__(self, original):
+    def __init__(self, original, *, adapter_format=FORMAT):
         super().__init__()
+        if adapter_format not in (FORMAT, SHARED_FFN_FORMAT):
+            raise ValueError('Unknown FIT12 market adapter format')
         if (original.settings.method not in ('H_SEQ', 'H_ER', 'H_full')
                 or original.encoder.config.hidden_size != 768
                 or original.encoder.config.num_hidden_layers != 12):
             raise ValueError('Expected FIT12 BERT-base H')
         self.h = original
+        self.adapter_format = adapter_format
         self.stage = 0
         self._active = MarketRoute()
         self.projections = {}
@@ -100,13 +104,21 @@ class MarketH(nn.Module):
         if history != (DOMAINS.index(group.domain) < self.stage-1) or DOMAINS.index(group.domain) >= self.stage:
             raise ValueError('Training group must use its current or retained origin market')
         with self.routing(group.domain):
-            return self.h.backward_h(group, step_seed, teacher, history, check, frozen_history=history)
+            return self.h.backward_h(group, step_seed, teacher, history, check,
+                                     frozen_history=history and self.adapter_format == FORMAT)
 
     def backward_birth(self, group, teacher, check):
         if DOMAINS.index(group.domain) >= self.stage-1:
             raise ValueError('Birth targets belong to completed markets')
         with self.routing(group.domain):
-            return self.h.backward_birth(group, teacher, check, frozen_history=True)
+            return self.h.backward_birth(group, teacher, check, frozen_history=self.adapter_format == FORMAT)
+
+    def shared_ffn_parameters(self):
+        block = self.encoder.encoder.layer[-1]
+        return {f'{name}.{key}': parameter
+                for name, layer in (('intermediate.dense', block.intermediate.dense),
+                                    ('output.dense', block.output.dense))
+                for key, parameter in layer.named_parameters(recurse=False)}
 
     def shared_encoder_state(self):
         if self.stage != 1:
@@ -122,14 +134,18 @@ class MarketH(nn.Module):
             self.enter(stage)
         if stage == 1:
             return make_optimizer(self.h)
-        # Keep the single head and its Adam moments, discard the previous market's moments.
+        # Keep the head's Adam moments. All encoder moments, including the shared FFN's, restart.
         enc_group = optimizer.param_groups[0]
         for param in enc_group['params']:
             param.grad = None
             optimizer.state.pop(param, None)
         enc_group['params'] = [p for p in self.encoder.parameters() if p.requires_grad]
-        if len(enc_group['params']) != 2*len(self.projections):
-            raise ValueError('Only the current query/value factors may train in the encoder')
+        expected = {id(p) for projection in self.projections.values()
+                    for p in projection.banks[DOMAINS[stage-1]].parameters()}
+        if self.adapter_format == SHARED_FFN_FORMAT:
+            expected.update(id(p) for p in self.shared_ffn_parameters().values())
+        if {id(p) for p in enc_group['params']} != expected:
+            raise ValueError('Wrong encoder parameters for this market and adapter format')
         return optimizer
 
     def enter(self, stage: int) -> None:
@@ -137,6 +153,9 @@ class MarketH(nn.Module):
             raise ValueError('Enter the next market in chronological order')
         if stage == 2:
             self.h.encoder.requires_grad_(False)
+            if self.adapter_format == SHARED_FFN_FORMAT:
+                for parameter in self.shared_ffn_parameters().values():
+                    parameter.requires_grad_(True)
             for p in self.projections.values():
                 p.banks['Dream'] = LowRank(p.base)
         if stage == 3:
@@ -185,8 +204,8 @@ class MarketH(nn.Module):
             target.copy_(value)
 
 
-def metadata(stage: int, identity: str) -> dict:
-    return dict(format=FORMAT, identity=identity, stage=stage, markets=list(DOMAINS),
+def metadata(stage: int, identity: str, adapter_format=FORMAT) -> dict:
+    return dict(format=adapter_format, identity=identity, stage=stage, markets=list(DOMAINS),
                 layers=list(LAYERS), projections=['query', 'value'], rank=RANK, scale=1,
                 base='single_shared_encoder', head='single_live_relation_head')
 
@@ -200,7 +219,7 @@ def pack_history(model: MarketH, memory: Memory, identity: str) -> bytes:
     target = io.BytesIO()
     with ZipFile(target, 'w') as archive:
         # Fixed member names and uncompressed payloads give byte-exact additive accounting.
-        archive.writestr(ZipInfo('route.json'), json.dumps(metadata(model.stage, identity),
+        archive.writestr(ZipInfo('route.json'), json.dumps(metadata(model.stage, identity, model.adapter_format),
                           separators=(',', ':')).encode('utf-8'))
         archive.writestr(ZipInfo('adapters.pt'), adapter_state.getvalue())
         if replay:
@@ -219,7 +238,7 @@ def restore_history(model: MarketH, payload: bytes, identity: str, memory=None) 
         expected = ['route.json', 'adapters.pt'] + (['memory.pt'] if replay else [])
         if archive.namelist() != expected:
             raise ValueError('Unexpected members for this market history method')
-        if json.loads(archive.read('route.json')) != metadata(model.stage, identity):
+        if json.loads(archive.read('route.json')) != metadata(model.stage, identity, model.adapter_format):
             raise ValueError('Historical state identity or routing differs')
         state = torch.load(io.BytesIO(archive.read('adapters.pt')), map_location='cpu', weights_only=True)
         model.load_adapters(state)
@@ -233,16 +252,31 @@ def restore_history(model: MarketH, payload: bytes, identity: str, memory=None) 
 
 
 def restore_scoring_endpoint(original, value: dict, identity: str, stage: int) -> MarketH:
-    if value['task']['market_adapters'] != FORMAT or stage not in (0, 1, 2, 3):
+    adapter_format = value['task']['market_adapters']
+    if adapter_format not in (FORMAT, SHARED_FFN_FORMAT) or stage not in (0, 1, 2, 3):
         raise ValueError('Unknown routed H endpoint')
+    needs_ffn = stage >= 2 and adapter_format == SHARED_FFN_FORMAT
+    if needs_ffn != ('shared_ffn' in value):
+        raise ValueError('Shared FFN snapshot does not match the scoring stage or format')
     if stage:
         base = torch.load(pinned(value['shared_encoder']), map_location='cpu', weights_only=True)
         original.encoder.load_state_dict(base, strict=True)
         del base
     original.head.load_state_dict(value['head'], strict=True)
-    model = MarketH(original)
+    model = MarketH(original, adapter_format=adapter_format)
     for index in range(1, stage + 1):
         model.enter(index)
+    if needs_ffn:
+        targets = model.shared_ffn_parameters()
+        saved = value['shared_ffn']
+        if targets.keys() != saved.keys():
+            raise ValueError('Incomplete shared FFN in scoring endpoint')
+        with torch.no_grad():
+            for key, target in targets.items():
+                tensor = saved[key]
+                if tensor.shape != target.shape or tensor.dtype != target.dtype:
+                    raise ValueError(f'Invalid shared FFN tensor {key}')
+                target.copy_(tensor)
     if stage >= 2 or 'market_state' in value:
         restore_history(model, pinned(value['market_state']).read_bytes(), identity)
     model.eval()
