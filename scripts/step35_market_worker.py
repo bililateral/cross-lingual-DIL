@@ -150,6 +150,11 @@ def worker(gate, action, target, name, deadline):
         tasks = stages.batch_tasks(tasks, method)
         batch_root = root/'stages'/method
         stages.require_prior(root, method, gate_id)
+        if not batch_root.is_dir() or (batch_root/'closed.json').exists():
+            raise ValueError('This training stage is not active')
+        if ((action == 'train' and (batch_root/'training_complete.json').exists())
+                or (action == 'score' and (batch_root/'scoring_complete.json').exists())):
+            raise ValueError('This stage operation is already complete')
     if action != 'train':
         frozen = read(batch_root/'training_complete.json')
         if frozen['tasks'] != tasks or set(frozen['winners']) != {t['id'] for t in tasks}:

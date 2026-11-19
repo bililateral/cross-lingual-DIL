@@ -2,6 +2,8 @@
 
 ## 2026-11-19 VendorLink FIT12 共享前馈层
 
+用户随后要求“先把这个分阶段调度脚本接好。H_SEQ、H_ER、H_full 每组都是 seed 51/52/53，三条跑齐才评分，达到之前定的条件再派下一组”，并询问是否需要再跑 VendorLink。沿用上一批相同 FIT12、相同 seed 的已开放 V_SET 与 V_CLS 作为外部对照。本次实施调度并做单核合成核验，正式训练仍待用户看完核验结果后决定。[本次范围与对照来源](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/scope.zh.md)
+
 用户要求“英文 VendorLink 按刚才的方案先把共享前馈层接好，做必要的 CPU 核验。GPU 核验等后续中文这批释放资源后再做，做好外审，正式训练等我看完核验结果再定。”本次沿用真实训练和评分入口，用合成文本验证。新外审材料按具体包核准外发。[本轮范围](../reports/documentation/20261119/vendorlink_shared_ffn/scope.zh.md)
 
 CPU 实测完成后，用户针对 36,703 字节包答复“允许这个 CPU 包外审”。该包已按许可向网页 GPT‑6 Pro 提交一次。[包清单](../reports/documentation/20261119/vendorlink_shared_ffn/review/package_manifest.json) · [提交身份](../reports/documentation/20261119/vendorlink_shared_ffn/review/submission.json)

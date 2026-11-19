@@ -13,6 +13,7 @@ import traceback
 from unittest.mock import patch
 
 import numpy as np
+import psutil
 
 
 def run_suite(root, ref_file):
@@ -126,6 +127,8 @@ def run_suite(root, ref_file):
             prediction[k:] = np.roll(prediction[k:],1)
             matrix = np.zeros((100,100),dtype=np.float64)
             matrix[np.arange(100),prediction] = 1
+            if scenario=='short_matrix' and task['id']=='H_SEQ_s53' and cell=='R33':
+                matrix=matrix[:-1]
             path = dest/f'{method}_{cell}.npy'
             np.save(path,matrix,allow_pickle=False)
             exports[method+':'+cell] = record(path)
@@ -139,6 +142,18 @@ def run_suite(root, ref_file):
         # A real child must match the owning controller's PID and Linux start identity.
         pid = os.fork()
         if pid == 0:
+            if action in ('train','score'):
+                def access_boundary(event, arguments):
+                    if event == 'open' and isinstance(arguments[0], str):
+                        path = arguments[0]
+                        if ('/analysis/result/' in path or (action == 'train' and
+                                ('/scoring/' in path or path.endswith(('_dev.json','_confirm.json'))))):
+                            raise AssertionError('Worker tried to read development evidence: '+path)
+                sys.addaudithook(access_boundary)
+                # Check the boundary itself independently of which files this worker normally reads.
+                try: (campaign/'stages/H_SEQ/analysis/result/results.json').read_bytes()
+                except AssertionError as exc: assert 'development evidence' in str(exc)
+                else: os._exit(2)
             try:
                 worker.worker(gate_path,action,dest,name,time.monotonic()+300)
                 if expected_error is not None:
@@ -169,7 +184,12 @@ def run_suite(root, ref_file):
             if scenario=='pass_all' and name=='H_SEQ_s51' and action=='train':
                 child('train',campaign/'training/H_ER_s51/attempt-1','H_ER_s51','closed.json')
                 child('score',campaign/'scoring/H_SEQ_s51','H_SEQ_s51','training_complete.json')
-            child(action,target,name)
+            # Exercise the production argv builder without binding fixture children to other CPUs.
+            with patch.object(psutil.Process,'cpu_affinity',return_value=list(range(6))):
+                argv=self.command(job,i if recovery else 0,time.monotonic()+300)
+            assert Path(argv[6])==Path(worker.__file__) and Path(argv[argv.index('--gate')+1])==gate_path
+            child(argv[argv.index('--action')+1],Path(argv[argv.index('--target')+1]),
+                  argv[argv.index('--task')+1] if '--task' in argv else None)
             completed(job)
             receipt = dict(success=True,released=True,slot=i)
             if recovery:
@@ -214,9 +234,15 @@ def run_suite(root, ref_file):
                 data['full_er']=full['full_er']
                 data['external']=full['external']
             if case=='pass_all':
+                child('train',campaign/'training/H_SEQ_s51/attempt-2','H_SEQ_s51','not active')
+                child('score',campaign/'scoring/H_ER_s51','H_ER_s51','not active')
                 try: queue.campaign(gate_path)
                 except FileExistsError: pass
                 else: raise AssertionError('Existing campaign was recreated')
+            if case in ('seq_stable','er_stable'):
+                next_method='H_ER' if case=='seq_stable' else 'H_full'
+                child('train',campaign/'training'/f'{next_method}_s51'/'attempt-1',
+                      f'{next_method}_s51','did not authorize')
         else:
             data.update(status='REJECTED')
             assert not opened
@@ -243,6 +269,7 @@ def run_suite(root, ref_file):
         qualify('duplicate_seed','frozen tasks',other_tasks=wrong)
         qualify('missing_train','three fixed training winners')
         qualify('missing_score','dispatch_receipt.json')
+        qualify('short_matrix','Incomplete Q2/FIT12')
         for case,count,outcome in [('seq_stable',1,'STOP_NO_MEANINGFUL_FORGETTING'),('seq_learning',1,'STOP_LEARNING'),
                 ('er_stable',2,'STOP_ER_FORGETTING'),('er_learning',2,'STOP_ER_LEARNING'),
                 ('unequal_start',2,'HOLD_PREHISTORY_IDENTITY'),('full_no_increment',3,'STOP_FULL_APPLICATION'),
@@ -262,6 +289,7 @@ def run_suite(root, ref_file):
     return dict(status='PASS',device='cpu',gpu_initialized=False,formal_training_tasks=0,synthetic_cases=results,
                 official_aggregate_binding=refs['results']['sha256'],external_readers=list(readers),seeds=list(SEEDS),
                 rejected_wrong_reference_fields=['bundle hash','manifest','pretrained model'],
+                training_and_blind_workers_read_development_values=False,closed_stage_reentry_rejected=True,
                 boundaries='Real campaign, child worker, receipt checks, native 13-metric analysis and decisions; GPU execution, model outputs and timing are synthetic.')
 
 

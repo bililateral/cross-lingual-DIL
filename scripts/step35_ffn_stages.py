@@ -109,23 +109,18 @@ def check_winners(root, frozen, tasks, gate_id, manifest_binding):
 
 
 def require_prior(root, method, gate_id):
-    """Only published, successful prior stages can authorize the next block."""
-    prior_results, prior_metrics = {}, {}
+    """Read only controller-issued permissions. Training must never open prior development values."""
+    permits = []
     for index in range(METHODS.index(method)):
         previous, following = METHODS[index:index+2]
         directory = root/'stages'/previous
         stage = read(directory/'closed.json')
         if stage['gate'] != gate_id or stage['method'] != previous:
             raise ValueError('Prior stage belongs to another campaign')
-        result = directory/'analysis/result'
-        policy = read(bound_at(stage['decision'], result/'decision.json'))
-        if (policy['method'] != previous or policy['status'] != 'PASS_'+previous
-                or policy['next_method'] != following):
+        if stage['status'] != 'PASS_'+previous or stage['next_method'] != following:
             raise ValueError('The prior stage did not authorize its successor')
-        prior_results[previous] = read(bound_at(stage['results'], result/'results.json'))[previous]
-        prior_metrics[previous] = stage['metrics']
-        bound_at(stage['metrics'], result/'metrics.json')
-    return prior_results, prior_metrics
+        permits.append(stage)
+    return permits
 
 
 def stage_decision(method, results, historical=None):
@@ -192,7 +187,16 @@ def analyze_stage(root, method, tasks, g, gate_id, manifest):
         score = read(bound_at(binding, job/'result/completion.json'))
         check_scores(root, task, score, manifest, gate_id, g['manifest'])
         completed.append(score)
-    earlier, metric_bindings = require_prior(root, method, gate_id)
+    earlier, metric_bindings = {}, {}
+    for permit in require_prior(root, method, gate_id):
+        previous = permit['method']
+        saved = root/'stages'/previous/'analysis/result'
+        prior_policy = read(bound_at(permit['decision'], saved/'decision.json'))
+        if any(prior_policy[k] != permit[k] for k in ('method','status','next_method')):
+            raise ValueError('Published permission and saved development decision differ')
+        earlier[previous] = read(bound_at(permit['results'], saved/'results.json'))[previous]
+        metric_bindings[previous] = permit['metrics']
+        bound_at(permit['metrics'], saved/'metrics.json')
     readers, original, ref = vendor_reference(g)
     # analyze creates a fresh result directory and opens precisely these three dev sets once.
     current = analyze(completed, tasks, dest)
@@ -243,13 +247,15 @@ def dispatch(runner, tasks, completed, gate_id):
         result = analysis/'result'
         def analyzed(job):
             decision = read(result/'decision.json')
-            if decision['method'] != method or decision['next_method'] not in (None, *METHODS[index+1:index+2]):
+            following = METHODS[index+1] if index+1 < len(METHODS) and decision['status'] == 'PASS_'+method else None
+            if decision['method'] != method or decision['next_method'] != following:
                 raise ValueError('Wrong stage decision')
         runner.run_many([dict(action='analyze', target=analysis, bucket='auxiliary', seconds=600,
                               operation='analyze_'+method)], 1, analyzed)
         succeeded(analysis/'dispatch_receipt.json')
         decision = read(result/'decision.json')
-        write(directory/'closed.json', dict(method=method, gate=gate_id, decision=record(result/'decision.json'),
+        write(directory/'closed.json', dict(method=method, gate=gate_id, status=decision['status'],
+              next_method=decision['next_method'], decision=record(result/'decision.json'),
               results=record(result/'results.json'), metrics=record(result/'metrics.json')))
         finished[method] = record(directory/'closed.json')
         if decision['next_method'] is None:

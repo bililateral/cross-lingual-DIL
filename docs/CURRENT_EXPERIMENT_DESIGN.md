@@ -4,7 +4,7 @@ H/S评价补充（2026-11-02，已结案）：用户选择[方案A](../reports/s
 
 ## 当前合同入口
 
-英文 VendorLink FIT12 共享前馈候选在 Dream 和 Agora 开放 BERT 最后一块的两层前馈变换，沿用六群记忆与同一共享关系头。用户已批准接线、合成 CPU 核验及外审，合成 GPU 核验排在中文六方法整批释放资源后。正式训练须由用户审阅核验结果后决定。旧 worker 的任务绑定、整批评分和外部读取器依赖已单列为候选分阶段派发的前置事项。[CPU 核验与独立处置](../reports/documentation/20261119/vendorlink_shared_ffn/review/primary_disposition.zh.md) · [候选与核验范围](../reports/documentation/20261119/vendorlink_shared_ffn/scope.zh.md)
+英文 VendorLink FIT12 共享前馈候选在 Dream 和 Agora 开放 BERT 最后一块的两层前馈变换，沿用六群记忆与同一共享关系头。用户已批准接线、合成 CPU 核验及外审，合成 GPU 核验排在中文六方法整批释放资源后。正式训练须由用户审阅核验结果后决定。本候选独立分阶段协议已接到实际控制器与 worker。每组三个 seed 训练齐全后盲评，整组分数齐全才开放；合同中的学习、遗忘和保护条件控制下一组，V_SET 与 V_CLS 复用上一批冻结聚合。[阶段合同](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/scope.zh.md) · [调度核验](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/report.zh.md) · [CPU 核验与独立处置](../reports/documentation/20261119/vendorlink_shared_ffn/review/primary_disposition.zh.md) · [候选与核验范围](../reports/documentation/20261119/vendorlink_shared_ffn/scope.zh.md)
 
 中文六方法共同确认采用 trial3 H_full 与五个原定义基线，固定 ABC／BCA／CAB × seed 4／5／6，54 条轨迹、162 端点，同一新 120 群盲评。11 月 19 日条件启动正式门绑定生产版本 `e1219ac0`。具名 VendorLink 四组全批完成、末笔结算并释放资源后，实际调度器复核中文首槽准入。同一进程接续正式控制；具名原生优化更新确认后删除一次性副本。训练、评价及具名 OOM 仍依原合同。[条件启动授权](../reports/documentation/20261118/h_history_benchmark/start/authorization.zh.md) · [中文正式门](../reports/documentation/20261118/h_history_benchmark/start/formal_gate.json) · [外审与主审](../reports/documentation/20261118/h_history_benchmark/start/review.zh.md) · [既有 OOM 调度主审](../reports/documentation/20261118/h_history_benchmark/dispatch_review/primary_disposition.zh.md)
 

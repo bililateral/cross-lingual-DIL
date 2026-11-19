@@ -2,6 +2,8 @@
 
 ## 2026-11-19 VendorLink 共享前馈层合成核验
 
+分阶段派发的两次原始回执、计时及部署来源存放在同一候选的 `dispatch/cpu01`、`dispatch/cpu02`。最终 18 份源码、单核核验程序、引用及固定九任务逐件核对，具名小回执已回传 Windows。合成队列和模拟开发矩阵随临时目录回收。上一批 V 只引用已开放聚合，正式模型保管仍沿原清理回执。[最终来源](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/cpu02/sources.json) · [九任务](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/cpu02/tasks.json) · [逐案回执](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/cpu02/result.json)
+
 Linux 在 `reports/documentation/20261119/vendorlink_shared_ffn/cpu01` 独立保管 17 份具名来源、合成核验程序与 CPU 原始回执。合成端点只在核验的临时目录内使用，正常退出时已回收。Windows 具名同步来源身份、准入、计时、控制台及聚合回执。CPU 送审输入的原字节可由本地提交 `15cc2dc8` 恢复。保管网页原文 15,266 字节及独立主审，供 GPU 增量核验时核对已验与待验范围。[外审原文](../reports/documentation/20261119/vendorlink_shared_ffn/review/external_report.zh.md) · [主审](../reports/documentation/20261119/vendorlink_shared_ffn/review/primary_disposition.zh.md) · [来源](../reports/documentation/20261119/vendorlink_shared_ffn/cpu01/sources.json) · [CPU 原件](../reports/documentation/20261119/vendorlink_shared_ffn/cpu01/result.json) · [审查包身份](../reports/documentation/20261119/vendorlink_shared_ffn/review/package_manifest.json)
 
 ## 2026-11-18 中文 trial3 H 六方法比较实现
