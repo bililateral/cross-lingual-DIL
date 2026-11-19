@@ -12,6 +12,8 @@ CPU 和 CUDA 核验完成后，用户明确答复“允许这个 CPU／GPU 合�
 
 ## 2026-11-18 批准四组正式训练、启动观测后更新进度并推送全部提交
 
+11 月 19 日，用户要求“那你觉得下一步的实验该如何执行？顺便把这次实验产生的模型权重文件删掉”。本次实际删除对象是刚结案的英文市场适配器四组。下一轮英文实验处于建议阶段。中文六方法继续按原合同运行。[权重清理回执](../reports/maintenance/20261119/vendorlink_market_weights/receipt.json)
+
 11 月 19 日，用户要求“实验运行结束了，把结果同步回来仔细分析”，并对 87,337 字节的结果包答复“允许这个结果包外审”。许可用于将该包向网页 GPT‑6 Pro 提交一次。四组按原合同解释，中文按已批准的条件自动开训。[结果同步清单](../reports/documentation/20261118/vendorlink_market_training/result/sync.json) · [本次包及提交](../reports/documentation/20261118/vendorlink_market_training/result/review/submission.json)
 
 用户审阅四组训练方案后明确要求“开始训练”，并要求实际观察到训练开始后及时更新全部相关项目进度记录，最后把所有本地提交推到远端。这一决定承接已经确定的并发、一次 OOM 重试和分桶预算。执行开训前定向核验与审查，整批 dev 和 confirm 延续合同的开放条件。[用户授权原文](../reports/documentation/20261118/vendorlink_market_training/execution/authorization.zh.md) · [四组合同](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md) 用户另就 76,794 字节的开训前包答复“允许这个包外审”；包经本地 Playwright MCP 提交网页 GPT‑6 Pro 一次，其两项必修意见已独立闭合。局部 OOM 的具名请求先等待旧进程与显存释放及可用资源；资源暂不足保留请求，已结算额度不足时停止派发。授权执行已由正式更新落地。[具体包许可](../reports/documentation/20261118/vendorlink_market_training/execution/review/submission.json) · [主审](../reports/documentation/20261118/vendorlink_market_training/execution/review/primary_disposition.zh.md) · [正式观测](../reports/documentation/20261118/vendorlink_market_training/execution/status_observation.json)
