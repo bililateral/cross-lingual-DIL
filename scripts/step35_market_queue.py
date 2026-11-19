@@ -28,17 +28,20 @@ def attempt_job(job, number):
 
 class OomHandoff:
     """Only the live dispatch loop consumes a request; workers never own the queue."""
-    def __init__(self, jobs, slots):
+    def __init__(self, jobs, slots, *, paired_start=True, cores_per_slot=2, stop_serial_exhausted=True):
         self.planned = {job['task_id'] for job in jobs}
         self.slots = slots
-        self.second_slot_seconds = jobs[1]['seconds'] if slots > 1 else 0
+        self.paired_start = paired_start and slots > 1
+        self.cores_per_slot = cores_per_slot
+        self.stop_serial_exhausted = stop_serial_exhausted
+        self.second_slot_seconds = jobs[1]['seconds'] if self.paired_start else 0
         self.started = False
         self.warmed = set()
         self.suspended = {}
         self.winners = {}
 
     def observe_updates(self, active):
-        if self.slots == 1 or len(self.warmed) >= 2:
+        if not self.paired_start or len(self.warmed) >= 2:
             return
         for slot, item in active.items():
             path = item['job']['target']/'run/workload.json'
@@ -63,7 +66,7 @@ class OomHandoff:
                 start_ticks=receipt['process']['start_ticks'], boot_id=receipt['process']['boot_id']))
 
     def waiting(self, ordinary_pending):
-        if self.slots == 1 and any(job['attempt'] == 2 for job, _ in self.suspended.values()):
+        if self.stop_serial_exhausted and self.slots == 1 and any(job['attempt'] == 2 for job, _ in self.suspended.values()):
             return False
         return any(ordinary_pending or job['attempt'] == 1 for job, _ in self.suspended.values())
 
@@ -74,11 +77,11 @@ class OomHandoff:
         return dict(oom_slots=[row for _, row in self.suspended.values()], successful_tasks=sorted(self.winners))
 
     def select(self, slot, ordinary, retired, snapshot):
-        if slot == 2 and len(self.warmed) < 2:
+        if self.paired_start and slot == 2 and len(self.warmed) < 2:
             return None
-        if not self.started and self.slots > 1 and len(psutil.Process().cpu_affinity()) < 4:
+        if self.paired_start and not self.started and len(psutil.Process().cpu_affinity()) < 2*self.cores_per_slot:
             return None
-        if len(psutil.Process().cpu_affinity()) < 2*(slot+1):
+        if len(psutil.Process().cpu_affinity()) < self.cores_per_slot*(slot+1):
             return None
         if slot not in retired:
             return ordinary
@@ -101,7 +104,7 @@ class OomHandoff:
         return ordinary  # A second OOM can release capacity, never a third attempt.
 
     def admission_limits(self, limits):
-        if self.started or self.slots == 1:
+        if self.started or not self.paired_start:
             return limits
         values = dict(limits)
         for name in ('free_gpu_bytes', 'free_ram_bytes', 'save_reserve_bytes'):
@@ -128,10 +131,11 @@ def request_marker(row):
     return Path(receipt['path']).parent/('reopen-'+receipt['sha256']+'.request')
 
 
-def request_recovery(campaign, task, attempt):
+def request_recovery(campaign, task, attempt, *, task_ids=None, protocol=PROTOCOL):
     """Submit an idempotent request for a particular failed attempt, never launch a process."""
     campaign = Path(campaign).resolve()
-    if task not in {f'{m}_s{s}' for m, s in V_ORDER+H_ORDER} or attempt not in (1, 2):
+    permitted = {f'{m}_s{s}' for m, s in V_ORDER+H_ORDER} if task_ids is None else task_ids
+    if task not in permitted or attempt not in (1, 2):
         raise ValueError('Unknown fixed trajectory or attempt')
     path = campaign/'training'/task/f'attempt-{attempt}'/'dispatch_receipt.json'
     receipt = read(path)
@@ -144,7 +148,7 @@ def request_recovery(campaign, task, attempt):
         return marker
     parent = read(campaign/'controller.json')
     process = psutil.Process(parent['pid'])
-    if (parent['protocol'] != PROTOCOL or kernel_identity(parent['pid']) !=
+    if (parent['protocol'] != protocol or kernel_identity(parent['pid']) !=
             {k: parent[k] for k in ('start_ticks', 'boot_id')} or
             (process.username(), process.cwd(), process.cmdline()) !=
             (parent['owner'], parent['cwd'], parent['command'])):
@@ -167,7 +171,8 @@ class MarketRunner(Runner):
 
     def settle_handoff(self,success=True):
         if hasattr(self,'handoff_since'):
-            self.ledger.sync_external(force=True)
+            if hasattr(self.ledger, 'sync_external'):
+                self.ledger.sync_external(force=True)
             self.ledger.charge('auxiliary','controller_setup_or_handoff',time.monotonic()-self.handoff_since,success)
             self.handoff_since=time.monotonic()
 

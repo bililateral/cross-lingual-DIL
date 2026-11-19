@@ -46,10 +46,12 @@ class Budget(ComparisonBudget):
         files = queue.campaign_files(self.root)
         used, small = sum(size for _, size in files), sum(size for suffix, size in files if suffix != '.pt')
         self.peak_rss, self.peak_disk = max(self.peak_rss, rss), max(self.peak_disk, used)
-        if (rss > self.limits['rss_bytes'] or used+reserve > self.limits['disk_bytes']
-                or small > self.limits['small_bytes']
+        if rss > self.limits['rss_bytes']:
+            raise RuntimeError('Worker RSS allowance exceeded')
+        if (used+reserve > self.limits['disk_bytes'] or small > self.limits['small_bytes']
                 or shutil.disk_usage(self.root).free < self.limits['free_reserve_bytes']+reserve):
-            raise RuntimeError('Independent comparison resource allowance exceeded')
+            import errno
+            raise OSError(errno.ENOSPC, 'Shared comparison disk allowance exceeded')
 
 
 def specs():

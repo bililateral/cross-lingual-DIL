@@ -130,8 +130,8 @@ class BenchmarkTest(unittest.TestCase):
     def test_missing_receipt_and_misaligned_blind_cells(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            receipts = [dict(id=r["id"], success=True, bucket="training") for r in b.plan()[:-1]]
-            b.data.write_json(root/"training_complete.json", dict(sources=[], completed=receipts,
+            winners = {r["id"]: {} for r in b.plan()[:-1]}
+            b.data.write_json(root/"training_complete.json", dict(sources=[], winners=winners,
                              status="ALL_TRAINING_COMPLETE_EVALUATION_CLOSED"))
             with self.assertRaisesRegex(ValueError, "54 successful"):
                 b.completed(root, {"sources": []})
@@ -221,24 +221,35 @@ class BenchmarkTest(unittest.TestCase):
             b.data.write_json(root/"process.json", {**row, "pid": os.getpid()+1})
             with self.assertRaisesRegex(ValueError, "reservation"):
                 b.check_dispatch(root, gate, "worker", end, 120)
-        EVIDENCE["dispatch"] = dict(own_claim="accepted", foreign_pid="rejected", historical_gate="rejected")
+            task = b.plan()[0]["id"]
+            process = {**row, **b.dispatch.kernel_identity(os.getpid()), "attempt":2, "task_id":task,
+                       "command":[sys.executable, "-B", str(Path(b.__file__).resolve()), "worker",
+                                  "--gate", str(gate), "--id", task, "--deadline", str(end), "--attempt", "2"]}
+            b.data.write_json(root/"process.json", process)
+            b.check_dispatch(root, gate, "worker", end, 120, task_id=task, attempt=2)
+            b.data.write_json(root/"process.json", {**process, "attempt":1})
+            with self.assertRaisesRegex(ValueError, "kernel process identity"):
+                b.check_dispatch(root, gate, "worker", end, 120, task_id=task, attempt=2)
+        EVIDENCE["dispatch"] = dict(own_claim="accepted", foreign_pid="rejected", historical_gate="rejected",
+                                    same_kernel_second_attempt="accepted", wrong_attempt="rejected")
 
     def test_generation_rechecks_162_endpoint_files(self):
         from types import SimpleNamespace
         rows = b.plan()
         partition = {"calibration": [dict(domain=d, group_uid=f"{d}-{i}") for d in "ABC" for i in range(12)]}
-        accounting = [dict(id=row["id"], bucket="training", success=True) for row in rows]
         access = dict(train=1, valid=0, heldout=0, owners=0, worker_train_reads=1)
         mapping = {"a": 1.0, "b": 0.0}
         with tempfile.TemporaryDirectory() as directory:
             campaign = Path(directory)
-            b.data.write_json(campaign/"training_complete.json", dict(status="ALL_TRAINING_COMPLETE_EVALUATION_CLOSED",
-                              sources=[], completed=accounting))
-            for row, receipt in zip(rows, accounting, strict=True):
-                job = campaign/row["id"]
+            winners = {}
+            for row in rows:
+                retry = row == rows[-1]
+                attempt = 2 if retry else 1
+                task = row["id"]
+                job = campaign/"training"/task/f"attempt-{attempt}"
                 root = job/"run"
                 root.mkdir(parents=True)
-                b.data.write_json(job/"dispatch_receipt.json", receipt)
+                b.data.write_json(job/"dispatch_receipt.json", dict(task_id=task, attempt=attempt, slot=0, success=True, released=True))
                 is_forever = row["name"] == b.forever.NAME
                 status = (b.forever_run.COMPLETE if is_forever else b.comparison_run.COMPLETE
                           if row["name"] in b.comparison.NEW_METHODS else b.TRAIN_CAL_COMPLETE)
@@ -256,13 +267,23 @@ class BenchmarkTest(unittest.TestCase):
                 b.data.write_json(root/"completion.json", dict(spec=row["native"], source_files=[], points=points,
                     updates=864, status=status, partition=partition, access=access,
                     counts=dict(current=864, fixture=0, replay=0)))
+                winners[task] = dict(attempt=attempt, receipt=b.queue.record(job/"dispatch_receipt.json"),
+                                     completion=b.queue.record(root/"completion.json"))
+                if retry:
+                    first = job.parent/"attempt-1"/"dispatch_receipt.json"
+                    first.parent.mkdir()
+                    b.data.write_json(first, dict(task_id=task, attempt=1, slot=0, success=False, released=True, failure_kind="CUDA_OOM"))
+                    winners[task]["first_oom_receipt"] = b.queue.record(first)
+            b.data.write_json(campaign/"training_complete.json", dict(status="ALL_TRAINING_COMPLETE_EVALUATION_CLOSED",
+                              sources=[], winners=winners))
             budget = SimpleNamespace(check=lambda: None)
             with patch.object(ev.shared, "generate") as generate:
                 ev.run("generation", campaign, campaign/"generation", {"sources":[]}, budget)
                 self.assertEqual(generate.call_count, 1)
                 generate.reset_mock()
                 for index in (0, len(rows)-1):
-                    path = campaign/rows[index]["id"]/"run"/"model-3.pt"
+                    task = rows[index]["id"]
+                    path = campaign/"training"/task/f"attempt-{winners[task]['attempt']}"/"run"/"model-3.pt"
                     original = path.read_bytes()
                     path.unlink()
                     with self.assertRaises(FileNotFoundError):
@@ -271,11 +292,17 @@ class BenchmarkTest(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, "File differs"):
                         ev.run("generation", campaign, campaign/"generation", {"sources":[]}, budget)
                     path.write_bytes(original)
+                last = rows[-1]["id"]
+                winners[last]["first_oom_receipt"] = winners[last]["receipt"]
+                b.data.write_json(campaign/"training_complete.json",
+                                  dict(status="ALL_TRAINING_COMPLETE_EVALUATION_CLOSED", sources=[], winners=winners))
+                with self.assertRaisesRegex(ValueError, "different training attempt"):
+                    ev.run("generation", campaign, campaign/"generation", {"sources":[]}, budget)
                 generate.assert_not_called()
             self.assertFalse((campaign/"evaluation_access.json").exists())
         EVIDENCE["before_generation"] = dict(handwritten_endpoints=162, intact="passed",
                 missing_H="blocked", changed_H="blocked", missing_FOREVER="blocked", changed_FOREVER="blocked",
-                official_groups_generated=0, official_pairs_opened=0)
+                substituted_first_oom_receipt="blocked", official_groups_generated=0, official_pairs_opened=0)
 
     def test_interrupted_worker_validation_keeps_receipt_and_fee(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -324,12 +351,14 @@ class BenchmarkTest(unittest.TestCase):
             analysis.write_text("handwritten test fixture")
             files = [b.queue.record(source)]
             scope = dict(experiment=b.EXPERIMENT, runs=b.plan(), cohort=b.cohort(), actions=["training", *b.POST],
-                         sources=files, workers=1, worker_failure_policy="stop_batch", analysis_plan=b.queue.record(analysis),
+                         sources=files, workers=1, worker_failure_policy=b.dispatch.POLICY, analysis_plan=b.queue.record(analysis),
+                         cpu_test_seconds=0, other_gpu_commitments=[], allow_observed_foreign_gpu_processes=False,
                          seconds_per_method={name:90 for name in b.NAMES}, post_seconds={name:90 for name in b.POST},
                          prior_used_seconds={k:0 for k in ("control", "training", *b.POST)},
                          budget_seconds={k:6000 for k in ("control", "training", *b.POST)},
                          limits={k:1024 for k in ("rss_bytes", "disk_bytes", "small_bytes", "free_reserve_bytes",
-                                                  "free_gpu_bytes", "allocator_bytes", "process_gpu_bytes")})
+                                                  "free_gpu_bytes", "allocator_bytes", "process_gpu_bytes",
+                                                  "worker_rss_bytes", "free_ram_bytes", "save_reserve_bytes")})
             def fixture_gate(authorization_sources):
                 auth = root/"synthetic-authorization.json"
                 b.data.write_json(auth, {**scope, "sources":authorization_sources, "authorize_execution":True})
@@ -390,7 +419,7 @@ if __name__ == "__main__":
                  "test_blind_loader_all_six_native_endpoint_formats")
     elif sys.argv[1:] == ["--review-fixes"] and not torch.cuda.is_available():
         cases = ("test_generation_rechecks_162_endpoint_files", "test_interrupted_worker_validation_keeps_receipt_and_fee",
-                 "test_gate_binds_authorized_sources_and_stop_reserve")
+                 "test_gate_binds_authorized_sources_and_stop_reserve", "test_reservation_and_historical_gate_rejection")
     elif not sys.argv[1:] and not torch.cuda.is_available():
         cases = unittest.defaultTestLoader.getTestCaseNames(BenchmarkTest)
     else:

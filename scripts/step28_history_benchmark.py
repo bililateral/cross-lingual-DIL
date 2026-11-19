@@ -18,6 +18,7 @@ import step28_continual_comparison_run as comparison_run
 import step28_forever_formal as forever_run
 import step28_formal_queue as queue
 import step28_history_optuna as history
+import step28_history_benchmark_dispatch as dispatch
 
 five, comparison, forever = five_run.m, comparison_run.m, forever_run.m
 data = five.data
@@ -29,6 +30,8 @@ NAMESPACE, CONFIRM_SEED = "trial3_six_confirmation_20261118", 2026111804
 EXPERIMENT = "chinese_trial3_six"
 TRAIN_CAL_COMPLETE = "COMPLETE_864_UPDATES_3_ENDPOINTS_TRAIN_CAL_ONLY"
 POST = ("generation", "confirmation", "analysis")
+POST_STATUS = dict(generation="GENERATED_VALIDATED_OWNERS_SEALED", confirmation="ALL_54_BLIND_AND_SCORED",
+                   analysis="SIX_METHOD_PAIRED_TABLE")
 SCRIPTS = Path(__file__).resolve().parent
 SCHEMAS = ("step28_chinese_base_policy", "step28_alias_ranking_policy", "step28_record_replay_policy",
            "step28_bge_continual_policy", "step28_continual_expression_policy", "step28_continual_expression_catalog")
@@ -79,6 +82,7 @@ def source_paths():
             else:
                 continue
             pending.extend(SCRIPTS/(name+".py") for name in names if name.startswith("step28_"))
+    paths.update(SCRIPTS/name for name in dispatch.SHARED_SOURCES)
     paths.update(SCRIPTS.parent/"schema"/(name+".json") for name in SCHEMAS)
     return sorted(paths)
 
@@ -89,7 +93,8 @@ def positive(value):
 
 def read_gate(path):
     allowed = data.read_json(path)
-    if (sys.platform != "linux" or allowed.get("experiment") != EXPERIMENT or
+    if (sys.platform != "linux" or Path(sys.executable).resolve() != Path(dispatch.PYTHON).resolve() or
+            allowed.get("experiment") != EXPERIMENT or
             allowed.get("approved") is not True or allowed.get("review_closed") is not True or
             allowed.get("runs") != plan() or allowed.get("cohort") != cohort() or
             allowed.get("actions") != ["training", *POST] or allowed.get("listener") or
@@ -103,24 +108,34 @@ def read_gate(path):
         raise ValueError("Fresh campaign path or exact deployed sources differ")
     approved = data.read_json(queue.verify(allowed["authorization"]))
     fields = ("experiment", "runs", "cohort", "actions", "sources", "limits", "workers", "seconds_per_method",
-              "budget_seconds", "prior_used_seconds", "post_seconds", "worker_failure_policy", "analysis_plan")
+              "budget_seconds", "prior_used_seconds", "post_seconds", "worker_failure_policy", "analysis_plan",
+              "cpu_test_seconds", "other_gpu_commitments", "allow_observed_foreign_gpu_processes")
     if approved.get("authorize_execution") is not True or any(approved[k] != allowed[k] for k in fields):
         raise ValueError("Execution scope or resource allocations differ from the decision")
     queue.verify(allowed["analysis_plan"])
-    if (type(allowed["workers"]) is not int or allowed["workers"] < 1 or
-            allowed["worker_failure_policy"] not in ("stop_batch", "retire_failed_slot_continue_healthy") or
+    if (type(allowed["workers"]) is not int or not 1 <= allowed["workers"] <= 3 or
+            allowed["worker_failure_policy"] != dispatch.POLICY or
+            not isinstance(allowed["other_gpu_commitments"], list) or
+            type(allowed["allow_observed_foreign_gpu_processes"]) is not bool or
             set(allowed["seconds_per_method"]) != set(NAMES) or set(allowed["post_seconds"]) != set(POST) or
             set(allowed["budget_seconds"]) != {"training", "control", *POST} or
             set(allowed["prior_used_seconds"]) != set(allowed["budget_seconds"]) or
             not all(positive(v) and v > 60 for k in ("seconds_per_method", "post_seconds")
                     for v in allowed[k].values()) or not all(positive(v) for v in allowed["budget_seconds"].values()) or
             not all(type(v) in (int, float) and math.isfinite(v) and 0 <= v <= allowed["budget_seconds"][k]
-                    for k, v in allowed["prior_used_seconds"].items())):
+                    for k, v in allowed["prior_used_seconds"].items()) or
+            type(allowed["cpu_test_seconds"]) is not int or
+            not 0 <= allowed["cpu_test_seconds"] <= allowed["prior_used_seconds"]["control"]):
         raise ValueError("Incomplete independent task, controller or cumulative budget")
     for key in ("rss_bytes", "disk_bytes", "small_bytes", "free_reserve_bytes",
-                "free_gpu_bytes", "allocator_bytes", "process_gpu_bytes"):
+                "free_gpu_bytes", "allocator_bytes", "process_gpu_bytes", "worker_rss_bytes",
+                "free_ram_bytes", "save_reserve_bytes"):
         if type(allowed["limits"].get(key)) is not int or allowed["limits"][key] <= 0:
             raise ValueError("Missing positive resource allocation: " + key)
+    limits = allowed["limits"]
+    if (limits["allocator_bytes"] > limits["process_gpu_bytes"] or limits["process_gpu_bytes"] > limits["free_gpu_bytes"]
+            or limits["worker_rss_bytes"] > min(limits["rss_bytes"], limits["free_ram_bytes"])):
+        raise ValueError("Per-worker limits must fit the approved reservations")
     return allowed
 
 
@@ -187,17 +202,14 @@ def validate_training(job, row, allowed, *, verify_models=True):
 def completed(campaign, allowed, *, verify_models=True, check=lambda: None):
     saved = data.read_json(campaign/"training_complete.json")
     rows = plan()
-    receipts = saved["completed"]
+    winners = saved["winners"]
     if (saved["status"] != "ALL_TRAINING_COMPLETE_EVALUATION_CLOSED" or saved["sources"] != allowed["sources"] or
-            len(receipts) != 54 or {r["id"] for r in receipts} != {r["id"] for r in rows} or
-            not all(r["success"] is True and r["bucket"] == "training" for r in receipts)):
+            set(winners) != {r["id"] for r in rows}):
         raise ValueError("All 54 successful training dispatch receipts are required")
     records = []
     for row in rows:
         check()
-        job = campaign/row["id"]
-        if data.read_json(job/"dispatch_receipt.json") != next(r for r in receipts if r["id"] == row["id"]):
-            raise ValueError("Dispatch receipt differs from batch")
+        job = dispatch.winner_directory(campaign, row["id"], winners[row["id"]])
         rec = validate_training(job, row, allowed, verify_models=verify_models)
         if records and rec["partition"] != records[0]["record"]["partition"]:
             raise ValueError("Methods do not share the same training/calibration groups")
@@ -205,14 +217,21 @@ def completed(campaign, allowed, *, verify_models=True, check=lambda: None):
     return records
 
 
-def check_dispatch(job, gate_path, action, deadline, seconds):
+def check_dispatch(job, gate_path, action, deadline, seconds, *, task_id=None, attempt=None):
     receipt_path = job/"process.json"
     until = min(deadline, time.monotonic()+5)
     while not receipt_path.is_file() and time.monotonic() < until:
         time.sleep(.05)
     receipt = data.read_json(receipt_path)
     expected = [sys.executable, "-B", str(Path(__file__).resolve()), action, "--gate", str(gate_path),
-                "--id", job.name, "--deadline", str(deadline)]
+                "--id", task_id or job.name, "--deadline", str(deadline)]
+    if attempt is not None:
+        expected += ["--attempt", str(attempt)]
+    if task_id is not None:
+        kernel = dispatch.kernel_identity(os.getpid())
+        if (any(receipt.get(k) != v for k,v in kernel.items()) or
+                (attempt is not None and (receipt.get("task_id"), receipt.get("attempt")) != (task_id, attempt))):
+            raise ValueError("Worker attempt or kernel process identity differs")
     if (receipt["pid"] != os.getpid() or receipt["command"][-len(expected):] != expected or
             Path(receipt["cwd"]).resolve() != SCRIPTS.parent or not 0 < deadline-time.monotonic() <= seconds):
         raise ValueError("Worker does not own the controller's live reservation")
@@ -220,10 +239,11 @@ def check_dispatch(job, gate_path, action, deadline, seconds):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("plan", "campaign", "worker", *POST))
+    parser.add_argument("action", choices=("plan", "campaign", "request-oom", "worker", *POST))
     parser.add_argument("--gate", type=Path)
     parser.add_argument("--id")
     parser.add_argument("--deadline", type=float)
+    parser.add_argument("--attempt", type=int, choices=(1, 2))
     args = parser.parse_args()
     if args.action == "plan":
         print(json.dumps(dict(cohort=cohort(), runs=plan()), indent=2))
@@ -234,32 +254,33 @@ def main():
     allowed = read_gate(gate_path)
     campaign = Path(allowed["campaign"])
     rows = [{**r, "seconds": allowed["seconds_per_method"][r["name"]]} for r in plan()]
+    if args.action == "request-oom":
+        print(dispatch.request_recovery(campaign, args.id, args.attempt, task_ids={r["id"] for r in rows},
+                                        protocol=EXPERIMENT))
+        return
     posts = [dict(id=k, action=k, bucket=k, seconds=allowed["post_seconds"][k], gpu=k=="confirmation") for k in POST]
     if args.action == "campaign":
-        def command(row, job, deadline):
-            return [sys.executable, "-B", __file__, row.get("action", "worker"), "--gate", str(gate_path),
-                    "--id", row["id"], "--deadline", str(deadline)]
-        def validate(row, job):
-            if row["id"] not in POST:
-                validate_training(job, row, allowed)
-            elif data.read_json(job/"result.json")["status"] != {
-                    "generation": "GENERATED_VALIDATED_OWNERS_SEALED", "confirmation": "ALL_54_BLIND_AND_SCORED",
-                    "analysis": "SIX_METHOD_PAIRED_TABLE"}[row["id"]]:
-                raise ValueError("Incomplete post-training step")
-        queue.dispatch(allowed, rows, command, validate, posts)
+        dispatch.campaign(allowed, gate_path, rows, Path(__file__),
+                          lambda job, row: validate_training(job, row, allowed), POST_STATUS)
         return
     tasks = {r["id"]: r for r in [*rows, *posts]}
     row = tasks.get(args.id)
     if (row is None or row.get("action", "worker") != args.action or args.deadline is None or
             not positive(args.deadline) or not 0 < args.deadline-time.monotonic() <= row["seconds"]):
         parser.error("action must match a reserved finite task")
-    job = campaign/row["id"]
+    if (args.action == "worker") != (args.attempt is not None):
+        parser.error("Only training workers own a numbered attempt")
+    job = (campaign/"training"/row["id"]/f"attempt-{args.attempt}" if args.action == "worker"
+           else campaign/row["id"])
     # Atomic entry claim also prevents concurrent/restored invocations reopening pairs.
     if not job.is_dir():
         parser.error("controller has not claimed the job")
-    check_dispatch(job, gate_path, args.action, args.deadline, row["seconds"])
+    check_dispatch(job, gate_path, args.action, args.deadline, row["seconds"], task_id=row["id"], attempt=args.attempt)
     with (job/"worker_claim.json").open("x", encoding="utf-8") as stream:
         json.dump(dict(id=row["id"], deadline=args.deadline), stream)
+    # The parent enforces aggregate RSS. A child checks its own allocation.
+    limits = allowed["limits"]
+    allowed = {**allowed, "limits": {**limits, "rss_bytes": limits["worker_rss_bytes"]}}
     try:
         if args.action == "worker":
             train(job, row, args.deadline, allowed)
@@ -268,7 +289,7 @@ def main():
             budget = Budget(campaign, args.deadline, allowed["limits"])
             evaluation.run(args.action, campaign, job, allowed, budget)
     except BaseException as error:
-        queue.write(job/"failure.json", dict(error=repr(error), traceback=traceback.format_exc()))
+        dispatch.record_worker_failure(job, args.action, error, traceback.format_exc())
         raise
 
 

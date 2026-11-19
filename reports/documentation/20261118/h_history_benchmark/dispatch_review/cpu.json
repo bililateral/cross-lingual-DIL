@@ -1,0 +1,120 @@
+{
+  "date": "2026-11-19",
+  "scope": "Chinese isolated workspace; Linux py310; one physical CPU, GPU invisible, real CPU workers, synthetic NVML and failures. No official data, training, model or cohort.",
+  "predecessor_implementation": "70c9c621598e3a2c6b76c6085e02c99701af5fbe",
+  "deployed_files": [
+    {
+      "path": "scripts/step35_market_queue.py",
+      "bytes": 15819,
+      "sha256": "d3cdff12ffed00d4074d995e08644b81202fd52536c76e8082770f13f2c00e1d"
+    },
+    {
+      "path": "scripts/step30_evolution_control.py",
+      "bytes": 38192,
+      "sha256": "2f14ba93bcaa1bf9c8d8a44602f4a3c33ddc664e65f292610dffa88469d2399a"
+    },
+    {
+      "path": "scripts/step30_evolution_policy.py",
+      "bytes": 13609,
+      "sha256": "a6245ce9b7e349b99bc0278d43d80abe325151fb8478cf0eee38200dca3dd971"
+    },
+    {
+      "path": "scripts/step30_evolution_io.py",
+      "bytes": 8477,
+      "sha256": "005322660ec09ebfd01619c56e9116adb885e6c35eef269ac8359c6522e08ec3"
+    },
+    {
+      "path": "scripts/step28_history_benchmark_dispatch.py",
+      "bytes": 7252,
+      "sha256": "acd2397b0d96ec0313bf66a6baaf0980019fe320fad778850d1907daaeb4ff2f"
+    },
+    {
+      "path": "tests/test_step28_history_benchmark.py",
+      "bytes": 28794,
+      "sha256": "33eb3806729f7b5155fc1b2b7a82cc554524f2fa0ce709a90c66be00ecdf8f37"
+    },
+    {
+      "path": "scripts/step28_history_benchmark.py",
+      "bytes": 15840,
+      "sha256": "fb41b383582db086ee68aa80454c8b125c0d2cdfdeedd9ace2c4115ef91fcf9c"
+    },
+    {
+      "path": "tests/test_step28_benchmark_handoff.py",
+      "bytes": 14290,
+      "sha256": "206858becb91d45d7521565abd2b139675fcb4b4ee4cfb5d42e2441892bd67ae"
+    },
+    {
+      "path": "scripts/step28_forever_formal.py",
+      "bytes": 11809,
+      "sha256": "1ef0d5c04bdc8ffcbc749b996afbc112d33cb433e399d4ebed3651a7f263b278"
+    }
+  ],
+  "readback": "SFTP compared local and isolated Linux file bytes for all nine listed paths. Other sources retain the source_sync.json and review/fix_cpu.json identities.",
+  "runs": [
+    {
+      "label": "initial_fixture",
+      "code": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/tests/test_step28_benchmark_handoff.py\", line 237, in <module>\n    cases=[exercise(base,c) for c in (\"handoff\",\"repeat\",\"other\",\"budget\",\"interrupt\")]\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/tests/test_step28_benchmark_handoff.py\", line 237, in <listcomp>\n    cases=[exercise(base,c) for c in (\"handoff\",\"repeat\",\"other\",\"budget\",\"interrupt\")]\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/tests/test_step28_benchmark_handoff.py\", line 113, in exercise\n    base.mkdir()\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/pathlib.py\", line 1175, in mkdir\n    self._accessor.mkdir(self, mode)\nFileExistsError: [Errno 17] File exists: '/tmp/tmpezgl11ce'\n",
+      "outer_seconds": 1.344000000000051,
+      "charged_seconds": 2
+    },
+    {
+      "label": "training_phase_only",
+      "code": 0,
+      "stdout": "{\"passed\": true, \"cases\": [{\"case\": \"handoff\", \"original_pid\": 1053217, \"retry_pid\": 1053227, \"healthy_pids\": {\"ABC_s4_LOGIT0.1_ref\": 1053219, \"ABC_s4_L2R_text_fixed\": 1053226}, \"healthy_next\": \"ABC_s4_L2R_text_fixed\", \"reopened_next\": \"ABC_s4_ER_GCR_group_fixed\", \"held_while_old_pid_visible\": true, \"held_below_reservation\": true, \"duplicate_request_idempotent\": true, \"first_receipt_unchanged\": true, \"attempts\": 6, \"inherited_seconds\": 7, \"settled_training_seconds\": 15, \"status\": \"COMPLETE\", \"winners\": 5}, {\"case\": \"repeat\", \"original_pid\": 1053233, \"retry_pid\": 1053242, \"healthy_pids\": {\"ABC_s4_LOGIT0.1_ref\": 1053235, \"ABC_s4_L2R_text_fixed\": 1053237}, \"healthy_next\": \"ABC_s4_L2R_text_fixed\", \"reopened_next\": \"ABC_s4_ER_GCR_group_fixed\", \"held_while_old_pid_visible\": true, \"held_below_reservation\": true, \"duplicate_request_idempotent\": true, \"first_receipt_unchanged\": true, \"attempts\": 6, \"inherited_seconds\": 7, \"settled_training_seconds\": 14, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"other\", \"attempts\": 3, \"inherited_seconds\": 7, \"settled_training_seconds\": 10, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"budget\", \"attempts\": 1, \"inherited_seconds\": 7, \"settled_training_seconds\": 8, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"interrupt\", \"attempts\": 3, \"inherited_seconds\": 7, \"settled_training_seconds\": 10, \"status\": \"INCOMPLETE\", \"winners\": 0}], \"logical_slots_up_to\": 3, \"physical_cpu_cores\": 1, \"gpu_kernels\": 0, \"formal_data_reads\": 0, \"model_updates\": 0}\n",
+      "stderr": "",
+      "outer_seconds": 7,
+      "charged_seconds": 7
+    },
+    {
+      "label": "previous_compatibility",
+      "code": 0,
+      "stdout": "{\"cases\": 3, \"cpu_affinity\": [0], \"evidence\": {\"before_generation\": {\"changed_FOREVER\": \"blocked\", \"changed_H\": \"blocked\", \"handwritten_endpoints\": 162, \"intact\": \"passed\", \"missing_FOREVER\": \"blocked\", \"missing_H\": \"blocked\", \"official_groups_generated\": 0, \"official_pairs_opened\": 0}, \"formal_gate_conditions\": {\"different_authorized_source\": \"blocked\", \"exact_synthetic_source\": \"accepted\", \"formal_campaign_created\": false, \"post_at_stop_reserve\": \"blocked\", \"training_at_stop_reserve\": \"blocked\"}, \"interrupted_validation\": {\"charged_seconds\": 0.10719254985451698, \"downstream_closed\": true, \"exit_status\": \"interrupted\", \"inherited_seconds\": 7.0, \"peer_charged_seconds\": 0.1034960919059813, \"peer_drained\": true, \"real_cpu_child\": true, \"receipts_per_child\": 1}}, \"formal_data_reads\": 0, \"gpu_used\": false, \"passed\": true, \"pretrained_loads\": 0, \"python\": \"/home/yongpeng/miniconda3/envs/py310/bin/python\", \"seconds\": 0.2646337100304663}\n",
+      "stderr": "test_generation_rechecks_162_endpoint_files (__main__.BenchmarkTest) ... ok\ntest_interrupted_worker_validation_keeps_receipt_and_fee (__main__.BenchmarkTest) ... ok\ntest_gate_binds_authorized_sources_and_stop_reserve (__main__.BenchmarkTest) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.265s\n\nOK\n",
+      "outer_seconds": 1.6410000000000764,
+      "charged_seconds": 2
+    },
+    {
+      "label": "full_fixture_first",
+      "code": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/tests/test_step28_benchmark_handoff.py\", line 258, in <module>\n    Budget(base, time.monotonic()+100, {**limits, **change}).check(reserve=32)\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/scripts/step28_continual_comparison_run.py\", line 67, in __init__\n    if not isinstance(limits[name], int) or limits[name] <= 0:\nKeyError: 'allocator_bytes'\n",
+      "outer_seconds": 1.405999999999949,
+      "charged_seconds": 2
+    },
+    {
+      "label": "full_campaign",
+      "code": 0,
+      "stdout": "{\"passed\": true, \"cases\": [{\"case\": \"handoff\", \"original_pid\": 1057017, \"retry_pid\": 1057025, \"healthy_pids\": {\"ABC_s4_LOGIT0.1_ref\": 1057019, \"ABC_s4_L2R_text_fixed\": 1057021}, \"healthy_next\": \"ABC_s4_L2R_text_fixed\", \"reopened_next\": \"ABC_s4_ER_GCR_group_fixed\", \"held_while_old_pid_visible\": true, \"held_below_reservation\": true, \"duplicate_request_idempotent\": true, \"first_receipt_unchanged\": true, \"attempts\": 6, \"inherited_seconds\": 7, \"synthetic_post_actions\": [\"generation\", \"confirmation\", \"analysis\"], \"settled_training_seconds\": 14, \"status\": \"COMPLETE\", \"winners\": 5}, {\"case\": \"repeat\", \"original_pid\": 1057038, \"retry_pid\": 1057044, \"healthy_pids\": {\"ABC_s4_LOGIT0.1_ref\": 1057040, \"ABC_s4_L2R_text_fixed\": 1057042}, \"healthy_next\": \"ABC_s4_L2R_text_fixed\", \"reopened_next\": \"ABC_s4_ER_GCR_group_fixed\", \"held_while_old_pid_visible\": true, \"held_below_reservation\": true, \"duplicate_request_idempotent\": true, \"first_receipt_unchanged\": true, \"attempts\": 6, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 15, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"other\", \"attempts\": 3, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 10, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"budget\", \"attempts\": 1, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 8, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"interrupt\", \"attempts\": 3, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 10, \"status\": \"INCOMPLETE\", \"winners\": 0}], \"local_rss_and_shared_disk_distinguished\": true, \"logical_slots_up_to\": 3, \"physical_cpu_cores\": 1, \"gpu_kernels\": 0, \"formal_data_reads\": 0, \"model_updates\": 0}\n",
+      "stderr": "",
+      "outer_seconds": 7.594000000000051,
+      "charged_seconds": 8
+    },
+    {
+      "label": "compatibility_before_receipt_substitution",
+      "code": 0,
+      "stdout": "{\"cases\": 3, \"cpu_affinity\": [0], \"evidence\": {\"before_generation\": {\"changed_FOREVER\": \"blocked\", \"changed_H\": \"blocked\", \"handwritten_endpoints\": 162, \"intact\": \"passed\", \"missing_FOREVER\": \"blocked\", \"missing_H\": \"blocked\", \"official_groups_generated\": 0, \"official_pairs_opened\": 0}, \"formal_gate_conditions\": {\"different_authorized_source\": \"blocked\", \"exact_synthetic_source\": \"accepted\", \"formal_campaign_created\": false, \"post_at_stop_reserve\": \"blocked\", \"training_at_stop_reserve\": \"blocked\"}, \"interrupted_validation\": {\"charged_seconds\": 0.13066079188138247, \"downstream_closed\": true, \"exit_status\": \"interrupted\", \"inherited_seconds\": 7.0, \"peer_charged_seconds\": 0.12817953201010823, \"peer_drained\": true, \"real_cpu_child\": true, \"receipts_per_child\": 1}}, \"formal_data_reads\": 0, \"gpu_used\": false, \"passed\": true, \"pretrained_loads\": 0, \"python\": \"/home/yongpeng/miniconda3/envs/py310/bin/python\", \"seconds\": 0.2949949773028493}\n",
+      "stderr": "test_generation_rechecks_162_endpoint_files (__main__.BenchmarkTest) ... ok\ntest_interrupted_worker_validation_keeps_receipt_and_fee (__main__.BenchmarkTest) ... ok\ntest_gate_binds_authorized_sources_and_stop_reserve (__main__.BenchmarkTest) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.295s\n\nOK\n",
+      "outer_seconds": 1.7660000000000764,
+      "charged_seconds": 2
+    },
+    {
+      "label": "final_generation_and_dispatch_guards",
+      "code": 0,
+      "stdout": "{\"cases\": 4, \"cpu_affinity\": [0], \"evidence\": {\"before_generation\": {\"changed_FOREVER\": \"blocked\", \"changed_H\": \"blocked\", \"handwritten_endpoints\": 162, \"intact\": \"passed\", \"missing_FOREVER\": \"blocked\", \"missing_H\": \"blocked\", \"official_groups_generated\": 0, \"official_pairs_opened\": 0, \"substituted_first_oom_receipt\": \"blocked\"}, \"dispatch\": {\"foreign_pid\": \"rejected\", \"historical_gate\": \"rejected\", \"own_claim\": \"accepted\", \"same_kernel_second_attempt\": \"accepted\", \"wrong_attempt\": \"rejected\"}, \"formal_gate_conditions\": {\"different_authorized_source\": \"blocked\", \"exact_synthetic_source\": \"accepted\", \"formal_campaign_created\": false, \"post_at_stop_reserve\": \"blocked\", \"training_at_stop_reserve\": \"blocked\"}, \"interrupted_validation\": {\"charged_seconds\": 0.10923795681446791, \"downstream_closed\": true, \"exit_status\": \"interrupted\", \"inherited_seconds\": 7.0, \"peer_charged_seconds\": 0.1064879191108048, \"peer_drained\": true, \"real_cpu_child\": true, \"receipts_per_child\": 1}}, \"formal_data_reads\": 0, \"gpu_used\": false, \"passed\": true, \"pretrained_loads\": 0, \"python\": \"/home/yongpeng/miniconda3/envs/py310/bin/python\", \"seconds\": 0.2939669578336179}\n",
+      "stderr": "test_generation_rechecks_162_endpoint_files (__main__.BenchmarkTest) ... ok\ntest_interrupted_worker_validation_keeps_receipt_and_fee (__main__.BenchmarkTest) ... ok\ntest_gate_binds_authorized_sources_and_stop_reserve (__main__.BenchmarkTest) ... ok\ntest_reservation_and_historical_gate_rejection (__main__.BenchmarkTest) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.294s\n\nOK\n",
+      "outer_seconds": 1.6880000000001019,
+      "charged_seconds": 2
+    }
+  ],
+  "charged_control_seconds_this_qualification": 25,
+  "other_expenses": "Includes both failed setup fixtures. Synthetic prior seven seconds and per-child counts in test output are fixtures inside the same qualification, not additional formal training charges. Preceding CPU/CUDA receipts remain separate.",
+  "last_observation": {
+    "at": "2026-11-19T10:42:37+08:00",
+    "formal_gate": false,
+    "campaign": false
+  },
+  "formal_training_tasks": 0,
+  "formal_labels_opened": 0
+}

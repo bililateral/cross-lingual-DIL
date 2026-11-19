@@ -124,6 +124,9 @@ def release(process):
 
 
 class Runner:
+    active_poll_seconds = .2
+    worker_threads = 2
+
     def __init__(self, allowed: dict, gate_path: Path, root: Path, ledger: Ledger, *,
                  worker_entry: Path | None = None, caps: dict = CAPS, limits=None,
                  wait_for_resources: bool = True, halt_dispatch_on_failure: bool = False,
@@ -244,6 +247,16 @@ class Runner:
                 tick = time.monotonic()
                 try:
                     snapshot = nv.snapshot() if nv else None
+                    if 'owned_rss_bytes' in self.limits:
+                        parent = psutil.Process()
+                        rss = parent.memory_info().rss
+                        for child in parent.children(recursive=True):
+                            try:
+                                rss += child.memory_info().rss
+                            except psutil.NoSuchProcess:
+                                pass
+                        if rss > self.limits['owned_rss_bytes']:
+                            raise RuntimeError('Shared controller and worker RAM limit')
                     self.retire_waiter(active)
                     for slot, item in list(active.items()):
                         p, job = item['process'], item['job']
@@ -331,7 +344,8 @@ class Runner:
                         process = None
                         try:
                             argv = self.command(job, slot, deadline)
-                            environment = dict(os.environ, OMP_NUM_THREADS='2', MKL_NUM_THREADS='2', OPENBLAS_NUM_THREADS='2',
+                            threads = str(self.worker_threads)
+                            environment = dict(os.environ, OMP_NUM_THREADS=threads, MKL_NUM_THREADS=threads, OPENBLAS_NUM_THREADS=threads,
                                 TOKENIZERS_PARALLELISM='false', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1',
                                 CUBLAS_WORKSPACE_CONFIG=':4096:8', CUDA_VISIBLE_DEVICES='0' if gpu else '')
                             with (job['target']/'console.txt').open('x') as output:
@@ -362,6 +376,8 @@ class Runner:
                                 failures.append(dict(task=job['target'].name, slot=slot, error=repr(exc)))
                             if self.halt_dispatch_on_failure:
                                 budget_stop = 'Worker launch failed; no further dispatch'
+                                if (job['target']/'shared_failure.json').exists():
+                                    raise RuntimeError('Shared validity failure before worker launch') from exc
                     waiting_oom = recovery is not None and recovery.waiting(next_job < len(jobs))
                     write(self.root/'dispatch.json', dict(active={**unreleased, **{s: x['identity'] for s, x in active.items()}},
                           retired=sorted(retired), failures=failures,
@@ -383,7 +399,7 @@ class Runner:
                         raise TimeoutError('Auxiliary monitoring cleanup reserve reached')
                     budget_stop = 'Auxiliary monitoring budget exhausted'
                 if work_left():
-                    time.sleep(.2 if active else 30)
+                    time.sleep(self.active_poll_seconds if active else 30)
         except BaseException as exc:
             controller_error = repr(exc)
             self.failed = True
