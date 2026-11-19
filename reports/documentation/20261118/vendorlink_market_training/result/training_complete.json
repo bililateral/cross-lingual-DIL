@@ -1,0 +1,734 @@
+{
+  "tasks": [
+    {
+      "id": "VendorLink_SEQ_s51",
+      "method": "VendorLink_SEQ",
+      "seed": 51,
+      "epochs": 40,
+      "stages": 3,
+      "phase": "M",
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "candidate": "V1",
+      "settings": {
+        "method": "VendorLink_SEQ",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.2832655111666686,
+        "encoder_lr": 1e-05,
+        "head_lr": 0.001,
+        "vendor_lr": 2e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "cls",
+        "head_schedule": "constant",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.767438161798796,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "unit",
+        "diagnostics": false
+      },
+      "stage_end_only": true
+    },
+    {
+      "id": "VendorLink_SEQ_s52",
+      "method": "VendorLink_SEQ",
+      "seed": 52,
+      "epochs": 40,
+      "stages": 3,
+      "phase": "M",
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "candidate": "V1",
+      "settings": {
+        "method": "VendorLink_SEQ",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.2832655111666686,
+        "encoder_lr": 1e-05,
+        "head_lr": 0.001,
+        "vendor_lr": 2e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "cls",
+        "head_schedule": "constant",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.767438161798796,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "unit",
+        "diagnostics": false
+      },
+      "stage_end_only": true
+    },
+    {
+      "id": "VendorLink_SEQ_s53",
+      "method": "VendorLink_SEQ",
+      "seed": 53,
+      "epochs": 40,
+      "stages": 3,
+      "phase": "M",
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "candidate": "V1",
+      "settings": {
+        "method": "VendorLink_SEQ",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.2832655111666686,
+        "encoder_lr": 1e-05,
+        "head_lr": 0.001,
+        "vendor_lr": 2e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "cls",
+        "head_schedule": "constant",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.767438161798796,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "unit",
+        "diagnostics": false
+      },
+      "stage_end_only": true
+    },
+    {
+      "id": "H_full_s51",
+      "method": "H_full",
+      "seed": 51,
+      "epochs": 40,
+      "stages": 3,
+      "phase": "M",
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "candidate": "H_CE_RMS",
+      "settings": {
+        "method": "H_full",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 2.5e-05,
+        "head_lr": 0.0003,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "mean_last4_sum",
+        "head_schedule": "encoder",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.191859540449699,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "rms",
+        "diagnostics": false,
+        "deterministic_history": true
+      },
+      "stage_end_only": true,
+      "market_adapters": "fit12-h-market-qv-r8-v1"
+    },
+    {
+      "id": "H_ER_s51",
+      "method": "H_ER",
+      "seed": 51,
+      "epochs": 40,
+      "stages": 3,
+      "phase": "M",
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "candidate": "H_CE_RMS",
+      "settings": {
+        "method": "H_ER",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 2.5e-05,
+        "head_lr": 0.0003,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "mean_last4_sum",
+        "head_schedule": "encoder",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.191859540449699,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "rms",
+        "diagnostics": false,
+        "deterministic_history": false
+      },
+      "stage_end_only": true,
+      "market_adapters": "fit12-h-market-qv-r8-v1"
+    },
+    {
+      "id": "H_SEQ_s51",
+      "method": "H_SEQ",
+      "seed": 51,
+      "epochs": 40,
+      "stages": 3,
+      "phase": "M",
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "candidate": "H_CE_RMS",
+      "settings": {
+        "method": "H_SEQ",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 2.5e-05,
+        "head_lr": 0.0003,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "mean_last4_sum",
+        "head_schedule": "encoder",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.191859540449699,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "rms",
+        "diagnostics": false,
+        "deterministic_history": false
+      },
+      "stage_end_only": true,
+      "market_adapters": "fit12-h-market-qv-r8-v1"
+    },
+    {
+      "id": "H_full_s52",
+      "method": "H_full",
+      "seed": 52,
+      "epochs": 40,
+      "stages": 3,
+      "phase": "M",
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "candidate": "H_CE_RMS",
+      "settings": {
+        "method": "H_full",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 2.5e-05,
+        "head_lr": 0.0003,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "mean_last4_sum",
+        "head_schedule": "encoder",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.191859540449699,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "rms",
+        "diagnostics": false,
+        "deterministic_history": true
+      },
+      "stage_end_only": true,
+      "market_adapters": "fit12-h-market-qv-r8-v1"
+    },
+    {
+      "id": "H_full_s53",
+      "method": "H_full",
+      "seed": 53,
+      "epochs": 40,
+      "stages": 3,
+      "phase": "M",
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "candidate": "H_CE_RMS",
+      "settings": {
+        "method": "H_full",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 2.5e-05,
+        "head_lr": 0.0003,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "mean_last4_sum",
+        "head_schedule": "encoder",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.191859540449699,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "rms",
+        "diagnostics": false,
+        "deterministic_history": true
+      },
+      "stage_end_only": true,
+      "market_adapters": "fit12-h-market-qv-r8-v1"
+    },
+    {
+      "id": "H_ER_s52",
+      "method": "H_ER",
+      "seed": 52,
+      "epochs": 40,
+      "stages": 3,
+      "phase": "M",
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "candidate": "H_CE_RMS",
+      "settings": {
+        "method": "H_ER",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 2.5e-05,
+        "head_lr": 0.0003,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "mean_last4_sum",
+        "head_schedule": "encoder",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.191859540449699,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "rms",
+        "diagnostics": false,
+        "deterministic_history": false
+      },
+      "stage_end_only": true,
+      "market_adapters": "fit12-h-market-qv-r8-v1"
+    },
+    {
+      "id": "H_ER_s53",
+      "method": "H_ER",
+      "seed": 53,
+      "epochs": 40,
+      "stages": 3,
+      "phase": "M",
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "candidate": "H_CE_RMS",
+      "settings": {
+        "method": "H_ER",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 2.5e-05,
+        "head_lr": 0.0003,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "mean_last4_sum",
+        "head_schedule": "encoder",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.191859540449699,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "rms",
+        "diagnostics": false,
+        "deterministic_history": false
+      },
+      "stage_end_only": true,
+      "market_adapters": "fit12-h-market-qv-r8-v1"
+    },
+    {
+      "id": "H_SEQ_s52",
+      "method": "H_SEQ",
+      "seed": 52,
+      "epochs": 40,
+      "stages": 3,
+      "phase": "M",
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "candidate": "H_CE_RMS",
+      "settings": {
+        "method": "H_SEQ",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 2.5e-05,
+        "head_lr": 0.0003,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "mean_last4_sum",
+        "head_schedule": "encoder",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.191859540449699,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "rms",
+        "diagnostics": false,
+        "deterministic_history": false
+      },
+      "stage_end_only": true,
+      "market_adapters": "fit12-h-market-qv-r8-v1"
+    },
+    {
+      "id": "H_SEQ_s53",
+      "method": "H_SEQ",
+      "seed": 53,
+      "epochs": 40,
+      "stages": 3,
+      "phase": "M",
+      "domains": [
+        "AlphaBay",
+        "Dream",
+        "Agora"
+      ],
+      "candidate": "H_CE_RMS",
+      "settings": {
+        "method": "H_SEQ",
+        "lambda_rank": 1.3051794547562026,
+        "lr_multiplier": 1.0,
+        "encoder_lr": 2.5e-05,
+        "head_lr": 0.0003,
+        "vendor_lr": 4e-05,
+        "weight_decay": 0.01,
+        "vendor_weight_decay": 0.0,
+        "microbatch": 8,
+        "vendor_batch": 32,
+        "channel_tokens": 256,
+        "vendor_tokens": 512,
+        "memory_groups": 6,
+        "memory_bytes": 1048576,
+        "pooling": "mean_last4_sum",
+        "head_schedule": "encoder",
+        "bce_weight": 1.0,
+        "hard_weight": 0.5,
+        "alpha": 0.07049361507739538,
+        "beta": 0.191859540449699,
+        "gamma": 1.0,
+        "auxiliary_lr": 0.0003,
+        "ce_scale_mode": "rms",
+        "diagnostics": false,
+        "deterministic_history": false
+      },
+      "stage_end_only": true,
+      "market_adapters": "fit12-h-market-qv-r8-v1"
+    }
+  ],
+  "winners": {
+    "VendorLink_SEQ_s51": {
+      "attempt": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/VendorLink_SEQ_s51/attempt-1/dispatch_receipt.json",
+        "bytes": 1320,
+        "sha256": "6783548d8061196776998dd46910ae4c9e2768119427934a5178cddea5ab7d84"
+      },
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/VendorLink_SEQ_s51/attempt-1/run/completion.json",
+        "bytes": 5615,
+        "sha256": "84ea39372122c455d7ad6ff772b15e0c863485a83c98eb1f0130bdb1f759661d"
+      }
+    },
+    "VendorLink_SEQ_s52": {
+      "attempt": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/VendorLink_SEQ_s52/attempt-1/dispatch_receipt.json",
+        "bytes": 1320,
+        "sha256": "083867c2667b99952f8c0048bfec39436ede925ae5c264e50a7e9732643c3577"
+      },
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/VendorLink_SEQ_s52/attempt-1/run/completion.json",
+        "bytes": 5615,
+        "sha256": "30870c9209120755fb0dbb2007e43fa21aab12c8281c8386584d4ef57ce9c017"
+      }
+    },
+    "VendorLink_SEQ_s53": {
+      "attempt": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/VendorLink_SEQ_s53/attempt-1/dispatch_receipt.json",
+        "bytes": 1320,
+        "sha256": "ee2be2e7bd04195331ec172a084f702e5fdb4804accbc05d36c729318b3afc1e"
+      },
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/VendorLink_SEQ_s53/attempt-1/run/completion.json",
+        "bytes": 5615,
+        "sha256": "5568ac5ff690dc95b875af838b06a80424fd083811a5eea746fe3c4452191aa4"
+      }
+    },
+    "H_SEQ_s51": {
+      "attempt": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_SEQ_s51/attempt-1/dispatch_receipt.json",
+        "bytes": 1282,
+        "sha256": "c298c6a9612c19ddc0babe43d6ed30340925527f92aa9539a247b8a075cc30d0"
+      },
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_SEQ_s51/attempt-1/run/completion.json",
+        "bytes": 6035,
+        "sha256": "143637c2b789e10089477323edf139b183c3466e13da6df021b00a60a5509b9f"
+      }
+    },
+    "H_ER_s51": {
+      "attempt": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_ER_s51/attempt-1/dispatch_receipt.json",
+        "bytes": 1276,
+        "sha256": "5ea6fb9ef213af0701c3e486e2fa4863cc32ed91aeb0f06922988adc74b0017a"
+      },
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_ER_s51/attempt-1/run/completion.json",
+        "bytes": 6973,
+        "sha256": "bdba5ed43d287ab5e4e130ce1038d6307f173c76201ec28016fd4568ca149b66"
+      }
+    },
+    "H_full_s51": {
+      "attempt": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_full_s51/attempt-1/dispatch_receipt.json",
+        "bytes": 1286,
+        "sha256": "03de53fafbfe29cff61de1f417e9ea6fd87ff4b8239b21c7225b5d3098ff16c3"
+      },
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_full_s51/attempt-1/run/completion.json",
+        "bytes": 7034,
+        "sha256": "556ff73c505337937bf1961705511e6a2db0c596acffdd981c761e893ffda56e"
+      }
+    },
+    "H_full_s52": {
+      "attempt": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_full_s52/attempt-1/dispatch_receipt.json",
+        "bytes": 1285,
+        "sha256": "b025a5c7b40df2711a57600d55fabd6cce4741e0c9de286445c36de5842e692d"
+      },
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_full_s52/attempt-1/run/completion.json",
+        "bytes": 7034,
+        "sha256": "f394a5f004842a8ba8da40dd58146b7dfbc0b12a05b0653892675fa6df492b59"
+      }
+    },
+    "H_ER_s52": {
+      "attempt": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_ER_s52/attempt-1/dispatch_receipt.json",
+        "bytes": 1279,
+        "sha256": "0941922ecd37250bac04a67e136495d1243c4a6f721a51a92d86e54891094ddd"
+      },
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_ER_s52/attempt-1/run/completion.json",
+        "bytes": 6973,
+        "sha256": "23ba8a54a43fc9bc95dd5eae8f026564cf8da77c5dff721a15aade1c9ff129e1"
+      }
+    },
+    "H_full_s53": {
+      "attempt": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_full_s53/attempt-1/dispatch_receipt.json",
+        "bytes": 1286,
+        "sha256": "51495396c1d6057d878c6fc8b9d756de62ad9dbd1653fcc2671372b8a2b56d16"
+      },
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_full_s53/attempt-1/run/completion.json",
+        "bytes": 7034,
+        "sha256": "74b878fd7368b0bec88dfe56597a69197a6e6406d958202a018fbfac316381a7"
+      }
+    },
+    "H_SEQ_s52": {
+      "attempt": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_SEQ_s52/attempt-1/dispatch_receipt.json",
+        "bytes": 1282,
+        "sha256": "4f2c3ca5b2cfa91e89c6101d6a91677deabeba4c1841f2a31ec7320183379045"
+      },
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_SEQ_s52/attempt-1/run/completion.json",
+        "bytes": 6035,
+        "sha256": "24191fbeb09db58420b243a15e245f00543b8dca5f434649921af895947d1dfc"
+      }
+    },
+    "H_ER_s53": {
+      "attempt": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_ER_s53/attempt-1/dispatch_receipt.json",
+        "bytes": 1278,
+        "sha256": "c7eb7becff31f5e466ce777361a235388155e584284ba2d4c3acf526020c49c5"
+      },
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_ER_s53/attempt-1/run/completion.json",
+        "bytes": 6973,
+        "sha256": "7ec907ce6d0707c2d3b508c64925e5ad762f745d8aef2afaac71971a917224f2"
+      }
+    },
+    "H_SEQ_s53": {
+      "attempt": 1,
+      "receipt": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_SEQ_s53/attempt-1/dispatch_receipt.json",
+        "bytes": 1283,
+        "sha256": "ad7b1f2756b826cc4dbf89d195f12d8c2350f2b33fac858aeb15242359a039c6"
+      },
+      "completion": {
+        "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_SEQ_s53/attempt-1/run/completion.json",
+        "bytes": 6035,
+        "sha256": "0600d86ab80f01f5ce554ade6b8dd6ca10fa29bdc1a3ce5504d172c0815fc75e"
+      }
+    }
+  },
+  "completions": [
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/VendorLink_SEQ_s51/attempt-1/run/completion.json",
+      "bytes": 5615,
+      "sha256": "84ea39372122c455d7ad6ff772b15e0c863485a83c98eb1f0130bdb1f759661d"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/VendorLink_SEQ_s52/attempt-1/run/completion.json",
+      "bytes": 5615,
+      "sha256": "30870c9209120755fb0dbb2007e43fa21aab12c8281c8386584d4ef57ce9c017"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/VendorLink_SEQ_s53/attempt-1/run/completion.json",
+      "bytes": 5615,
+      "sha256": "5568ac5ff690dc95b875af838b06a80424fd083811a5eea746fe3c4452191aa4"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_full_s51/attempt-1/run/completion.json",
+      "bytes": 7034,
+      "sha256": "556ff73c505337937bf1961705511e6a2db0c596acffdd981c761e893ffda56e"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_ER_s51/attempt-1/run/completion.json",
+      "bytes": 6973,
+      "sha256": "bdba5ed43d287ab5e4e130ce1038d6307f173c76201ec28016fd4568ca149b66"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_SEQ_s51/attempt-1/run/completion.json",
+      "bytes": 6035,
+      "sha256": "143637c2b789e10089477323edf139b183c3466e13da6df021b00a60a5509b9f"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_full_s52/attempt-1/run/completion.json",
+      "bytes": 7034,
+      "sha256": "f394a5f004842a8ba8da40dd58146b7dfbc0b12a05b0653892675fa6df492b59"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_full_s53/attempt-1/run/completion.json",
+      "bytes": 7034,
+      "sha256": "74b878fd7368b0bec88dfe56597a69197a6e6406d958202a018fbfac316381a7"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_ER_s52/attempt-1/run/completion.json",
+      "bytes": 6973,
+      "sha256": "23ba8a54a43fc9bc95dd5eae8f026564cf8da77c5dff721a15aade1c9ff129e1"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_ER_s53/attempt-1/run/completion.json",
+      "bytes": 6973,
+      "sha256": "7ec907ce6d0707c2d3b508c64925e5ad762f745d8aef2afaac71971a917224f2"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_SEQ_s52/attempt-1/run/completion.json",
+      "bytes": 6035,
+      "sha256": "24191fbeb09db58420b243a15e245f00543b8dca5f434649921af895947d1dfc"
+    },
+    {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261118/vendorlink_market_training/execution/campaign/training/H_SEQ_s53/attempt-1/run/completion.json",
+      "bytes": 6035,
+      "sha256": "0600d86ab80f01f5ce554ade6b8dd6ca10fa29bdc1a3ce5504d172c0815fc75e"
+    }
+  ]
+}
