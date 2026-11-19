@@ -2,7 +2,7 @@
 
 ## 2026-11-18 中文定稿 H 与五基线统一重新确认
 
-11 月 19 日，用户明确“我觉得不用设置具体的少忘和旧域末态提升数值门，只要实验能完整运行有结果就行，具体的提升直接看结果”。随后将累计预算委托执行者拟定，指定沿 VendorLink 控制器处理故障，并批准 36,031 字节的增量审查包。该包已完成外审和六项独立处置。审阅 720 累计小时、最多三路和 OOM 重试说明后，用户要求“等vendor-link试验运行结束后，满足正式开训的资源条件后就自动开始训练，确认开训后监听脚本自删”，并要求及时更新项目记录。该指令覆盖本批中文条件启动。[本次完整原话](../reports/documentation/20261118/h_history_benchmark/start/authorization.zh.md) · [调度增量处置](../reports/documentation/20261118/h_history_benchmark/dispatch_review/primary_disposition.zh.md)
+11 月 19 日，用户要求“只要实验能完整运行有结果就行，具体的提升直接看结果”，将累计预算委托执行者拟定，指定沿 VendorLink 控制器处理故障并批准该调度增量外审。随后要求“等vendor-link试验运行结束后，满足正式开训的资源条件后就自动开始训练，确认开训后监听脚本自删”，并要求及时更新项目记录。对于监听增量包，用户答复“允许这个监听增量包外审”，对应 29,970 字节的单次外发；网页原件及主执行者逐项处置已归档。[条件启动授权](../reports/documentation/20261118/h_history_benchmark/start/authorization.zh.md) · [逐包授权与回收](../reports/documentation/20261118/h_history_benchmark/start/submission.json) · [外审与主审](../reports/documentation/20261118/h_history_benchmark/start/review.zh.md)
 
 CPU 和 CUDA 核验完成后，用户明确答复“允许这个 CPU／GPU 合审包外审”。授权对象为 40,584 字节的合审包。已通过本地 Playwright MCP 向网页 GPT-6 Pro 提交一次并回收原文。此前 38,727 字节的单 CPU 包未提交。[具体包身份及提交记录](../reports/documentation/20261118/h_history_benchmark/review/submission.json) · [原文与独立处置](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md)
 

@@ -4,7 +4,7 @@
 
 ## 中文 trial3 H 与五基线的共同确认
 
-中文六方法已获条件开训指令。按已列明的 720 累计小时、最多三槽和具名 OOM 恢复安排，在 VendorLink FIT12 四组整批完成且进程释放后，资源够一槽即开。下一步闭合监听定向审查，部署唯一队列的条件启动入口，在第一条真实优化更新后核对自删回执并更新交接。54 个身份齐备后在同批群上报告五个配对的旧域末态、遗忘、初学和新域表现。[条件开训授权](../reports/documentation/20261118/h_history_benchmark/start/authorization.zh.md) · [合同](../reports/documentation/20261118/h_history_benchmark/scope.zh.md)
+中文六方法已部署唯一监听。下一步由这个进程等待 VendorLink 四组整批训练、评分、分析、末笔结算和进程释放，再按中文资源合同够一槽先派一槽，最多三槽。观察首个中文原生正更新、一次性副本自删及原控制器继续派工。54 个身份齐备后在新 120 群上报告五个配对的旧域末态、遗忘、初学和新域表现。累计预算 720 小时。[中文正式门](../reports/documentation/20261118/h_history_benchmark/start/formal_gate.json) · [监听现场](../reports/documentation/20261118/h_history_benchmark/start/waiting_observation.json) · [外审与主审](../reports/documentation/20261118/h_history_benchmark/start/review.zh.md)
 
 ## VendorLink账号监督：FIT12共同协议后续
 
