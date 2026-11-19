@@ -28,20 +28,34 @@ def market_tasks(*, shared_ffn=False):
     return result
 
 
-def validate_streams(winners):
+def validate_streams(winners, methods=('H_SEQ', 'H_ER', 'H_full')):
     for seed in SEEDS:
-        seq, er, full = [read(verify(winners[f'{method}_s{seed}']['completion']))
-                         for method in ('H_SEQ', 'H_ER', 'H_full')]
-        if (len({x['current_stream'] for x in (seq, er, full)}) != 1
-                or er['history_stream'] != full['history_stream'] or er['survivors'] != full['survivors']
-                or set(er['survivors']) != set(DOMAINS[:2]) or seq['survivors']
-                or any(len(set(v)) != 6 for v in er['survivors'].values())
+        rows = {m: read(verify(winners[f'{m}_s{seed}']['completion'])) for m in methods}
+        seq = rows['H_SEQ']
+        if (len({row['current_stream'] for row in rows.values()}) != 1 or seq['survivors']
                 or seq['workload']['history_groups'] or seq['workload']['teacher_groups']):
-            raise ValueError('Unpaired current groups, replay draws, survivors, or unintended SEQ replay')
-        for row in (seq, er, full):
+            raise ValueError('Unpaired current groups or unintended SEQ replay')
+        if 'H_ER' in rows:
+            er = rows['H_ER']
+            if set(er['survivors']) != set(DOMAINS[:2]) or any(len(set(v)) != 6 for v in er['survivors'].values()):
+                raise ValueError('Incomplete six-group replay state')
+        if 'H_full' in rows:
+            full = rows['H_full']
+            if er['history_stream'] != full['history_stream'] or er['survivors'] != full['survivors']:
+                raise ValueError('Unpaired Full and ER replay')
+        for row in rows.values():
             sizes = row['history_bytes']
             if set(sizes) != {'end_1','enter_2','end_2','enter_3','end_3'} or not all(0 < n <= 2**20 for n in sizes.values()):
                 raise ValueError('Incomplete or oversized historical state')
+
+
+def er_pressure(rows):
+    def values(key):
+        return [r[key] for r in rows]
+    absolute = all(statistics.mean(values(k)) >= .70 and min(values(k)) >= .60 for k in ('R11','R22','R33'))
+    gain = all(statistics.mean(values(k)) >= .04 and min(values(k)) >= 0 for k in ('GB','GC'))
+    return dict(er_learning=absolute and gain,
+                er_forgetting=statistics.mean(values('F')) >= .02 and sum(x > 0 for x in values('F')) >= 2)
 
 
 def paired_report(results, historical):
@@ -74,8 +88,7 @@ def paired_report(results, historical):
         new_final=all(guard(r,('R22','R33'),-.02,-.05) for r in (er,seq)),
         relative_gain=all(item['passed'] for item in gain_protection.values()))
     pressure = dict(seq_learning=ref['checks']['learning'], seq_forgetting=ref['checks']['meaningful_forgetting'],
-                    er_learning=absolute(er) and gain(er),
-                    er_forgetting=mean(calc(er,'F')) >= .02 and sum(x>0 for x in calc(er,'F')) >= 2)
+                    **er_pressure(er))
     extern = (ref['checks']['external'] and guard(results['V_CLS'],('R11','R22','R33'),-.02,-.05)
               and guard(results['V_SET'],('R22','R33'),-.02,-.05))
     joint, scenario = all(guards.values()), all(pressure.values())
@@ -116,19 +129,34 @@ def worker(gate, action, target, name, deadline):
     from step35_vendorlink_account_run import make_model, execute
     g = read(gate)
     root = Path(g['campaign'])
+    staged = g['protocol'] != PROTOCOL
+    if staged:
+        import step35_ffn_stages as stages
     if (gate.resolve() != Path(__file__).resolve().parents[2]/'formal_gate.json'
-            or root != gate.parent/'campaign' or not (g['training_authorized'] and g['review_closed'])
-            or g['protocol'] != PROTOCOL):
+            or root != gate.parent/'campaign' or g['training_authorized'] is not True or g['review_closed'] is not True
+            or (staged and g['protocol'] != stages.PROTOCOL)):
         raise ValueError('Wrong deployment or authorization')
     controller = read(root/'controller.json')
-    if (os.getppid() != controller['pid'] or
+    if (controller['protocol'] != g['protocol'] or os.getppid() != controller['pid'] or
             kernel_identity(controller['pid']) != {k:controller[k] for k in ('start_ticks','boot_id')}):
         raise ValueError('Only the single live campaign controller may dispatch a worker')
     tasks = read(verify(g['tasks']))
-    if tasks != market_tasks():
+    if tasks != market_tasks(shared_ffn=staged):
         raise ValueError('Changed frozen scientific task/configuration')
-    manifest = read(verify(g['manifest']))
     gate_id = record(gate)
+    batch_root = root
+    if staged:
+        method = target.parent.name if action == 'analyze' else next(t['method'] for t in tasks if t['id'] == name)
+        tasks = stages.batch_tasks(tasks, method)
+        batch_root = root/'stages'/method
+        stages.require_prior(root, method, gate_id)
+    if action != 'train':
+        frozen = read(batch_root/'training_complete.json')
+        if frozen['tasks'] != tasks or set(frozen['winners']) != {t['id'] for t in tasks}:
+            raise ValueError('Complete training batch required')
+        if staged:
+            stages.check_winners(root, frozen, tasks, gate_id, g['manifest'])
+    manifest = read(verify(g['manifest']))
     check = Check(gate.parent, deadline-time.monotonic(), g['limits'])
     check()
     if action in ('train','score'):
@@ -136,7 +164,7 @@ def worker(gate, action, target, name, deadline):
         for binding in g['model_binding']['files']:
             verify(binding)
         task = next(t for t in tasks if t['id'] == name)
-        identity = dict(protocol=PROTOCOL, task=task, manifest=g['manifest'], gate=gate_id)
+        identity = dict(protocol=g['protocol'], task=task, manifest=g['manifest'], gate=gate_id)
     if action == 'train':
         if target not in [root/'training'/name/f'attempt-{i}' for i in (1,2)]:
             raise ValueError('Wrong training attempt directory')
@@ -150,9 +178,6 @@ def worker(gate, action, target, name, deadline):
         out = execute(make_model(g['model_binding'],task), load_fit, target/'run', task, identity, g['model_binding'], check)
         validate_training(task, out, manifest, identity)
         return
-    frozen = read(root/'training_complete.json')
-    if frozen['tasks'] != tasks or set(frozen['winners']) != {t['id'] for t in tasks}:
-        raise ValueError('Complete training batch required')
     if action == 'score':
         if target != root/'scoring'/name:
             raise ValueError('Wrong blind score destination')
@@ -164,8 +189,11 @@ def worker(gate, action, target, name, deadline):
         scored = score(task, out, manifest, g['model_binding'], target/'result', 'dev', check)
         validate_scores(scored)
         return
-    if action != 'analyze' or target != root/'analysis':
+    if action != 'analyze' or target != batch_root/'analysis':
         raise ValueError('Invalid result operation')
+    if staged:
+        stages.analyze_stage(root, method, tasks, g, gate_id, manifest)
+        return
     batch = read(root/'scoring_complete.json')
     if batch['tasks'] != tasks or len(batch['completions']) != len(tasks):
         raise ValueError('Complete blind score batch required')
@@ -177,6 +205,11 @@ def worker(gate, action, target, name, deadline):
     historical = {key:read(verify(row['binding']))[row['method']] for key,row in g['historical'].items()}
     decision = paired_report(results,historical)
     metrics = read(target/'result/metrics.json')
+    write_metric_tables(tasks, metrics, target/'result')
+    write(target/'result/decision.json', decision)
+
+
+def write_metric_tables(tasks, metrics, destination):
     groups = {}
     for task in tasks:
         start = task['id']+':'
@@ -192,7 +225,7 @@ def worker(gate, action, target, name, deadline):
         for k in rows[0][1]:
             v = [r[k] for _,r in rows]
             table[name][k] = dict(values=v, mean=statistics.mean(v), sd=statistics.stdev(v), range=[min(v),max(v)])
-    write(target/'result/metric_summary.json',table)
+    write(destination/'metric_summary.json',table)
     paired_metrics = {}
     for method in ('H_ER','H_SEQ','V_SET','V_CLS'):
         for cell in ('R01','R11','R12','R21','R22','R23','R31','R32','R33'):
@@ -203,8 +236,7 @@ def worker(gate, action, target, name, deadline):
                 differences = [a-b for a,b in zip(left[metric]['values'],right[metric]['values'],strict=True)]
                 paired_metrics[method+':'+cell][metric] = dict(values=differences,mean=statistics.mean(differences),
                     sd=statistics.stdev(differences),range=[min(differences),max(differences)])
-    write(target/'result/metric_pairs.json',dict(seeds=list(SEEDS),full_minus_comparator=paired_metrics))
-    write(target/'result/decision.json', decision)
+    write(destination/'metric_pairs.json',dict(seeds=list(SEEDS),full_minus_comparator=paired_metrics))
 
 
 if __name__ == '__main__':

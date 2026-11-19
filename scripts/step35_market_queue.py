@@ -202,6 +202,25 @@ class MarketRunner(Runner):
                 '--deadline', str(deadline)] + (['--task', job['task_id']] if 'task_id' in job else [])
 
 
+def register_controller(root, protocol):
+    parent = psutil.Process(os.getpid())
+    write(root/'controller.json', dict(protocol=protocol, pid=parent.pid, owner=parent.username(),
+          cwd=parent.cwd(), command=parent.cmdline(), **kernel_identity(parent.pid)))
+
+
+def train_block(runner, batch, slots, completed):
+    jobs = []
+    for task in batch:
+        name, method = task['id'], task['method']
+        vendor = method == 'VendorLink_SEQ'
+        jobs.append(attempt_job(dict(task_id=name, task_dir=runner.root/'training'/name, action='train',
+            bucket='training', seconds=HOURS[method]*3600, gpu_family='V' if vendor else 'H',
+            reserved_bytes=runner.limits['vendor_reserve_bytes' if vendor else 'free_gpu_bytes']), 1))
+    handoff = OomHandoff(jobs, slots)
+    runner.run_many(jobs, slots, completed, recovery=handoff)
+    return handoff.winners
+
+
 def run_training(runner, tasks, completed):
     """V completes serially, then the H pool. Publish only validated winning attempts."""
     ordered = V_ORDER+H_ORDER
@@ -211,21 +230,10 @@ def run_training(runner, tasks, completed):
                    t['domains'] != ['AlphaBay', 'Dream', 'Agora'] for t in tasks)):
         raise ValueError('Exactly the four frozen arms, three paired seeds and all three markets required')
     root = runner.root
-    parent = psutil.Process(os.getpid())
-    write(root/'controller.json', dict(protocol=PROTOCOL, pid=parent.pid, owner=parent.username(),
-          cwd=parent.cwd(), command=parent.cmdline(), **kernel_identity(parent.pid)))
+    register_controller(root, PROTOCOL)
     winners = {}
     for batch, slots in ((tasks[:3], 1), (tasks[3:], 3)):
-        jobs = []
-        for task in batch:
-            name, method = task['id'], task['method']
-            vendor = method == 'VendorLink_SEQ'
-            jobs.append(attempt_job(dict(task_id=name, task_dir=root/'training'/name, action='train',
-                bucket='training', seconds=HOURS[method]*3600, gpu_family='V' if vendor else 'H',
-                reserved_bytes=runner.limits['vendor_reserve_bytes' if vendor else 'free_gpu_bytes']), 1))
-        handoff = OomHandoff(jobs, slots)
-        runner.run_many(jobs, slots, completed, recovery=handoff)
-        winners.update(handoff.winners)
+        winners.update(train_block(runner, batch, slots, completed))
     if set(winners) != set(ordered_ids):
         raise RuntimeError('Incomplete training batch')
     manifest = dict(tasks=tasks, winners=winners, completions=[winners[t]['completion'] for t in ordered_ids])
@@ -242,10 +250,17 @@ def campaign(gate):
     started=time.monotonic()
     gate = Path(gate).resolve()
     g = read(gate)
+    staged = g['protocol'] != PROTOCOL
+    caps = CAPS
+    if staged:
+        import step35_ffn_stages as stages
+        if g['protocol'] != stages.PROTOCOL:
+            raise ValueError('Unknown FIT12 campaign protocol')
+        caps = stages.CAPS
     if (sys.platform != 'linux' or Path(sys.executable).resolve() != Path(PYTHON).resolve() or
-            g['protocol'] != PROTOCOL or g['training_authorized'] is not True or g['review_closed'] is not True
-            or g['caps'] != CAPS or g['limits']['workers'] != 3):
-        raise ValueError('An approved, reviewed four-arm Linux training gate is required')
+            g['training_authorized'] is not True
+            or g['review_closed'] is not True or g['caps'] != caps or g['limits']['workers'] != 3):
+        raise ValueError('An approved, reviewed Linux gate for the specified protocol is required')
     from step35_vendorlink_account_control import validate_training
     from step35_vendorlink_account_evaluate import validate_scores
     from step35_market_worker import market_tasks, validate_streams
@@ -259,15 +274,17 @@ def campaign(gate):
             or Path(sys.modules[Runner.__module__].__file__).resolve() not in sources):
         raise ValueError('Bind the actual controller, dispatch loop and training worker')
     root = Path(g['campaign']).resolve()
-    data = read(verify(g['manifest']))
     tasks = read(verify(g['tasks']))
-    if tasks != market_tasks():
-        raise ValueError('Wrong four-arm task freeze')
+    if tasks != market_tasks(shared_ffn=staged):
+        raise ValueError('Wrong frozen tasks for this protocol')
+    if staged:
+        stages.validate_gate(g, sources, gate)
+    data = read(verify(g['manifest']))
     root.mkdir(exist_ok=False)
     from step35_market_accounting import MarketLedger
-    ledger = MarketLedger(root, g['prior_seconds'], g['cpu_test_seconds'], g['prior_operation_ids'], caps=CAPS)
+    ledger = MarketLedger(root, g['prior_seconds'], g['cpu_test_seconds'], g['prior_operation_ids'], caps=caps)
     gate_binding = record(gate)
-    runner = MarketRunner(g, gate, root, ledger, worker_entry=worker, limits=g['limits'], caps=CAPS,
+    runner = MarketRunner(g, gate, root, ledger, worker_entry=worker, limits=g['limits'], caps=caps,
                           source_bindings=[gate_binding, g['tasks'], g['manifest'], *g['sources']],
                           halt_dispatch_on_failure=True, continue_after_oom=True)
     runner.handoff_since=started
@@ -276,10 +293,14 @@ def campaign(gate):
     def completed(job):
         task = by_id[job['task_id']]
         result = read(job['target']/'run/completion.json')
-        identity = dict(protocol=PROTOCOL, task=task, manifest=g['manifest'], gate=gate_binding)
+        identity = dict(protocol=g['protocol'], task=task, manifest=g['manifest'], gate=gate_binding)
         validate_training(task, result, data, identity)
 
     try:
+        if staged:
+            register_controller(root, g['protocol'])
+            stages.dispatch(runner, tasks, completed, gate_binding)
+            return
         batch = run_training(runner, tasks, completed)
         validate_streams(batch['winners'])
         scores = [dict(action='score', task_id=t['id'], target=root/'scoring'/t['id'], bucket='gpu',
@@ -321,7 +342,15 @@ def main():
     reopen.add_argument('--attempt', type=int, choices=(1, 2), required=True)
     args = parser.parse_args()
     if args.action == 'request-oom':
-        print(request_recovery(args.campaign, args.task, args.attempt))
+        current = read(args.campaign/'controller.json')['protocol']
+        if current != PROTOCOL:
+            import step35_ffn_stages as stages
+            if current != stages.PROTOCOL:
+                raise ValueError('Unknown FIT12 recovery protocol')
+            ids = {f'{method}_s{seed}' for method in stages.METHODS for seed in SEEDS}
+            print(request_recovery(args.campaign, args.task, args.attempt, task_ids=ids, protocol=current))
+        else:
+            print(request_recovery(args.campaign, args.task, args.attempt))
     else:
         campaign(args.gate)
 

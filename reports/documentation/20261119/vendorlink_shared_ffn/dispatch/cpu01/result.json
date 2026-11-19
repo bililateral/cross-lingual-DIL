@@ -1,0 +1,564 @@
+{
+  "status": "PASS",
+  "device": "cpu",
+  "gpu_initialized": false,
+  "formal_training_tasks": 0,
+  "synthetic_cases": {
+    "no_authorization": {
+      "opened": [],
+      "dispatched": [],
+      "campaign_created": false,
+      "status": "REJECTED"
+    },
+    "wrong_gpu": {
+      "opened": [],
+      "dispatched": [],
+      "campaign_created": false,
+      "status": "REJECTED"
+    },
+    "old_twelve": {
+      "opened": [],
+      "dispatched": [],
+      "campaign_created": false,
+      "status": "REJECTED"
+    },
+    "mixed_format": {
+      "opened": [],
+      "dispatched": [],
+      "campaign_created": false,
+      "status": "REJECTED"
+    },
+    "duplicate_seed": {
+      "opened": [],
+      "dispatched": [],
+      "campaign_created": false,
+      "status": "REJECTED"
+    },
+    "missing_train": {
+      "opened": [],
+      "dispatched": [
+        [
+          "train",
+          "H_SEQ_s51"
+        ],
+        [
+          "train",
+          "H_SEQ_s52"
+        ]
+      ],
+      "campaign_created": true,
+      "status": "REJECTED"
+    },
+    "missing_score": {
+      "opened": [],
+      "dispatched": [
+        [
+          "train",
+          "H_SEQ_s51"
+        ],
+        [
+          "train",
+          "H_SEQ_s52"
+        ],
+        [
+          "train",
+          "H_SEQ_s53"
+        ],
+        [
+          "score",
+          "H_SEQ_s51"
+        ],
+        [
+          "score",
+          "H_SEQ_s52"
+        ]
+      ],
+      "campaign_created": true,
+      "status": "REJECTED"
+    },
+    "seq_stable": {
+      "opened": [
+        "H_SEQ"
+      ],
+      "dispatched": [
+        [
+          "train",
+          "H_SEQ_s51"
+        ],
+        [
+          "train",
+          "H_SEQ_s52"
+        ],
+        [
+          "train",
+          "H_SEQ_s53"
+        ],
+        [
+          "score",
+          "H_SEQ_s51"
+        ],
+        [
+          "score",
+          "H_SEQ_s52"
+        ],
+        [
+          "score",
+          "H_SEQ_s53"
+        ],
+        [
+          "analyze",
+          "H_SEQ"
+        ]
+      ],
+      "campaign_created": true,
+      "status": "STOP_NO_MEANINGFUL_FORGETTING"
+    },
+    "seq_learning": {
+      "opened": [
+        "H_SEQ"
+      ],
+      "dispatched": [
+        [
+          "train",
+          "H_SEQ_s51"
+        ],
+        [
+          "train",
+          "H_SEQ_s52"
+        ],
+        [
+          "train",
+          "H_SEQ_s53"
+        ],
+        [
+          "score",
+          "H_SEQ_s51"
+        ],
+        [
+          "score",
+          "H_SEQ_s52"
+        ],
+        [
+          "score",
+          "H_SEQ_s53"
+        ],
+        [
+          "analyze",
+          "H_SEQ"
+        ]
+      ],
+      "campaign_created": true,
+      "status": "STOP_LEARNING"
+    },
+    "er_stable": {
+      "opened": [
+        "H_SEQ",
+        "H_ER"
+      ],
+      "dispatched": [
+        [
+          "train",
+          "H_SEQ_s51"
+        ],
+        [
+          "train",
+          "H_SEQ_s52"
+        ],
+        [
+          "train",
+          "H_SEQ_s53"
+        ],
+        [
+          "score",
+          "H_SEQ_s51"
+        ],
+        [
+          "score",
+          "H_SEQ_s52"
+        ],
+        [
+          "score",
+          "H_SEQ_s53"
+        ],
+        [
+          "analyze",
+          "H_SEQ"
+        ],
+        [
+          "train",
+          "H_ER_s51"
+        ],
+        [
+          "train",
+          "H_ER_s52"
+        ],
+        [
+          "train",
+          "H_ER_s53"
+        ],
+        [
+          "score",
+          "H_ER_s51"
+        ],
+        [
+          "score",
+          "H_ER_s52"
+        ],
+        [
+          "score",
+          "H_ER_s53"
+        ],
+        [
+          "analyze",
+          "H_ER"
+        ]
+      ],
+      "campaign_created": true,
+      "status": "STOP_ER_FORGETTING"
+    },
+    "er_learning": {
+      "opened": [
+        "H_SEQ",
+        "H_ER"
+      ],
+      "dispatched": [
+        [
+          "train",
+          "H_SEQ_s51"
+        ],
+        [
+          "train",
+          "H_SEQ_s52"
+        ],
+        [
+          "train",
+          "H_SEQ_s53"
+        ],
+        [
+          "score",
+          "H_SEQ_s51"
+        ],
+        [
+          "score",
+          "H_SEQ_s52"
+        ],
+        [
+          "score",
+          "H_SEQ_s53"
+        ],
+        [
+          "analyze",
+          "H_SEQ"
+        ],
+        [
+          "train",
+          "H_ER_s51"
+        ],
+        [
+          "train",
+          "H_ER_s52"
+        ],
+        [
+          "train",
+          "H_ER_s53"
+        ],
+        [
+          "score",
+          "H_ER_s51"
+        ],
+        [
+          "score",
+          "H_ER_s52"
+        ],
+        [
+          "score",
+          "H_ER_s53"
+        ],
+        [
+          "analyze",
+          "H_ER"
+        ]
+      ],
+      "campaign_created": true,
+      "status": "STOP_ER_LEARNING"
+    },
+    "unequal_start": {
+      "opened": [
+        "H_SEQ",
+        "H_ER"
+      ],
+      "dispatched": [
+        [
+          "train",
+          "H_SEQ_s51"
+        ],
+        [
+          "train",
+          "H_SEQ_s52"
+        ],
+        [
+          "train",
+          "H_SEQ_s53"
+        ],
+        [
+          "score",
+          "H_SEQ_s51"
+        ],
+        [
+          "score",
+          "H_SEQ_s52"
+        ],
+        [
+          "score",
+          "H_SEQ_s53"
+        ],
+        [
+          "analyze",
+          "H_SEQ"
+        ],
+        [
+          "train",
+          "H_ER_s51"
+        ],
+        [
+          "train",
+          "H_ER_s52"
+        ],
+        [
+          "train",
+          "H_ER_s53"
+        ],
+        [
+          "score",
+          "H_ER_s51"
+        ],
+        [
+          "score",
+          "H_ER_s52"
+        ],
+        [
+          "score",
+          "H_ER_s53"
+        ],
+        [
+          "analyze",
+          "H_ER"
+        ]
+      ],
+      "campaign_created": true,
+      "status": "HOLD_PREHISTORY_IDENTITY"
+    },
+    "full_no_increment": {
+      "opened": [
+        "H_SEQ",
+        "H_ER",
+        "H_full"
+      ],
+      "dispatched": [
+        [
+          "train",
+          "H_SEQ_s51"
+        ],
+        [
+          "train",
+          "H_SEQ_s52"
+        ],
+        [
+          "train",
+          "H_SEQ_s53"
+        ],
+        [
+          "score",
+          "H_SEQ_s51"
+        ],
+        [
+          "score",
+          "H_SEQ_s52"
+        ],
+        [
+          "score",
+          "H_SEQ_s53"
+        ],
+        [
+          "analyze",
+          "H_SEQ"
+        ],
+        [
+          "train",
+          "H_ER_s51"
+        ],
+        [
+          "train",
+          "H_ER_s52"
+        ],
+        [
+          "train",
+          "H_ER_s53"
+        ],
+        [
+          "score",
+          "H_ER_s51"
+        ],
+        [
+          "score",
+          "H_ER_s52"
+        ],
+        [
+          "score",
+          "H_ER_s53"
+        ],
+        [
+          "analyze",
+          "H_ER"
+        ],
+        [
+          "train",
+          "H_full_s51"
+        ],
+        [
+          "train",
+          "H_full_s52"
+        ],
+        [
+          "train",
+          "H_full_s53"
+        ],
+        [
+          "score",
+          "H_full_s51"
+        ],
+        [
+          "score",
+          "H_full_s52"
+        ],
+        [
+          "score",
+          "H_full_s53"
+        ],
+        [
+          "analyze",
+          "H_full"
+        ]
+      ],
+      "campaign_created": true,
+      "status": "STOP_FULL_APPLICATION",
+      "full_er": false,
+      "external": true
+    },
+    "pass_all": {
+      "opened": [
+        "H_SEQ",
+        "H_ER",
+        "H_full"
+      ],
+      "dispatched": [
+        [
+          "train",
+          "H_SEQ_s51"
+        ],
+        [
+          "train",
+          "H_SEQ_s52"
+        ],
+        [
+          "train",
+          "H_SEQ_s53"
+        ],
+        [
+          "score",
+          "H_SEQ_s51"
+        ],
+        [
+          "score",
+          "H_SEQ_s52"
+        ],
+        [
+          "score",
+          "H_SEQ_s53"
+        ],
+        [
+          "analyze",
+          "H_SEQ"
+        ],
+        [
+          "train",
+          "H_ER_s51"
+        ],
+        [
+          "train",
+          "H_ER_s52"
+        ],
+        [
+          "train",
+          "H_ER_s53"
+        ],
+        [
+          "score",
+          "H_ER_s51"
+        ],
+        [
+          "score",
+          "H_ER_s52"
+        ],
+        [
+          "score",
+          "H_ER_s53"
+        ],
+        [
+          "analyze",
+          "H_ER"
+        ],
+        [
+          "train",
+          "H_full_s51"
+        ],
+        [
+          "train",
+          "H_full_s52"
+        ],
+        [
+          "train",
+          "H_full_s53"
+        ],
+        [
+          "score",
+          "H_full_s51"
+        ],
+        [
+          "score",
+          "H_full_s52"
+        ],
+        [
+          "score",
+          "H_full_s53"
+        ],
+        [
+          "analyze",
+          "H_full"
+        ]
+      ],
+      "campaign_created": true,
+      "status": "PASS_FULL_APPLICATION",
+      "full_er": true,
+      "external": true
+    }
+  },
+  "official_aggregate_binding": "605babd0b39e6e4b1cd24afb1e9c5c264b221669173ae1fa5344f5c0953996dd",
+  "external_readers": [
+    "V_SET",
+    "V_CLS"
+  ],
+  "seeds": [
+    51,
+    52,
+    53
+  ],
+  "rejected_wrong_reference_fields": [
+    "bundle hash",
+    "manifest",
+    "pretrained model"
+  ],
+  "boundaries": "Real campaign, child worker, receipt checks, native 13-metric analysis and decisions; GPU execution, model outputs and timing are synthetic.",
+  "elapsed_seconds": 4.537618413101882,
+  "peak_rss_bytes": 550035456
+}
