@@ -4,7 +4,7 @@
 
 ## 中文 trial3 H 与五基线的共同确认
 
-用户已选定在一批新 120 群上比较消融 Full 同配置 H、ER0.1、Logit0.1、L²R、ER+GCR、FOREVER。脚本、CPU／CUDA 合成核验及主审修复已完成。下一步是开训前固定五个配对比较的主要主张、O／F 实际幅度、A_acq／N／Z 保护与区间口径，再按各方法真实规模确定累计分桶、并发、失败政策、资源预留及本批授权。先前三批结果、八配置消融和这张拟作的前瞻表分别引用。[当前方案](../reports/documentation/20261118/h_history_benchmark/scope.zh.md) · [已处置意见和待定合同项](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md)
+用户已选定在一批新 120 群上比较消融 Full 同配置 H、ER0.1、Logit0.1、L²R、ER+GCR、FOREVER。脚本、CPU／CUDA 合成核验及主审修复已完成。11 月 19 日用户明确按实测出表。五个配对比较各报九组差值及均值，少忘、旧域末态、初学和新域能力均保留实际方向和幅度。下一步只需准备本批运行安排，按原任务用时和资源记录估算累计任务小时与同时能跑的轨迹数，说明单条任务故障和整批中断如何处置，供用户决定是否开训。[当前方案与出表口径](../reports/documentation/20261118/h_history_benchmark/scope.zh.md) · [实现主审](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md)
 
 ## VendorLink账号监督：FIT12共同协议后续
 

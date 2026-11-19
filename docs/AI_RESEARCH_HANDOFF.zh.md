@@ -12,7 +12,7 @@
 
 ### 历史权重版H主实验消融
 
-**中文六方法的脚本及合审已完成，正式训练待决定。** 本批拟比较消融 Full 同一套 trial3 配置与五个独立原定义基线，固定三个顺序、三个 seed、54 条轨迹，统一在新 120 群盲评。六项 CPU、三项 CUDA 合成核验通过。外审发现生成前漏验端点文件、控制器验收中断可漏账两项缺陷，已修复。最终三项单核用例覆盖 162 份手写端点、两路真实 CPU 子进程中断收尾和正式门边界。正式运行须另定统计判据和本批资源预算。目前未生成新群或开放标签，八配置消融原结论保持。送审基线为 Git `c41f7ab8`，最终部署源按 50 份原清单替换 4 份修复记录。[方案与两端核验](../reports/documentation/20261118/h_history_benchmark/scope.zh.md) · [外审及主审](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md) · [修复源码与核验](../reports/documentation/20261118/h_history_benchmark/review/fix_cpu.json) · [旧入口退役](../reports/documentation/20261118/h_history_benchmark/retirement.json)
+**中文六方法的脚本及合审已完成，正式训练待决定。** 本批拟比较消融 Full 同一套 trial3 配置与五个独立原定义基线，固定三个顺序、三个 seed、54 条轨迹，统一在新 120 群盲评。六项 CPU、三项 CUDA 合成核验通过。外审发现生成前漏验端点文件、控制器验收中断可漏账两项缺陷，已修复。最终三项单核用例覆盖 162 份手写端点、两路真实 CPU 子进程中断收尾和正式门边界。11 月 19 日用户确定按完整结果出表，五个对照的改善或退步均据实报告，无需预定 O／F 的最低提升或显著性门。开训尚待本批资源、故障安排和执行授权。目前未生成新群或开放标签，八配置消融原结论保持。送审基线为 Git `c41f7ab8`，最终部署源按 50 份原清单替换 4 份修复记录。[方案与两端核验](../reports/documentation/20261118/h_history_benchmark/scope.zh.md) · [外审及主审](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md) · [修复源码与核验](../reports/documentation/20261118/h_history_benchmark/review/fix_cpu.json) · [旧入口退役](../reports/documentation/20261118/h_history_benchmark/retirement.json)
 
 11 月 16 日，八配置消融完成。Full 相对 ER 的旧域末态和遗忘改善，平均取得能力的点值保护微负，原联合验收为 false。结果外审及 18 项主审处置已结案，本批后续只需按保存结果解释。[实测报告](../reports/documentation/20261116/h_ablation_result/result/report.zh.md) · [结果主审](../reports/documentation/20261116/h_ablation_result/result/review/primary_disposition.zh.md)
 

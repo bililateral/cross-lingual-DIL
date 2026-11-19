@@ -2,6 +2,8 @@
 
 ## 2026-11-18 中文定稿 H 与五基线统一重新确认
 
+11 月 19 日，用户明确“我觉得不用设置具体的少忘和旧域末态提升数值门，只要实验能完整运行有结果就行，具体的提升直接看结果”。这项决定取代主审收尾时提出的开训前另定效果门建议。中文六方法主表按完整批次报告每个基线的实测差值，初学与新域指标同步列出。用户另询问累计预算、并发和失败处置的含义，尚未为这批中文训练指定资源数值或故障政策。[现行出表口径](../reports/documentation/20261118/h_history_benchmark/scope.zh.md)
+
 CPU 和 CUDA 核验完成后，用户明确答复“允许这个 CPU／GPU 合审包外审”。授权对象为 40,584 字节的合审包。已通过本地 Playwright MCP 向网页 GPT-6 Pro 提交一次并回收原文。此前 38,727 字节的单 CPU 包未提交。[具体包身份及提交记录](../reports/documentation/20261118/h_history_benchmark/review/submission.json) · [原文与独立处置](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md)
 
 11 月 19 日零时，用户确认“允许这一次限额短测并行”。当时 V 的 seed 51 已完成，seed 52 在跑，留足其 29 GiB 显存承诺后尚有 2.09 GiB。例外只限一次中文手写 CUDA 核验，整 PID 最多 1.5 GiB、最多 180 秒，独立记费。英语正式调度、三条 V 与后续九条 H 的安排沿原合同。
