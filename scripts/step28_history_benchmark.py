@@ -97,8 +97,7 @@ def read_gate(path):
             allowed.get("experiment") != EXPERIMENT or
             allowed.get("approved") is not True or allowed.get("review_closed") is not True or
             allowed.get("runs") != plan() or allowed.get("cohort") != cohort() or
-            allowed.get("actions") != ["training", *POST] or allowed.get("listener") or
-            allowed.get("predecessor") or allowed.get("automatic_retry")):
+            allowed.get("actions") != ["training", *POST] or allowed.get("automatic_retry")):
         raise ValueError("A separate reviewed and explicitly authorized six-method gate is required")
     workspace = SCRIPTS.parent
     campaign = Path(allowed["campaign"]).resolve()
@@ -112,6 +111,14 @@ def read_gate(path):
               "cpu_test_seconds", "other_gpu_commitments", "allow_observed_foreign_gpu_processes")
     if approved.get("authorize_execution") is not True or any(approved[k] != allowed[k] for k in fields):
         raise ValueError("Execution scope or resource allocations differ from the decision")
+    for key in ("listener", "predecessor"):
+        if allowed.get(key) != approved.get(key):
+            raise ValueError("Conditional start differs from the decision")
+    if allowed.get("listener") or allowed.get("predecessor"):
+        if (not allowed.get("predecessor") or not allowed.get("listener") or
+                Path(allowed["listener"]["path"]) != SCRIPTS/"once_wait.py" or
+                Path(allowed["predecessor"]["path"]) != workspace.parent.parent/"vendorlink_market_training/execution/launch.json"):
+            raise ValueError("Wrong listener or predecessor")
     queue.verify(allowed["analysis_plan"])
     if (type(allowed["workers"]) is not int or not 1 <= allowed["workers"] <= 3 or
             allowed["worker_failure_policy"] != dispatch.POLICY or
@@ -237,6 +244,12 @@ def check_dispatch(job, gate_path, action, deadline, seconds, *, task_id=None, a
         raise ValueError("Worker does not own the controller's live reservation")
 
 
+def start_campaign(allowed, gate):
+    rows = [{**r, "seconds": allowed["seconds_per_method"][r["name"]]} for r in plan()]
+    dispatch.campaign(allowed, gate, rows, Path(__file__),
+                      lambda job, row: validate_training(job, row, allowed), POST_STATUS)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("plan", "campaign", "request-oom", "worker", *POST))
@@ -253,16 +266,15 @@ def main():
     gate_path = args.gate.resolve()
     allowed = read_gate(gate_path)
     campaign = Path(allowed["campaign"])
+    if args.action == "campaign":
+        start_campaign(allowed, gate_path)
+        return
     rows = [{**r, "seconds": allowed["seconds_per_method"][r["name"]]} for r in plan()]
     if args.action == "request-oom":
         print(dispatch.request_recovery(campaign, args.id, args.attempt, task_ids={r["id"] for r in rows},
                                         protocol=EXPERIMENT))
         return
     posts = [dict(id=k, action=k, bucket=k, seconds=allowed["post_seconds"][k], gpu=k=="confirmation") for k in POST]
-    if args.action == "campaign":
-        dispatch.campaign(allowed, gate_path, rows, Path(__file__),
-                          lambda job, row: validate_training(job, row, allowed), POST_STATUS)
-        return
     tasks = {r["id"]: r for r in [*rows, *posts]}
     row = tasks.get(args.id)
     if (row is None or row.get("action", "worker") != args.action or args.deadline is None or

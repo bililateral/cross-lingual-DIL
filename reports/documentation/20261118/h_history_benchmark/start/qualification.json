@@ -1,0 +1,85 @@
+{
+  "passed": true,
+  "prior_cpu_seconds": 78,
+  "prior_gpu_seconds": 47,
+  "prior_by_receipt": [
+    {
+      "file": "../cpu.json",
+      "seconds": 20
+    },
+    {
+      "file": "../review/fix_cpu.json",
+      "seconds": 2
+    },
+    {
+      "file": "../dispatch_review/cpu.json",
+      "seconds": 25
+    },
+    {
+      "file": "../dispatch_review/fix_cpu.json",
+      "seconds": 31
+    }
+  ],
+  "listener_cpu_seconds": 8,
+  "operational_reserve_seconds": 60,
+  "operational_reserve_note": "Conservative advance charge for status reads, input metadata inspection, arming and transfer administration; reported separately from measured preparation and qualification. Wait sleep is excluded.",
+  "runs": [
+    {
+      "code": 0,
+      "seconds": 3.2349999999996726,
+      "charged": 4,
+      "stdout": {
+        "passed": true,
+        "evidence": {
+          "predecessor_running_and_partial_held": true,
+          "terminal_failure_held": true,
+          "release_of_related_pid_required": true,
+          "resource_99_held_100_admitted": true,
+          "unique_launch": 1,
+          "direct_launch_rejected": true,
+          "pid_verified": true,
+          "native_format_real_cpu_updates": 1,
+          "wrong_run_and_zero_held": true,
+          "deletion_after_update": true,
+          "charged_monitor_seconds": 1
+        },
+        "official_data_reads": 0,
+        "official_training_tasks": 0,
+        "gpu_kernels": 0
+      },
+      "stderr": ""
+    },
+    {
+      "code": 0,
+      "seconds": 3.155999999999949,
+      "charged": 4,
+      "stdout": {
+        "passed": true,
+        "evidence": {
+          "predecessor_running_and_partial_held": true,
+          "terminal_failure_held": true,
+          "release_of_related_pid_required": true,
+          "resource_99_held_100_admitted": true,
+          "unique_launch": 1,
+          "direct_launch_rejected": true,
+          "changed_gate_held": true,
+          "pid_verified": true,
+          "native_format_real_cpu_updates": 1,
+          "wrong_run_and_zero_held": true,
+          "deletion_after_update": true,
+          "charged_monitor_seconds": 1
+        },
+        "official_data_reads": 0,
+        "official_training_tasks": 0,
+        "gpu_kernels": 0
+      },
+      "stderr": ""
+    }
+  ],
+  "existing_gpu": {
+    "file": "../gpu.json",
+    "whole_process_peak_bytes": 748683264,
+    "seconds": 46.601874083746225
+  },
+  "scope": "Single Linux py310 CPU core, no GPU or formal data access in listener qualification. A real child made one small SGD update to verify retirement."
+}

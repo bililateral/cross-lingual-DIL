@@ -6,6 +6,7 @@ import sys
 import time
 
 import psutil
+import step28_benchmark_wait as waiting
 
 from step30_evolution_control import kernel_identity
 from step30_evolution_io import Ledger, PYTHON, read, record, verify, write
@@ -23,6 +24,10 @@ BUCKETS = {"training": "training", "generation": "generation", "confirmation": "
 class ChineseRunner(MarketRunner):
     active_poll_seconds = 2.
     worker_threads = 1
+
+    def retire_waiter(self, active):
+        if self.allowed.get("listener"):
+            waiting.retire(self.allowed, self.root, active)
 
     def verify_worker_sources(self, job):
         try:
@@ -113,6 +118,8 @@ def campaign(allowed, gate, rows, entry, validate, post_status):
     root = Path(allowed["campaign"])
     caps = {BUCKETS[k]: v for k, v in allowed["budget_seconds"].items()}
     prior = {BUCKETS[k]: v for k, v in allowed["prior_used_seconds"].items()}
+    if allowed.get("listener"):
+        prior["auxiliary"] += waiting.verify_handoff(allowed, gate)
     # Reserve all first attempts before claiming the new directory. Retries reserve
     # their full method allowance against remaining and in-flight time at dispatch.
     if (sum(r["seconds"] for r in rows)+prior["training"] > caps["training"] or
