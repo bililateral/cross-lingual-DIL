@@ -4,7 +4,7 @@
 
 ## 中文 trial3 H 与五基线的共同确认
 
-中文 trial3 H_full、ER0.1、Logit0.1、L²R、ER+GCR、FOREVER 共 54 条轨迹，使用同一批新 120 群。完整后对五个基线逐一公布九组差值及均值，报告遗忘、旧域末态、初学和新域能力，保留各指标的实际方向和幅度。按 11 月 19 日决定，拟用 720 个累计任务小时，其中训练 700 小时。建议按单槽资源逐步开至三路，沿 VendorLink 的控制器处理具名 OOM 恢复。运行增量已完成 Linux 单核核验，具体包已获准外审。下一步闭合增量审查后，等用户决定是否启动这批中文训练。[预算、工期与历史实耗](../reports/documentation/20261118/h_history_benchmark/scope.zh.md) · [原实现主审](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md) · [调度核验](../reports/documentation/20261118/h_history_benchmark/dispatch_review/cpu.json)
+中文 trial3 H_full、ER0.1、Logit0.1、L²R、ER+GCR、FOREVER 共 54 条轨迹，使用同一批新 120 群。完整后对五个基线逐一公布九组差值及均值，报告遗忘、旧域末态、初学和新域能力，保留各指标的实际方向和幅度。按 11 月 19 日决定，拟用 720 个累计任务小时，其中训练 700 小时。建议按单槽资源逐步开至三路，沿 VendorLink 的控制器处理具名 OOM 恢复。运行增量的六项审查意见已修复并完成单核核验。下一步等用户决定是否按上述安排开训。开训时将独立授权、最终源码、既有费用和当时资源承诺绑定至本批正式门。[预算、工期与历史实耗](../reports/documentation/20261118/h_history_benchmark/scope.zh.md) · [原实现主审](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md) · [调度主审与最终核验](../reports/documentation/20261118/h_history_benchmark/dispatch_review/primary_disposition.zh.md)
 
 ## VendorLink账号监督：FIT12共同协议后续
 

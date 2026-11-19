@@ -2,7 +2,7 @@
 
 ## 2026-11-18 中文定稿 H 与五基线统一重新确认
 
-11 月 19 日，用户明确“我觉得不用设置具体的少忘和旧域末态提升数值门，只要实验能完整运行有结果就行，具体的提升直接看结果”。中文六方法主表将据实报告各基线的遗忘、旧域末态、初学与新域能力。随后用户就累计预算明确“这个你自己拟定”，并问“之前做这个实验用的多少并发？”，指定“跟vendor-link这次实验的控制器同样的失败处理逻辑”。据旧回执拟 720 累计小时、建议最多三路。该批训练尚待开训指令。用户对本次 36,031 字节的运行增量包另行答复“允许这个增量包外审”。[运行安排与历史依据](../reports/documentation/20261118/h_history_benchmark/scope.zh.md) · [具体审查范围](../reports/documentation/20261118/h_history_benchmark/dispatch_review/questions.zh.md)
+11 月 19 日，用户明确“我觉得不用设置具体的少忘和旧域末态提升数值门，只要实验能完整运行有结果就行，具体的提升直接看结果”。中文六方法主表将据实报告各基线的遗忘、旧域末态、初学与新域能力。随后用户就累计预算明确“这个你自己拟定”，并问“之前做这个实验用的多少并发？”，指定“跟vendor-link这次实验的控制器同样的失败处理逻辑”。据旧回执拟 720 累计小时、建议最多三路。该批训练尚待开训指令。用户对本次 36,031 字节的运行增量包另行答复“允许这个增量包外审”。具体包已提交一次，完整原文和六项独立处置均已留存。[运行安排与历史依据](../reports/documentation/20261118/h_history_benchmark/scope.zh.md) · [具体包授权与交付](../reports/documentation/20261118/h_history_benchmark/dispatch_review/submission.json)
 
 CPU 和 CUDA 核验完成后，用户明确答复“允许这个 CPU／GPU 合审包外审”。授权对象为 40,584 字节的合审包。已通过本地 Playwright MCP 向网页 GPT-6 Pro 提交一次并回收原文。此前 38,727 字节的单 CPU 包未提交。[具体包身份及提交记录](../reports/documentation/20261118/h_history_benchmark/review/submission.json) · [原文与独立处置](../reports/documentation/20261118/h_history_benchmark/review/primary_disposition.zh.md)
 

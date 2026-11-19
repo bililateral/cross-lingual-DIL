@@ -1,6 +1,8 @@
 """Use the FIT12 dispatch loop for the Chinese benchmark's one training queue."""
 import errno
 from pathlib import Path
+import signal
+import sys
 import time
 
 import psutil
@@ -22,13 +24,16 @@ class ChineseRunner(MarketRunner):
     active_poll_seconds = 2.
     worker_threads = 1
 
-    def command(self, job, slot, deadline):
+    def verify_worker_sources(self, job):
         try:
             for binding in self.source_bindings:
                 verify(binding)
         except (OSError, ValueError) as exc:
             write(job["target"]/"shared_failure.json", dict(error=repr(exc)))
             raise
+
+    def command(self, job, slot, deadline):
+        self.verify_worker_sources(job)
         cores = psutil.Process().cpu_affinity()
         action = job["action"]
         args = ["--id", job["task_id"] if action == "worker" else action, "--deadline", str(deadline)]
@@ -48,6 +53,8 @@ def training_phase(runner, rows, workers, protocol, validate):
     by_id = {r["id"]: r for r in rows}
     def accepted(job):
         try:
+            if job["attempt"] == 2:
+                verify(job["first_oom_receipt"])
             validate(job["target"], by_id[job["task_id"]])
         except BaseException as exc:
             # Failed source/endpoint validation or parent interruption is shared.
@@ -75,6 +82,10 @@ def winner_directory(campaign, task_id, winner):
         raise ValueError("Successful released receipt required")
     if number == 2:
         prior = receipt(winner["first_oom_receipt"], root/"attempt-1"/"dispatch_receipt.json")
+        reopened = read(root/"attempt-1"/"slot_reopened.json")
+        if (reopened["previous"]["receipt"] != winner["first_oom_receipt"] or
+                (reopened["next_task"], reopened["next_attempt"]) != (task_id, 2)):
+            raise ValueError("Winner differs from the first failure accepted for recovery")
         if (prior["task_id"], prior["attempt"], prior["success"], prior["released"],
             prior["failure_kind"], prior["slot"]) != (task_id, 1, False, True, "CUDA_OOM", success["slot"]):
             raise ValueError("Second attempt requires the original released CUDA OOM in the same slot")
@@ -93,8 +104,7 @@ def record_worker_failure(job, action, error, traceback_text):
     evidence = dict(kind="CUDA_OOM" if oom else "OTHER", error=repr(error), traceback=traceback_text)
     write(job/"worker_failure.json", evidence)
     write(job/"failure.json", evidence)
-    if (not oom and (isinstance(error, ValueError) or
-            isinstance(error, OSError) and error.errno in (errno.ENOSPC, errno.EDQUOT))):
+    if isinstance(error, OSError) and error.errno in (errno.ENOSPC, errno.EDQUOT):
         write(job/"shared_failure.json", dict(error=repr(error)))
 
 
@@ -118,6 +128,8 @@ def campaign(allowed, gate, rows, entry, validate, post_status):
                            caps=caps, limits=runtime_limits, halt_dispatch_on_failure=True, continue_after_oom=True,
                            source_bindings=[record(gate), allowed["authorization"], allowed["analysis_plan"], *allowed["sources"]])
     runner.handoff_since = started
+    # The loop checks this request between dispatch/settlement critical sections.
+    previous_handler = signal.signal(signal.SIGTERM, lambda sig, frame: setattr(runner, "stop_signal", sig))
     try:
         training_phase(runner, rows, allowed["workers"], allowed["experiment"], validate)
         for action, status in post_status.items():
@@ -127,8 +139,18 @@ def campaign(allowed, gate, rows, entry, validate, post_status):
                     raise ValueError("Post-training step incomplete")
             runner.run_many([job], 1, post_complete)
         runner.settle_handoff()
+        runner.check_controller_stop()
         write(root/"completion.json", dict(status="ALL_FORMAL_ACTIONS_COMPLETE", sources=allowed["sources"]))
     except BaseException as error:
-        write(root/"failure.json", dict(error=repr(error), automatic_restart=False))
-        runner.settle_handoff(False)
+        cleanup_errors = []
+        try:
+            runner.settle_handoff(False)
+        except BaseException as secondary:
+            cleanup_errors.append(repr(secondary))
+        try:
+            write(root/"failure.json", dict(error=repr(error), cleanup_errors=cleanup_errors, automatic_restart=False))
+        except BaseException as secondary:
+            print("Cannot persist campaign failure:", repr(error), cleanup_errors, repr(secondary), file=sys.stderr)
         raise
+    finally:
+        signal.signal(signal.SIGTERM, previous_handler)

@@ -1,0 +1,76 @@
+{
+  "reviewed_git": "c1b16332",
+  "scope": "Linux existing py310. One physical CPU, three logical slots at most. NVML and CUDA OOM are handwritten. Actual CPU subprocesses and process groups, with a real SIGTERM. Formal data reads, cohorts, model updates and GPU kernels all zero.",
+  "reproduction_fixture": {
+    "path": "tests/test_step28_benchmark_handoff.py",
+    "bytes": 14312,
+    "sha256": "3d239b5894a301cebe1b9b527572c46413dc8a89bd6cbdaa51aef7730782cb5b",
+    "fixture_patch": "--- a/tests/test_step28_benchmark_handoff.py\n+++ b/tests/test_step28_benchmark_handoff.py\n@@ -146,11 +146,11 @@\n                 first_hash=record(attempt(TASKS[0])/\"dispatch_receipt.json\")\n                 if case!=\"budget\":\n+                    (base/\"old_gpu_pid\").write_text(str(first[\"pid\"]))\n+                    wait(lambda: (base/\"saw_old_gpu_pid\").exists())\n                     (base/\"first_healthy_done\").touch()\n                     wait(lambda: (attempt(TASKS[3])/\"running\").exists())\n                     peers={t:read(attempt(t)/\"process.json\")[\"pid\"] for t in (TASKS[2],TASKS[3])}\n                     assert not (attempt(TASKS[0],2)/\"process.json\").exists()\n-                    (base/\"old_gpu_pid\").write_text(str(first[\"pid\"]))\n                     (base/\"low_gpu\").touch()\n-                    wait(lambda: (base/\"saw_old_gpu_pid\").exists())\n                 assert request(1)==request(1)\n                 if case!=\"budget\":\n@@ -175,5 +175,5 @@\n                     assert first_hash==record(attempt(TASKS[0])/\"dispatch_receipt.json\")\n                     evidence.update(original_pid=first[\"pid\"],retry_pid=second[\"pid\"],healthy_pids=peers,\n-                          healthy_next=TASKS[3],reopened_next=TASKS[4],held_while_old_pid_visible=True,\n+                          healthy_next_while_old_pid_visible=TASKS[3],reopened_next=TASKS[4],held_while_old_pid_visible=True,\n                           held_below_reservation=True,duplicate_request_idempotent=True,first_receipt_unchanged=True)\n             elif case==\"other\":\n"
+  },
+  "deployed_files": [
+    {
+      "path": "scripts/step35_market_queue.py",
+      "bytes": 16136,
+      "sha256": "f2f874cb9db8c781dfb2beba29a437198dfec05a2acd8c7be0657eb8228f3cc0",
+      "reviewed_sha256": "d3cdff12ffed00d4074d995e08644b81202fd52536c76e8082770f13f2c00e1d"
+    },
+    {
+      "path": "scripts/step30_evolution_control.py",
+      "bytes": 40666,
+      "sha256": "47779ded8a5c1bd74fa853dde5b7c3302b366409338d47cadfe6fd697e0100e7",
+      "reviewed_sha256": "2f14ba93bcaa1bf9c8d8a44602f4a3c33ddc664e65f292610dffa88469d2399a"
+    },
+    {
+      "path": "scripts/step28_history_benchmark_dispatch.py",
+      "bytes": 8347,
+      "sha256": "af0de9fb382cff15ec23b92325e382d5a9484a2c1d964650aec946da744491e2",
+      "reviewed_sha256": "acd2397b0d96ec0313bf66a6baaf0980019fe320fad778850d1907daaeb4ff2f"
+    },
+    {
+      "path": "tests/test_step28_history_benchmark.py",
+      "bytes": 29722,
+      "sha256": "6a58b33cf8a690449115b5204b7bca6c9cad7a941ac9547d7e83cfdfa8d9e395",
+      "reviewed_sha256": "33eb3806729f7b5155fc1b2b7a82cc554524f2fa0ce709a90c66be00ecdf8f37"
+    },
+    {
+      "path": "tests/test_step28_benchmark_handoff.py",
+      "bytes": 21330,
+      "sha256": "d654c6b9b17c35909db69a8fb2f6d284c5d9d047e8b9e8ed175749e0e83d2385",
+      "reviewed_sha256": "206858becb91d45d7521565abd2b139675fcb4b4ee4cfb5d42e2441892bd67ae"
+    }
+  ],
+  "attempts": [
+    {
+      "label": "pre_fix_stale_pid_blocks_healthy_slot",
+      "code": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/tests/test_step28_benchmark_handoff.py\", line 265, in <module>\n    cases=[exercise(base/c,c) for c in (\"handoff\",\"repeat\",\"other\",\"budget\",\"interrupt\")]\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/tests/test_step28_benchmark_handoff.py\", line 265, in <listcomp>\n    cases=[exercise(base/c,c) for c in (\"handoff\",\"repeat\",\"other\",\"budget\",\"interrupt\")]\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/tests/test_step28_benchmark_handoff.py\", line 151, in exercise\n    wait(lambda: (attempt(TASKS[3])/\"running\").exists())\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/tests/test_step28_benchmark_handoff.py\", line 33, in wait\n    raise TimeoutError(f\"Timed out at fixture line {condition.__code__.co_firstlineno}\")\nTimeoutError: Timed out at fixture line 151\n",
+      "outer_seconds": 13.983999999999469,
+      "charged_control_seconds": 14
+    },
+    {
+      "label": "final_native_dispatch_faults",
+      "code": 0,
+      "stdout": "{\"passed\": true, \"cases\": [{\"case\": \"handoff\", \"original_pid\": 1063173, \"retry_pid\": 1063187, \"healthy_pids\": {\"ABC_s4_LOGIT0.1_ref\": 1063175, \"ABC_s4_L2R_text_fixed\": 1063185}, \"healthy_next_while_old_pid_visible\": \"ABC_s4_L2R_text_fixed\", \"reopened_next\": \"ABC_s4_ER_GCR_group_fixed\", \"held_while_old_pid_visible\": true, \"held_below_reservation\": true, \"duplicate_request_idempotent\": true, \"first_receipt_unchanged\": true, \"attempts\": 6, \"inherited_seconds\": 7, \"synthetic_post_actions\": [\"generation\", \"confirmation\", \"analysis\"], \"settled_training_seconds\": 14, \"status\": \"COMPLETE\", \"winners\": 5}, {\"case\": \"repeat\", \"original_pid\": 1063208, \"retry_pid\": 1063224, \"healthy_pids\": {\"ABC_s4_LOGIT0.1_ref\": 1063210, \"ABC_s4_L2R_text_fixed\": 1063218}, \"healthy_next_while_old_pid_visible\": \"ABC_s4_L2R_text_fixed\", \"reopened_next\": \"ABC_s4_ER_GCR_group_fixed\", \"held_while_old_pid_visible\": true, \"held_below_reservation\": true, \"duplicate_request_idempotent\": true, \"first_receipt_unchanged\": true, \"attempts\": 6, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 14, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"other\", \"attempts\": 3, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 13, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"budget\", \"attempts\": 1, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 8, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"interrupt\", \"attempts\": 3, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 10, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"source\", \"original_error\": \"ValueError('Bound source identity mismatch: /tmp/tmp1dqt21x5/source/shared_source')\", \"attempts\": 3, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 10, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"bad_json\", \"original_error\": \"JSONDecodeError('Expecting property name enclosed in double quotes: line 1 column 2 (char 1)')\", \"attempts\": 3, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 10, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"receipt_io\", \"original_error\": \"OSError(28, 'handwritten first receipt write')\", \"attempts\": 3, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 10, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"launch_interrupt\", \"original_error\": \"KeyboardInterrupt('handwritten third-slot launch interrupt')\", \"attempts\": 3, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 10, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"sigterm\", \"original_error\": \"InterruptedError('Controller received SIGTERM')\", \"attempts\": 3, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 10, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"release_once\", \"original_error\": \"InterruptedError('Controller received SIGTERM')\", \"attempts\": 3, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 10, \"status\": \"INCOMPLETE\", \"winners\": 0}, {\"case\": \"tamper\", \"attempts\": 5, \"inherited_seconds\": 7, \"synthetic_post_actions\": [], \"settled_training_seconds\": 13, \"status\": \"INCOMPLETE\", \"winners\": 0}], \"local_rss_and_shared_disk_distinguished\": true, \"control_cap\": [{\"primary\": \"TimeoutError('Cumulative budget exceeded; no further dispatch')\", \"cleanup\": [], \"charge_count\": 1, \"charged_seconds\": 181}, {\"primary\": \"ValueError('handwritten primary phase failure')\", \"cleanup\": [\"TimeoutError('Cumulative budget exceeded; no further dispatch')\"], \"charge_count\": 1, \"charged_seconds\": 181}], \"logical_slots_up_to\": 3, \"physical_cpu_cores\": 1, \"gpu_kernels\": 0, \"formal_data_reads\": 0, \"model_updates\": 0}\n",
+      "stderr": "",
+      "outer_seconds": 14.125,
+      "charged_control_seconds": 15
+    },
+    {
+      "label": "final_162_endpoints_and_formal_gate",
+      "code": 0,
+      "stdout": "{\"cases\": 4, \"cpu_affinity\": [0], \"evidence\": {\"before_generation\": {\"changed_FOREVER\": \"blocked\", \"changed_H\": \"blocked\", \"handwritten_endpoints\": 162, \"intact\": \"passed\", \"missing_FOREVER\": \"blocked\", \"missing_H\": \"blocked\", \"official_groups_generated\": 0, \"official_pairs_opened\": 0, \"rebound_first_failure\": \"blocked\", \"substituted_first_oom_receipt\": \"blocked\"}, \"dispatch\": {\"foreign_pid\": \"rejected\", \"historical_gate\": \"rejected\", \"own_claim\": \"accepted\", \"same_kernel_second_attempt\": \"accepted\", \"wrong_attempt\": \"rejected\"}, \"formal_gate_conditions\": {\"different_authorized_source\": \"blocked\", \"exact_synthetic_source\": \"accepted\", \"formal_campaign_created\": false, \"post_at_stop_reserve\": \"blocked\", \"training_at_stop_reserve\": \"blocked\"}, \"interrupted_validation\": {\"charged_seconds\": 0.10222805803641677, \"downstream_closed\": true, \"exit_status\": \"interrupted\", \"inherited_seconds\": 7.0, \"peer_charged_seconds\": 0.09931593388319016, \"peer_drained\": true, \"real_cpu_child\": true, \"receipts_per_child\": 1}}, \"formal_data_reads\": 0, \"gpu_used\": false, \"passed\": true, \"pretrained_loads\": 0, \"python\": \"/home/yongpeng/miniconda3/envs/py310/bin/python\", \"seconds\": 0.29496986605226994}\n",
+      "stderr": "test_generation_rechecks_162_endpoint_files (__main__.BenchmarkTest) ... ok\ntest_interrupted_worker_validation_keeps_receipt_and_fee (__main__.BenchmarkTest) ... ok\ntest_gate_binds_authorized_sources_and_stop_reserve (__main__.BenchmarkTest) ... ok\ntest_reservation_and_historical_gate_rejection (__main__.BenchmarkTest) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.295s\n\nOK\n",
+      "outer_seconds": 1.7030000000004293,
+      "charged_control_seconds": 2
+    }
+  ],
+  "charged_control_seconds_this_followup": 31,
+  "earlier_incremental_qualification_seconds": 25,
+  "prior_cpu_and_gpu_receipts": "../cpu.json, ../review/fix_cpu.json, ../gpu.json. The 180-second synthetic budget boundary inside these checks is test data, not an additional charge.",
+  "last_observation": {
+    "at": "2026-11-19T11:08:20.768101+08:00",
+    "campaign": false,
+    "formal_gate": false
+  }
+}

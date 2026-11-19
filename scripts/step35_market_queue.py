@@ -57,7 +57,7 @@ class OomHandoff:
             self.winners[task] = dict(attempt=job['attempt'], receipt=record(path),
                                       completion=record(job['target']/'run/completion.json'))
             if job['attempt'] == 2:
-                self.winners[task]['first_oom_receipt'] = record(job['task_dir']/'attempt-1'/'dispatch_receipt.json')
+                self.winners[task]['first_oom_receipt'] = job['first_oom_receipt']
             self.warmed.add(slot)
         elif receipt['failure_kind'] == 'CUDA_OOM' and receipt['released']:
             binding = record(path)
@@ -104,11 +104,12 @@ class OomHandoff:
         return ordinary  # A second OOM can release capacity, never a third attempt.
 
     def admission_limits(self, limits):
-        if self.started or not self.paired_start:
-            return limits
         values = dict(limits)
-        for name in ('free_gpu_bytes', 'free_ram_bytes', 'save_reserve_bytes'):
-            values[name] *= 2
+        if self.suspended:
+            values['released_gpu_processes'] = [row for _, row in self.suspended.values()]
+        if not self.started and self.paired_start:
+            for name in ('free_gpu_bytes', 'free_ram_bytes', 'save_reserve_bytes'):
+                values[name] *= 2
         return values
 
     def initial_pair_seconds(self):
@@ -120,6 +121,8 @@ class OomHandoff:
             return
         _, row = self.suspended[slot]
         path = verify(row['receipt'])
+        if job['attempt'] == 2:
+            job['first_oom_receipt'] = row['receipt']
         write(path.parent/'slot_reopened.json', dict(previous=row, next_task=job['task_id'],
               next_attempt=job['attempt'], admission=observation))
         del self.suspended[slot]
@@ -170,10 +173,13 @@ class MarketRunner(Runner):
         self.source_bindings = source_bindings
 
     def settle_handoff(self,success=True):
-        if hasattr(self,'handoff_since'):
+        if getattr(self,'handoff_since',None) is not None:
             if hasattr(self.ledger, 'sync_external'):
                 self.ledger.sync_external(force=True)
-            self.ledger.charge('auxiliary','controller_setup_or_handoff',time.monotonic()-self.handoff_since,success)
+            elapsed = time.monotonic()-self.handoff_since
+            # charge records the actual event before reporting an exceeded cap.
+            self.handoff_since = None
+            self.ledger.charge('auxiliary','controller_setup_or_handoff',elapsed,success)
             self.handoff_since=time.monotonic()
 
     def run_many(self,*args,**kwargs):

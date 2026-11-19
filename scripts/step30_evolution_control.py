@@ -69,7 +69,16 @@ def resource_observation(allowed: dict, root: Path, gpu: bool, owned=(), nv=None
                     commitments.append(dict(**row, unreflected_bytes=remaining))
                 except psutil.NoSuchProcess:
                     commitments.append(dict(**row, exited=True))
-            unknown = sorted(set(used)-{r['pid'] for r in commitments if not r.get('exited')})
+            stale = []
+            for row in limits.get('released_gpu_processes', ()):
+                pid = row['pid']
+                if pid in used and not psutil.pid_exists(pid):
+                    # This controller reaped the process. NVML still deducts its
+                    # bytes from free. A reused live numeric PID stays unknown.
+                    stale.append(pid)
+            if stale:
+                observation['released_pids_still_in_nvml'] = stale
+            unknown = sorted(set(used)-set(stale)-{r['pid'] for r in commitments if not r.get('exited')})
             foreign = []
             for pid in unknown:
                 if not allowed.get('allow_observed_foreign_gpu_processes', False):
@@ -142,6 +151,10 @@ class Runner:
             raise ValueError('Controller and ledger must use identical cumulative budgets')
         self.failed = False
 
+    def check_controller_stop(self):
+        if getattr(self, 'stop_signal', None):
+            raise InterruptedError('Controller received '+signal.Signals(self.stop_signal).name)
+
     def retire_waiter(self, active):
         binding = self.allowed.get('waiter')
         if not binding or (self.root/'waiter_deleted.json').exists():
@@ -199,44 +212,90 @@ class Runner:
         def dispatch_details():
             return {} if recovery is None else recovery.dispatch_details()
 
-        def finish(slot, error=None):
-            item = active.pop(slot)
+        def finish(slot, error=None, *, final=False):
+            item = active[slot]
             p, job = item['process'], item['job']
-            reported_oom = (error is None and p.poll() not in (None, 0)
-                            and (job['target']/'worker_failure.json').exists()
-                            and read(job['target']/'worker_failure.json').get('kind') == 'CUDA_OOM')
-            try:
-                release(p)
-            except BaseException as exc:
-                error = error or repr(exc)
-                reported_oom = False
-            if p.poll() is None:
-                unreleased[slot] = dict(item['identity'], release_unconfirmed=True)
+            target = job['target']
+            operation = job.get('operation', target.name)
+            problems = item.setdefault('settlement_errors', [])
+            fatal = None
+            reported_oom = False
+            if p is not None and p.poll() not in (None, 0):
+                try:
+                    if hasattr(self, 'verify_worker_sources'):
+                        self.verify_worker_sources(job)
+                    evidence = target/'worker_failure.json'
+                    if error is None and evidence.is_file():
+                        reported_oom = read(evidence).get('kind') == 'CUDA_OOM'
+                except BaseException as exc:
+                    problems.append(repr(exc))
+                    fatal = exc
+            if p is not None:
+                try:
+                    release(p)
+                    if p.poll() is None:
+                        raise RuntimeError('Worker release unconfirmed')
+                except BaseException as exc:
+                    problems.append(repr(exc))
+                    # The outer cleanup still owns the handle and elapsed time.
+                    if not final:
+                        raise
+                    fatal = fatal or exc
+                    try:
+                        release(p)
+                        if p.poll() is None:
+                            raise RuntimeError('Worker release unconfirmed after cleanup')
+                    except BaseException as secondary:
+                        problems.append(repr(secondary))
+                        unreleased[slot] = dict(item['identity'], release_unconfirmed=True)
             elapsed = time.monotonic()-item['started']
-            if recovery is not None and (elapsed > job['seconds'] or
-                    (job['target']/'shared_failure.json').exists()):
-                reported_oom = False
-            if p.returncode or elapsed > job['seconds']:
-                error = error or f'Worker exit {p.returncode} or lifecycle cap exceeded'
-            if error is None:
+            exit_code = p.returncode if p is not None else None
+            if exit_code or elapsed > job['seconds']:
+                error = error or f'Worker exit {exit_code} or lifecycle cap exceeded'
+            if not error and not problems:
                 try:
                     completed(job)
                 except BaseException as exc:
                     error = repr(exc)
+                    if not isinstance(exc, Exception) or (target/'shared_failure.json').exists():
+                        fatal = exc
+            if problems:
+                error = error or problems[0]
+            if problems or elapsed > job['seconds'] or (target/'shared_failure.json').exists():
+                reported_oom = False
             receipt = dict(success=error is None, error=error, seconds=elapsed, slot=slot,
                            failure_kind='CUDA_OOM' if reported_oom else ('OTHER' if error else None),
-                           released=p.poll() is not None, peak_gpu_bytes=item['peak_gpu'], peak_rss_bytes=item['peak_rss'])
+                           released=slot not in unreleased, peak_gpu_bytes=item['peak_gpu'], peak_rss_bytes=item['peak_rss'])
             if recovery is not None:
                 receipt.update(task_id=job['task_id'], attempt=job['attempt'], process=item['identity'])
-            write(job['target']/'dispatch_receipt.json', receipt)
-            operation = job.get('operation', job['target'].name)
-            self.ledger.charge(job['bucket'], operation, elapsed, error is None)
+            if problems:
+                receipt['settlement_errors'] = problems
+            try:
+                write(target/'dispatch_receipt.json', receipt)
+            except BaseException as exc:
+                fatal = fatal or exc
+                problems.append(repr(exc))
+                receipt.update(success=False, failure_kind='OTHER', error=error or repr(exc), settlement_errors=problems)
+                try:
+                    write(target/'dispatch_receipt.json', receipt)
+                except BaseException as secondary:
+                    problems.append(repr(secondary))
+                    print('Attempt receipt not persisted:', operation, problems, file=sys.stderr)
+            # Each admitted attempt is charged once, even on evidence I/O failure.
+            del active[slot]
+            try:
+                self.ledger.charge(job['bucket'], operation, elapsed, receipt['success'])
+            except BaseException as exc:
+                if fatal is not None:
+                    raise fatal from exc
+                raise
+            if not receipt['success']:
+                retired.add(slot)
+                failures.append(dict(task=operation, slot=slot, error=receipt['error'], kind=receipt['failure_kind']))
+            if fatal is not None:
+                raise fatal
             if recovery is not None:
                 recovery.finished(slot, job, receipt)
-            if error is not None:
-                retired.add(slot)
-                failures.append(dict(task=operation, slot=slot, error=error,
-                                     kind='CUDA_OOM' if reported_oom else 'OTHER'))
         try:
             initialized = time.monotonic()
             try:
@@ -246,6 +305,7 @@ class Runner:
             while work_left():
                 tick = time.monotonic()
                 try:
+                    self.check_controller_stop()
                     snapshot = nv.snapshot() if nv else None
                     if 'owned_rss_bytes' in self.limits:
                         parent = psutil.Process()
@@ -289,6 +349,7 @@ class Runner:
                     if recovery is not None:
                         recovery.observe_updates(active)
                     for slot in range(slots):
+                        self.check_controller_stop()
                         if slot in active or budget_stop:
                             continue
                         ordinary = jobs[next_job] if next_job < len(jobs) else None
@@ -341,7 +402,9 @@ class Runner:
                             next_job += 1
                         started = time.monotonic()
                         deadline = started+job['seconds']
-                        process = None
+                        item = dict(process=None, job=job, identity={}, started=started,
+                                    deadline=deadline, peak_gpu=0, peak_rss=0)
+                        active[slot] = item
                         try:
                             argv = self.command(job, slot, deadline)
                             threads = str(self.worker_threads)
@@ -351,6 +414,7 @@ class Runner:
                             with (job['target']/'console.txt').open('x') as output:
                                 process = subprocess.Popen(argv, env=environment, cwd=self.allowed['workspace'],
                                     stdout=output, stderr=subprocess.STDOUT, start_new_session=True, umask=0o077)
+                                item['process'], item['identity'] = process, {'pid': process.pid}
                             p = psutil.Process(process.pid)
                             identity = dict(pid=p.pid, owner=p.username(), created=p.create_time(), command=argv,
                                             cwd=p.cwd(), reserved_bytes=admission_limits['free_gpu_bytes'],
@@ -359,25 +423,17 @@ class Runner:
                                 identity.update(task_id=job['task_id'], attempt=job['attempt'])
                             # taskset execs in place, so the command after exec omits its own wrapper.
                             identity['command'] = argv[3:]
-                            active[slot] = dict(process=process, job=job, identity=identity, started=started,
-                                                deadline=deadline, peak_gpu=0, peak_rss=0)
+                            item['identity'] = identity
                             write(job['target']/'process.json', dict(**identity, launch_command=argv, slot=slot))
                         except BaseException as exc:
-                            if slot in active:
+                            try:
                                 finish(slot, repr(exc))
-                            else:
-                                if process is not None:
-                                    release(process)
-                                elapsed = time.monotonic()-started
-                                write(job['target']/'dispatch_receipt.json', dict(success=False, error=repr(exc),
-                                      seconds=elapsed, slot=slot, released=True))
-                                self.ledger.charge(job['bucket'], job.get('operation', job['target'].name), elapsed, False)
-                                retired.add(slot)
-                                failures.append(dict(task=job['target'].name, slot=slot, error=repr(exc)))
+                            except BaseException as secondary:
+                                raise exc from secondary
+                            if not isinstance(exc, Exception) or (job['target']/'shared_failure.json').exists():
+                                raise
                             if self.halt_dispatch_on_failure:
                                 budget_stop = 'Worker launch failed; no further dispatch'
-                                if (job['target']/'shared_failure.json').exists():
-                                    raise RuntimeError('Shared validity failure before worker launch') from exc
                     waiting_oom = recovery is not None and recovery.waiting(next_job < len(jobs))
                     write(self.root/'dispatch.json', dict(active={**unreleased, **{s: x['identity'] for s, x in active.items()}},
                           retired=sorted(retired), failures=failures,
@@ -410,7 +466,7 @@ class Runner:
             try:
                 for slot in list(active):
                     try:
-                        finish(slot, 'Controller interrupted; no automatic retry')
+                        finish(slot, 'Controller interrupted; no automatic retry', final=True)
                     except BaseException as exc:
                         cleanup_errors.append(repr(exc))
                     finally:

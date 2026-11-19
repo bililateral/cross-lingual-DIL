@@ -274,6 +274,8 @@ class BenchmarkTest(unittest.TestCase):
                     first.parent.mkdir()
                     b.data.write_json(first, dict(task_id=task, attempt=1, slot=0, success=False, released=True, failure_kind="CUDA_OOM"))
                     winners[task]["first_oom_receipt"] = b.queue.record(first)
+                    b.data.write_json(first.parent/"slot_reopened.json", dict(next_task=task, next_attempt=2,
+                                      previous={"receipt":winners[task]["first_oom_receipt"]}))
             b.data.write_json(campaign/"training_complete.json", dict(status="ALL_TRAINING_COMPLETE_EVALUATION_CLOSED",
                               sources=[], winners=winners))
             budget = SimpleNamespace(check=lambda: None)
@@ -293,6 +295,15 @@ class BenchmarkTest(unittest.TestCase):
                         ev.run("generation", campaign, campaign/"generation", {"sources":[]}, budget)
                     path.write_bytes(original)
                 last = rows[-1]["id"]
+                first = campaign/"training"/last/"attempt-1"/"dispatch_receipt.json"
+                modified = b.data.read_json(first)
+                modified["seconds"] = 0.25
+                b.data.write_json(first, modified)
+                winners[last]["first_oom_receipt"] = b.queue.record(first)
+                b.data.write_json(campaign/"training_complete.json",
+                                  dict(status="ALL_TRAINING_COMPLETE_EVALUATION_CLOSED", sources=[], winners=winners))
+                with self.assertRaisesRegex(ValueError, "accepted for recovery"):
+                    ev.run("generation", campaign, campaign/"generation", {"sources":[]}, budget)
                 winners[last]["first_oom_receipt"] = winners[last]["receipt"]
                 b.data.write_json(campaign/"training_complete.json",
                                   dict(status="ALL_TRAINING_COMPLETE_EVALUATION_CLOSED", sources=[], winners=winners))
@@ -302,7 +313,8 @@ class BenchmarkTest(unittest.TestCase):
             self.assertFalse((campaign/"evaluation_access.json").exists())
         EVIDENCE["before_generation"] = dict(handwritten_endpoints=162, intact="passed",
                 missing_H="blocked", changed_H="blocked", missing_FOREVER="blocked", changed_FOREVER="blocked",
-                substituted_first_oom_receipt="blocked", official_groups_generated=0, official_pairs_opened=0)
+                substituted_first_oom_receipt="blocked", rebound_first_failure="blocked",
+                official_groups_generated=0, official_pairs_opened=0)
 
     def test_interrupted_worker_validation_keeps_receipt_and_fee(self):
         with tempfile.TemporaryDirectory() as directory:
