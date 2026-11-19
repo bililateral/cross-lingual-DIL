@@ -2,7 +2,7 @@
 
 ## 当前工作
 
-11 月 19 日英文 VendorLink FIT12 四组训练、盲评分及一次开发分析均已完成，中文六方法随后由原监听自动开训。19:45:23（北京时间）英文四组权重已按用户指令清理，中文三路在跑。[英文完成回执](../reports/documentation/20261118/vendorlink_market_training/result/completion.json) · [清理及中文现场](../reports/maintenance/20261119/vendorlink_market_weights/receipt.json) · [计划](RESEARCH_PLAN.md)
+11 月 19 日英文 VendorLink FIT12 四组训练、盲评分及一次开发分析均已完成，中文六方法随后由原监听自动开训。19:45:23（北京时间）完成英文四组权重清理。20:22:05 中文已完成 2/54 条，三路在跑，0 失败。[英文完成回执](../reports/documentation/20261118/vendorlink_market_training/result/completion.json) · [权重清理](../reports/maintenance/20261119/vendorlink_market_weights/receipt.json) · [中文现场](../reports/documentation/20261118/h_history_benchmark/start/progress_20261119_202205.json) · [计划](RESEARCH_PLAN.md)
 
 ### VendorLink账号监督共同评价
 
@@ -12,7 +12,7 @@
 
 ### 历史权重版H主实验消融
 
-**中文六方法已自动开训。** 前序英文整批完成并结算释放后，17:09:01 原监听核准资源。17:09:17，ABC／seed 4 的 trial3 H 出现第一笔原生优化更新，同一进程留证、删除 Linux 一次性副本并继续派工。19:45:23 原控制器 PID 1072885 和三个 worker 的身份吻合，ABC／seed 4 的 trial3 H、ER0.1、Logit0.1 首试在跑，0/54 完成、51 待派、0 失败。正式门绑定 `e1219ac0`。按原队列完成 54 条、162 端点后生成并盲评新 120 群，预算 720 累计任务小时。[正式门](../reports/documentation/20261118/h_history_benchmark/start/formal_gate.json) · [前序释放](../reports/documentation/20261118/h_history_benchmark/start/ready.json) · [首笔更新](../reports/documentation/20261118/h_history_benchmark/start/first_update.json) · [自删回执](../reports/documentation/20261118/h_history_benchmark/start/waiter_deleted.json) · [最近现场](../reports/maintenance/20261119/vendorlink_market_weights/receipt.json)
+**中文六方法已自动开训。** 前序英文整批完成并结算释放后，17:09:01 原监听核准资源。17:09:17，ABC／seed 4 的 trial3 H 出现第一笔原生优化更新，同一进程留证、删除 Linux 一次性副本并继续派工。20:22:05 原控制器 PID 1072885 与三个 worker 的身份吻合。ABC／seed 4 的 ER0.1、Logit0.1 均首试完成并释放，整进程显存采样峰值各 7,682 MiB。trial3 H、L²R、ER+GCR 三路在跑，2/54 完成、49 待派、0 失败。正式门绑定 `e1219ac0`。按原队列完成 54 条、162 端点后生成并盲评新 120 群，预算 720 累计任务小时。[正式门](../reports/documentation/20261118/h_history_benchmark/start/formal_gate.json) · [前序释放](../reports/documentation/20261118/h_history_benchmark/start/ready.json) · [首笔更新](../reports/documentation/20261118/h_history_benchmark/start/first_update.json) · [自删回执](../reports/documentation/20261118/h_history_benchmark/start/waiter_deleted.json) · [调度、显存现场及两份成功回执身份](../reports/documentation/20261118/h_history_benchmark/start/progress_20261119_202205.json)
 
 11 月 16 日，八配置消融完成。Full 相对 ER 的旧域末态和遗忘改善，平均取得能力的点值保护微负，原联合验收为 false。结果外审及 18 项主审处置已结案，本批后续只需按保存结果解释。[实测报告](../reports/documentation/20261116/h_ablation_result/result/report.zh.md) · [结果主审](../reports/documentation/20261116/h_ablation_result/result/review/primary_disposition.zh.md)
 
