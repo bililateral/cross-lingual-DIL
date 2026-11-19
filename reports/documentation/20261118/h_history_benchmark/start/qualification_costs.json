@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "charged_cpu_seconds": 8,
+  "runs": [
+    {
+      "code": 1,
+      "seconds": 3.342999999999847,
+      "charged": 4,
+      "stdout": null,
+      "stderr": "Traceback (most recent call last):\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/tests/test_step28_benchmark_wait.py\", line 253, in <module>\n    result=qualify(Path(d))\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/tests/test_step28_benchmark_wait.py\", line 172, in qualify\n    qualify_resource_drop(root,g,row,Memory,mem)\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/tests/test_step28_benchmark_wait.py\", line 240, in qualify_resource_drop\n    w.wait_then_start(g,gate,time.monotonic())\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/scripts/step28_benchmark_wait.py\", line 279, in wait_then_start\n    bench.start_campaign(g, gate)\n  File\"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/scripts/step28_history_benchmark.py\", line 249, in start_campaign\n    dispatch.campaign(allowed, gate, rows, Path(__file__),\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/scripts/step28_history_benchmark_dispatch.py\", line 142, in campaign\n    training_phase(runner, rows, allowed[\"workers\"], allowed[\"experiment\"], validate)\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/scripts/step28_history_benchmark_dispatch.py\", line 68, intraining_phase\n    runner.run_many(jobs, workers, accepted, recovery=handoff)\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/scripts/step35_market_queue.py\", line 188, in run_many\n    return super().run_many(*args,**kwargs)\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/scripts/step30_evolution_control.py\", line 458, in run_many\n    time.sleep(self.active_poll_seconds if active else 30)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py\", line 1114, in __call__\n    return self._mock_call(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py\", line 1118, in _mock_call\n    return self._execute_mock_call(*args, **kwargs)\n  File \"/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py\", line 1179, in _execute_mock_call\n    result = effect(*args, **kwargs)\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261118/h_history_benchmark/workspace/tests/test_step28_benchmark_wait.py\", line 227, in sleep\n    assert not (campaign/\"training\"/row[\"id\"]/\"attempt-1\").exists()\nAssertionError\n",
+      "test_source_sha256": "82c88ed064d064c9268fc7d39c37671d38867fbf554cf96a506426c6358a5926"
+    },
+    {
+      "code": 0,
+      "seconds": 3.79700000000048,
+      "charged": 4,
+      "stdout": {
+        "passed": true,
+        "evidence": {
+          "predecessor_running_and_partial_held": true,
+          "terminal_failure_held": true,
+          "release_of_related_pid_required": true,
+          "final_accounting_required": true,
+          "over_budget_predecessor_rejected": true,
+          "resource_99_held_100_admitted": true,
+          "unique_launch": 1,
+          "direct_launch_rejected": true,
+          "changed_gate_held": true,
+          "pid_verified": true,
+          "native_format_real_cpu_updates": 1,
+          "wrong_run_and_zero_held": true,
+          "deletion_after_update": true,
+          "forever_native_first_update_identified": true,
+          "wrong_source_and_symlink_preserved": true,
+          "journal_reconciled_without_worker": true,
+          "negative_or_stale_review_rejected": true,
+          "one_core_resource_drop_and_readmission": true,
+          "charged_monitor_seconds": 1
+        },
+        "official_data_reads": 0,
+        "official_training_tasks": 0,
+        "gpu_kernels": 0
+      },
+      "stderr": "",
+      "test_source_sha256": "7a4fdc475d588ec7b05ad6e354d96742fa05dcb997f684929d3df842ba56a3c5"
+    }
+  ],
+  "first_failure": "The real controller persisted a negative admission observation before any process launch. The first fixture also required an absent attempt directory. Only that assertion changed: verify admission.ready is false, process.json and console.txt absent, no active worker. First run and time retained.",
+  "base_qualification": "qualification.json",
+  "purpose": "Targeted single-core Linux py310 verification of the external review fixes and a drop in resources during handoff. No project training data, GPU kernels or formal tasks."
+}

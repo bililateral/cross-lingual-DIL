@@ -139,6 +139,13 @@ def retire_completed(store, spec, allowed):
         latest=latest, retired=retired, status='DELETED'))
 
 
+def report_current_update(spec, stage, counts, role):
+    current = counts['current']
+    if role == 'current' and (current == 1 or current % 24 == 0):
+        print(json.dumps(dict(event='updates', run_id=spec.run_id, stage=stage,
+                              completed=current, counts=counts)), flush=True)
+
+
 def execute(job, spec, deadline, allowed):
     import torch
     root = job/'run'
@@ -171,8 +178,7 @@ def execute(job, spec, deadline, allowed):
     def log(row):
         with (root/'updates.jsonl').open('a', encoding='utf-8') as out:
             out.write(json.dumps(dict(wall_time_epoch=time.time(), **row)) + '\n')
-        if learner.counts['current'] % 24 == 0:
-            print(json.dumps(dict(event='updates', stage=learner.stage, counts=learner.counts)), flush=True)
+        report_current_update(spec, learner.stage, learner.counts, row['role'])
     for number in (1, 2, 3):
         result['points'][str(number)] = run.stage(learner, supply, store, log=log)
         data.write_json(root/'progress.json', {**result, 'counts': learner.counts})

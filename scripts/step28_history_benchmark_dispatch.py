@@ -114,12 +114,12 @@ def record_worker_failure(job, action, error, traceback_text):
 
 
 def campaign(allowed, gate, rows, entry, validate, post_status):
-    started = time.monotonic()
     root = Path(allowed["campaign"])
     caps = {BUCKETS[k]: v for k, v in allowed["budget_seconds"].items()}
     prior = {BUCKETS[k]: v for k, v in allowed["prior_used_seconds"].items()}
     if allowed.get("listener"):
         prior["auxiliary"] += waiting.verify_handoff(allowed, gate)
+    started = time.monotonic()
     # Reserve all first attempts before claiming the new directory. Retries reserve
     # their full method allowance against remaining and in-flight time at dispatch.
     if (sum(r["seconds"] for r in rows)+prior["training"] > caps["training"] or
@@ -132,7 +132,8 @@ def campaign(allowed, gate, rows, entry, validate, post_status):
     runtime_limits = dict(limits, workers=allowed["workers"], rss_bytes=limits["worker_rss_bytes"],
                           owned_rss_bytes=limits["rss_bytes"], free_disk_reserve=limits["free_reserve_bytes"])
     runner = ChineseRunner(dict(allowed, experiment_root=str(root)), gate, root, ledger, worker_entry=entry,
-                           caps=caps, limits=runtime_limits, halt_dispatch_on_failure=True, continue_after_oom=True,
+                           caps=caps, limits=runtime_limits, wait_for_resources=True,
+                           halt_dispatch_on_failure=True, continue_after_oom=True,
                            source_bindings=[record(gate), allowed["authorization"], allowed["analysis_plan"], *allowed["sources"]])
     runner.handoff_since = started
     # The loop checks this request between dispatch/settlement critical sections.

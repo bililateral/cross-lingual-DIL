@@ -26,7 +26,6 @@ from step30_evolution_io import PYTHON, read, record, sha, verify, write
 GIB = 2**30
 SOURCE_GATE = "7607f7cf20834a5fa4f9a34ebda0d92543537d33b87c704abf91d812b0555b1f"
 SOURCE_LAUNCH = "766901a7d37b98064ba16f1d21e23845d297227a92ba00bb29f87a78cd01daff"
-INPUT_FILES = ("manifest.json","validation.json","groups.csv","train/items.jsonl","train/supervision/pairs.csv")
 
 
 def now():
@@ -44,31 +43,18 @@ def freeze(p, value):
 
 
 def inputs(install=False):
-    reference = b.five.base.contract()
-    data = Path(reference["data_root"])
-    model = Path(reference["models"]["split_rank"]["path"])
-    for name in b.NAMES:
-        module = b.forever if name==b.forever.NAME else b.comparison if name in b.comparison.NEW_METHODS else b.five
-        c = module.config(b.native(name,"ABC",4))
-        if c["data_root"] != str(data) or c["models"]["split_rank"] != reference["models"]["split_rank"]:
-            raise ValueError("Unexpected model or training archive")
-    paths = [data/f for f in INPUT_FILES]+[model]
-    summary = []
-    for rel in paths:
-        original, dest = PROJECT/rel, WS/rel
-        if (not original.is_dir() if rel==model else not original.is_file()):
-            raise FileNotFoundError(original)
-        if dest.is_symlink() or dest.exists():
-            if dest.resolve()!=original.resolve():
-                raise ValueError("Input destination already occupied: "+str(rel))
-        elif install:
-            dest.parent.mkdir(parents=True,exist_ok=True)
-            dest.symlink_to(original,target_is_directory=rel==model)
-        summary.append(dict(relative=str(rel),available=original.exists(),linked=dest.is_symlink()))
-    for name,key in (("manifest.json","data_manifest_sha256"),("validation.json","data_validation_sha256")):
-        if sha(PROJECT/data/name)!=reference[key]:
-            raise ValueError("Frozen training metadata differs")
-    return summary
+    return w.training_inputs(WS,PROJECT,install)
+
+
+def accepted_review(document, manifest_sha, qualification_sha, fix_sha):
+    first = document.splitlines()[0] if document else ""
+    if not (first.startswith("<!-- ") and first.endswith(" -->")):
+        raise ValueError("Missing structured independent review disposition")
+    signed = json.loads(first[5:-4])
+    if (signed.get("review_closed") is not True or signed.get("experiment") != b.EXPERIMENT or
+            signed.get("manifest_sha256") != manifest_sha or signed.get("qualification_sha256") != qualification_sha
+            or signed.get("fix_qualification_sha256") != fix_sha):
+        raise ValueError("Review is open or covers different sources or qualifications")
 
 
 def production_sources():
@@ -97,16 +83,17 @@ def prepare():
             or sha(START/"authorization.zh.md")!=manifest["authorization_text_sha256"]):
         raise ValueError("One-shot launcher, authorization, plan or operations differ")
     conclusion=START/"review.zh.md"
-    if not conclusion.is_file() or "START_REVIEW_CLOSED" not in conclusion.read_text(encoding="utf-8"):
-        raise ValueError("The incremental review disposition is required")
     q=read(START/"qualification.json")
-    if not q["passed"]:
+    fix=read(START/"qualification_costs.json")
+    accepted_review(conclusion.read_text(encoding="utf-8"),sha(START/"source_manifest.json"),
+                    sha(START/"qualification.json"),sha(START/"qualification_costs.json"))
+    if q["passed"] is not True or fix["passed"] is not True:
         raise ValueError("Listener qualification incomplete")
     links=inputs(True)
     hours=dict(zip(b.NAMES,(6,5,5,46,6,4),strict=True))
     # The historical 30-second ledger tail is separate. Sleeper time is free.
     preflight_seconds=math.ceil(time.monotonic()-ENTRY)
-    cpu=q["prior_cpu_seconds"]+q["listener_cpu_seconds"]
+    cpu=q["prior_cpu_seconds"]+q["listener_cpu_seconds"]+fix["charged_cpu_seconds"]
     control=cpu+preflight_seconds+q["operational_reserve_seconds"]
     authorized=dict(experiment=b.EXPERIMENT,runs=b.plan(),cohort=b.cohort(),actions=["training",*b.POST],
         sources=src,workers=3,seconds_per_method={k:v*3600 for k,v in hours.items()},
@@ -121,7 +108,8 @@ def prepare():
         allow_observed_foreign_gpu_processes=True)
     auth=ROOT/"authorization.json"
     freeze(auth,dict(authorized,authorize_execution=True,decision=record(START/"authorization.zh.md"),
-                     review=record(conclusion),qualification=record(START/"qualification.json")))
+                     review=record(conclusion),qualification=record(START/"qualification.json"),
+                     fix_qualification=record(START/"qualification_costs.json")))
     freeze(GATE,dict(authorized,approved=True,review_closed=True,automatic_retry=False,workspace=str(WS),
                      campaign=str(CAMPAIGN),authorization=record(auth)))
     b.read_gate(GATE)
@@ -174,13 +162,20 @@ def observe():
     return out
 
 
+def reconcile():
+    if not (WAIT/"first_update.json").is_file():
+        raise ValueError("An existing first-update proof is required")
+    w.retire(b.read_gate(GATE),CAMPAIGN,{})
+    return read(CAMPAIGN/"waiter_deleted.json")
+
+
 if __name__=="__main__":
     if sys.platform!="linux" or Path(sys.executable).resolve()!=Path(PYTHON).resolve():
         raise RuntimeError("Use Linux py310")
     os.umask(0o077)
     p=argparse.ArgumentParser()
-    p.add_argument("action",choices=("inputs","prepare","check","arm","observe"))
+    p.add_argument("action",choices=("inputs","prepare","check","arm","observe","reconcile"))
     action=p.parse_args().action
     actions={"inputs":inputs,"prepare":prepare,"check":lambda:dict(sources=len(production_sources()),inputs=inputs()),
-             "arm":arm,"observe":observe}
+             "arm":arm,"observe":observe,"reconcile":reconcile}
     print(json.dumps(actions[action](),ensure_ascii=False))
