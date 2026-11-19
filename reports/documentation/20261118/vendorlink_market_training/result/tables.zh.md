@@ -105,4 +105,4 @@ F_A=R11−R31，F_B=R22−R32。Q=(R11+R22)/2，O=(R31+R32)/2，F=Q−O，负值
 | original_H_ER | 三颗 | 0.8234 | 1.6814 | 0.8795 | 0.9620 | 2.7250 | 1.6468 | 0.6386 | 1.6468 | 0.5824 |
 | original_beta_Full | 三颗 | 0.8877 | 0.7565 | 1.0965 | 0.6721 | 1.6780 | 1.7755 | 0.3436 | 1.7755 | 0.1476 |
 
-V_SET 和 V_CLS 使用同一 VendorLink 训练的两种账号级读法。逐商品辅助读法 V_CLS_ads 的全表、各指标原值及范围分别见 [裁决原件](decision.json)、[逐格 13 指标](metrics.json)、[各 seed 的均值、样本标准差和范围](metric_summary.json) 与 [Full 的辅助指标配对](metric_pairs.json)。
+V_SET 和 V_CLS 来自同一条 VendorLink 训练路径。V_CLS_ads 另存逐商品原值、汇总和主指标派生配对。13 项辅助指标的 468 个配对系列覆盖同批 H_ER、H_SEQ、V_SET、V_CLS 四个对照。[主指标及派生配对](decision.json) · [逐格 13 指标](metrics.json) · [均值、样本标准差及范围](metric_summary.json) · [13 指标配对表](metric_pairs.json)
