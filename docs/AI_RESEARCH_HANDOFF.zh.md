@@ -2,7 +2,7 @@
 
 ## 当前工作
 
-11 月 19 日英文 VendorLink FIT12 四组训练、盲评分及一次开发分析均已完成，中文六方法随后由原监听自动开训。19:45:23（北京时间）完成英文四组权重清理。21:28:02 中文已完成 3/54 条，三路在跑，0 失败。英文共享前馈候选已完成模型 CPU 核验与分阶段调度核验。[本轮准入](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/cpu02/admission.json) · [CPU 回执](../reports/documentation/20261119/vendorlink_shared_ffn/cpu01/result.json) · [上一批英文完成回执](../reports/documentation/20261118/vendorlink_market_training/result/completion.json) · [权重清理](../reports/maintenance/20261119/vendorlink_market_weights/receipt.json) · [中文现场](../reports/documentation/20261118/h_history_benchmark/start/progress_20261119_202205.json) · [计划](RESEARCH_PLAN.md)
+11 月 20 日 09:50:03（北京时间），中文六方法已完成 9/54 条，3 条运行中、42 条待派、0 失败。11 月 19 日 VendorLink FIT12 四组已完成训练、盲评分及开发分析，19:45:23 完成权重清理。英文共享前馈候选已完成模型 CPU 核验与分阶段调度核验，GPU 核验待中文整批释放资源。[中文现场](../reports/documentation/20261118/h_history_benchmark/start/progress_20261120_095003.json) · [英文完成回执](../reports/documentation/20261118/vendorlink_market_training/result/completion.json) · [权重清理](../reports/maintenance/20261119/vendorlink_market_weights/receipt.json) · [英文 CPU 回执](../reports/documentation/20261119/vendorlink_shared_ffn/cpu01/result.json) · [计划](RESEARCH_PLAN.md)
 
 ### VendorLink账号监督共同评价
 
@@ -13,7 +13,9 @@
 
 ### 历史权重版H主实验消融
 
-**中文六方法已自动开训。** 前序英文整批完成并结算释放后，17:09:01 原监听核准资源。17:09:17，ABC／seed 4 的 trial3 H 出现第一笔原生优化更新，同一进程留证、删除 Linux 一次性副本并继续派工。20:22:05 原控制器 PID 1072885 与三个 worker 的身份吻合。ABC／seed 4 的 ER0.1、Logit0.1 均首试完成并释放，整进程显存采样峰值各 7,682 MiB。当时 trial3 H、L²R、ER+GCR 三路在跑，2/54 完成。21:28:02 英文调度 CPU 核验准入时再核同一中文控制器及活动 worker，3/54 完成、三路在跑、0 失败。[资源准入时点](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/cpu02/admission.json) 正式门绑定 `e1219ac0`。按原队列完成 54 条、162 端点后生成并盲评新 120 群，预算 720 累计任务小时。[正式门](../reports/documentation/20261118/h_history_benchmark/start/formal_gate.json) · [前序释放](../reports/documentation/20261118/h_history_benchmark/start/ready.json) · [首笔更新](../reports/documentation/20261118/h_history_benchmark/start/first_update.json) · [自删回执](../reports/documentation/20261118/h_history_benchmark/start/waiter_deleted.json) · [调度、显存现场及两份成功回执身份](../reports/documentation/20261118/h_history_benchmark/start/progress_20261119_202205.json)
+**中文六方法正在三路训练。** 11 月 20 日 09:50:03，原控制器 PID 1072885 与三个首试 worker 身份吻合，正式门绑定的 54 份生产源码校验一致。ABC／seed 4 已完成除 L²R 外的五条，seed 5 已完成 H、ER0.1、Logit0.1、ER+GCR 四条。最新日志显示，ABC／seed 4 的 L²R 在第二阶段（144/288 次），seed 5 的 L²R 在第一阶段（240/288 次），seed 5 的 FOREVER 在第二阶段（当前域训练累计 312/864 次）。42 条待派，零失败、无预算停派。09:49:18 训练已结算 28 小时 48 分 08 秒，三条活动轨迹暂计约 21 小时 12 分，退出后结算。等 54 条、162 端点齐备，再生成并盲评新 120 群。预算 720 累计任务小时，其中训练 700 小时。[最新现场](../reports/documentation/20261118/h_history_benchmark/start/progress_20261120_095003.json) · [正式门](../reports/documentation/20261118/h_history_benchmark/start/formal_gate.json)
+
+11 月 19 日 VendorLink 整批完成并结算释放后，中文原监听于 17:09:01 核准资源。17:09:17，ABC／seed 4 的 trial3 H 产生第一笔原生优化更新，同一进程留证、删除 Linux 一次性副本并继续派工。生产版本为 `e1219ac0`。[前序释放](../reports/documentation/20261118/h_history_benchmark/start/ready.json) · [首笔更新](../reports/documentation/20261118/h_history_benchmark/start/first_update.json) · [自删回执](../reports/documentation/20261118/h_history_benchmark/start/waiter_deleted.json) · [首日晚间观测](../reports/documentation/20261118/h_history_benchmark/start/progress_20261119_202205.json)
 
 11 月 16 日，八配置消融完成。Full 相对 ER 的旧域末态和遗忘改善，平均取得能力的点值保护微负，原联合验收为 false。结果外审及 18 项主审处置已结案，本批后续只需按保存结果解释。[实测报告](../reports/documentation/20261116/h_ablation_result/result/report.zh.md) · [结果主审](../reports/documentation/20261116/h_ablation_result/result/review/primary_disposition.zh.md)
 
