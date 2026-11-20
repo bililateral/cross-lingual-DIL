@@ -2,7 +2,7 @@
 
 ## 当前工作
 
-11 月 20 日 13:36:14（北京时间）只读复核，中文六方法已完成 10/54 条，3 条运行中、41 条待派、0 失败。11 月 19 日 VendorLink FIT12 四组已完成训练、盲评分及开发分析，19:45:23 完成权重清理。英文共享前馈候选已完成模型 CPU 核验与分阶段调度核验。若中文三路持续，预计 11 月 26 日下午可安排英文 GPU 核验，实际以中文整批结算、相关进程退出和资源释放为准。[中文现场与排期估算](../reports/documentation/20261118/h_history_benchmark/start/progress_20261120_113447.json) · [英文完成回执](../reports/documentation/20261118/vendorlink_market_training/result/completion.json) · [权重清理](../reports/maintenance/20261119/vendorlink_market_weights/receipt.json) · [英文 CPU 回执](../reports/documentation/20261119/vendorlink_shared_ffn/cpu01/result.json) · [计划](RESEARCH_PLAN.md)
+11 月 20 日 13:47:35（北京时间）清理后只读复核，中文六方法已完成 10/54 条，3 条运行中、41 条待派、0 失败。11 月 19 日 VendorLink FIT12 四组已完成训练、盲评分及开发分析，19:45:23 完成权重清理。英文共享前馈候选已完成模型 CPU 核验与分阶段调度核验。若中文三路持续，预计 11 月 26 日下午可安排英文 GPU 核验，实际以中文整批结算、相关进程退出和资源释放为准。[13:47 派发现场](../reports/maintenance/20261120/targeted_cleanup.json) · [11:34 排期依据](../reports/documentation/20261118/h_history_benchmark/start/progress_20261120_113447.json) · [英文完成回执](../reports/documentation/20261118/vendorlink_market_training/result/completion.json) · [权重清理](../reports/maintenance/20261119/vendorlink_market_weights/receipt.json) · [英文 CPU 回执](../reports/documentation/20261119/vendorlink_shared_ffn/cpu01/result.json) · [计划](RESEARCH_PLAN.md)
 
 ### VendorLink账号监督共同评价
 
@@ -13,7 +13,7 @@
 
 ### 历史权重版H主实验消融
 
-**中文六方法正在三路训练。** 11 月 20 日 13:36:14，Linux 原生派发账仍为 RUNNING。控制器 1072885 和首试 worker 1200064、1276547、1370845 的项目工作目录和内核启动标识已核实，分别运行 ABC／seed 4 L²R、seed 5 L²R 和 seed 6 H。以下更新计数、已结算费用和排期依据为 11:34:47 的留存观测。11 月 20 日 11:34:47，原控制器 PID 1072885 和三个首试 worker 的属主、命令、工作目录与内核身份吻合。ABC 的 seed 4、5 各完成除 L²R 外的五条。两条 L²R 最新日志分别为 480/864 和 289/864 次更新，均已进入第二阶段。seed 5 的 FOREVER 释放后，同一槽已开始 seed 6 的 H 并记录第一笔更新。41 条待派，零失败，无 OOM 或预算停派。训练已结算 31 小时 24 分 44 秒。按现场领取顺序、五个短方法本批成功计时和 L²R 同顺序同 seed 的历史计时，三路持续时估计还需约 140 小时训练，至 11 月 26 日 08 时左右。训练结束后再生成、盲评新 120 群并分析，串行确认参考耗时 5.11 小时。预算 720 累计任务小时，其中训练 700 小时。[最新现场及估算](../reports/documentation/20261118/h_history_benchmark/start/progress_20261120_113447.json) · [09:50 生产来源核对](../reports/documentation/20261118/h_history_benchmark/start/progress_20261120_095003.json) · [正式门](../reports/documentation/20261118/h_history_benchmark/start/formal_gate.json)
+**中文六方法正在三路训练。** 11 月 20 日 13:47:35，Linux 原生派发账仍为 RUNNING，清理前后控制器和三个 worker 的内核启动标识一致。控制器 1072885 和首试 worker 1200064、1276547、1370845 的项目工作目录和内核启动标识已核实，分别运行 ABC／seed 4 L²R、seed 5 L²R 和 seed 6 H。以下更新计数、已结算费用和排期依据为 11:34:47 的留存观测。11 月 20 日 11:34:47，原控制器 PID 1072885 和三个首试 worker 的属主、命令、工作目录与内核身份吻合。ABC 的 seed 4、5 各完成除 L²R 外的五条。两条 L²R 最新日志分别为 480/864 和 289/864 次更新，均已进入第二阶段。seed 5 的 FOREVER 释放后，同一槽已开始 seed 6 的 H 并记录第一笔更新。41 条待派，零失败，无 OOM 或预算停派。训练已结算 31 小时 24 分 44 秒。按现场领取顺序、五个短方法本批成功计时和 L²R 同顺序同 seed 的历史计时，三路持续时估计还需约 140 小时训练，至 11 月 26 日 08 时左右。训练结束后再生成、盲评新 120 群并分析，串行确认参考耗时 5.11 小时。预算 720 累计任务小时，其中训练 700 小时。[13:47 现场核对](../reports/maintenance/20261120/targeted_cleanup.json) · [11:34 训练计数、费用及排期依据](../reports/documentation/20261118/h_history_benchmark/start/progress_20261120_113447.json) · [09:50 生产来源核对](../reports/documentation/20261118/h_history_benchmark/start/progress_20261120_095003.json) · [正式门](../reports/documentation/20261118/h_history_benchmark/start/formal_gate.json)
 
 11 月 19 日 VendorLink 整批完成并结算释放后，中文原监听于 17:09:01 核准资源。17:09:17，ABC／seed 4 的 trial3 H 产生第一笔原生优化更新，同一进程留证、删除 Linux 一次性副本并继续派工。生产版本为 `e1219ac0`。[前序释放](../reports/documentation/20261118/h_history_benchmark/start/ready.json) · [首笔更新](../reports/documentation/20261118/h_history_benchmark/start/first_update.json) · [自删回执](../reports/documentation/20261118/h_history_benchmark/start/waiter_deleted.json) · [首日晚间观测](../reports/documentation/20261118/h_history_benchmark/start/progress_20261119_202205.json)
 
@@ -26,6 +26,8 @@
 Evolution 以 [STOP_LEARNING](../reports/documentation/20261108/evolution_registered/result/report.zh.md) 结束，早期 ABC 在[前置门](../reports/seller_alias_continual/20261107/history_result/source_receipts/abc_formal/completion.json)停止。L²R／ER+GCR、S_default、FOREVER、五方法比较及 Optuna 的结论和主审按[历史与证据](#历史与证据)及[合同索引](CURRENT_EXPERIMENT_DESIGN.md)追溯，各批次的有效负结果及原判据继续适用。
 
 ### 文件保管与本轮交付
+
+11 月 20 日双端定向清理已完成，删除 141 个路径。中文活跃批次、英文待做 CUDA 核验和原始证据继续保管。大清理周期为 11 月 20 日至 12 月 5 日。[当轮清理回执](../reports/maintenance/20261120/targeted_cleanup.json) · [恢复入口](STORAGE.zh.md#2026-11-20-双端定向清理与恢复)
 
 11 月 17 日获准清理的训练权重已删除。复核优先使用保存的实测结果、日志和原回执。指标汇总中的中文 H 公式展示与实测报告分别引用。具体文件、公式来源和清理周期见[当前保管](STORAGE.zh.md#2026-11-17-linux剩余训练权重清理后的当前保管)及[展示来源](STORAGE.zh.md#2026-11-17-当前展示文件与同步索引)。最近一批获准推送在 11 月 18 日交付至 `c73c5f6e`，其中包括英语队列启动与进度。中文新比较按本次提交范围保管。
 

@@ -4,13 +4,13 @@
 
 ## 中文 trial3 H 与五基线的共同确认
 
-中文六方法已自动开训并完成一次性脚本自删。原控制器接续 54 条队列。162 个端点齐备后在新 120 群上整批盲评，报告五个预定配对的旧域末态、遗忘、初学和新域表现。累计预算 720 小时。[首笔更新](../reports/documentation/20261118/h_history_benchmark/start/first_update.json) · [中文正式门](../reports/documentation/20261118/h_history_benchmark/start/formal_gate.json) · [当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)
+中文六方法已自动开训并完成一次性脚本自删。沿原控制器接续 54 条队列，收尾先核对全批成功回执、端点和累计费用。本批生产工作区和盲评依赖已按本轮清理范围保管。162 个端点齐备后在新 120 群上整批盲评，报告五个预定配对的旧域末态、遗忘、初学和新域表现。累计预算 720 小时。[首笔更新](../reports/documentation/20261118/h_history_benchmark/start/first_update.json) · [中文正式门](../reports/documentation/20261118/h_history_benchmark/start/formal_gate.json) · [当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)
 
 ## VendorLink账号监督：FIT12共同协议后续
 
 四组训练、开发评价、结果外审及主审已结案。撰写结果时分别引用同结构 ER、SEQ、外部两读取器和预指定的原无适配器 ER。Dream 同时报告取得、遗忘与末态。该批没有待接续训练或确认。[实测分析](../reports/documentation/20261118/vendorlink_market_training/result/report.zh.md) · [结果主审](../reports/documentation/20261118/vendorlink_market_training/result/review/primary_disposition.zh.md)
 
-11 月 19 日，用户准许先接入最后一个 BERT 块的共享前馈层。合成 CPU 核验与外审主审已完成。中文六方法整批释放资源后，做单进程合成 GPU 核验。用户看完核验结果后决定是否开训。分阶段调度及已保存的 V_SET／V_CLS 引用已接通并经合成回执核验。若用户批准正式训练，用独立正式门绑定本次九条清单、候选 CUDA 资格和已用费用，先运行 H_SEQ 的三个固定 seed，再按新学习和遗忘门依次决定是否进入 ER、Full。[分组实测及下一步](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/report.zh.md) · [外审与正式入口条件](../reports/documentation/20261119/vendorlink_shared_ffn/review/primary_disposition.zh.md) · [本轮范围](../reports/documentation/20261119/vendorlink_shared_ffn/scope.zh.md) · [四组开发实测](../reports/documentation/20261118/vendorlink_market_training/result/report.zh.md)
+11 月 19 日，用户准许先接入最后一个 BERT 块的共享前馈层。合成 CPU 核验与外审主审已完成。中文六方法整批结算、相关进程退出并实测释放资源后，复核合成入口和候选来源绑定，做单进程合成 GPU 核验并回收结果和费用。用户看完核验结果后决定是否开训。分阶段调度及已保存的 V_SET／V_CLS 引用已接通并经合成回执核验。若用户批准正式训练，用独立正式门绑定本次九条清单、候选 CUDA 资格和已用费用，先运行 H_SEQ 的三个固定 seed，再按新学习和遗忘门依次决定是否进入 ER、Full。[分组实测及下一步](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/report.zh.md) · [外审与正式入口条件](../reports/documentation/20261119/vendorlink_shared_ffn/review/primary_disposition.zh.md) · [本轮范围](../reports/documentation/20261119/vendorlink_shared_ffn/scope.zh.md) · [四组开发实测](../reports/documentation/20261118/vendorlink_market_training/result/report.zh.md)
 
 已结案的四组合同要求 Full 相对同结构 ER 的少忘与旧域末态增益各至少 2 个百分点，并同时通过两旧域末态及新域取得、净学习和稳定性保护。遗忘压力、Full 对 H_SEQ 的保持和外部 VendorLink 两读取器分别判断。按训练 111 h、核验与评分 5 h、辅助 4 h 分桶。confirm 保持封存。[冻结比较、顺序和开训排程](../reports/documentation/20261118/vendorlink_market_training/proposal.zh.md)
 

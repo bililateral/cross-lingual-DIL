@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-11-20 双端定向清理与恢复
+
+Windows 删除 26 份已结束审查的送审输入 ZIP 和 5 份已结束核验的源码，共 31 文件、69,942,157 逻辑字节。Linux 删除 11 份历史送审 ZIP、3 份核验部署副本及 96 份有对应 .py 源码的缓存，共 110 文件、166,559,720 逻辑字节。两端合计 141 个路径、236,501,877 字节，约 225.55 MiB，逐项核实已不存在。Linux 文件均为单硬链接，删除前分配块合计 166,776,832 字节。[逐项清理回执](../reports/maintenance/20261120/targeted_cleanup.json)
+
+按回执中的 commit:path 恢复送审输入包和一次性源码。各缓存对应源码保留原位。正式审查原文、主审、原始通过／失败回执及根 tests 回归继续保管。中文控制器和三个 worker 的启动身份在 13:47:35（北京时间）删除前后一致，英文共享前馈候选的待做 CUDA 核验依赖继续保管。历史清单保留当时身份。本次属于定向清理，沿本文件的大清理周期。
+
 ## 2026-11-19 VendorLink 共享前馈层合成核验
 
 分阶段派发的两次原始回执、计时及部署来源存放在同一候选的 `dispatch/cpu01`、`dispatch/cpu02`。最终 18 份源码、单核核验程序、引用及固定九任务逐件核对，具名小回执已回传 Windows。合成队列和模拟开发矩阵随临时目录回收。上一批 V 只引用已开放聚合，正式模型保管仍沿原清理回执。[最终来源](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/cpu02/sources.json) · [九任务](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/cpu02/tasks.json) · [逐案回执](../reports/documentation/20261119/vendorlink_shared_ffn/dispatch/cpu02/result.json)
@@ -986,7 +992,7 @@ CPU01—07与native01/02失败/完成原件、账本和必要资源样本在两�
 
 随后用户明确批准该具体ZIP外发，并要求重点审查过度设计及必要实验。2026-10-23 12:04:45（Asia/Shanghai）原包身份不变、经本地Playwright单次提交成功；[授权](../reports/documentation/20261023/continual_mainline/review/authorization.json)、实际请求、提交页面及[回执](../reports/documentation/20261023/continual_mainline/review/submission.json)新增在同目录，回执保留先前拒绝历史。当前在审、待完整回收和独立处置；包内待确认字样是形成时状态，不重打包覆写。实施／预算仍未批准。
 
-新具体方案、预算及外审请求保存在Windows `reports/documentation/20261023/continual_mainline/`。已准备[方案审查ZIP](../reports/documentation/20261023/continual_mainline/review/continual_mainline_plan_review.zip)：233582字节、35成员（34载荷及manifest），SHA256 `17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487`；34载荷608117字节的大小/SHA逐项一致，见[准备回执](../reports/documentation/20261023/continual_mainline/review/preparation.json)。仅含具体方案、预算、请求、相关已开放报告/合同/源码/资格字段和权重删除回执，没有正式文本、标签、owners、private_custody、模型载荷或凭据。当前未上传、未连接Linux、未新增科研执行，具体包先供用户审阅确认；旧结果包批准不扩大到本包。新方案及元数据作本地Git交付，ZIP留Windows供待审上传，不推送、不覆盖冻结历史来源。此新增待审包有当前用途，不属于应清理的已验收无用副本；其他Optuna保管决定不变。
+新具体方案、预算及外审请求保存在Windows `reports/documentation/20261023/continual_mainline/`。已准备[方案审查 ZIP 的 Git 恢复位置](../reports/maintenance/20261120/targeted_cleanup.json)：233582字节、35成员（34载荷及manifest），SHA256 `17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487`；34载荷608117字节的大小/SHA逐项一致，见[准备回执](../reports/documentation/20261023/continual_mainline/review/preparation.json)。仅含具体方案、预算、请求、相关已开放报告/合同/源码/资格字段和权重删除回执，没有正式文本、标签、owners、private_custody、模型载荷或凭据。当前未上传、未连接Linux、未新增科研执行，具体包先供用户审阅确认；旧结果包批准不扩大到本包。新方案及元数据作本地Git交付，ZIP留Windows供待审上传，不推送、不覆盖冻结历史来源。此新增待审包有当前用途，不属于应清理的已验收无用副本；其他Optuna保管决定不变。
 
 ## 项目大清理周期
 

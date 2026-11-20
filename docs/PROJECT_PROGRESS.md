@@ -10,6 +10,7 @@
 | 下一步与未授权研究 | [科研计划](RESEARCH_PLAN.md) |
 | 用户原话、授权对象与历史正负结果 | [讨论记录](RESEARCH_DISCUSSION.zh.md) |
 | 权重、归档和恢复 | [存储记录](STORAGE.zh.md) |
+| 最近双端定向整理、逐项恢复与清理周期 | [本轮保管记录](STORAGE.zh.md#2026-11-20-双端定向清理与恢复) · [大清理周期](STORAGE.zh.md#项目大清理周期) |
 | 近期已完成实验及其原始审查 | [近期完成工作](AI_RESEARCH_HANDOFF.zh.md#近期完成工作与历史执行边界) |
 | 旧阶段原报告及完整原文 | [历史与证据](AI_RESEARCH_HANDOFF.zh.md#历史与证据) |
 
